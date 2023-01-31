@@ -12,6 +12,11 @@ import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.ObjectSet;
 import com.talosvfx.talos.editor.ParticleEmitterWrapper;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
+import com.talosvfx.talos.editor.notifications.CommandEventHandler;
+import com.talosvfx.talos.editor.notifications.EventContextProvider;
+import com.talosvfx.talos.editor.notifications.Observer;
+import com.talosvfx.talos.editor.notifications.commands.enums.Commands;
+import com.talosvfx.talos.editor.notifications.events.commands.CommandContextEvent;
 import com.talosvfx.talos.editor.project2.vfxui.GenericStageWrappedWidget;
 import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.runtime.assets.GameAssetType;
@@ -39,7 +44,7 @@ import lombok.Getter;
 
 import java.util.Comparator;
 
-public class ParticleNodeEditorApp extends AppManager.BaseApp<VFXProjectData> implements ContainerOfPrefs<ViewportPreferences>, GameAsset.GameAssetUpdateListener {
+public class ParticleNodeEditorApp extends AppManager.BaseApp<VFXProjectData> implements ContainerOfPrefs<ViewportPreferences>, GameAsset.GameAssetUpdateListener, Observer {
 
 	@Getter
 	private final ModuleBoardWidget moduleBoardWidget;
@@ -63,6 +68,7 @@ public class ParticleNodeEditorApp extends AppManager.BaseApp<VFXProjectData> im
 
 	public ParticleNodeEditorApp () {
 		this.singleton = false;
+		Notifications.registerObserver(this);
 
 		moduleBoardWidget = new ModuleBoardWidget(this);
 
@@ -289,6 +295,7 @@ public class ParticleNodeEditorApp extends AppManager.BaseApp<VFXProjectData> im
 		if (this.gameAsset != null) {
 			this.gameAsset.listeners.removeValue(this, true);
 		}
+		Notifications.unregisterObserver(this);
 	}
 
 	@Override
@@ -312,6 +319,11 @@ public class ParticleNodeEditorApp extends AppManager.BaseApp<VFXProjectData> im
 
 	public void resetToNew() {
 		// ?
+	}
+
+	@CommandEventHandler(commandType = Commands.CommandType.DELETE)
+	public void onDeleteCommand (CommandContextEvent event) {
+		moduleBoardWidget.deleteSelectedWrappers();
 	}
 
 	@Override

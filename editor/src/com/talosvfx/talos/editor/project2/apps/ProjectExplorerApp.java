@@ -5,6 +5,10 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.widgets.ProjectExplorerWidget;
 import com.talosvfx.talos.editor.layouts.DummyLayoutApp;
+import com.talosvfx.talos.editor.notifications.CommandEventHandler;
+import com.talosvfx.talos.editor.notifications.ContextRequiredEvent;
+import com.talosvfx.talos.editor.notifications.commands.enums.Commands;
+import com.talosvfx.talos.editor.notifications.events.commands.CommandContextEvent;
 import com.talosvfx.talos.editor.project2.AppManager;
 import com.talosvfx.talos.editor.project2.SharedResources;
 
@@ -56,6 +60,37 @@ public class ProjectExplorerApp extends AppManager.BaseApp<Object> {
 	public void onRemove () {
 
 	}
+
+	@CommandEventHandler(commandType = Commands.CommandType.COPY)
+	public void onCopyCommand (CommandContextEvent commandContextEvent) {
+		projectExplorerWidget.getDirectoryViewWidget().invokeCopy();
+	}
+
+	@CommandEventHandler(commandType = Commands.CommandType.PASTE)
+	public void onPasteCommand (CommandContextEvent commandContextEvent) {
+		projectExplorerWidget.getDirectoryViewWidget().invokePaste();
+	}
+
+	@CommandEventHandler(commandType = Commands.CommandType.CUT)
+	public void onCutCommand (CommandContextEvent commandContextEvent) {
+		projectExplorerWidget.getDirectoryViewWidget().invokeCut();
+	}
+
+	@CommandEventHandler(commandType = Commands.CommandType.SELECT_ALL)
+	public void onSelectAllCommand (CommandContextEvent commandContextEvent) {
+		projectExplorerWidget.getDirectoryViewWidget().invokeSelectAll();
+	}
+
+	@CommandEventHandler(commandType = Commands.CommandType.DELETE)
+	public void onDeleteCommand (CommandContextEvent commandContextEvent) {
+		projectExplorerWidget.getDirectoryViewWidget().invokeDelete();
+	}
+
+	@CommandEventHandler(commandType = Commands.CommandType.RENAME)
+	public void onRenameCommand (CommandContextEvent commandContextEvent) {
+		projectExplorerWidget.getDirectoryViewWidget().invokeDelete();
+	}
+
 
 	public FileHandle getCurrentSelectedFolder() {
 		return projectExplorerWidget.getCurrentFolder();

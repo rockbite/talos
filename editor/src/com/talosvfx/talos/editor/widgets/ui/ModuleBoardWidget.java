@@ -100,18 +100,6 @@ public class ModuleBoardWidget extends WidgetGroup {
         addActor(moduleContainer);
 
         shapeRenderer = Render.instance().shapeRenderer();
-
-        addListener(new ClickListener() {
-
-            @Override
-            public boolean keyUp (InputEvent event, int keycode) {
-                if (event.isHandled()) return super.keyUp(event, keycode);
-                if (keycode == Input.Keys.DEL || keycode == Input.Keys.FORWARD_DEL) {
-                    deleteSelectedWrappers();
-                }
-                return super.keyUp(event, keycode);
-            }
-        });
     }
 
     public Array<NodeConnection> getCurrentConnections () {

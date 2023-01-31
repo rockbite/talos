@@ -12,6 +12,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.ScissorStack;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.rockbite.bongo.engine.render.PolygonSpriteBatchMultiTextureMULTIBIND;
+import com.talosvfx.talos.editor.project2.SharedResources;
+import com.talosvfx.talos.editor.project2.SharedStage;
 import com.talosvfx.talos.editor.utils.grid.property_providers.DynamicGridPropertyProvider;
 import com.talosvfx.talos.editor.widgets.ui.ViewportWidget;
 import lombok.Getter;
@@ -29,7 +31,7 @@ public class GenericStageWrappedViewportWidget extends ViewportWidget {
 		Supplier<Camera> currentCameraSupplier = viewportViewSettings.getCurrentCameraSupplier();
 		Camera camera = currentCameraSupplier.get();
 
-		stage = new Stage(new ScreenViewport(camera), new PolygonSpriteBatchMultiTextureMULTIBIND(3000, null));
+		stage = new SharedStage(new ScreenViewport(camera), new PolygonSpriteBatchMultiTextureMULTIBIND(3000, null));
 
 		camera.position.set(0, 0, 0);
 		if (camera instanceof OrthographicCamera) {

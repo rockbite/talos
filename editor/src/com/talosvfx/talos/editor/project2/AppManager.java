@@ -19,6 +19,7 @@ import com.talosvfx.talos.editor.addons.scene.events.save.SaveRequest;
 import com.talosvfx.talos.editor.layouts.LayoutApp;
 import com.talosvfx.talos.editor.layouts.LayoutContent;
 import com.talosvfx.talos.editor.layouts.LayoutGrid;
+import com.talosvfx.talos.editor.notifications.EventContextProvider;
 import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.Observer;
@@ -175,7 +176,7 @@ public class AppManager extends InputAdapter implements Observer {
 
 	//Grid layout needs to be able to be setup with layout specific in mind
 
-	public abstract static class BaseApp<T> {
+	public abstract static class BaseApp<T> implements EventContextProvider<BaseApp<T>> {
 		protected boolean singleton;
 
 		@Getter
@@ -186,7 +187,6 @@ public class AppManager extends InputAdapter implements Observer {
 
 		public void updateForGameAsset (GameAsset<T> gameAsset) {
 			this.gameAsset = gameAsset;
-
 		}
 
 		public abstract String getAppName ();
@@ -207,6 +207,11 @@ public class AppManager extends InputAdapter implements Observer {
 
 		public boolean hasChangesToSave () {
 			return SharedResources.globalSaveStateSystem.isItemChangedAndUnsaved(gameAsset);
+		}
+
+		@Override
+		public BaseApp<T> getContext() {
+			return this;
 		}
 	}
 
@@ -530,6 +535,18 @@ public class AppManager extends InputAdapter implements Observer {
 		// todo: close all floating windows
 	}
 
+	public BaseApp getFocusedApp () {
+		Array<BaseApp> appInstances = getAppInstances();
+		for (BaseApp appInstance : appInstances) {
+			boolean isFocused = appInstance.getGridAppReference().isTabFocused();
+			if (isFocused) {
+				return appInstance;
+			}
+		}
+
+		return null;
+	}
+
 	@EventHandler
 	public void onSave (SaveRequest event) {
 		// set preferences for all assets
@@ -547,21 +564,15 @@ public class AppManager extends InputAdapter implements Observer {
 
 		//Save the selected app if it needs it
 
-		for (BaseApp appInstance : appInstances) {
-			boolean isFocused = appInstance.getGridAppReference().isTabFocused();
+		BaseApp focusedApp = getFocusedApp();
+		GameAsset<?> gameAsset = focusedApp.gameAsset;
+		if (gameAsset.isDummy() || gameAsset == AppManager.singletonAsset) {
+			return;
+		}
 
-			if (isFocused) {
-				GameAsset<?> gameAsset = appInstance.gameAsset;
-				if (gameAsset.isDummy() || gameAsset == AppManager.singletonAsset) continue;
-
-				boolean itemChangedAndUnsaved = SharedResources.globalSaveStateSystem.isItemChangedAndUnsaved(gameAsset);
-				if (itemChangedAndUnsaved) {
-					AssetRepository.getInstance().saveGameAssetResourceJsonToFile(gameAsset);
-					return;
-				}
-
-			}
-
+		boolean itemChangedAndUnsaved = SharedResources.globalSaveStateSystem.isItemChangedAndUnsaved(gameAsset);
+		if (itemChangedAndUnsaved) {
+			AssetRepository.getInstance().saveGameAssetResourceJsonToFile(gameAsset);
 		}
 	}
 

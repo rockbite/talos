@@ -5,8 +5,9 @@ import com.talosvfx.talos.runtime.scene.GameObject;
 import com.talosvfx.talos.runtime.scene.GameObjectContainer;
 import com.talosvfx.talos.editor.notifications.ContextRequiredEvent;
 import com.talosvfx.talos.editor.notifications.TalosEvent;
+import com.talosvfx.talos.editor.notifications.events.AbstractContextRequiredEvent;
 
-public class GameObjectsRestructured extends ContextRequiredEvent<GameObjectContainer> {
+public class GameObjectsRestructured extends AbstractContextRequiredEvent<GameObjectContainer> {
     public Array<GameObject> targets;
 
     public GameObjectsRestructured () {
@@ -24,6 +25,7 @@ public class GameObjectsRestructured extends ContextRequiredEvent<GameObjectCont
 
     @Override
     public void reset () {
+        super.reset();
         targets.clear();
     }
 }

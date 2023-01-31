@@ -154,7 +154,7 @@ public class EditableLabel extends Table implements ActorCloneable {
         textField.clearSelection();
 
         if (getStage() != null) {
-            if (getStage().getKeyboardFocus() == this) {
+            if (getStage().getKeyboardFocus() == textField) {
                 getStage().setKeyboardFocus(keyboardFocus);
             }
         }

@@ -3,8 +3,9 @@ package com.talosvfx.talos.editor.addons.scene.events;
 import com.badlogic.gdx.utils.ObjectSet;
 import com.talosvfx.talos.runtime.scene.GameObject;
 import com.talosvfx.talos.editor.notifications.ContextRequiredEvent;
+import com.talosvfx.talos.editor.notifications.events.AbstractContextRequiredEvent;
 
-public class GameObjectSelectionChanged<T> extends ContextRequiredEvent<T> {
+public class GameObjectSelectionChanged<T> extends AbstractContextRequiredEvent<T> {
 
     private ObjectSet<GameObject> objectArray = new ObjectSet<>();
 
@@ -23,6 +24,7 @@ public class GameObjectSelectionChanged<T> extends ContextRequiredEvent<T> {
 
     @Override
     public void reset () {
+        super.reset();
         objectArray.clear();
     }
 }

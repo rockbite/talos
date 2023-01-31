@@ -62,57 +62,6 @@ public class DirectoryViewWidget extends Table {
 
 		items = new ItemGroup();
 
-		addCaptureListener(new InputListener() {
-
-			@Override
-			public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
-				return super.touchDown(event, x, y, pointer, button);
-			}
-
-			@Override
-			public boolean keyDown (InputEvent event, int keycode) {
-
-				if (keycode == Input.Keys.X && ctrlPressed()) {
-					projectExplorerWidget.invokeCut(convertToFileArray(selected));
-				}
-
-				if (keycode == Input.Keys.C && ctrlPressed()) {
-					projectExplorerWidget.invokeCopy(convertToFileArray(selected));
-				}
-
-				if (keycode == Input.Keys.V && ctrlPressed()) {
-					projectExplorerWidget.invokePaste(fileHandle);
-				}
-
-				if (keycode == Input.Keys.FORWARD_DEL || keycode == Input.Keys.DEL) {
-					Array<String> paths = new Array<>();
-					for (int i = 0; i < selected.size; i++) {
-						Item item = selected.get(i);
-						paths.add(item.getFileHandle().path());
-					}
-					projectExplorerWidget.deletePath(paths);
-				}
-
-				if (keycode == Input.Keys.A && ctrlPressed()) {
-					for (Actor child : items.getChildren()) {
-						Item item = (Item)child;
-						if (!selected.contains(item, true)) {
-							item.select();
-							selected.add(item);
-						}
-					}
-					reportSelectionChanged();
-				}
-
-				boolean renamePressed = TalosMain.isOsX() && keycode == Input.Keys.ENTER || !TalosMain.isOsX() && keycode == Input.Keys.F2;
-				if (renamePressed) {
-					rename();
-				}
-
-				return true;
-			}
-		});
-
 		addListener(new ClickListener(0) {
 			@Override
 			public void clicked (InputEvent event, float x, float y) {
@@ -164,6 +113,43 @@ public class DirectoryViewWidget extends Table {
 		items.invalidateHierarchy();
 
 		setTouchable(Touchable.enabled);
+	}
+
+
+	public void invokeCut() {
+		projectExplorerWidget.invokeCut(convertToFileArray(selected));
+	}
+
+	public void invokeCopy() {
+		projectExplorerWidget.invokeCopy(convertToFileArray(selected));
+	}
+
+	public void invokePaste() {
+		projectExplorerWidget.invokePaste(fileHandle);
+	}
+
+	public void invokeRename() {
+		rename();
+	}
+
+	public void invokeDelete() {
+		Array<String> paths = new Array<>();
+		for (int i = 0; i < selected.size; i++) {
+			Item item = selected.get(i);
+			paths.add(item.getFileHandle().path());
+		}
+		projectExplorerWidget.deletePath(paths);
+	}
+
+	public void invokeSelectAll() {
+		for (Actor child : items.getChildren()) {
+			Item item = (Item)child;
+			if (!selected.contains(item, true)) {
+				item.select();
+				selected.add(item);
+			}
+		}
+		reportSelectionChanged();
 	}
 
 	private void reportSelectionChanged () {

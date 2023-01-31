@@ -37,6 +37,7 @@ import com.talosvfx.talos.editor.layouts.LayoutApp;
 import com.talosvfx.talos.editor.layouts.LayoutContent;
 import com.talosvfx.talos.editor.layouts.LayoutGrid;
 import com.talosvfx.talos.editor.project2.SharedResources;
+import com.talosvfx.talos.editor.project2.SharedStage;
 import com.talosvfx.talos.editor.utils.WindowUtils;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.glfw.GLFWDropCallback;
@@ -118,7 +119,7 @@ public class TalosLauncher implements ILauncher {
 					public void create () {
 						super.create();
 
-						stage = new Stage(new ScreenViewport(), new PolygonSpriteBatchMultiTextureMULTIBIND());
+						stage = new SharedStage(new ScreenViewport(), new PolygonSpriteBatchMultiTextureMULTIBIND());
 						SharedResources.inputHandling.addPermanentInputProcessor(stage);
 						SharedResources.inputHandling.setGDXMultiPlexer();
 
