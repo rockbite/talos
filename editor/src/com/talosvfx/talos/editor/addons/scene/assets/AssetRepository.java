@@ -28,6 +28,7 @@ import com.esotericsoftware.spine.SkeletonData;
 import com.talosvfx.talos.editor.addons.scene.events.*;
 import com.talosvfx.talos.editor.addons.scene.events.meta.MetaDataReloadedEvent;
 import com.talosvfx.talos.editor.addons.scene.events.explorer.DirectoryMovedEvent;
+import com.talosvfx.talos.editor.project2.AppManager;
 import com.talosvfx.talos.runtime.assets.AMetadata;
 import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
 import com.talosvfx.talos.editor.data.RoutineStageData;
@@ -200,14 +201,6 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 		}
 		return null;
 	}
-
-	public <T> GameAsset<T> createDummyAsset (GameAssetType gameAssetType) {
-		GameAsset<T> gameAsset = new GameAsset<T>("dummy", gameAssetType);
-		gameAsset.setDummy(true);
-		return gameAsset;
-	}
-
-
 
 
 	static class DataMaps {
@@ -1520,7 +1513,12 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 			gameAssetsToUpdate.addAll(rawAsset.gameAssetReferences);
 
 
+
 			for (GameAsset gameAsset : gameAssetsToUpdate) {
+				if (gameAsset.dependentRawAssets.size == 1) {
+					SharedResources.appManager.onAssetDeleted(gameAsset);
+				}
+
 				gameAsset.dependentRawAssets.removeValue(rawAsset, true);
 
 				//check if this is a broken game asset, or one to be removed
@@ -1529,7 +1527,6 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 					gameAsset.setUpdated();
 				} else {
 					gameAsset.setBroken(new Exception("Game Asset Removed"));
-					gameAsset.setUpdated();
 					dataMaps.removeFileHandleGameAssetObjectMap(rawAsset.handle);
 					identifierGameAssetMap.get(gameAsset.type).remove(gameAsset.nameIdentifier);
 					uniqueIdentifierGameAssetMap.get(gameAsset.type).remove(rawAsset.metaData.uuid);

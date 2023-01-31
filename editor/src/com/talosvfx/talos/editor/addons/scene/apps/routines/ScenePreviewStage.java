@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.PolygonBatch;
 import com.talosvfx.talos.editor.addons.scene.MainRenderer;
 
+import com.talosvfx.talos.editor.project2.AppManager;
 import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.runtime.scene.GameObject;import com.talosvfx.talos.runtime.scene.GameObjectContainer;
 
@@ -123,7 +124,7 @@ public class ScenePreviewStage extends ViewportWidget implements Observer {
 	}
 
 	public void setFromGameAsset(GameAsset<Scene> gameAsset) {
-		if(gameAsset != null) {
+		if (gameAsset != null && ((GameAsset)gameAsset) != AppManager.dummyAsset) {
 			SavableContainer currentContainer = gameAsset.getResource();
 			Scene scene = new Scene();
 			scene.load(TempHackUtil.hackIt(currentContainer.getAsString()));

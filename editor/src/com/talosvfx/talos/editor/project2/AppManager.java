@@ -30,10 +30,14 @@ import com.talosvfx.talos.editor.project2.localprefs.TalosLocalPrefs;
 import com.talosvfx.talos.editor.widgets.ui.menu.MainMenu;
 import com.talosvfx.talos.runtime.assets.meta.EmptyMetadata;
 import lombok.Getter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.UUID;
 
 public class AppManager extends InputAdapter implements Observer {
+
+	private static final Logger logger = LoggerFactory.getLogger(AppManager.class);
 
 	private static final Object dummyObject = new Object();
 	public static final GameAsset<Object> singletonAsset = new GameAsset<>("singleton", GameAssetType.DIRECTORY);
@@ -94,7 +98,7 @@ public class AppManager extends InputAdapter implements Observer {
 			gameAsset = AssetRepository.getInstance().findFirstOfType(gameAssetType);
 			if (gameAsset == null) {
 				//Create a dummy of that type
-				gameAsset = AssetRepository.getInstance().createDummyAsset(gameAssetType);
+				gameAsset = (GameAsset<T>)dummyAsset;
 			}
 		} else {
 			if (gameAssetUniqueIdentifier != null) {
@@ -172,6 +176,24 @@ public class AppManager extends InputAdapter implements Observer {
 		return null;
 	}
 
+	public void onAssetDeleted (GameAsset<?> gameAsset) {
+		Array<? extends BaseApp<?>> appsForGameAsset = baseAppsOpenForGameAsset.remove(gameAsset);
+
+		for (BaseApp app : appsForGameAsset) {
+			//Swapping registers for assets
+			if (!baseAppsOpenForGameAsset.containsKey(dummyAsset)) {
+				baseAppsOpenForGameAsset.put(dummyAsset, new Array<>());
+			}
+
+			Array<BaseApp<?>> baseApps = (Array<BaseApp<?>>)baseAppsOpenForGameAsset.get(dummyAsset);
+			if (!baseApps.contains(app, true)) {
+				baseApps.add(app);
+			}
+
+			app.updateForGameAsset(dummyAsset);
+		}
+	}
+
 	//	app manager that interacts, some are singletons, some are per instances, all are tied to some kind of object
 
 	//Grid layout needs to be able to be setup with layout specific in mind
@@ -187,6 +209,9 @@ public class AppManager extends InputAdapter implements Observer {
 
 		public void updateForGameAsset (GameAsset<T> gameAsset) {
 			this.gameAsset = gameAsset;
+			if (getGridAppReference() != null) {
+				getGridAppReference().updateTabName(getAppName());
+			}
 		}
 
 		public abstract String getAppName ();
@@ -346,9 +371,31 @@ public class AppManager extends InputAdapter implements Observer {
 		}
 
 		for (BaseApp<T> baseApp : appsToUpdate) {
+			if (baseApp.getGameAsset() != gameAsset) {
+				//Need to swap in the registry
+				if (baseApp.getGameAsset() != dummyAsset) {
+					logger.warn("Probably should never happen, be careful of this case");
+				} else {
+					swapInRegistry(baseApp, gameAsset);
+				}
+
+			}
 			baseApp.updateForGameAsset(gameAsset);
 		}
 
+	}
+
+	private <T> void swapInRegistry (BaseApp<T> existingApp, GameAsset<T> newGameAsset) {
+		GameAsset<T> oldAsset = existingApp.getGameAsset();
+		Array<BaseApp<?>> baseApps = (Array<BaseApp<?>>)baseAppsOpenForGameAsset.get(oldAsset);
+		baseApps.removeValue(existingApp, true);
+
+		//Add it to the right registry
+		if (!baseAppsOpenForGameAsset.containsKey(newGameAsset)) {
+			baseAppsOpenForGameAsset.put(newGameAsset, new Array<>());
+		}
+		Array<BaseApp<?>> newBaseAppsArray = (Array<BaseApp<?>>)baseAppsOpenForGameAsset.get(newGameAsset);
+		newBaseAppsArray.add(existingApp);
 	}
 
 	public void removeAll () {
@@ -447,12 +494,34 @@ public class AppManager extends InputAdapter implements Observer {
 	}
 
 	private <T, U extends BaseApp<T>> Array<U> getAppsToUpdate (GameAsset<T> gameAsset) {
+		Array<U> appsToUpdate = new Array<>();
+
 		if (baseAppsOpenForGameAsset.containsKey(gameAsset)) {
 			//Unsafe type
 			Array<U> baseApps = (Array<U>)baseAppsOpenForGameAsset.get(gameAsset);
-			return baseApps;
+			appsToUpdate.addAll(baseApps);
 		}
-		return new Array<>();
+
+		if (gameAsset != dummyAsset && gameAsset != singletonAsset) {
+			//Add all dummys that are not already in appsToUpdate by class, and that are active and matching the game asset repo
+
+			Array<Class<BaseApp>> appsForGameAssetType = appRegistry.getAppsForGameAssetType(gameAsset);
+
+			Array<? extends BaseApp> anyDummyAppsOpen = getAppsToUpdate(dummyAsset);
+			for (BaseApp<T> objectBaseApp : anyDummyAppsOpen) {
+				//Is the base app a type we want?
+
+				Class<BaseApp> aClass = (Class<BaseApp>)objectBaseApp.getClass();
+
+				if (appsForGameAssetType.contains(aClass, false)) {
+					appsToUpdate.add((U)objectBaseApp);
+				}
+
+			}
+		}
+
+
+		return appsToUpdate;
 	}
 
 	private <T, U extends BaseApp<T>> U createBaseAppForGameAsset (GameAsset<T> gameAsset, Class<U> aClass) {
