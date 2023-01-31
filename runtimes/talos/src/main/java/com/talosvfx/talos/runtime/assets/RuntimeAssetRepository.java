@@ -75,6 +75,11 @@ public class RuntimeAssetRepository extends BaseAssetRepository implements Asset
 		throw new GdxRuntimeException("No asset found " + assetName + " " + clazz.getSimpleName());
 	}
 
+	@Override
+	public <T> GameAsset findGameAsset(String assetName, Class<T> clazz) {
+		throw new UnsupportedOperationException("Not supported operation");
+	}
+
 	private interface GameAssetLoader<T> {
 		GameAsset<T> load (GameAssetExportStructure exportStructure, FileHandle baseFolder);
 	}

@@ -26,7 +26,6 @@ import com.talosvfx.talos.runtime.vfx.assets.AssetProvider;
 import com.talosvfx.talos.runtime.vfx.render.drawables.TextureRegionDrawable;
 import com.talosvfx.talos.runtime.vfx.values.DrawableValue;
 import com.talosvfx.talos.runtime.vfx.values.ModuleValue;
-import org.w3c.dom.Text;
 
 public class SpriteMaterialModule extends MaterialModule implements GameAsset.GameAssetUpdateListener {
 
@@ -60,9 +59,9 @@ public class SpriteMaterialModule extends MaterialModule implements GameAsset.Ga
 	public void setAsset (String identifier) {
 		this.assetIdentifier = identifier;
 		final AssetProvider assetProvider = graph.getEffectDescriptor().getAssetProvider();
-		GameAsset<?> asset = assetProvider.findGameAsset(assetIdentifier, Sprite.class);
+		GameAsset<Texture> asset = assetProvider.findGameAsset(assetIdentifier, Sprite.class);
 		asset.listeners.add(this);
-		this.gameAsset = (GameAsset<Texture>) asset;
+		this.gameAsset = asset;
 		userDrawable.setDrawable(new TextureRegionDrawable(new Sprite(gameAsset.getResource())));
 	}
 

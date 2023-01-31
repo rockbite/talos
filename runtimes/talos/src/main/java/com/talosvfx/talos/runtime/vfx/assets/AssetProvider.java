@@ -22,5 +22,5 @@ public interface AssetProvider {
 
 	<T> T findAsset (String assetName, Class<T> clazz);
 
-	<T> GameAsset<?> findGameAsset(String assetName, Class<T> clazz);
+	<T> GameAsset findGameAsset(String assetName, Class<T> clazz);
 }

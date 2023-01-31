@@ -78,7 +78,6 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.zip.Deflater;
 
 import static com.talosvfx.talos.editor.layouts.LayoutGrid.LayoutJsonStructure;
 
