@@ -332,13 +332,12 @@ public class AsyncRoutineNodeWidget extends AbstractRoutineNodeWidget {
                     onRunStart();
                 }
 
-                timelineWidget.clearMap();
                 microNodeView.clearMap();
 
                 float maxDuration = (1 - states.first().alpha) * states.first().getDuration();
                 for (AsyncRoutineNodeState<?> state : states) {
                     Object target = state.getTarget();
-                    timelineWidget.setProgress(target, state.alpha);
+                    timelineWidget.setProgress(state.alpha);
                     microNodeView.setProgress(target, state.alpha);
 
                     if(maxDuration < (1 - state.alpha) * state.getDuration() && state.alpha > 0) {
@@ -348,7 +347,6 @@ public class AsyncRoutineNodeWidget extends AbstractRoutineNodeWidget {
                 maxDuration = (float) (Math.floor(maxDuration * 100f) / 100f);
                 microNodeView.setLabel(maxDuration + ""); // todo: use string builder here
             } else {
-                timelineWidget.clearMap();
                 microNodeView.clearMap();
                 microNodeView.setLabel("0.0");
 
@@ -377,7 +375,6 @@ public class AsyncRoutineNodeWidget extends AbstractRoutineNodeWidget {
         super.resetNode();
 
         microNodeView.clearMap();
-        timelineWidget.clearMap();
     }
 }
 
