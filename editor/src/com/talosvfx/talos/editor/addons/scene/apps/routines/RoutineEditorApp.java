@@ -95,10 +95,15 @@ public class RoutineEditorApp extends AppManager.BaseApp<RoutineStageData> imple
                 Stage stage = routineStageWrapper.getStage();
             }
 
-
             @Override
             protected void onTouchFocused () {
                 SharedResources.stage.setKeyboardFocus(routineStageWrapper);
+            }
+
+            @Override
+            public void actInBackground() {
+                super.actInBackground();
+                routineStage.act();
             }
         };
 
