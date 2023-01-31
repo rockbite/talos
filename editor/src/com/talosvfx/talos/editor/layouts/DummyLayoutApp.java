@@ -295,4 +295,9 @@ public class DummyLayoutApp<T> implements LayoutApp {
     public LayoutContent getLayoutContent () {
         return layoutContent;
     }
+
+    @Override
+    public void actInBackground() {
+        // do nothing by default
+    }
 }
