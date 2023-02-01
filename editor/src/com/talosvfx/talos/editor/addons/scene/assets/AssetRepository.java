@@ -816,8 +816,8 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 					}
 				}
 
-
-				((GameAsset<Texture>)gameAssetOut).setResourcePayload(new Texture(value.handle));
+				Texture resourcePayload = new Texture(value.handle);
+				((GameAsset<Texture>)gameAssetOut).setResourcePayload(resourcePayload);
 
 
 				break;

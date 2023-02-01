@@ -208,9 +208,17 @@ class Item extends Widget implements ActorCloneable<Item> {
 	}
 
 	public void updatePreview () {
-		final Texture texture = new Texture(fileHandle);
-		final TextureRegionDrawable drawable = new TextureRegionDrawable(texture);
-		icon.setDrawable(drawable);
-		icon.setScaling(Scaling.fit);
+		try {
+			final Texture texture = new Texture(fileHandle);
+			final TextureRegionDrawable drawable = new TextureRegionDrawable(texture);
+			icon.setDrawable(drawable);
+			icon.setScaling(Scaling.fit);
+		} catch (Exception e) {
+			//invalid png
+			final Texture texture = new Texture(Gdx.files.internal("addons/scene/missing/missing.png"));
+			final TextureRegionDrawable drawable = new TextureRegionDrawable(texture);
+			icon.setDrawable(drawable);
+			icon.setScaling(Scaling.fit);
+		}
 	}
 }

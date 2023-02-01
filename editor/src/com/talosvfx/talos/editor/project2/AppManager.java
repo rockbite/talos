@@ -179,6 +179,8 @@ public class AppManager extends InputAdapter implements Observer {
 	public void onAssetDeleted (GameAsset<?> gameAsset) {
 		Array<? extends BaseApp<?>> appsForGameAsset = baseAppsOpenForGameAsset.remove(gameAsset);
 
+		if (gameAsset.isBroken()) return;
+
 		for (BaseApp app : appsForGameAsset) {
 			//Swapping registers for assets
 			if (!baseAppsOpenForGameAsset.containsKey(dummyAsset)) {
