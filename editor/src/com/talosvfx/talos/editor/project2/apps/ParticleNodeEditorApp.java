@@ -327,6 +327,21 @@ public class ParticleNodeEditorApp extends AppManager.BaseApp<VFXProjectData> im
 		moduleBoardWidget.deleteSelectedWrappers();
 	}
 
+	@CommandEventHandler(commandType = Commands.CommandType.GROUP)
+	public void onGroup (CommandContextEvent event) {
+		moduleBoardWidget.createGroupFromSelectedWrappers();
+	}
+
+	@CommandEventHandler(commandType = Commands.CommandType.COPY)
+	public void onCopyCommand (CommandContextEvent event) {
+		moduleBoardWidget.copySelectedModules();
+	}
+
+	@CommandEventHandler(commandType = Commands.CommandType.PASTE)
+	public void onPasteCommand (CommandContextEvent event) {
+		moduleBoardWidget.pasteFromClipboard();
+	}
+
 	@Override
 	public void onUpdate () {
 		loadProject(gameAsset.getResource());
