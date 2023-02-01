@@ -2,6 +2,7 @@ package com.talosvfx.talos.runtime.scene.render;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Camera;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.esotericsoftware.spine.TalosSkeletonRenderer;
 import com.talosvfx.talos.runtime.scene.GameObject;
@@ -35,6 +36,6 @@ public class SkeletonComponentRenderer extends ComponentRenderer<SpineRendererCo
 		spineRendererComponent.skeleton.getColor().set(spineRendererComponent.finalColor);
 		skeletonRenderer.draw(batch, spineRendererComponent.skeleton);
 
-//		batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+		batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 	}
 }
