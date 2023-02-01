@@ -84,6 +84,7 @@ public class ParticleNodeEditorApp extends AppManager.BaseApp<VFXProjectData> im
 		uiContent = new Table();
 		moduleGraphUIWrapper = new GenericStageWrappedWidget(uiContent);
 		moduleBoardWidget.sendInUIStage(moduleGraphUIWrapper.getStage());
+		moduleBoardWidget.sendInStage(moduleGraphStageWrapper.getStage());
 
 		final Table content = new Table();
 		Stack stack = new Stack(moduleGraphStageWrapper, moduleGraphUIWrapper);

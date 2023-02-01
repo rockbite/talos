@@ -83,7 +83,6 @@ public class ModuleBoardWidget extends WidgetGroup {
     public boolean ccCurrentlyRemoving = false;
 
     private Stage uiStage;
-
     public ModuleBoardWidget (ParticleNodeEditorApp app) {
         super();
 
@@ -249,17 +248,12 @@ public class ModuleBoardWidget extends WidgetGroup {
         return arr;
     }
 
-    public void sendInUIStage (Stage stage) {
-        uiStage = stage;
+    public void sendInStage (Stage stage) {
 
-        uiStage.addListener(new InputListener() {
+        stage.addListener(new InputListener() {
             @Override
             public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
                 super.touchDown(event, x, y, pointer, button);
-
-                if (button == 1) {
-                    showPopup();
-                }
 
                 if (!event.isHandled()) {
                     clearSelection();
@@ -269,10 +263,29 @@ public class ModuleBoardWidget extends WidgetGroup {
                     return false;
                 }
 
+
                 return false;
             }
+        });
+    }
+
+    public void sendInUIStage (Stage stage) {
+        uiStage = stage;
+
+        uiStage.addListener(new InputListener() {
+            @Override
+            public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
+                super.touchDown(event, x, y, pointer, button);
+
+                if (button == 1) {
+                    clearSelection();
+                    showPopup();
+                    return true;
+                }
 
 
+                return false;
+            }
         });
     }
 
