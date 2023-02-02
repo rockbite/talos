@@ -179,7 +179,6 @@ public class ProjectExplorerWidget extends Table implements Observer {
             @Override
             public void selected (FilteredTree.Node node) {
                 select(node);
-                directoryViewWidget.openDirectory((String) node.getObject());
             }
 
             @Override
@@ -624,8 +623,6 @@ public class ProjectExplorerWidget extends Table implements Observer {
         rootNode.setExpanded(true);
 
         rootNode.expandAll();
-
-        directoryViewWidget.openDirectory(root.path());
     }
 
     private void traversePath(FileHandle path, int currDepth, int maxDepth, FilteredTree.Node node) {
