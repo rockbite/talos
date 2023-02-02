@@ -500,6 +500,9 @@ public abstract class ViewportWidget extends Table {
 					} else {
 						hitGizmo = hitGizmo(hitCords.x, hitCords.y);
 						if (canTouchGizmo(hitGizmo)) {
+
+							selectGameObject(hitGizmo.getGameObject());
+
 							hitGizmo.touchDown(hitCords.x, hitCords.y, button);
 							getStage().setKeyboardFocus(ViewportWidget.this);
 							event.handle();
@@ -614,6 +617,7 @@ public abstract class ViewportWidget extends Table {
 		if (testGizmo instanceof GroupSelectionGizmo) return true;
 
 		if (!testGizmo.getGameObject().isEditorVisible()) return false;
+		if (testGizmo.getGameObject().isEditorTransformLocked()) return false;
 
 		return true;
 	}

@@ -128,7 +128,7 @@ public class CurveGizmo extends Gizmo {
         if(!selected) return false;
 
         tmp.set(getX(), getY());
-        if(isPointHit(tmp, x, y, 30)) return false;
+//        if(isPointHit(tmp, x, y, 30)) return false;
 
         int touchPoint = getTouchedPoint(x, y);
 
@@ -144,7 +144,7 @@ public class CurveGizmo extends Gizmo {
             return false;
         }
 
-        return true;
+        return false;
     }
 
     private int getTouchedPoint(float x, float y) {
@@ -297,5 +297,10 @@ public class CurveGizmo extends Gizmo {
     @Override
     public boolean catchesShift() {
         return true;
+    }
+
+    @Override
+    public int getPriority () {
+       return -1;
     }
 }
