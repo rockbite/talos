@@ -1734,6 +1734,34 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 
 				rawAsset.handle = newHandle;
 
+				if (isRootGameResource(rawAsset)) {
+					//We need to update the game assets identifier
+					String gameAssetIdentifierFromRawAsset = getGameAssetIdentifierFromRawAsset(rawAsset);
+					GameAssetType typeFromExtension = null;
+					try {
+						typeFromExtension = GameAssetType.getAssetTypeFromExtension(rawAsset.handle.extension());
+					} catch (GameAssetType.NoAssetTypeException e) {
+						throw new RuntimeException(e);
+					}
+
+					GameAsset<?> assetForIdentifier = getAssetForIdentifier(gameAssetIdentifierFromRawAsset, typeFromExtension);
+
+					if (assetForIdentifier != null) {
+						dataMaps.fileHandleGameAssetObjectMap.remove(file);
+
+						GameAsset<?> removedGameAsset = identifierGameAssetMap.get(assetForIdentifier.type).remove(gameAssetIdentifierFromRawAsset);
+						String newAssetName = newHandle.nameWithoutExtension();
+
+						putAssetForIdentifier(newAssetName, removedGameAsset.type, removedGameAsset);
+						removedGameAsset.nameIdentifier = newAssetName;
+						dataMaps.fileHandleGameAssetObjectMap.put(newHandle, removedGameAsset);
+
+						removedGameAsset.setUpdated();
+					} else {
+						System.err.println("No game asset found for identifier " + gameAssetIdentifierFromRawAsset);
+					}
+				}
+
 				for (GameAsset gameAssetReference : rawAsset.gameAssetReferences) {
 					gameAssetReference.setUpdated();
 				}

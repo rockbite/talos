@@ -181,6 +181,8 @@ public class AppManager extends InputAdapter implements Observer {
 
 		if (gameAsset.isBroken()) return;
 
+		if (appsForGameAsset == null) return;
+
 		for (BaseApp app : appsForGameAsset) {
 			//Swapping registers for assets
 			if (!baseAppsOpenForGameAsset.containsKey(dummyAsset)) {
