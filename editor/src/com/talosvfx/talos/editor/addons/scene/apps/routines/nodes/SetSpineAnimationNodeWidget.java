@@ -51,7 +51,12 @@ public class SetSpineAnimationNodeWidget extends AbstractRoutineNodeWidget {
             loadList(reference);
         }
 
-        String animation = jsonValue.get("properties").getString("animation", selectBox.getOptions().first());
+        Array<String> options = selectBox.getOptions();
+        if (options.isEmpty()) {
+            return;
+        }
+
+        String animation = jsonValue.get("properties").getString("animation", options.first());
         selectBox.setValue(animation);
     }
 
