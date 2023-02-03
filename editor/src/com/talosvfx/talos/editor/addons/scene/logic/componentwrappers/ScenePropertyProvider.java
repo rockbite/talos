@@ -4,6 +4,7 @@ import com.badlogic.gdx.utils.Array;
 import com.talosvfx.talos.editor.addons.scene.SceneUtils;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.project2.TalosProjectData;
+import com.talosvfx.talos.editor.widgets.ui.FilteredTree;
 import com.talosvfx.talos.runtime.scene.SceneData;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.DynamicItemListWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.IPropertyProvider;
@@ -71,7 +72,14 @@ public class ScenePropertyProvider implements IPropertyProvider {
 				}
 				SceneUtils.layersUpdated();
 			}
-		}, new DynamicItemListWidget.DynamicItemListInteraction<ItemData>() {
+		}) {
+			@Override
+			public boolean canDelete (ItemData itemData) {
+				return itemData.canDelete;
+			}
+		};
+
+		itemListWidget.setInteraction(new DynamicItemListWidget.DynamicItemListInteraction<ItemData>() {
 			@Override
 			public Supplier<ItemData> newInstanceCreator () {
 				return newItemDataSupplier;
@@ -88,12 +96,20 @@ public class ScenePropertyProvider implements IPropertyProvider {
 				itemData.updateName(newText);
 				return newText;
 			}
-		}) {
+
 			@Override
-			public boolean canDelete (ItemData itemData) {
-				return itemData.canDelete;
+			public void onUpdate() {
+				int preferredLayerIndex = SharedResources.currentProject.getSceneData().getPreferredSceneLayer().getIndex();
+				itemListWidget.list.addNodeToSelectionByIndex(preferredLayerIndex);
 			}
-		};
+		});
+		itemListWidget.list.addItemListener(new FilteredTree.ItemListener<ItemData>() {
+			@Override
+			public void selected (FilteredTree.Node<ItemData> node) {
+				super.selected(node);
+				SharedResources.currentProject.getSceneData().setPreferredSceneLayer(node.getName());
+			}
+		});
 
 		itemListWidget.setDraggableInLayerOnly(true);
 

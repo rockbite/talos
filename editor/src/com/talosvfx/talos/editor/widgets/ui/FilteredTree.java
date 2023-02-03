@@ -202,6 +202,11 @@ public class FilteredTree<T> extends WidgetGroup {
         selection.fireChangeEvent();
     }
 
+    // Adds a single node to the selection by index
+    public void addNodeToSelectionByIndex(int index) {
+        addNodeToSelection(getNodeByIndex(index));
+    }
+
     // Removes a single node from selection
     public void removeNodeFromSelection (Node<T> node) {
         if (!selection.contains(node)) {
@@ -644,6 +649,10 @@ public class FilteredTree<T> extends WidgetGroup {
         rootNodes.insert(index, node);
         node.addToTree(this);
         invalidateHierarchy();
+    }
+
+    public Node<T> getNodeByIndex(int index) {
+        return rootNodes.get(index);
     }
 
     public void remove (Node node) {
