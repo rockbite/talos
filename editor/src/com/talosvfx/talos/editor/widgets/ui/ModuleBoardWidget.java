@@ -48,7 +48,7 @@ import org.slf4j.Logger;
 public class ModuleBoardWidget extends WidgetGroup {
 
     private static Logger logger = LoggerFactory.getLogger(ModuleBoardWidget.class);
-    private final ParticleNodeEditorApp app;
+    public ParticleNodeEditorApp app;
     ShapeRenderer shapeRenderer;
 
     public ObjectMap<ParticleEmitterWrapper, Array<ModuleWrapper>> moduleWrappers = new ObjectMap<>();
@@ -489,6 +489,9 @@ public class ModuleBoardWidget extends WidgetGroup {
                 final U moduleWrapper = createModuleWrapper(module, screenX, screenY);
                 moduleWrapper.setModuleToDefaults();
                 module.setModuleGraph(currentEmitterGraph);
+                moduleWrapper.onGraphSet();
+
+                selectWrapper(moduleWrapper);
 
                 // save here
                 app.dataModified();
@@ -538,7 +541,6 @@ public class ModuleBoardWidget extends WidgetGroup {
             getModuleWrappers().add(moduleWrapper);
             moduleContainer.addActor(moduleWrapper);
 
-            selectWrapper(moduleWrapper);
         } catch (ReflectionException e) {
             e.printStackTrace();
         }
