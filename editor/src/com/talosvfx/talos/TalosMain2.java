@@ -109,6 +109,7 @@ public class TalosMain2 extends ApplicationAdapter {
 
 	private void projectLoader (TalosProjectData projectData) {
 		SharedResources.currentProject = projectData;
+		RuntimeContext.getInstance().setSceneData(projectData.getSceneData());
 
 		TalosLocalPrefs.Instance().updateProject(projectData);
 
@@ -123,8 +124,6 @@ public class TalosMain2 extends ApplicationAdapter {
 
 		//todo: move this somewhere else
 		SocketServer.getInstance();
-
-		RuntimeContext.getInstance().setSceneData(projectData.getSceneData());
 	}
 
 
