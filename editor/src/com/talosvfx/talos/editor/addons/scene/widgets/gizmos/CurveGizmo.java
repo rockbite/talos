@@ -125,10 +125,15 @@ public class CurveGizmo extends Gizmo {
 
     @Override
     public boolean hit(float x, float y) {
-        if(!selected) return false;
+//        if(!selected) return false;
+        CurveComponent curve = gameObject.getComponent(CurveComponent.class);
+
 
         tmp.set(getX(), getY());
 //        if(isPointHit(tmp, x, y, 30)) return false;
+        if (getClosestWorldPoint(tmp2, x, y, 20)) {
+            return true;
+        }
 
         int touchPoint = getTouchedPoint(x, y);
 
@@ -212,13 +217,22 @@ public class CurveGizmo extends Gizmo {
         animateActor.addAction(Actions.moveTo(1f, 0f, 1f, Interpolation.elasticOut));
     }
 
-    private float getDistanceToBezier(Bezier<Vector2> bz, Vector2 point) {
-        Vector2 prev = bezier.valueAt(tmp3, 0.05f);
-        float min = 99999;
-        for(float t = 0.05f; t < 0.95f; t+=1/10f) {
-            Vector2 curr = bezier.valueAt(tmp2, t);
+    @Override
+    public void setSelected (boolean selected) {
+        super.setSelected(selected);
+    }
+
+    private float getDistanceToBezier(Bezier<Vector2> bz, Vector2 point, Vector2 closestOut, int samples) {
+        float alphaIterate = 1f/samples;
+        Vector2 prev = bz.valueAt(tmp3, alphaIterate);
+        float min = Float.MAX_VALUE;
+        for(float t = alphaIterate; t < 1; t+=alphaIterate) {
+            Vector2 curr = bz.valueAt(tmp2, t);
             float dst = Intersector.distanceSegmentPoint(prev, curr, point);
-            if(min > dst) min = dst;
+            if(min > dst) {
+                min = dst;
+                closestOut.set(curr);
+            }
             prev.set(curr);
         }
         return min;
@@ -235,7 +249,7 @@ public class CurveGizmo extends Gizmo {
         for(int i = 0; i < curve.getNumSegments(); i++) {
             Vector2[] pointsInSegment = curve.getPointsInSegment(i);
             bezier.set(pointsInSegment);
-            float dst = getDistanceToBezier(bezier, local);
+            float dst = getDistanceToBezier(bezier, local, tmp4, 1000);
             if(dst < threshold) {
                 selectedSegmentIndex = i;
             }
@@ -245,6 +259,41 @@ public class CurveGizmo extends Gizmo {
             // debug info here
         }
     }
+
+    private boolean getClosestWorldPoint (Vector2 out, float worldX, float worldY, float threshHold) {
+        float minDist = Float.MAX_VALUE;
+        int chosenSegment = 0;
+        float closestWorldX = 0;
+        float closestWorldY = 0;
+
+
+        Vector2 local = toLocal(tmp, worldX, worldY);
+
+        float localX = local.x;
+        float localY = local.y;
+
+        CurveComponent curve = gameObject.getComponent(CurveComponent.class);
+        for(int i = 0; i < curve.getNumSegments(); i++) {
+            Vector2[] pointsInSegment = curve.getPointsInSegment(i);
+            bezier.set(pointsInSegment);
+
+            local.set(localX, localY);
+
+            float distanceToBezier = getDistanceToBezier(bezier, local, tmp4, 1000);
+            if (distanceToBezier < minDist) {
+                minDist = distanceToBezier;
+                closestWorldX = tmp4.x;
+                closestWorldY = tmp4.y;
+            }
+        }
+
+        out.set(closestWorldX, closestWorldY);
+        Vector2 world = toWorld(out);
+
+
+        return isPointHit(world, worldX, worldY, threshHold);
+    }
+
 
     private boolean touchDragged;
     @Override

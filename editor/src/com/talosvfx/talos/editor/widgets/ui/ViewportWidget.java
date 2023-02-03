@@ -438,6 +438,8 @@ public abstract class ViewportWidget extends Table {
 							hitGizmo.touchDown(hitCords.x, hitCords.y, button);
 						}
 
+						event.stop();
+
 						return true;
 					} else {
 						Gizmo testGizmo = hitGizmoGameObject(hitCords.x, hitCords.y, selection.first());
@@ -449,6 +451,7 @@ public abstract class ViewportWidget extends Table {
 							hitGizmo = testGizmo;
 
 							hitGizmo.touchDown(hitCords.x, hitCords.y, button);
+							event.stop();
 							return true;
 
 						} else {

@@ -27,6 +27,7 @@ import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.logic.IPropertyHolder;
 import com.talosvfx.talos.editor.addons.scene.logic.MultiPropertyHolder;
 import com.talosvfx.talos.editor.addons.scene.logic.PropertyWrapperProviders;
+import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.CurveGizmo;
 import com.talosvfx.talos.runtime.RuntimeContext;
 import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.runtime.assets.GameAssetType;
@@ -359,11 +360,12 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 				}
 
 				upWillClear = true;
+				upWillClear = false;
 				dragged = false;
 
 				Vector2 hitCords = getWorldFromLocal(x, y);
 
-				if (button == 1 && !event.isCancelled()) {
+				if (button == 1 && !event.isCancelled() && !event.isStopped()) {
 					final Vector2 vec = new Vector2(Gdx.input.getX(), Gdx.input.getY());
 					screenToLocalCoordinates(vec);
 					localToStageCoordinates(vec);
@@ -446,6 +448,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
 			@Override
 			public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
+
 				// set focus to scene
 				SharedResources.stage.setKeyboardFocus(SceneEditorWorkspace.this);
 
