@@ -67,6 +67,11 @@ public class MapComponentProvider extends RendererComponentProvider<MapComponent
 				talosLayer.setName(newText);
 				return newText;
 			}
+
+			@Override
+			public void onUpdate() {
+
+			}
 		});
 
 		talosLayerPropertiesWidget = new TalosLayerPropertiesWidget(null, new Supplier<TalosLayer>() {
