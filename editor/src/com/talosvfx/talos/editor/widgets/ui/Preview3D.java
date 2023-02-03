@@ -20,6 +20,7 @@ import java.util.function.Supplier;
 
 public class Preview3D extends PreviewWidget {
 
+    @Getter
     private final TinyGizmoRenderer tinyGizmoRenderer;
 
     @Getter
@@ -109,14 +110,15 @@ public class Preview3D extends PreviewWidget {
     public void act(float delta) {
         super.act(delta);
 
+        viewportViewSettings.setDisableCamera(tinyGizmoRenderer.getInteracted() && Gdx.input.isTouched());
+
         bongoPreview.setCamera(viewportViewSettings.getCurrentCamera());
 
 //        worldCamera.viewportWidth = getWidth();
 //        worldCamera.viewportHeight = getHeight();
 //        worldCamera.update();
 
-        if (!tinyGizmoRenderer.getInteracted() && Gdx.input.isTouched()) {
-        }
+
     }
 
     @Override

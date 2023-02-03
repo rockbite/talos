@@ -35,11 +35,17 @@ public class ParticlePreviewApp extends AppManager.BaseApp<VFXProjectData> imple
 			@Override
 			public void onInputProcessorAdded () {
 				super.onInputProcessorAdded();
+				SharedResources.inputHandling.addPriorityInputProcessor(preview3D.getTinyGizmoRenderer().getInputAdapter());
 				SharedResources.stage.setScrollFocus(preview3D);
+				SharedResources.inputHandling.setGDXMultiPlexer();
+
 			}
 			@Override
 			public void onInputProcessorRemoved () {
+				SharedResources.inputHandling.removePriorityInputProcessor(preview3D.getTinyGizmoRenderer().getInputAdapter());
 				super.onInputProcessorRemoved();
+				SharedResources.inputHandling.setGDXMultiPlexer();
+
 			}
 
 

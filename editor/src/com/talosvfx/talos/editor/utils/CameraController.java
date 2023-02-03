@@ -23,6 +23,8 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import lombok.Getter;
+import lombok.Setter;
 
 public class CameraController extends InputAdapter {
 
@@ -41,6 +43,9 @@ public class CameraController extends InputAdapter {
 	private boolean movingCamera = false;
 
 	public boolean scrollOnly = false;
+
+	@Getter@Setter
+	private boolean disabled;
 
 	public CameraController (OrthographicCamera camera) {
 		this.camera = camera;
@@ -78,6 +83,7 @@ public class CameraController extends InputAdapter {
 
 	@Override
 	public boolean touchDown (int screenX, int screenY, int pointer, int button) {
+		if (disabled) return false;
 		if(scrollOnly) return false;
 
 		movingCamera = false;
@@ -90,6 +96,7 @@ public class CameraController extends InputAdapter {
 
 	@Override
 	public boolean touchUp (int screenX, int screenY, int pointer, int button) {
+		if (disabled) return false;
 		if(scrollOnly) return false;
 
 		if(button != 0) return false;
@@ -98,6 +105,7 @@ public class CameraController extends InputAdapter {
 
 	@Override
 	public boolean touchDragged (int screenX, int screenY, int pointer) {
+		if (disabled) return false;
 		if(scrollOnly) return false;
 
 		if(!movingCamera) return false;
@@ -135,4 +143,6 @@ public class CameraController extends InputAdapter {
 	public void setCamera (Camera currentCamera) {
 		this.camera = currentCamera;
 	}
+
+
 }

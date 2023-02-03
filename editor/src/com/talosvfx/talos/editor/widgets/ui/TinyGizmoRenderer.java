@@ -154,7 +154,7 @@ public class TinyGizmoRenderer {
 
 	public void render (Camera camera, Preview3D preview3D, Array<DragPoint> dragPoints) {
 		vec.set(0, 0);
-		vec2.set(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		vec2.set(preview3D.getWidth(), preview3D.getHeight());
 
 		preview3D.localToScreenCoordinates(vec);
 		preview3D.localToScreenCoordinates(vec2);
@@ -166,16 +166,9 @@ public class TinyGizmoRenderer {
 		temp.set(Gdx.input.getX(), Gdx.input.getY());
 //		preview3D.screenToLocalCoordinates(temp);
 
-		final Ray pickRay = camera.getPickRay(temp.x, temp.y,
-			RenderPassSystem.glViewport.x,
-			RenderPassSystem.glViewport.y,
-			RenderPassSystem.glViewport.width,
-			RenderPassSystem.glViewport.height
-		);
+		final Ray pickRay = camera.getPickRay(temp.x, temp.y, vec.x, vec.y, w, h);
 
-
-
-		tinyGizmo.updateWindow(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		tinyGizmo.updateWindow(w, h);
 		tinyGizmo.updateRay(pickRay.direction.x, pickRay.direction.y, pickRay.direction.z);
 
 		float fieldOfView = 0;
@@ -185,7 +178,7 @@ public class TinyGizmoRenderer {
 
 		tinyGizmo.updateCamera(
 			fieldOfView, camera.near, camera.far,
-			camera.position.x, camera.position.y, camera.position.z,
+			pickRay.origin.x, pickRay.origin.y, pickRay.origin.z,
 			quaternion.x, quaternion.y, quaternion.z, quaternion.w
 		);
 
