@@ -507,11 +507,12 @@ public class DirectoryViewWidget extends Table {
 					target = fileHandle;
 				}
 
-				if (belongsToProject(payloadObject)) { // should move file
-					handlePayloadDropToDirectory(payloadObject, target, false);
-				} else { // should copy file
+				if (payloadObject.isExternal()) { // should copy file
 					handlePayloadDropToDirectory(payloadObject, target, true);
+				} else { // should move file
+					handlePayloadDropToDirectory(payloadObject, target, false);
 				}
+
 			}
 
 			/**
@@ -655,62 +656,6 @@ public class DirectoryViewWidget extends Table {
 			return false;
 		}
 		return item.fileHandle.isDirectory();
-	}
-
-	/**
-	 * Broken assets still belong to project.
-	 */
-	private static boolean belongsToProject (GlobalDragAndDrop.BaseDragAndDropPayload payload) {
-		if (payload instanceof GlobalDragAndDrop.FileHandleDragAndDropPayload) {
-			return belongsToProject((GlobalDragAndDrop.FileHandleDragAndDropPayload) payload);
-		} else if (payload instanceof GlobalDragAndDrop.GameAssetDragAndDropPayload) {
-			return belongsToProject((GlobalDragAndDrop.GameAssetDragAndDropPayload) payload);
-		} else if (payload instanceof GlobalDragAndDrop.ArrayDragAndDropPayload) {
-			return belongToProject((GlobalDragAndDrop.ArrayDragAndDropPayload) payload);
-		}
-		return false;
-	}
-
-	/**
-	 * Broken assets still belong to project.
-	 */
-	private static boolean belongsToProject (GlobalDragAndDrop.FileHandleDragAndDropPayload payload) {
-		if (payload == null || payload.getHandle() == null) {
-			return false;
-		}
-		String projectPath = SharedResources.currentProject.rootProjectDir().path();
-		String payloadPath = payload.getHandle().path();
-		return payloadPath.startsWith(projectPath);
-	}
-
-	/**
-	 * Broken assets still belong to project.
-	 */
-	private static boolean belongsToProject (GlobalDragAndDrop.GameAssetDragAndDropPayload payload) {
-		if (payload == null || payload.getGameAsset() == null) {
-			return false;
-		}
-		String projectPath = SharedResources.currentProject.rootProjectDir().path();
-		String payloadPath = payload.getGameAsset().getRootRawAsset().handle.path();
-		return payloadPath.startsWith(projectPath);
-	}
-
-	/**
-	 * Broken assets still belong to project.
-	 * In case even single file/asset doesn't belong to project, will return false.
-	 */
-	private static boolean belongToProject (GlobalDragAndDrop.ArrayDragAndDropPayload payload) {
-		boolean belongsToProject = true;
-
-		for (GlobalDragAndDrop.BaseDragAndDropPayload item : payload.getItems()) {
-			if (item instanceof GlobalDragAndDrop.FileHandleDragAndDropPayload && !belongsToProject((GlobalDragAndDrop.FileHandleDragAndDropPayload) item)) {
-				return false;
-			} else if (item instanceof GlobalDragAndDrop.GameAssetDragAndDropPayload && !belongsToProject((GlobalDragAndDrop.GameAssetDragAndDropPayload) item)) {
-				return false;
-			}
-		}
-
-		return belongsToProject;
 	}
 
 	private void itemClicked (Item item, boolean rightClick) {
