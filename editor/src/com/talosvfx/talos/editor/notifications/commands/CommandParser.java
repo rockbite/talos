@@ -1,5 +1,6 @@
 package com.talosvfx.talos.editor.notifications.commands;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
@@ -8,6 +9,7 @@ import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.XmlReader;
 import com.talosvfx.talos.editor.notifications.commands.enums.Commands;
 import com.talosvfx.talos.editor.notifications.commands.implementations.GeneralCommand;
+import com.talosvfx.talos.editor.utils.InputUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -88,7 +90,11 @@ public class CommandParser {
         ModifierKey[] modifierKeys = new ModifierKey[keyStrings.length - 1];
         for (int i = 0; i < keyStrings.length - 1; i++) {
             String keyString = keyStrings[i];
-            modifierKeys[i] = (ModifierKey.valueOf(keyString.toUpperCase()));
+            ModifierKey modifierKey = ModifierKey.valueOf(keyString.toUpperCase());
+            if (InputUtils.isOsX() && modifierKey.equals(ModifierKey.CTRL)) {
+                modifierKey = ModifierKey.CMD;
+            }
+            modifierKeys[i] = modifierKey;
         }
 
         if (type.equalsIgnoreCase("keyboard")) {
