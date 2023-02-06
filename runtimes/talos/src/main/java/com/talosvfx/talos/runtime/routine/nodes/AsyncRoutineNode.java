@@ -107,16 +107,12 @@ public abstract class AsyncRoutineNode<U, T extends AsyncRoutineNodeState<U>> ex
 
         for(int i = states.size - 1; i >= 0; i--) {
             T state = states.get(i);
-            state.alpha += state.direction * delta/state.getDuration();
-            if(state.alpha > 1) state.alpha = 1;
-            if(state.alpha < 0) state.alpha = 0;
-            state.interpolatedAlpha = interpolation.apply(state.alpha);
 
-            stateTick(state, delta);
-
+            //Do removal before
             if(state.alpha >= 1 && state.direction == 1) {
                 if(!isYoyo) {
                     freeState(i);
+                    continue;
                 } else {
                     state.direction *= -1;
                 }
@@ -124,7 +120,18 @@ public abstract class AsyncRoutineNode<U, T extends AsyncRoutineNodeState<U>> ex
 
             if(state.alpha <= 0 && state.direction == -1) {
                 freeState(i);
+                continue;
             }
+            //end removal
+
+            state.alpha += state.direction * delta/state.getDuration();
+            if(state.alpha > 1) state.alpha = 1;
+            if(state.alpha < 0) state.alpha = 0;
+            state.interpolatedAlpha = interpolation.apply(state.alpha);
+
+            stateTick(state, delta);
+
+
         }
 
         for(U target: tmpArr) {

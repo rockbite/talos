@@ -135,7 +135,8 @@ public class MoveOnPath extends AsyncRoutineNode<GameObject, MoveOnPath.State> {
             currLen += length;
             float currA = currLen/state.sumLength;
             float prevA = prevLen/state.sumLength;
-            if(alpha < currA) {
+
+            if(alpha <= currA) {
                 float localAlpha = (alpha-prevA)/(currA-prevA);
                 Vector2 point = bezier.valueAt(tmp, localAlpha);
                 TransformComponent transform = state.getTarget().getComponent(TransformComponent.class);
