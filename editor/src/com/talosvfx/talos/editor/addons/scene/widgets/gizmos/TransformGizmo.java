@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.collision.BoundingBox;
@@ -104,16 +104,32 @@ public class TransformGizmo extends Gizmo {
         batch.setColor(Color.WHITE);
     }
 
+    private float[] verts = new float[2 * 4];
+
     @Override
-    void getHitBox (Rectangle rectangle) {
+    void getHitBox (Polygon boundingPolygon) {
         if (spriteTransformGizmo != null) {
             //Lets get the size from smart transform and pass it as the rect
-            spriteTransformGizmo.getBounds(rectangle);
+            spriteTransformGizmo.getBounds(boundingPolygon);
             return;
         }
 
         float size = 60 * worldPerPixel;
-        rectangle.set(getX() - size / 2f, getY() - size / 2f, size, size);
+        boundingPolygon.setPosition(getX(), getY());
+
+        verts[0] = -size/2f;
+        verts[1] = -size/2f;
+
+        verts[2] = -size/2f;
+        verts[3] = size/2f;
+
+        verts[4] = size/2f;
+        verts[5] = size/2f;
+
+        verts[6] = size/2f;
+        verts[7] = -size/2f;
+
+        boundingPolygon.setVertices(verts);
     }
 
     @Override
