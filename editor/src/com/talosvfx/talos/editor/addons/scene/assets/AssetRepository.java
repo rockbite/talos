@@ -1735,8 +1735,7 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 				rawAsset.handle = newHandle;
 
 				if (isRootGameResource(rawAsset)) {
-					//We need to update the game assets identifier
-					String gameAssetIdentifierFromRawAsset = getGameAssetIdentifierFromRawAsset(rawAsset);
+					UUID getAssetUniqueIdentifierFromRawAsset = getGameAssetUniqueIdentifierFromRawAsset(rawAsset);
 					GameAssetType typeFromExtension = null;
 					try {
 						typeFromExtension = GameAssetType.getAssetTypeFromExtension(rawAsset.handle.extension());
@@ -1744,21 +1743,19 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 						throw new RuntimeException(e);
 					}
 
-					GameAsset<?> assetForIdentifier = getAssetForIdentifier(gameAssetIdentifierFromRawAsset, typeFromExtension);
+					GameAsset<?> assetForUniqueIdentifier = getAssetForUniqueIdentifier(getAssetUniqueIdentifierFromRawAsset, typeFromExtension);
 
-					if (assetForIdentifier != null) {
+					if (assetForUniqueIdentifier != null) {
 						dataMaps.fileHandleGameAssetObjectMap.remove(file);
 
-						GameAsset<?> removedGameAsset = identifierGameAssetMap.get(assetForIdentifier.type).remove(gameAssetIdentifierFromRawAsset);
 						String newAssetName = newHandle.nameWithoutExtension();
 
-						putAssetForIdentifier(newAssetName, removedGameAsset.type, removedGameAsset);
-						removedGameAsset.nameIdentifier = newAssetName;
-						dataMaps.fileHandleGameAssetObjectMap.put(newHandle, removedGameAsset);
+						assetForUniqueIdentifier.nameIdentifier = newAssetName;
+						dataMaps.fileHandleGameAssetObjectMap.put(newHandle, assetForUniqueIdentifier);
 
-						removedGameAsset.setUpdated();
+						assetForUniqueIdentifier.setUpdated();
 					} else {
-						System.err.println("No game asset found for identifier " + gameAssetIdentifierFromRawAsset);
+						System.err.println("No game asset found for identifier " + rawAsset.handle.path());
 					}
 				}
 
@@ -1795,7 +1792,7 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 
 					if (isRootGameResource(rawAsset)) {
 						//We need to update the game assets identifier
-						String gameAssetIdentifierFromRawAsset = getGameAssetIdentifierFromRawAsset(rawAsset);
+						UUID gameAssetUniqueIdentifierFromRawAsset = getGameAssetUniqueIdentifierFromRawAsset(rawAsset);
 						GameAssetType typeFromExtension = null;
 						try {
 							typeFromExtension = GameAssetType.getAssetTypeFromExtension(rawAsset.handle.extension());
@@ -1803,20 +1800,18 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 							throw new RuntimeException(e);
 						}
 
-						GameAsset<?> assetForIdentifier = getAssetForIdentifier(gameAssetIdentifierFromRawAsset, typeFromExtension);
+						GameAsset<?> assetForUniqueIdentifier = getAssetForUniqueIdentifier(gameAssetUniqueIdentifierFromRawAsset, typeFromExtension);
 
-						if (assetForIdentifier != null) {
+						if (assetForUniqueIdentifier != null) {
 							dataMaps.fileHandleGameAssetObjectMap.remove(file);
 
-							GameAsset<?> removedGameAsset = identifierGameAssetMap.get(assetForIdentifier.type).remove(gameAssetIdentifierFromRawAsset);
 							String newAssetName = destination.nameWithoutExtension();
-							putAssetForIdentifier(newAssetName, removedGameAsset.type, removedGameAsset);
-							removedGameAsset.nameIdentifier = newAssetName;
-							dataMaps.fileHandleGameAssetObjectMap.put(destination, removedGameAsset);
+							assetForUniqueIdentifier.nameIdentifier = newAssetName;
+							dataMaps.fileHandleGameAssetObjectMap.put(destination, assetForUniqueIdentifier);
 
-							removedGameAsset.setUpdated();
+							assetForUniqueIdentifier.setUpdated();
 						} else {
-							System.err.println("No game asset found for identifier " + gameAssetIdentifierFromRawAsset);
+							System.err.println("No game asset found for identifier " + rawAsset.handle.path());
 						}
 					}
 
