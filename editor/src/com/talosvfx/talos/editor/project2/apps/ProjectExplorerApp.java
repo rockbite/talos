@@ -2,18 +2,20 @@ package com.talosvfx.talos.editor.project2.apps;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.talosvfx.talos.editor.project2.apps.preferences.ContainerOfPrefs;
+import com.talosvfx.talos.editor.project2.apps.preferences.ProjectExplorerPreferences;
+import com.talosvfx.talos.editor.project2.localprefs.TalosLocalPrefs;
 import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.widgets.ProjectExplorerWidget;
 import com.talosvfx.talos.editor.layouts.DummyLayoutApp;
 import com.talosvfx.talos.editor.notifications.CommandEventHandler;
-import com.talosvfx.talos.editor.notifications.ContextRequiredEvent;
 import com.talosvfx.talos.editor.notifications.commands.enums.Commands;
 import com.talosvfx.talos.editor.notifications.events.commands.CommandContextEvent;
 import com.talosvfx.talos.editor.project2.AppManager;
 import com.talosvfx.talos.editor.project2.SharedResources;
 
 @SingletonApp
-public class ProjectExplorerApp extends AppManager.BaseApp<Object> {
+public class ProjectExplorerApp extends AppManager.BaseApp<Object> implements ContainerOfPrefs<ProjectExplorerPreferences> {
 
 	private final ProjectExplorerWidget projectExplorerWidget;
 
@@ -47,6 +49,8 @@ public class ProjectExplorerApp extends AppManager.BaseApp<Object> {
 	@Override
 	public void updateForGameAsset (GameAsset<Object> gameAsset) {
 		super.updateForGameAsset(gameAsset);
+		TalosLocalPrefs.getAppPrefs(gameAsset, this);
+
 		projectExplorerWidget.loadDirectoryTree(SharedResources.currentProject.rootProjectDir().path());
 
 	}
@@ -94,6 +98,18 @@ public class ProjectExplorerApp extends AppManager.BaseApp<Object> {
 
 	public FileHandle getCurrentSelectedFolder() {
 		return projectExplorerWidget.getCurrentFolder();
+	}
+
+	@Override
+	public void applyFromPreferences(ProjectExplorerPreferences prefs) {
+		projectExplorerWidget.getSplitPane().setSplitAmount(prefs.sidebarSplitAmount);
+	}
+
+	@Override
+	public ProjectExplorerPreferences getPrefs() {
+		ProjectExplorerPreferences preferences = new ProjectExplorerPreferences();
+		preferences.sidebarSplitAmount = projectExplorerWidget.getSplitPane().getSplitAmount();
+		return preferences;
 	}
 }
 
