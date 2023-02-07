@@ -35,7 +35,6 @@
     <category name = "Rendering">
         <module name = "Ribbon Renderer" wrapper = "RibbonModuleWrapper">RibbonModule</module>
         <module name = "Nine Patch Renderer" wrapper = "NinePatchModuleWrapper">NinePatchModule</module>
-        <module name = "Shaded Sprite" wrapper = "ShadedSpriteModuleWrapper">ShadedSpriteModule</module>
     </category>
     <category name = "Materials">
         <module name = "SpriteMaterial" wrapper = "SpriteMaterialModuleWrapper">SpriteMaterialModule</module>
