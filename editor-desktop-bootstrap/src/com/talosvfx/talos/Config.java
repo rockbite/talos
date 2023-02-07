@@ -17,10 +17,11 @@ public class Config {
 		String channelPath = getChannelPath(releaseChannel);
 
 		String editorBuildPath = "../editor-desktop/build/libs/";
-		String configFileToCreate = "dist/" +  channelPath + "-config.xml";
+		String configFileToCreate = "dist/" +  getTalosJarNameNoExtension(releaseChannel) + "-config.xml";
 
 		File talosJar = new File(editorBuildPath + getTalosJarName(releaseChannel));
 		File configFile = new File(configFileToCreate);
+		configFile.getParentFile().mkdirs();
 
 		Configuration config = Configuration.builder()
 			.property("version", releaseChannel.getDisplayString())
@@ -50,11 +51,16 @@ public class Config {
 		}
 	}
 
-	private String getTalosJarName (Channel releaseChannel) {
+	private String getTalosJarNameNoExtension (Channel releaseChannel) {
 		String baseString = "editor-desktop-" + releaseChannel.getMajor() + "." + releaseChannel.getMinor() + "." + releaseChannel.getPatch();
 		if (releaseChannel.isSnapshot()) {
 			baseString  += "-SNAPSHOT";
 		}
+		return baseString;
+	}
+
+	private String getTalosJarName (Channel releaseChannel) {
+		String baseString = getTalosJarNameNoExtension(releaseChannel);
 		baseString += ".jar";
 		return baseString;
 	}
