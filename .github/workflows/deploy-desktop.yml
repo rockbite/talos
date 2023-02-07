@@ -43,7 +43,7 @@ jobs:
         run: scp -r ./editor-desktop/build/libs/* ${{secrets.SSH_SERVER_USER }}@${{secrets.SSH_SERVER }}:/var/www/editor.talosvfx.com/raw-editor-binaries
 
       - name: Deploy config with scp
-        run: scp -r ./editor-desktop-boostrap/dist/* ${{secrets.SSH_SERVER_USER }}@${{secrets.SSH_SERVER }}:/var/www/editor.talosvfx.com/raw-editor-binaries
+        run: scp -r ./editor-desktop-bootstrap/dist/* ${{secrets.SSH_SERVER_USER }}@${{secrets.SSH_SERVER }}:/var/www/editor.talosvfx.com/raw-editor-binaries
 
       - name: Execute repo gen
         run: ssh ${{secrets.SSH_SERVER_USER }}@${{secrets.SSH_SERVER }} 'bash -s' < ./editor-desktop-bootstrap/remote-repogen.sh
