@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<Pane id="pane" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="400.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <HBox fx:id="optionbox" alignment="CENTER" layoutX="101.0" layoutY="144.0" prefHeight="100.0" prefWidth="200.0">
+         <children>
+            <Label fx:id="updateLabel" alignment="CENTER" prefHeight="88.0" prefWidth="200.0" text="Checking for updates" textAlignment="CENTER" textFill="WHITE" textOverrun="CENTER_ELLIPSIS" wrapText="true" HBox.hgrow="ALWAYS" />
+         </children>
+      </HBox>
+      <ProgressBar fx:id="progressBar" layoutX="100.0" layoutY="296.0" prefWidth="200.0" progress="0.0" />
+   </children>
+</Pane>

@@ -1,0 +1,39 @@
+buildscript {
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+        google()
+    }
+
+}
+plugins {
+    id 'application'
+    id 'org.openjfx.javafxplugin' version '0.0.13'
+}
+
+javafx {
+    version = "16"
+    modules = [ 'javafx.controls', 'javafx.fxml' ]
+}
+
+mainClassName = "com.talosvfx.talos.Bootstrap"
+
+dependencies {
+    implementation libs.update4j
+}
+
+sourceSets.main.java.srcDirs = [ "src/" ]
+sourceSets.main.resources.srcDirs = ["resources/"]
+
+sourceCompatibility = "11"
+targetCompatibility = "11"
+
+tasks.register('genConfig', JavaExec) {
+    classpath = sourceSets.main.runtimeClasspath
+
+    mainClass = 'com.talosvfx.talos.Config'
+
+    // arguments to pass to the application
+    args '${project.version}'
+}

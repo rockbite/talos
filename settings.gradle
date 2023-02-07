@@ -2,7 +2,8 @@ includeBuild 'bongo'
 
 include 'editor'
 include 'editor-desktop'
-include 'editor-web'
+include 'editor-desktop-bootstrap'
+//include 'editor-web'
 include 'plugins'
 include 'runtimes:talos'
 include 'runtimes:talos-libgdx'
@@ -28,6 +29,7 @@ dependencyResolutionManagement {
             version("lombokPlugin", "6.4.1")
             version("grgit", "3.1.1")
             version("classpathscanner", "4.8.154")
+            version("update4j", "1.5.9")
 
 
             library("libgdx", "com.badlogicgames.gdx", "gdx").versionRef("libgdx")
@@ -61,6 +63,8 @@ dependencyResolutionManagement {
 
             library("grgit", "org.ajoberstar.grgit", "grgit-gradle").versionRef("grgit")
             library("classpathscanner", "io.github.classgraph", "classgraph").versionRef("classpathscanner")
+
+            library("update4j", "org.update4j", "update4j").versionRef("update4j")
 
             plugin("grgit", "org.ajoberstar.grgit").versionRef("grgit")
             plugin("lombok", "io.freefair.lombok").versionRef("lombokPlugin")
