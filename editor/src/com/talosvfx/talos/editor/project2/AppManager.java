@@ -633,19 +633,23 @@ public class AppManager extends InputAdapter implements Observer {
 		}
 
 		// save preferences
-		TalosLocalPrefs.savePrefs();
+		if (SharedResources.currentProject != null) { // cannot save prefs, if no project open
+			TalosLocalPrefs.savePrefs();
+		}
 
 		//Save the selected app if it needs it
 
 		BaseApp focusedApp = getFocusedApp();
-		GameAsset<?> gameAsset = focusedApp.gameAsset;
-		if (gameAsset.isDummy() || gameAsset == AppManager.singletonAsset) {
-			return;
-		}
+		if (focusedApp != null) { // no app may be in focus
+			GameAsset<?> gameAsset = focusedApp.gameAsset;
+			if (gameAsset.isDummy() || gameAsset == AppManager.singletonAsset) {
+				return;
+			}
 
-		boolean itemChangedAndUnsaved = SharedResources.globalSaveStateSystem.isItemChangedAndUnsaved(gameAsset);
-		if (itemChangedAndUnsaved) {
-			AssetRepository.getInstance().saveGameAssetResourceJsonToFile(gameAsset);
+			boolean itemChangedAndUnsaved = SharedResources.globalSaveStateSystem.isItemChangedAndUnsaved(gameAsset);
+			if (itemChangedAndUnsaved) {
+				AssetRepository.getInstance().saveGameAssetResourceJsonToFile(gameAsset);
+			}
 		}
 	}
 

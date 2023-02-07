@@ -46,7 +46,6 @@ import com.talosvfx.talos.runtime.vfx.modules.RandomInputModule;
 import com.talosvfx.talos.runtime.vfx.modules.RandomRangeModule;
 import com.talosvfx.talos.runtime.vfx.modules.RibbonModule;
 import com.talosvfx.talos.runtime.vfx.modules.ScriptModule;
-import com.talosvfx.talos.runtime.vfx.modules.ShadedSpriteModule;
 import com.talosvfx.talos.runtime.vfx.modules.SingleParticlePointDataGeneratorModule;
 import com.talosvfx.talos.runtime.vfx.modules.SpriteMaterialModule;
 import com.talosvfx.talos.runtime.vfx.modules.StaticValueModule;
@@ -103,7 +102,6 @@ public class ParticleEmitterDescriptor {
             registeredModules.add(RibbonModule.class);
             registeredModules.add(FromToModule.class);
             registeredModules.add(GlobalScopeModule.class);
-            registeredModules.add(ShadedSpriteModule.class);
             registeredModules.add(FakeMotionBlurModule.class);
             registeredModules.add(VectorFieldModule.class);
             registeredModules.add(RadToCartModule.class);
