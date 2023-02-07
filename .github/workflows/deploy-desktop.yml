@@ -38,9 +38,6 @@ jobs:
       - name: Adding Known Hosts
         run: ssh-keyscan -H ${{ secrets.SSH_SERVER }} >> ~/.ssh/known_hosts
 
-      - name: Push latest repo gen script
-        run: scp ./editor-desktop-boostrap/repogen.sh ${{secrets.SSH_SERVER_USER }}@${{secrets.SSH_SERVER }}:/var/www/editor.talosvfx.com
-
       - name: Deploy binary jar to server with scp
         run: scp -r ./editor-desktop/build/libs/ ${{secrets.SSH_SERVER_USER }}@${{secrets.SSH_SERVER }}:/var/www/editor.talosvfx.com/raw-editor-binaries
 
