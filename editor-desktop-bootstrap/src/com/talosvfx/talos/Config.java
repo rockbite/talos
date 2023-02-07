@@ -14,11 +14,10 @@ public class Config {
 
 	public Config (Channel releaseChannel) {
 		this.releaseChannel = releaseChannel;
+		String channelPath = getChannelPath(releaseChannel);
 
 		String editorBuildPath = "../editor-desktop/build/libs/";
-		String configFileToCreate = "dist/config.xml";
-
-		String channelPath = getChannelPath(releaseChannel);
+		String configFileToCreate = "dist/" +  channelPath + "-config.xml";
 
 		File talosJar = new File(editorBuildPath + getTalosJarName(releaseChannel));
 		File configFile = new File(configFileToCreate);
