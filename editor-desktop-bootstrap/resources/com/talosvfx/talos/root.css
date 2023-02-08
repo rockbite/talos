@@ -1,15 +1,13 @@
 p {
     color: white;
 }
-#pane {
-    -fx-background-color: transparent;
+
+#rootPane {
     -fx-background-image: url("splash.png");
     -fx-background-size: cover;
     -fx-background-position: center center;
+    -fx-background-color: #222222;
 }
-#optionbox {
-    -fx-background-color: rgba(0.5, 0.5, 0.5, 0.3);
-}
-#progressBar {
-
+#centerBox {
+    -fx-background-color: rgba(0.2, 0.2, 0.2, 0.5);
 }

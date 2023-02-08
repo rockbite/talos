@@ -21,6 +21,9 @@ mainClassName = "com.talosvfx.talos.Bootstrap"
 
 dependencies {
     implementation libs.update4j
+    implementation libs.jmetro
+    implementation libs.okhttp
+    implementation libs.gson
 }
 
 sourceSets.main.java.srcDirs = [ "src/" ]

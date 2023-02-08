@@ -1,15 +1,43 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<Pane id="pane" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="400.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1">
+<VBox fx:id="rootPane" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <HBox fx:id="optionbox" alignment="CENTER" layoutX="101.0" layoutY="144.0" prefHeight="100.0" prefWidth="200.0">
+      <HBox prefHeight="100.0" prefWidth="200.0" spacing="30.0">
          <children>
-            <Label fx:id="updateLabel" alignment="CENTER" prefHeight="88.0" prefWidth="200.0" text="Checking for updates" textAlignment="CENTER" textFill="WHITE" textOverrun="CENTER_ELLIPSIS" wrapText="true" HBox.hgrow="ALWAYS" />
+            <ComboBox fx:id="versionBox" onAction="#onVersionBoxSelect" prefWidth="150.0" promptText="Version" />
          </children>
-      </HBox>
-      <ProgressBar fx:id="progressBar" layoutX="100.0" layoutY="296.0" prefWidth="200.0" progress="0.0" />
+         <padding>
+            <Insets left="30.0" top="30.0" />
+         </padding></HBox>
+      <VBox fx:id="centerBox" alignment="CENTER" spacing="10.0">
+         <children>
+            <Label fx:id="updateLabel" alignment="CENTER" minHeight="100.0" minWidth="200.0" text="Checking for updates" textAlignment="CENTER" textFill="WHITE" textOverrun="CENTER_ELLIPSIS" wrapText="true" VBox.vgrow="ALWAYS">
+               <VBox.margin>
+                  <Insets />
+               </VBox.margin></Label>
+            <ProgressBar fx:id="progressBar" minWidth="300.0" progress="0.0">
+               <VBox.margin>
+                  <Insets />
+               </VBox.margin></ProgressBar>
+         </children>
+         <padding>
+            <Insets bottom="30.0" left="50.0" right="50.0" top="30.0" />
+         </padding>
+         <VBox.margin>
+            <Insets left="100.0" right="100.0" />
+         </VBox.margin>
+      </VBox>
+      <HBox alignment="CENTER_RIGHT" prefHeight="100.0" prefWidth="200.0" spacing="20.0">
+         <children>
+            <Button fx:id="updateButton" alignment="CENTER_RIGHT" contentDisplay="CENTER" mnemonicParsing="false" onAction="#onUpdateButton" text="Update" />
+            <Button fx:id="launchButton" mnemonicParsing="false" onAction="#onLaunchButton" text="Launch" />
+         </children>
+         <padding>
+            <Insets right="40.0" />
+         </padding></HBox>
    </children>
-</Pane>
+</VBox>
