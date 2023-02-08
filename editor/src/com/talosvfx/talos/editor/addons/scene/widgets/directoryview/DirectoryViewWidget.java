@@ -393,52 +393,25 @@ public class DirectoryViewWidget extends Table {
 			SharedResources.globalDragAndDrop.addTarget(new DragAndDrop.Target(node.value.getActor()) {
 				@Override
 				public boolean drag (DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
-					return true;
-				}
-
-				@Override
-				public void drop (DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
 					GlobalDragAndDrop.BaseDragAndDropPayload object = (GlobalDragAndDrop.BaseDragAndDropPayload)payload.getObject();
 
 					boolean isSomethingWeWant = object instanceof GlobalDragAndDrop.FileHandleDragAndDropPayload || object instanceof GlobalDragAndDrop.GameAssetDragAndDropPayload || object instanceof GlobalDragAndDrop.ArrayDragAndDropPayload;
 
 					if (!isSomethingWeWant)
-						return;
+						return false;
 
-					FileHandle destination = ((ProjectExplorerWidget.RowWidget) getActor()).getFileHandle();
-					if (object instanceof GlobalDragAndDrop.ArrayDragAndDropPayload) {
-						GlobalDragAndDrop.ArrayDragAndDropPayload payloadObject = (GlobalDragAndDrop.ArrayDragAndDropPayload) object;
-						for (GlobalDragAndDrop.BaseDragAndDropPayload item : payloadObject.getItems()) {
-							if (item instanceof GlobalDragAndDrop.GameAssetDragAndDropPayload) {
-								handlePayloadObject((GlobalDragAndDrop.GameAssetDragAndDropPayload) item);
-							} else if (item instanceof GlobalDragAndDrop.FileHandleDragAndDropPayload) {
-								handlePayloadObject((GlobalDragAndDrop.FileHandleDragAndDropPayload) item);
-							}
-						}
-						navigateTo(destination);
-					} else if (object instanceof GlobalDragAndDrop.GameAssetDragAndDropPayload) {
-						handlePayloadObject((GlobalDragAndDrop.GameAssetDragAndDropPayload) object);
-						navigateTo(destination);
-					} else if (object instanceof GlobalDragAndDrop.FileHandleDragAndDropPayload) {
-						handlePayloadObject((GlobalDragAndDrop.FileHandleDragAndDropPayload) object);
-						navigateTo(destination);
-					}
+					return true;
 				}
 
-				private void handlePayloadObject(GlobalDragAndDrop.GameAssetDragAndDropPayload payload) {
-					GameAsset<?> sourceItem = payload.getGameAsset();
-					FileHandle handle = sourceItem.getRootRawAsset().handle;
-					FileHandle destination = ((ProjectExplorerWidget.RowWidget) getActor()).getFileHandle();
-					if (!handle.parent().path().equals(destination.path())) {
-						AssetRepository.getInstance().moveFile(handle, destination, true, false);
-					}
-				}
-
-				private void handlePayloadObject(GlobalDragAndDrop.FileHandleDragAndDropPayload payload) {
-					FileHandle handle = payload.getHandle();
-					FileHandle destination = ((ProjectExplorerWidget.RowWidget) getActor()).getFileHandle();
-					if (!handle.parent().path().equals(destination.path())) {
-						AssetRepository.getInstance().moveFile(handle, destination, true, false);
+				@Override
+				public void drop (DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
+					GlobalDragAndDrop.BaseDragAndDropPayload payloadObject = (GlobalDragAndDrop.BaseDragAndDropPayload)payload.getObject();
+					FileHandle target = ((ProjectExplorerWidget.RowWidget) getActor()).getFileHandle();
+					//We should check what kind of payload we got
+					if (payloadObject.isExternal()) { // should copy file
+						handlePayloadDropToDirectory(payloadObject, target, true);
+					} else { // should move file
+						handlePayloadDropToDirectory(payloadObject, target, false);
 					}
 				}
 			});
@@ -513,143 +486,142 @@ public class DirectoryViewWidget extends Table {
 				} else { // should move file
 					handlePayloadDropToDirectory(payloadObject, target, false);
 				}
-
-			}
-
-			/**
-			 * Handle asset drop to directory view.
-			 * @param payload FileHandle/GameAsset/ArrayOfPayloads, that was dropped to directory view.
-			 * @param targetDir directory, where payload should be uploaded
-			 * @param copy true - preserves original files and copies to target. false - original files are not preserved, but rather moved to target.
-			 */
-			private void handlePayloadDropToDirectory(GlobalDragAndDrop.BaseDragAndDropPayload payload, FileHandle targetDir, boolean copy) {
-				if (!targetDir.isDirectory()) {
-					return;
-				}
-
-				Array<FileHandle> files = new Array<>();
-
-				if (payload instanceof GlobalDragAndDrop.ArrayDragAndDropPayload) {
-					for (GlobalDragAndDrop.BaseDragAndDropPayload item : ((GlobalDragAndDrop.ArrayDragAndDropPayload) payload).getItems()) {
-						if (item instanceof GlobalDragAndDrop.GameAssetDragAndDropPayload) {
-							GameAsset<?> gameAsset = ((GlobalDragAndDrop.GameAssetDragAndDropPayload) item).getGameAsset();
-							files.add(gameAsset.getRootRawAsset().handle);
-						} else if (item instanceof GlobalDragAndDrop.FileHandleDragAndDropPayload) {
-							files.add(((GlobalDragAndDrop.FileHandleDragAndDropPayload) item).getHandle());
-						}
-					}
-				} else if (payload instanceof GlobalDragAndDrop.GameAssetDragAndDropPayload) {
-					GameAsset<?> gameAsset = ((GlobalDragAndDrop.GameAssetDragAndDropPayload) payload).getGameAsset();
-					files.add(gameAsset.getRootRawAsset().handle);
-				} else if (payload instanceof GlobalDragAndDrop.FileHandleDragAndDropPayload) {
-					files.add(((GlobalDragAndDrop.FileHandleDragAndDropPayload) payload).getHandle());
-				}
-
-				if (!files.isEmpty()) {
-					asyncHandleFiles(files, targetDir, copy, 0);
-				}
-			}
-
-			private void asyncHandleFiles(Array<FileHandle> files, FileHandle targetDir, boolean copy, int index) {
-				FileHandle source = files.get(index);
-				if (!targetDir.equals(source.parent())) {
-					if (copy) {
-						if (index == files.size - 1) { // last element should refresh directory view with changes
-							copyFileHandle(source, targetDir, () -> {
-								String projectPath = SharedResources.currentProject.rootProjectDir().path();
-								projectExplorerWidget.loadDirectoryTree(projectPath);
-								// Note: fileHandle is current directory open in view
-								projectExplorerWidget.expand(fileHandle.path());
-								projectExplorerWidget.select(fileHandle.path());
-							});
-						} else {
-							copyFileHandle(source, targetDir,() -> {
-								asyncHandleFiles(files, targetDir, copy, index + 1);
-							});
-						}
-					} else {
-						if (index == files.size - 1) {  // last element should refresh directory view with changes
-							moveFileHandle(source, targetDir, () -> {
-								String projectPath = SharedResources.currentProject.rootProjectDir().path();
-								projectExplorerWidget.loadDirectoryTree(projectPath);
-								// Note: fileHandle is current directory open in view
-								projectExplorerWidget.expand(fileHandle.path());
-								projectExplorerWidget.select(fileHandle.path());
-							});
-						} else {
-							moveFileHandle(source, targetDir, () -> {
-								asyncHandleFiles(files, targetDir, copy, index + 1);
-							});
-						}
-					}
-				}
-			}
-
-			private void copyFileHandle (FileHandle source, FileHandle target, Runnable onComplete) {
-				if (target.child(source.name()).exists()) {
-					// file is already present, see if it should be replaced
-					String title = "Oh no!";
-					String message = "An older item named \"" + source.name() + "\" already \n exists in this location. Do you want to replace it with the newer \n one you're moving?";
-					Runnable keep = () -> {
-						// copy new file to current directory with new name
-						AssetRepository.getInstance().copyRawAsset(source, target, false);
-						onComplete.run();
-					};
-					Runnable stop = () -> {
-						// do nothing
-						onComplete.run();
-					};
-					Runnable replace = () -> {
-						// replace file in directory with new file
-						AssetRepository.getInstance().copyRawAsset(source, target, true);
-						onComplete.run();
-					};
-
-					projectExplorerWidget.showKeepStopReplaceDialog(title, message, keep, stop, replace);
-				} else {
-					AssetRepository.getInstance().copyRawAsset(source, target, false);
-					onComplete.run();
-				}
-			}
-
-			private void moveFileHandle (FileHandle source, FileHandle target, Runnable onComplete) {
-				if (target.child(source.name()).exists()) {
-					// file is already present, see if it should be replaced
-					String title = "Oh no!";
-					String message = "An older item named \"" + source.name() + "\" already \n exists in this location. Do you want to replace it with the newer \n one you're moving?";
-					Runnable keep = () -> {
-						// move new file to current directory with new name
-						String fileName = NamingUtils.getNewName(source.nameWithoutExtension(), new Supplier<Collection<String>>() {
-							@Override
-							public Collection<String> get () {
-								ArrayList<String> fileNames = new ArrayList<>();
-								for (FileHandle fileHandle : target.list()) {
-									fileNames.add(fileHandle.nameWithoutExtension());
-								}
-								return fileNames;
-							}
-						}) + "." + source.extension();
-
-						AssetRepository.getInstance().moveFile(source, target.child(fileName), false);
-						onComplete.run();
-					};
-					Runnable stop = () -> {
-						// do nothing
-						onComplete.run();
-					};
-					Runnable replace = () -> {
-						// replace file in directory with new file
-						AssetRepository.getInstance().moveFile(source, target, false);
-						onComplete.run();
-					};
-
-					projectExplorerWidget.showKeepStopReplaceDialog(title, message, keep, stop, replace);
-				} else {
-					AssetRepository.getInstance().moveFile(source, target, false);
-					onComplete.run();
-				}
 			}
 		});
+	}
+
+	/**
+	 * Handle asset drop to directory view.
+	 * @param payload FileHandle/GameAsset/ArrayOfPayloads, that was dropped to directory view.
+	 * @param targetDir directory, where payload should be uploaded
+	 * @param copy true - preserves original files and copies to target. false - original files are not preserved, but rather moved to target.
+	 */
+	private void handlePayloadDropToDirectory(GlobalDragAndDrop.BaseDragAndDropPayload payload, FileHandle targetDir, boolean copy) {
+		if (!targetDir.isDirectory()) {
+			return;
+		}
+
+		Array<FileHandle> files = new Array<>();
+
+		if (payload instanceof GlobalDragAndDrop.ArrayDragAndDropPayload) {
+			for (GlobalDragAndDrop.BaseDragAndDropPayload item : ((GlobalDragAndDrop.ArrayDragAndDropPayload) payload).getItems()) {
+				if (item instanceof GlobalDragAndDrop.GameAssetDragAndDropPayload) {
+					GameAsset<?> gameAsset = ((GlobalDragAndDrop.GameAssetDragAndDropPayload) item).getGameAsset();
+					files.add(gameAsset.getRootRawAsset().handle);
+				} else if (item instanceof GlobalDragAndDrop.FileHandleDragAndDropPayload) {
+					files.add(((GlobalDragAndDrop.FileHandleDragAndDropPayload) item).getHandle());
+				}
+			}
+		} else if (payload instanceof GlobalDragAndDrop.GameAssetDragAndDropPayload) {
+			GameAsset<?> gameAsset = ((GlobalDragAndDrop.GameAssetDragAndDropPayload) payload).getGameAsset();
+			files.add(gameAsset.getRootRawAsset().handle);
+		} else if (payload instanceof GlobalDragAndDrop.FileHandleDragAndDropPayload) {
+			files.add(((GlobalDragAndDrop.FileHandleDragAndDropPayload) payload).getHandle());
+		}
+
+		if (!files.isEmpty()) {
+			asyncHandleFiles(files, targetDir, copy, 0);
+		}
+	}
+
+	private void asyncHandleFiles(Array<FileHandle> files, FileHandle targetDir, boolean copy, int index) {
+		FileHandle source = files.get(index);
+		if (!targetDir.equals(source.parent())) {
+			if (copy) {
+				if (index == files.size - 1) { // last element should refresh directory view with changes
+					copyFileHandle(source, targetDir, () -> {
+						String projectPath = SharedResources.currentProject.rootProjectDir().path();
+						projectExplorerWidget.loadDirectoryTree(projectPath);
+						// Note: fileHandle is current directory open in view
+						projectExplorerWidget.expand(fileHandle.path());
+						projectExplorerWidget.select(fileHandle.path());
+					});
+				} else {
+					copyFileHandle(source, targetDir,() -> {
+						asyncHandleFiles(files, targetDir, copy, index + 1);
+					});
+				}
+			} else {
+				if (index == files.size - 1) {  // last element should refresh directory view with changes
+					moveFileHandle(source, targetDir, () -> {
+						String projectPath = SharedResources.currentProject.rootProjectDir().path();
+						projectExplorerWidget.loadDirectoryTree(projectPath);
+						// Note: fileHandle is current directory open in view
+						projectExplorerWidget.expand(fileHandle.path());
+						projectExplorerWidget.select(fileHandle.path());
+					});
+				} else {
+					moveFileHandle(source, targetDir, () -> {
+						asyncHandleFiles(files, targetDir, copy, index + 1);
+					});
+				}
+			}
+		}
+	}
+
+	private void copyFileHandle (FileHandle source, FileHandle target, Runnable onComplete) {
+		if (target.child(source.name()).exists()) {
+			// file is already present, see if it should be replaced
+			String title = "Oh no!";
+			String message = "An older item named \"" + source.name() + "\" already \n exists in this location. Do you want to replace it with the newer \n one you're moving?";
+			Runnable keep = () -> {
+				// copy new file to current directory with new name
+				AssetRepository.getInstance().copyRawAsset(source, target, false);
+				onComplete.run();
+			};
+			Runnable stop = () -> {
+				// do nothing
+				onComplete.run();
+			};
+			Runnable replace = () -> {
+				// replace file in directory with new file
+				AssetRepository.getInstance().copyRawAsset(source, target, true);
+				onComplete.run();
+			};
+
+			projectExplorerWidget.showKeepStopReplaceDialog(title, message, keep, stop, replace);
+		} else {
+			AssetRepository.getInstance().copyRawAsset(source, target, false);
+			onComplete.run();
+		}
+	}
+
+	private void moveFileHandle (FileHandle source, FileHandle target, Runnable onComplete) {
+		if (target.child(source.name()).exists()) {
+			// file is already present, see if it should be replaced
+			String title = "Oh no!";
+			String message = "An older item named \"" + source.name() + "\" already \n exists in this location. Do you want to replace it with the newer \n one you're moving?";
+			Runnable keep = () -> {
+				// move new file to current directory with new name
+				String fileName = NamingUtils.getNewName(source.nameWithoutExtension(), new Supplier<Collection<String>>() {
+					@Override
+					public Collection<String> get () {
+						ArrayList<String> fileNames = new ArrayList<>();
+						for (FileHandle fileHandle : target.list()) {
+							fileNames.add(fileHandle.nameWithoutExtension());
+						}
+						return fileNames;
+					}
+				}) + "." + source.extension();
+
+				AssetRepository.getInstance().moveFile(source, target.child(fileName), false);
+				onComplete.run();
+			};
+			Runnable stop = () -> {
+				// do nothing
+				onComplete.run();
+			};
+			Runnable replace = () -> {
+				// replace file in directory with new file
+				AssetRepository.getInstance().moveFile(source, target, false);
+				onComplete.run();
+			};
+
+			projectExplorerWidget.showKeepStopReplaceDialog(title, message, keep, stop, replace);
+		} else {
+			AssetRepository.getInstance().moveFile(source, target, false);
+			onComplete.run();
+		}
 	}
 
 	private static boolean isDirectory (Item item) {
