@@ -80,10 +80,11 @@ public class DirectoryViewWidget extends Table {
 				if (!event.isStopped()) {
 					clearSelection();
 
-					Array<FileHandle> selection = new Array<>();
-					selection.add(fileHandle);
-
-					projectExplorerWidget.showContextMenu(selection, true);
+					if (fileHandle != null) {
+						Array<FileHandle> selection = new Array<>();
+						selection.add(fileHandle);
+						projectExplorerWidget.showContextMenu(selection, true);
+					}
 					event.stop();
 				}
 			}
