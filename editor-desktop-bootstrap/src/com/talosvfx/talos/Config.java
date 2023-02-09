@@ -27,7 +27,7 @@ public class Config {
 			.property("version", releaseChannel.getDisplayString())
 			.property("snapshot", String.valueOf(releaseChannel.isSnapshot()))
 			.property("channel", channelPath)
-			.property("user.location", "${user.home}/talos/")
+			.property("user.location", "${user.home}/Talos/")
 			.basePath("${user.location}")
 			.baseUri("https://editor.talosvfx.com/channels/" + channelPath + "/")
 			.file(FileMetadata.readFrom(talosJar.toPath())
