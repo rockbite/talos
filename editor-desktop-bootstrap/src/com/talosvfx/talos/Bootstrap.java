@@ -200,7 +200,7 @@ public class Bootstrap extends Application implements Delegate {
 	private boolean canLaunchChannel (ChannelData currentTarget) {
 		String versionIdentifier = currentTarget.getVersionIdentifier();
 		String userHome = System.getProperty("user.home");
-		File file = new File(userHome + "/Talos/channels/" + versionIdentifier);
+		File file = new File(userHome + "/Talos/" + versionIdentifier);
 		if (!file.exists()) {
 			return false;
 		}
