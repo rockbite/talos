@@ -17,7 +17,7 @@ javafx {
     modules = [ 'javafx.controls', 'javafx.fxml' ]
 }
 
-mainClassName = "com.talosvfx.talos.Bootstrap"
+mainClassName = "com.talosvfx.talos.Start"
 
 dependencies {
     implementation libs.update4j
@@ -39,4 +39,18 @@ tasks.register('genConfig', JavaExec) {
 
     // arguments to pass to the application
     args '${project.version}'
+}
+
+task dist(type: Jar) {
+    manifest {
+        attributes 'Main-Class': project.mainClassName
+    }
+    dependsOn configurations.runtimeClasspath
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+    archiveFileName = "bootstrap.jar"
+    with jar
+
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }

@@ -95,3 +95,4 @@ editor-web/war
 editor/assets/talos-version.properties
 /editor-desktop/target/
 /editor-desktop-bootstrap/dist/
+/editor-desktop-bootstrap/target/
