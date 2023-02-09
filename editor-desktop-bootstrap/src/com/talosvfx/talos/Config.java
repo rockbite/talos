@@ -31,7 +31,7 @@ public class Config {
 			.basePath("${user.location}")
 			.baseUri("https://editor.talosvfx.com/channels/" + channelPath + "/")
 			.file(FileMetadata.readFrom(talosJar.toPath())
-				.path("${user.location}/" + channelPath + "/" + getTalosJarName(releaseChannel))
+				.path(channelPath + "/" + getTalosJarName(releaseChannel)) //relative to base path
 				.uri(getTalosJarName(releaseChannel))
 				.classpath())
 			.property("default.launcher.main.class", "com.talosvfx.talos.TalosLauncher")

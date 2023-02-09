@@ -99,7 +99,11 @@ public class Bootstrap extends Application implements Delegate {
 				protected Void call () throws Exception {
 					Path zip = Paths.get("talos.zip");
 					if (finalConfig.update(UpdateOptions.archive(zip).updateHandler(appUpdater)).getException() == null) {
-						Archive.read(zip).install();
+						try {
+							Archive.read(zip).install();
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
 					}
 
 					Platform.runLater(new Runnable() {
