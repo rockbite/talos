@@ -14,10 +14,12 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.SingleSelectionModel;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import jfxtras.styles.jmetro.JMetro;
 import jfxtras.styles.jmetro.Style;
@@ -63,6 +65,9 @@ public class Bootstrap extends Application implements Delegate {
 	@FXML
 	Button launchButton;
 
+	@FXML
+	CheckBox autoLaunchCheckbox;
+
 	private AppUpdater appUpdater;
 
 	private LocalPreferences preferences;
@@ -70,13 +75,19 @@ public class Bootstrap extends Application implements Delegate {
 
 	private Configuration currentConfig;
 	private OkHttpClient okHttpClient;
+	private boolean wasAutoLaunchOnLoad;
+
+	@FXML
+	public void onAutoLaunch (ActionEvent actionEvent) {
+		preferences.setAutoLaunch(autoLaunchCheckbox.isSelected());
+		savePrefsToFile();
+	}
 
 	@FXML
 	public void onUpdateButton (ActionEvent actionEvent) {
 		if (currentConfig != null) {
 			updateButton.setDisable(true);
 			launchButton.setDisable(true);
-
 
 			updateLabel.setText("Updating to " + currentConfig.getResolvedProperty("version"));
 
@@ -168,6 +179,11 @@ public class Bootstrap extends Application implements Delegate {
 						public void run () {
 							updateLabel.setText("No updates found");
 							launchButton.setDisable(false);
+
+							if (wasAutoLaunchOnLoad) {
+								onLaunchButton(null);
+							}
+
 						}
 					});
 				}
@@ -241,20 +257,19 @@ public class Bootstrap extends Application implements Delegate {
 		Parent root = loader.load();
 		Scene scene = new Scene(root);
 
+		scene.setFill(Color.TRANSPARENT);
+
+		primaryStage.setTitle("Talos Launcher");
+		primaryStage.setResizable(false);
+		JMetro jMetro = new JMetro(Style.DARK);
+		jMetro.setScene(scene);
+
 		URL resource = getClass().getResource("root.css");
 		if (resource == null) {
 			System.out.println("NO css found");
 		} else {
 			scene.getStylesheets().add(resource.toExternalForm());
 		}
-		// set up the stage
-		primaryStage.setTitle("Talos Launcher");
-//		primaryStage.setWidth(400);
-//		primaryStage.setHeight(400);
-//		primaryStage.initStyle(StageStyle.UNDECORATED);
-		primaryStage.setResizable(false);
-		JMetro jMetro = new JMetro(Style.DARK);
-		jMetro.setScene(scene);
 		primaryStage.setScene(scene);
 		primaryStage.show();
 
@@ -265,6 +280,10 @@ public class Bootstrap extends Application implements Delegate {
 		progressBar.setVisible(false);
 
 		preferences = readPrefsFromFile();
+
+		autoLaunchCheckbox.setSelected(preferences.isAutoLaunch());
+
+		wasAutoLaunchOnLoad = preferences.isAutoLaunch();
 
 		fetchRepoData();
 
@@ -293,7 +312,6 @@ public class Bootstrap extends Application implements Delegate {
 
 	private void fetchRepoData () {
 		updateLabel.setText("Fetching version data...");
-
 
 		String url = "https://editor.talosvfx.com/channels/repo.json";
 
@@ -335,18 +353,6 @@ public class Bootstrap extends Application implements Delegate {
 				@Override
 				public void run () {
 					updateLabel.setText("Updates fetched");
-
-					ChannelData e = new ChannelData();
-					e.setVersionIdentifier("0.2");
-					e.setLatestVersionString("0.2.5");
-
-					repoData.getVersions().add(e);
-
-					ChannelData b = new ChannelData();
-					b.setVersionIdentifier("1.0");
-					b.setLatestVersionString("1.0.0");
-
-					repoData.getVersions().add(b);
 
 					repoData.sort();
 					for (ChannelData version : repoData.getVersions()) {

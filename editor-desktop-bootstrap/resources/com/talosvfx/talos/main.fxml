@@ -8,7 +8,12 @@
    <children>
       <HBox prefHeight="100.0" prefWidth="200.0" spacing="30.0">
          <children>
-            <ComboBox fx:id="versionBox" onAction="#onVersionBoxSelect" prefWidth="150.0" promptText="Version" />
+            <VBox spacing="5.0">
+               <children>
+                  <Label text="Version Select" />
+                  <ComboBox fx:id="versionBox" onAction="#onVersionBoxSelect" prefWidth="150.0" promptText="Version" style="-fx-background-radius: 5px; -fx-border-radius: 5px;" />
+               </children>
+            </VBox>
          </children>
          <padding>
             <Insets left="30.0" top="30.0" />
@@ -31,13 +36,33 @@
             <Insets left="100.0" right="100.0" />
          </VBox.margin>
       </VBox>
-      <HBox alignment="CENTER_RIGHT" prefHeight="100.0" prefWidth="200.0" spacing="20.0">
+      <HBox alignment="CENTER_RIGHT">
          <children>
-            <Button fx:id="updateButton" alignment="CENTER_RIGHT" contentDisplay="CENTER" mnemonicParsing="false" onAction="#onUpdateButton" text="Update" />
-            <Button fx:id="launchButton" mnemonicParsing="false" onAction="#onLaunchButton" text="Launch" />
+            <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" spacing="40.0" HBox.hgrow="ALWAYS">
+               <children>
+                  <CheckBox fx:id="autoLaunchCheckbox" mnemonicParsing="false" onAction="#onAutoLaunch" text="Auto launch" />
+               </children>
+               <opaqueInsets>
+                  <Insets />
+               </opaqueInsets>
+               <padding>
+                  <Insets left="20.0" />
+               </padding>
+            </HBox>
+            <HBox alignment="CENTER_RIGHT" prefHeight="100.0" prefWidth="200.0" spacing="20.0">
+               <children>
+                  <Button fx:id="updateButton" alignment="CENTER_RIGHT" contentDisplay="CENTER" mnemonicParsing="false" onAction="#onUpdateButton" style="-fx-background-radius: 20px; -fx-border-radius: 20px;" text="Update" />
+                  <Button fx:id="launchButton" defaultButton="true" mnemonicParsing="false" onAction="#onLaunchButton" style="-fx-background-radius: 20px; -fx-border-radius: 20px;" text="Launch">
+                     <opaqueInsets>
+                        <Insets />
+                     </opaqueInsets>
+                  </Button>
+               </children>
+               <padding>
+                  <Insets right="40.0" />
+               </padding>
+            </HBox>
          </children>
-         <padding>
-            <Insets right="40.0" />
-         </padding></HBox>
+      </HBox>
    </children>
 </VBox>
