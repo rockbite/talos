@@ -55,8 +55,6 @@ public class TalosLauncher implements ILauncher {
 	public ObjectMap<IWindowDialog, Lwjgl3Window> windowMap = new ObjectMap<>();
 
 	public static void main (String[] arg) {
-		Configuration.GLFW_CHECK_THREAD0.set(false);
-
 		Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
 		config.setWindowedMode(1200, 900);
 		config.setMaximized(true);

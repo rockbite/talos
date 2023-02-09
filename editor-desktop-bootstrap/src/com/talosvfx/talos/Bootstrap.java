@@ -34,6 +34,7 @@ import org.jetbrains.annotations.Nullable;
 import org.update4j.Archive;
 import org.update4j.Configuration;
 import org.update4j.UpdateOptions;
+import org.update4j.service.DefaultLauncher;
 import org.update4j.service.Delegate;
 
 import java.io.File;
@@ -48,9 +49,13 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 public class Bootstrap extends Application implements Delegate {
 
+
+	private static Start start;
 	@FXML
 	Label updateLabel;
 
@@ -76,6 +81,7 @@ public class Bootstrap extends Application implements Delegate {
 	private Configuration currentConfig;
 	private OkHttpClient okHttpClient;
 	private boolean wasAutoLaunchOnLoad;
+	private Stage stage;
 
 	@FXML
 	public void onAutoLaunch (ActionEvent actionEvent) {
@@ -127,18 +133,14 @@ public class Bootstrap extends Application implements Delegate {
 	@FXML
 	public void onLaunchButton (ActionEvent actionEvent) {
 		if (currentConfig != null) {
-			Thread run = new Thread(() -> {
-				currentConfig.launch(this);
-			});
-			run.setName("TalosAppThread");
-			run.start();
 
+			currentConfig.launch(new CustomLauncher(start));
 			exitBootsrap();
 		}
 	}
 
 	private void exitBootsrap () {
-		Platform.exit();
+		stage.close();
 	}
 
 	@FXML
@@ -240,6 +242,8 @@ public class Bootstrap extends Application implements Delegate {
 
 	@Override
 	public void start (Stage primaryStage) throws Exception {
+		this.stage = primaryStage;
+
 		okHttpClient = new OkHttpClient();
 
 		appUpdater = new AppUpdater(this);
@@ -379,10 +383,24 @@ public class Bootstrap extends Application implements Delegate {
 
 	@Override
 	public void main (List<String> args) throws Throwable {
+		System.out.println("main");
 	}
 
-	public static void main (String[] args) {
-		launch(args);
+
+
+	public static void main (String[] args, Start start) {
+		Bootstrap.start = start;
+
+		Platform.startup(new Runnable() {
+			@Override
+			public void run () {
+				try {
+					new Bootstrap().start(new Stage());
+				} catch (Exception e) {
+					throw new RuntimeException(e);
+				}
+			}
+		});
 	}
 
 }
