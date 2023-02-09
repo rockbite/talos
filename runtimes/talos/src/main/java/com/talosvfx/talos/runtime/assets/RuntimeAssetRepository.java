@@ -220,7 +220,6 @@ public class RuntimeAssetRepository extends BaseAssetRepository implements Asset
 		FileHandle sceneFile = baseFolder.child(exportStructure.type.name()).child(exportStructure.relativePathsOfRawFiles.first());
 
 		Scene scene = new Scene();
-		scene.path = sceneFile.path();
 		scene.loadFromHandle(sceneFile);
 
 		gameAsset.setResourcePayload(scene);

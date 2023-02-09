@@ -453,7 +453,7 @@ public class SceneUtils {
 		Prefab tempPrefabForSerialization = new Prefab(gameObject);
 		String serializedPrefab = tempPrefabForSerialization.getAsString();
 
-		Prefab newPrefab = new Prefab(serializedPrefab, tempPrefabForSerialization.path, tempPrefabForSerialization.name);
+		Prefab newPrefab = new Prefab(serializedPrefab, gameObject.getName());
 
 		if (newPrefab.getSelfObject().hasComponent(TransformComponent.class)) {
 			TransformComponent component = newPrefab.getSelfObject().getComponent(TransformComponent.class);
