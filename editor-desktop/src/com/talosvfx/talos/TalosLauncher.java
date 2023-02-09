@@ -233,5 +233,17 @@ public class TalosLauncher implements ILauncher {
 		}
 		openedWindows.clear();
 		windowMap.clear();
+
+		new Thread(new Runnable() {
+			@Override
+			public void run () {
+				try {
+					Thread.sleep(1);
+				} catch (InterruptedException e) {
+					throw new RuntimeException(e);
+				}
+				System.exit(0);
+			}
+		}).start();
 	}
 }

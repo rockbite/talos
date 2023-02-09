@@ -41,10 +41,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -71,6 +69,7 @@ public class Bootstrap extends Application implements Delegate {
 	private ChannelData currentTarget;
 
 	private Configuration currentConfig;
+	private OkHttpClient okHttpClient;
 
 	@FXML
 	public void onUpdateButton (ActionEvent actionEvent) {
@@ -82,6 +81,8 @@ public class Bootstrap extends Application implements Delegate {
 			updateLabel.setText("Updating to " + currentConfig.getResolvedProperty("version"));
 
 			Configuration finalConfig = currentConfig;
+
+			progressBar.setVisible(true);
 			Task<Void> doUpdate = new Task<Void>() {
 				@Override
 				protected Void call () throws Exception {
@@ -94,6 +95,7 @@ public class Bootstrap extends Application implements Delegate {
 						@Override
 						public void run () {
 							updateLabel.setText("Update complete");
+							launchButton.setDisable(false);
 						}
 					});
 					return null;
@@ -101,7 +103,7 @@ public class Bootstrap extends Application implements Delegate {
 			};
 
 			Thread thread = new Thread(doUpdate);
-			thread.setDaemon(true);
+			thread.setName("DoUpdateThread");
 			thread.start();
 
 		}
@@ -110,8 +112,18 @@ public class Bootstrap extends Application implements Delegate {
 	@FXML
 	public void onLaunchButton (ActionEvent actionEvent) {
 		if (currentConfig != null) {
-			currentConfig.launch();
+			Thread run = new Thread(() -> {
+				currentConfig.launch(this);
+			});
+			run.setName("TalosAppThread");
+			run.start();
+
+			exitBootsrap();
 		}
+	}
+
+	private void exitBootsrap () {
+		Platform.exit();
 	}
 
 	@FXML
@@ -140,7 +152,6 @@ public class Bootstrap extends Application implements Delegate {
 				currentConfig = Configuration.read(in);
 
 				if (currentConfig.requiresUpdate()) {
-					System.out.println("Requires update");
 					Platform.runLater(new Runnable() {
 						@Override
 						public void run () {
@@ -149,6 +160,14 @@ public class Bootstrap extends Application implements Delegate {
 
 							launchButton.setDisable(!canLaunchChannel(currentTarget));
 
+						}
+					});
+				} else {
+					Platform.runLater(new Runnable() {
+						@Override
+						public void run () {
+							updateLabel.setText("No updates found");
+							launchButton.setDisable(false);
 						}
 					});
 				}
@@ -201,6 +220,7 @@ public class Bootstrap extends Application implements Delegate {
 
 	@Override
 	public void start (Stage primaryStage) throws Exception {
+		okHttpClient = new OkHttpClient();
 
 		appUpdater = new AppUpdater(this);
 
@@ -274,11 +294,10 @@ public class Bootstrap extends Application implements Delegate {
 	private void fetchRepoData () {
 		updateLabel.setText("Fetching version data...");
 
-		OkHttpClient client = new OkHttpClient();
 
 		String url = "https://editor.talosvfx.com/channels/repo.json";
 
-		Call call = client.newCall(new Request.Builder().url(url).build());
+		Call call = okHttpClient.newCall(new Request.Builder().url(url).build());
 
 		call.enqueue(new Callback() {
 			@Override
