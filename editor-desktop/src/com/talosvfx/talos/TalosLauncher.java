@@ -39,7 +39,6 @@ import com.talosvfx.talos.editor.project2.SharedStage;
 import com.talosvfx.talos.editor.utils.WindowUtils;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.glfw.GLFWDropCallback;
-import org.lwjgl.system.Configuration;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -205,18 +204,6 @@ public class TalosLauncher implements ILauncher {
 
 
 		final Lwjgl3Graphics graphics = (Lwjgl3Graphics)Gdx.graphics;
-		graphics.getWindow().setWindowListener(new Lwjgl3WindowAdapter() {
-			@Override
-			public void focusGained () {
-				super.focusGained();
-				System.out.println("FOCUS GAINED");
-			}
-
-			@Override
-			public void focusLost () {
-				System.out.println("FOCUS LOST");
-			}
-		});
 
 
 		if (SharedLibraryLoader.isMac) {
@@ -225,7 +212,6 @@ public class TalosLauncher implements ILauncher {
 				public void run () {
 					graphics.getWindow().restoreWindow();
 					graphics.getWindow().focusWindow();
-					System.out.println("MANUAL FOCUS");
 				}
 			});
 
