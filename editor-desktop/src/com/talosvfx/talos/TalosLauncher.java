@@ -58,7 +58,7 @@ public class TalosLauncher implements ILauncher {
 	public static void main (String[] arg) {
 		Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
 		config.setWindowedMode(1200, 900);
-		config.setMaximized(true);
+		config.setMaximized(false);
 		config.useVsync(true);
 		config.setHdpiMode(HdpiMode.Logical);
 		config.setBackBufferConfig(1,1,1,1,8,8, 0);
@@ -203,7 +203,14 @@ public class TalosLauncher implements ILauncher {
 	}
 
 	private static void afterCreated () {
+
+
 		final Lwjgl3Graphics graphics = (Lwjgl3Graphics)Gdx.graphics;
+
+		if (SharedLibraryLoader.isMac) {
+			graphics.getWindow().restoreWindow();
+			graphics.getWindow().focusWindow();
+		}
 		glfwSetDropCallback(graphics.getWindow().getWindowHandle(), new GLFWDropCallback() {
 			@Override
 			public void invoke (long window, int count, long names) {
@@ -223,10 +230,6 @@ public class TalosLauncher implements ILauncher {
 
 						SharedResources.globalDragAndDrop.fakeDragDrop(x, y, filesPaths);
 
-						if (SharedLibraryLoader.isMac) {
-							graphics.getWindow().restoreWindow();
-							graphics.getWindow().focusWindow();
-						}
 					}
 				});
 			}
