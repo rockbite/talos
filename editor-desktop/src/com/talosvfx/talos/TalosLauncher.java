@@ -18,10 +18,7 @@ package com.talosvfx.talos;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
-import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
-import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
-import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Window;
+import com.badlogic.gdx.backends.lwjgl3.*;
 import com.badlogic.gdx.graphics.glutils.HdpiMode;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -205,11 +202,27 @@ public class TalosLauncher implements ILauncher {
 	private static void afterCreated () {
 
 
+
+
 		final Lwjgl3Graphics graphics = (Lwjgl3Graphics)Gdx.graphics;
+		graphics.getWindow().setWindowListener(new Lwjgl3WindowAdapter() {
+			@Override
+			public void focusGained () {
+				super.focusGained();
+				System.out.println("FOCUS GAINED");
+			}
+
+			@Override
+			public void focusLost () {
+				System.out.println("FOCUS LOST");
+			}
+		});
+
 
 		if (SharedLibraryLoader.isMac) {
 			graphics.getWindow().restoreWindow();
 			graphics.getWindow().focusWindow();
+			System.out.println("MANUAL FOCUS");
 		}
 		glfwSetDropCallback(graphics.getWindow().getWindowHandle(), new GLFWDropCallback() {
 			@Override
