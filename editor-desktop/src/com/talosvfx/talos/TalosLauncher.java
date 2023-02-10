@@ -225,6 +225,9 @@ public class TalosLauncher implements ILauncher {
 				});
 			}
 		});
+
+		graphics.getWindow().iconifyWindow();
+		graphics.getWindow().restoreWindow();
 	}
 
 	@Override

@@ -17,16 +17,15 @@ public class Start {
 
 		//Wait for the booter to die and then start our lwjgl app
 		start.exec();
+		System.exit(0);
 	}
 
 	private void exec () {
-		while (true) {
-			if (!mainThreadRunnables.isEmpty()) {
-				try {
-					mainThreadRunnables.take().run();
-				} catch (InterruptedException e) {
-					throw new RuntimeException(e);
-				}
+		if (!mainThreadRunnables.isEmpty()) {
+			try {
+				mainThreadRunnables.take().run();
+			} catch (InterruptedException e) {
+				throw new RuntimeException(e);
 			}
 		}
 	}
