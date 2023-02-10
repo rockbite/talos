@@ -20,6 +20,11 @@ javafx {
 mainClassName = "com.talosvfx.talos.Start"
 
 dependencies {
+
+    implementation libs.logback.core
+    implementation libs.logback.classic
+    implementation libs.slf4j.api
+
     implementation libs.update4j
     implementation libs.jmetro
     implementation libs.okhttp

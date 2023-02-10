@@ -1078,7 +1078,13 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 
 				if (gameAssetOut == null) {
 
-					GameAsset<Prefab> prefabGameAsset = new GameAsset<>(gameAssetIdentifier, assetTypeFromExtension);
+					GameAsset<Prefab> prefabGameAsset = new GameAsset<Prefab>(gameAssetIdentifier, assetTypeFromExtension) {
+						@Override
+						public void setUpdated() {
+							getResource().setName(getRootRawAsset().handle.nameWithoutExtension());
+							super.setUpdated();
+						}
+					};
 					gameAssetOut = prefabGameAsset;
 
 
@@ -1095,7 +1101,13 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 				break;
 			case SCENE:
 				if (gameAssetOut == null) {
-					GameAsset<Scene> sceneGameAsset = new GameAsset<>(gameAssetIdentifier, assetTypeFromExtension);
+					GameAsset<Scene> sceneGameAsset = new GameAsset<Scene>(gameAssetIdentifier, assetTypeFromExtension) {
+						@Override
+						public void setUpdated() {
+							getResource().setName(getRootRawAsset().handle.nameWithoutExtension());
+							super.setUpdated();
+						}
+					};
 					gameAssetOut = sceneGameAsset;
 
 
@@ -1107,7 +1119,6 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 				}
 
 				Scene scene = new Scene();
-				scene.path = value.handle.path();
 				scene.loadFromHandle(value.handle);
 
 				((GameAsset<Scene>)gameAssetOut).setResourcePayload(scene);
@@ -1791,7 +1802,6 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 					Notifications.fireEvent(assetPathChanged);
 
 					if (isRootGameResource(rawAsset)) {
-						//We need to update the game assets identifier
 						UUID gameAssetUniqueIdentifierFromRawAsset = getGameAssetUniqueIdentifierFromRawAsset(rawAsset);
 						GameAssetType typeFromExtension = null;
 						try {
@@ -1819,6 +1829,10 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 
 					rawAsset.handle = destination;
 
+					if (isRootGameResource(rawAsset)) {
+						handleRootGameResourceRename(rawAsset, destination);
+					}
+
 					for (GameAsset gameAssetReference : rawAsset.gameAssetReferences) {
 						gameAssetReference.setUpdated();
 					}
@@ -1835,6 +1849,32 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 
 		if (checkGameAssets) {
 			checkAllGameAssetCreation();
+		}
+	}
+
+	private void handleRootGameResourceRename(RawAsset rawAsset, FileHandle newHandle) {
+		UUID gameAssetUniqueIdentifierFromRawAsset = getGameAssetUniqueIdentifierFromRawAsset(rawAsset);
+		GameAssetType typeFromExtension = null;
+		try {
+			typeFromExtension = GameAssetType.getAssetTypeFromExtension(rawAsset.handle.extension());
+		} catch (GameAssetType.NoAssetTypeException e) {
+			throw new RuntimeException(e);
+		}
+
+		GameAsset<?> assetForUniqueIdentifier = getAssetForUniqueIdentifier(gameAssetUniqueIdentifierFromRawAsset, typeFromExtension);
+
+		if (assetForUniqueIdentifier != null) {
+			if (typeFromExtension == GameAssetType.SCENE){
+				GameAsset<Scene> sceneAsset = (GameAsset<Scene>) assetForUniqueIdentifier;
+				sceneAsset.getResource().setName(newHandle.nameWithoutExtension());
+				saveGameAssetResourceJsonToFile(assetForUniqueIdentifier);
+			} else if (typeFromExtension == GameAssetType.PREFAB) {
+				GameAsset<Prefab> prefabAsset = (GameAsset<Prefab>) assetForUniqueIdentifier;
+				prefabAsset.getResource().setName(newHandle.nameWithoutExtension());
+				saveGameAssetResourceJsonToFile(assetForUniqueIdentifier);
+			}
+		} else {
+			System.err.println("No game asset found for identifier " + rawAsset.handle.path());
 		}
 	}
 

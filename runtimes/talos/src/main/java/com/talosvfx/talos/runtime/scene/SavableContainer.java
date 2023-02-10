@@ -20,18 +20,11 @@ public abstract class SavableContainer implements GameObjectContainer, Json.Seri
 
 	private static final Logger logger = LoggerFactory.getLogger(SavableContainer.class);
 
-	public String path;
 	public GameObject root;
 
 	public SavableContainer () {
 		root = new GameObject();
 		root.setGameObjectContainer(this);
-	}
-
-	public SavableContainer (String path) {
-		root = new GameObject();
-		root.setGameObjectContainer(this);
-		this.path = path;
 	}
 
 	@Override

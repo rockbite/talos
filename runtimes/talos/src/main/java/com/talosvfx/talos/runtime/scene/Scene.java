@@ -1,33 +1,24 @@
 package com.talosvfx.talos.runtime.scene;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Json;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 
 public class Scene extends SavableContainer  {
 
-    private static final Logger logger = LoggerFactory.getLogger(Scene.class);
+    protected transient String name;
 
     public Scene() {
         super();
     }
 
-    public Scene(String path) {
-        super(path);
-    }
-
-
     @Override
     public String getName () {
-        FileHandle fileHandle = Gdx.files.absolute(path);
-        return fileHandle.nameWithoutExtension();
+        return name;
     }
 
     @Override
     public void setName (String name) {
+        this.name = name;
         root.setName(name);
     }
 
@@ -37,4 +28,9 @@ public class Scene extends SavableContainer  {
         super.writeData(json);
     }
 
+    @Override
+    public void loadFromHandle(FileHandle handle) {
+        super.loadFromHandle(handle);
+        setName(handle.nameWithoutExtension());
+    }
 }
