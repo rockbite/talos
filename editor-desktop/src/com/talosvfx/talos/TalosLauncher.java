@@ -220,9 +220,15 @@ public class TalosLauncher implements ILauncher {
 
 
 		if (SharedLibraryLoader.isMac) {
-			graphics.getWindow().restoreWindow();
-			graphics.getWindow().focusWindow();
-			System.out.println("MANUAL FOCUS");
+			Gdx.app.postRunnable(new Runnable() {
+				@Override
+				public void run () {
+					graphics.getWindow().restoreWindow();
+					graphics.getWindow().focusWindow();
+					System.out.println("MANUAL FOCUS");
+				}
+			});
+
 		}
 		glfwSetDropCallback(graphics.getWindow().getWindowHandle(), new GLFWDropCallback() {
 			@Override
