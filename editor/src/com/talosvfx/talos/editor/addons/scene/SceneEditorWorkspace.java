@@ -747,13 +747,6 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		}
 	}
 
-	public void openScene (FileHandle fileHandle) {
-		Scene scene = new Scene();
-		scene.path = fileHandle.path();
-		openSavableContainer(scene);
-		//TalosMain.Instance().UIStage().saveProjectAction();
-	}
-
 	@Override
 	public SavableContainer getContext() {
 		return currentContainer;
