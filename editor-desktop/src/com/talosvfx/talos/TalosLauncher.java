@@ -30,6 +30,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.ScreenUtils;
+import com.badlogic.gdx.utils.SharedLibraryLoader;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.rockbite.bongo.engine.render.PolygonSpriteBatchMultiTextureMULTIBIND;
 import com.talosvfx.talos.editor.dialogs.IWindowDialog;
@@ -221,13 +222,15 @@ public class TalosLauncher implements ILauncher {
 						final int y = Gdx.input.getY();
 
 						SharedResources.globalDragAndDrop.fakeDragDrop(x, y, filesPaths);
+
+						if (SharedLibraryLoader.isMac) {
+							graphics.getWindow().restoreWindow();
+							graphics.getWindow().focusWindow();
+						}
 					}
 				});
 			}
 		});
-
-		graphics.getWindow().iconifyWindow();
-		graphics.getWindow().restoreWindow();
 	}
 
 	@Override

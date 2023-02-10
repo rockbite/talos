@@ -12,5 +12,8 @@ jpackage \
 --file-associations jpackage-mac-res/TalosFileAssociations.properties \
 --java-options "-XstartOnFirstThread" \
 --java-options "-splash:$APPDIR/splash.png" \
+--vendor "TalosVFX" \
+--mac-package-identifier "TalosVFX" \
+--mac-package-name "TalosVFX" \
 --verbose
 
