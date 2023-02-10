@@ -33,7 +33,9 @@ public class LayoutContent extends LayoutItem {
 	public void act(float delta) {
 		super.act(delta);
 		for (LayoutApp value : apps.values()) {
-			value.actInBackground();
+			if (activeApp != value) {
+				value.actInBackground(delta);
+			}
 		}
 	}
 
