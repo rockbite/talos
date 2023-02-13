@@ -95,6 +95,7 @@ public class SceneEditorApp extends AppManager.BaseApp<Scene> implements GameAss
 
 	@Override
 	public void onUpdate () {
+		getGridAppReference().updateTabName(getAppName());
 		workspaceWidget.loadFromScene(gameAsset);
 	}
 

@@ -3,9 +3,7 @@ package com.talosvfx.talos.editor.nodes.widgets;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
@@ -37,7 +35,12 @@ public class ColorWidget extends AbstractWidget<Color> {
         if(label != null) {
             content.add(label).left().expandX().height(32);
         }
-        content.add(colorButton).right().expandX().height(32).width(96);
+
+        Table buttonWrapper = new Table();
+        buttonWrapper.setBackground(skin.newDrawable("color-bg"));
+        buttonWrapper.add(colorButton).center().pad(2f).grow();
+
+        content.add(buttonWrapper).right().expandX().height(32).width(96);
         color.set(Color.WHITE);
         colorButton.setColor(color);
 

@@ -2,7 +2,6 @@ package com.talosvfx.talos.editor.addons.scene.apps.routines;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.ui.RoutineControlWindow;
@@ -11,19 +10,14 @@ import com.talosvfx.talos.editor.data.RoutineStageData;
 import com.talosvfx.talos.editor.layouts.DummyLayoutApp;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.CommandEventHandler;
-import com.talosvfx.talos.editor.notifications.ContextRequiredEvent;
-import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.Observer;
-import com.talosvfx.talos.editor.notifications.commands.CommandContextType;
 import com.talosvfx.talos.editor.notifications.commands.enums.Commands;
 import com.talosvfx.talos.editor.notifications.events.commands.CommandContextEvent;
-import com.talosvfx.talos.editor.notifications.events.commands.CommandEvent;
 import com.talosvfx.talos.editor.project2.AppManager;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.project2.apps.preferences.ContainerOfPrefs;
 import com.talosvfx.talos.editor.project2.apps.preferences.ViewportPreferences;
 import com.talosvfx.talos.editor.project2.localprefs.TalosLocalPrefs;
-import com.talosvfx.talos.editor.project2.savestate.SaveSystem;
 import com.talosvfx.talos.editor.project2.vfxui.GenericStageWrappedViewportWidget;
 import com.talosvfx.talos.editor.project2.vfxui.GenericStageWrappedWidget;
 import org.slf4j.Logger;
@@ -112,8 +106,8 @@ public class RoutineEditorApp extends AppManager.BaseApp<RoutineStageData> imple
             }
 
             @Override
-            public void actInBackground() {
-                super.actInBackground();
+            public void actInBackground(float delta) {
+                super.actInBackground(delta);
                 routineStage.act();
             }
         };
