@@ -149,7 +149,7 @@ public class ProjectSplash extends Table {
 
 		TalosProjectData talosProjectData = TalosProjectData.newDefaultProject(name, dirHandle);
 		SharedResources.projectLoader.loadProject(talosProjectData);
-
+		talosProjectData.save();
 		hide();
 	}
 
