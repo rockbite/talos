@@ -331,7 +331,6 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 	private void checkAllGameAssetCreation () { //raws
 		checkGameAssetCreation(GameAssetType.SPRITE);
 		checkGameAssetCreation(GameAssetType.SCRIPT);
-		checkGameAssetCreation(GameAssetType.ROUTINE);
 		checkGameAssetCreation(GameAssetType.ATLAS);
 		checkGameAssetCreation(GameAssetType.SOUND);
 
@@ -341,6 +340,7 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 		checkGameAssetCreation(GameAssetType.VFX_OUTPUT);
 		checkGameAssetCreation(GameAssetType.PREFAB);
 		checkGameAssetCreation(GameAssetType.SCENE);
+		checkGameAssetCreation(GameAssetType.ROUTINE);
 
 		checkGameAssetCreation(GameAssetType.TILE_PALETTE);
 

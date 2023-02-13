@@ -8,6 +8,8 @@ import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.JsonWriter;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.layouts.LayoutGrid;
+import com.talosvfx.talos.editor.notifications.Notifications;
+import com.talosvfx.talos.editor.notifications.events.LayoutLoadedEvent;
 import com.talosvfx.talos.editor.project2.apps.ProjectExplorerApp;
 import com.talosvfx.talos.editor.project2.localprefs.TalosLocalPrefs;
 import com.talosvfx.talos.runtime.scene.SceneData;
@@ -122,6 +124,7 @@ public class TalosProjectData implements Json.Serializable {
 		} else {
 			SharedResources.appManager.openApp(AppManager.singletonAsset, ProjectExplorerApp.class);
 		}
+		Notifications.fireEvent(Notifications.obtainEvent(LayoutLoadedEvent.class));
 	}
 
 	public FileHandle getProjectDir() {

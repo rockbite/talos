@@ -7,6 +7,7 @@ import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.*;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.nodes.*;
+import com.talosvfx.talos.editor.notifications.events.LayoutLoadedEvent;
 import com.talosvfx.talos.runtime.routine.RoutineInstance;
 import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.events.RoutineUpdated;
@@ -45,7 +46,11 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
     private boolean paused = false;
     @Getter
     private boolean playing;
-    private ScenePreviewApp scenePreviewApp;
+
+    @Getter
+    private ScenePreviewApp currentScenePreviewApp;
+
+    private ObjectMap<String, ScenePreviewApp> scenePreviewAppMap;
 
     private boolean cameraLocked = false;
 
@@ -53,6 +58,7 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
         super(skin);
         this.routineEditorApp = routineEditorApp;
         Notifications.registerObserver(this);
+        scenePreviewAppMap = new ObjectMap<>();
     }
 
     @Override
@@ -152,6 +158,27 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
           */
             // do this with any async
         }
+    }
+
+    public void setCurrentScenePreviewApp(String executorName) {
+        GameAsset assetForExecutor = getAssetForExecutor(executorName);
+        if (assetForExecutor != null) {
+            currentScenePreviewApp = scenePreviewAppMap.get(assetForExecutor.nameIdentifier);
+        }
+    }
+
+    public GameAsset getAssetForExecutor(String executorName) {
+        RoutineInstance routineInstance = data.getRoutineInstance();
+        RoutineExecutorNode node = (RoutineExecutorNode) routineInstance.getCustomLookup().get(executorName);
+        if (node != null) {
+            RoutineExecuteNodeWidget executorWidget = (RoutineExecuteNodeWidget) nodeBoard.findNode(node.uniqueId);
+
+            GameAssetWidget assetWidget = (GameAssetWidget) executorWidget.getWidget("scene");
+            GameAsset sceneAsset = assetWidget.getValue();
+
+            return sceneAsset;
+        }
+        return null;
     }
 
     public void routineUpdated() {
@@ -292,19 +319,31 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
     public void act() {
         if(data == null) return;
         data.getRoutineInstance().tick(getDelta());
-        if(scenePreviewApp != null) {
+        if(currentScenePreviewApp != null) {
             if (data.getRoutineInstance() != null) {
-                scenePreviewApp.setSpeed(timeScale * data.getRoutineInstance().getTimeScale());
+                currentScenePreviewApp.setSpeed(timeScale * data.getRoutineInstance().getTimeScale());
             } else {
-                scenePreviewApp.setSpeed(timeScale);
+                currentScenePreviewApp.setSpeed(timeScale);
             }
         }
     }
 
     public ScenePreviewApp openPreviewWindow(GameAsset<Scene> gameAsset) {
-        scenePreviewApp = SharedResources.appManager.openAppIfNotOpened(gameAsset, ScenePreviewApp.class);
+        ScenePreviewApp scenePreviewApp = SharedResources.appManager.openAppIfNotOpened(gameAsset, ScenePreviewApp.class);
+        scenePreviewAppMap.put(gameAsset.nameIdentifier, scenePreviewApp);
+        currentScenePreviewApp = scenePreviewApp;
 
-        return scenePreviewApp;
+        return currentScenePreviewApp;
+    }
+
+    public void addPreviewApp(GameAsset<Scene> gameAsset) {
+        ScenePreviewApp scenePreviewApp = SharedResources.appManager.getAppIfOpened(gameAsset, ScenePreviewApp.class);
+        if (scenePreviewApp != null) {
+            scenePreviewAppMap.put(gameAsset.nameIdentifier, scenePreviewApp);
+            if (currentScenePreviewApp == null) {
+                currentScenePreviewApp = scenePreviewApp;
+            }
+        }
     }
 
     public void resetNodes() {
@@ -328,8 +367,8 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
     public void stop() {
         RoutineInstance routineInstance = data.getRoutineInstance();
         routineInstance.stop();
-        if (scenePreviewApp != null) {
-            scenePreviewApp.reload();
+        if (currentScenePreviewApp != null) {
+            currentScenePreviewApp.reload();
         }
         playing = false;
         //timeScale = 1f;
@@ -338,30 +377,42 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
     public void resume() {
         paused = false;
         data.getRoutineInstance().setPaused(paused);
-        if (scenePreviewApp != null) {
-            scenePreviewApp.setPaused(paused);
+        if (currentScenePreviewApp != null) {
+            currentScenePreviewApp.setPaused(paused);
         }
     }
 
     public void pause() {
         paused = true;
         data.getRoutineInstance().setPaused(paused);
-        if (scenePreviewApp != null) {
-            scenePreviewApp.setPaused(paused);
+        if (currentScenePreviewApp != null) {
+            currentScenePreviewApp.setPaused(paused);
         }
     }
 
     public void setTimeScale(float timeScale) {
         this.timeScale = timeScale;
-        if(scenePreviewApp != null) {
-            scenePreviewApp.setSpeed(timeScale);
+        if(currentScenePreviewApp != null) {
+            currentScenePreviewApp.setSpeed(timeScale);
         }
     }
 
     public void lockCamera(boolean checked) {
         cameraLocked = checked;
-        if(scenePreviewApp != null) {
-            scenePreviewApp.setLockCamera(checked);
+        if(currentScenePreviewApp != null) {
+            currentScenePreviewApp.setLockCamera(checked);
+        }
+    }
+
+    @EventHandler
+    public void onLayoutLoadedEvent(LayoutLoadedEvent event) {
+        Array<RoutineExecutorNode> executors = data.getRoutineInstance().getNodesByClass(RoutineExecutorNode.class);
+        for (RoutineExecutorNode executor : executors) {
+
+            GameAsset assetForExecutor = getAssetForExecutor(executor.getTitle());
+            if (assetForExecutor != null) {
+                addPreviewApp(assetForExecutor);
+            }
         }
     }
 }

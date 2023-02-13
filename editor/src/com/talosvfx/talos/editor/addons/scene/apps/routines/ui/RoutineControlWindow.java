@@ -11,6 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.RoutineStage;
+import com.talosvfx.talos.editor.project2.apps.ScenePreviewApp;
 import com.talosvfx.talos.runtime.routine.RoutineInstance;
 import com.talosvfx.talos.editor.data.RoutineStageData;
 import com.talosvfx.talos.editor.nodes.widgets.ValueWidget;
@@ -119,6 +120,43 @@ public class RoutineControlWindow extends Table {
                 routineStage.lockCamera(cameraLockBtn.isChecked());
             }
         });
+
+        selectBox.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                String executorName = selectBox.getSelected().toString();
+                routineStage.setCurrentScenePreviewApp(executorName);
+
+                ScenePreviewApp currentScenePreviewApp = routineStage.getCurrentScenePreviewApp();
+                if (currentScenePreviewApp != null) {
+                    cameraLockBtn.setChecked(currentScenePreviewApp.getWorkspaceWidget().isLockCamera());
+
+                    if (routineStage.isPlaying()) {
+                        routineStage.stop();
+                        updatePlayState();
+                    }
+
+                    if(currentScenePreviewApp.getWorkspaceWidget().isPaused()){
+                        routineStage.pause();
+                    }else{
+                        routineStage.resume();
+                    }
+                    updatePauseState();
+                } else {
+                   reset();
+                }
+            }
+        });
+    }
+
+    public void reset(){
+        cameraLockBtn.setChecked(false);
+        if (routineStage.isPlaying()) {
+            routineStage.stop();
+            updatePlayState();
+        }
+        routineStage.resume();
+        updatePauseState();
     }
 
     private void updatePauseState() {
