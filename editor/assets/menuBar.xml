@@ -37,11 +37,13 @@
         <menu name="preferences" title="Preferences"/>
     </menu>
     <menu name="window" title="Window">
-        <menu name="panels" title="Panels">
-            <menu name="close_all" title="Close all floating panels"/>
-            <separator/>
-            <inject name="panel_list"/>
-        </menu>
+<!--        does not need panels item for now, because there are no usable items -->
+<!--        <menu name="panels" title="Panels">-->
+<!--&lt;!&ndash;            does not need close_all for now, because floating panels feature is not present &ndash;&gt;-->
+<!--&lt;!&ndash;            <menu name="close_all" title="Close all floating panels"/>&ndash;&gt;-->
+<!--            <separator/>-->
+<!--            <inject name="panel_list"/>-->
+<!--        </menu>-->
         <separator/>
         <menu name="layouts" title="Layouts">
             <menu name="save_layout" title="Save As New"/>

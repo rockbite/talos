@@ -118,8 +118,6 @@ public class AppManager extends InputAdapter implements Observer {
 		Array<BaseApp<T>> baseApps = (Array<BaseApp<T>>)baseAppsOpenForGameAsset.get(gameAsset);
 		baseApps.add(baseAppForGameAsset);
 
-		SharedResources.mainMenu.askToInject(menuOpenAppListProvider, PANEL_LIST_MENU_PATH);
-
 		return baseAppForGameAsset;
 	}
 
@@ -134,8 +132,6 @@ public class AppManager extends InputAdapter implements Observer {
 				}
 			}
 		}
-
-		SharedResources.mainMenu.askToInject(menuOpenAppListProvider, PANEL_LIST_MENU_PATH);
 	}
 
 	public Array<BaseApp> getAppInstances() {
@@ -334,8 +330,6 @@ public class AppManager extends InputAdapter implements Observer {
 		U baseAppForGameAsset = createBaseAppForGameAsset(asset, app);
 		createAppAndPlaceInGrid(asset, SharedResources.currentProject.getLayoutGrid(), baseAppForGameAsset);
 
-		SharedResources.mainMenu.askToInject(menuOpenAppListProvider, PANEL_LIST_MENU_PATH);
-
 		return baseAppForGameAsset;
 	}
 
@@ -368,10 +362,6 @@ public class AppManager extends InputAdapter implements Observer {
 
 		for (U baseApp : appsToCreate) {
 			createAppAndPlaceInGrid(gameAsset, layoutGrid, baseApp);
-		}
-
-		if(!appsToCreate.isEmpty()) {
-			SharedResources.mainMenu.askToInject(menuOpenAppListProvider, PANEL_LIST_MENU_PATH);
 		}
 
 		for (BaseApp<T> baseApp : appsToUpdate) {
@@ -600,7 +590,6 @@ public class AppManager extends InputAdapter implements Observer {
 			}
 		};
 
-		SharedResources.mainMenu.registerMenuProvider(menuOpenAppListProvider, PANEL_LIST_MENU_PATH);
 		SharedResources.mainMenu.registerMenuProvider(menuAppListProvider, APP_LIST_MENU_PATH);
 	}
 
