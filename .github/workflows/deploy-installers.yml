@@ -62,10 +62,16 @@ jobs:
     name: Upload installer binaries
     runs-on: ubuntu-latest
     steps:
-      - name: Download installers
+      - name: Download Mac installer
         uses: actions/download-artifact@v3
         with:
-          name: [ mac-installer, win-installer ]
+          name: mac-installer
+
+      - name: Download  Windows installers
+        uses: actions/download-artifact@v3
+        with:
+          name: win-installer     
+
       - name: Print the final result
         run: ls
       - name: Install SSH Key
