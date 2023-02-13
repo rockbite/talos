@@ -35,11 +35,12 @@ jobs:
         run: |
           cd editor-desktop-bootstrap
           ./package-mac.sh
+
       - name: Build Windows
         if: runner.os == 'Windows'
         run: |
           cd editor-desktop-bootstrap
-          ./package-win.sh
+          bash ./package-win.sh
 
       - name: Install SSH Key
         uses: shimataro/ssh-key-action@v2
