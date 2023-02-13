@@ -28,7 +28,7 @@ import com.esotericsoftware.spine.SkeletonData;
 import com.talosvfx.talos.editor.addons.scene.events.*;
 import com.talosvfx.talos.editor.addons.scene.events.meta.MetaDataReloadedEvent;
 import com.talosvfx.talos.editor.addons.scene.events.explorer.DirectoryMovedEvent;
-import com.talosvfx.talos.editor.project2.AppManager;
+import com.talosvfx.talos.editor.notifications.events.ProjectUnloadEvent;
 import com.talosvfx.talos.runtime.assets.AMetadata;
 import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
 import com.talosvfx.talos.editor.data.RoutineStageData;
@@ -215,16 +215,35 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 			System.out.println("Put file handle game asset " + handle.path() + " " + gameAsset.nameIdentifier);
 		}
 
-		void putUUIRawAsset (UUID uuid, RawAsset rawAsset) {
+		void clearFileHandleGameAssets () {
+			fileHandleGameAssetObjectMap.clear();
+
+			System.out.println("Cleared file handles in file handle game asset map.");
+		}
+
+		void putUUIDRawAsset(UUID uuid, RawAsset rawAsset) {
 			uuidRawAssetMap.put(uuid, rawAsset);
 
 			System.out.println("Put uuid " + uuid.toString() + " " + rawAsset.handle.path());
 		}
+
+		void clearUUIDRawAssets () {
+			uuidRawAssetMap.clear();
+
+			System.out.println("Cleared uuids for raw asset map.");
+		}
+
 		void putFileHandleRawAsset (FileHandle handle, RawAsset rawAsset) {
 			fileHandleRawAssetMap.put(handle, rawAsset);
 
 			System.out.println("Put file handle raw " + handle.path() + " " + rawAsset.handle.path());
 
+		}
+
+		void clearFileHandleRawAssets () {
+			fileHandleRawAssetMap.clear();
+
+			System.out.println("Cleared file handle raw assets map.");
 		}
 
 		public GameAsset removeFileHandleGameAssetObjectMap (FileHandle handle) {
@@ -289,6 +308,20 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 //				loadChangesFromScripts(AssetRepository.this::fileVisit);
 			}
 		});
+	}
+
+	public void unloadAssets () {
+		this.assetsRoot = null;
+
+		identifierGameAssetMap.clear();
+		System.out.println("Cleared identifiers in identifier game asset map.");
+
+		uniqueIdentifierGameAssetMap.clear();
+		System.out.println("Cleared uuids in unique identifier game asset map.");
+
+		dataMaps.clearFileHandleGameAssets();
+		dataMaps.clearUUIDRawAssets();
+		dataMaps.clearFileHandleRawAssets();
 	}
 
 	private void loadChangesFromScripts(Function<Path, FileVisitResult> function) {
@@ -1366,7 +1399,7 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 				rawAsset.metaData = createMetaDataForAsset(rawAsset);
 			}
 
-			dataMaps.putUUIRawAsset(rawAsset.metaData.uuid, rawAsset);
+			dataMaps.putUUIDRawAsset(rawAsset.metaData.uuid, rawAsset);
 			dataMaps.putFileHandleRawAsset(fileHandle, rawAsset);
 
 			System.out.println("Raw asset created" + rawAsset.handle.path());
@@ -1382,6 +1415,11 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 	@EventHandler
 	public void onProjectLoad (ProjectLoadedEvent projectLoadedEvent) {
 		loadAssetsForProject(projectLoadedEvent.getProjectData().rootProjectDir());
+	}
+
+	@EventHandler
+	public void onProjectUnload (ProjectUnloadEvent projectUnloadEvent) {
+		unloadAssets();
 	}
 
 	@EventHandler

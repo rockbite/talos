@@ -53,7 +53,7 @@ public class TalosMain2 extends ApplicationAdapter {
 		commandsSystem = new CommandsSystem();
 
 		AssetRepository.init();
-		SharedResources.projectLoader = this::projectLoader;
+		SharedResources.projectLoader = new ProjectLoaderImpl();
 		SharedResources.appManager = new AppManager();
 		SharedResources.inputHandling = new InputHandling();
 		SharedResources.globalDragAndDrop = new GlobalDragAndDrop();
@@ -81,6 +81,7 @@ public class TalosMain2 extends ApplicationAdapter {
 		SharedResources.ui = new UIController();
 
 		layoutGridContainer = new Table();
+		((ProjectLoaderImpl) SharedResources.projectLoader).setLayoutGridContainer(layoutGridContainer);
 
 		Table fullScreen = new Table();
 		fullScreen.setFillParent(true);
@@ -107,26 +108,6 @@ public class TalosMain2 extends ApplicationAdapter {
 
 		openProjectExplorer();
 	}
-
-	private void projectLoader (TalosProjectData projectData) {
-		SharedResources.currentProject = projectData;
-		RuntimeContext.getInstance().setSceneData(projectData.getSceneData());
-
-		TalosLocalPrefs.Instance().updateProject(projectData);
-
-		layoutGridContainer.clearChildren();
-		layoutGridContainer.add(projectData.getLayoutGrid()).grow();
-
-		ProjectLoadedEvent projectLoadedEvent = Notifications.obtainEvent(ProjectLoadedEvent.class);
-		projectLoadedEvent.setProjectData(projectData);
-		Notifications.fireEvent(projectLoadedEvent);
-
-		projectData.loadLayout();
-
-		//todo: move this somewhere else
-		SocketServer.getInstance();
-	}
-
 
 	private void openProjectExplorer () {
 		ProjectSplash projectSplash = new ProjectSplash();
