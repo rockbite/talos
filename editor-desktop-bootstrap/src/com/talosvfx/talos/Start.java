@@ -7,12 +7,17 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 public class Start {
 
+	String[] args;
 	BlockingQueue<Runnable> mainThreadRunnables = new LinkedBlockingQueue<>();
 
 	private boolean shutdown = false;
 
+	public Start (String[] args) {
+		this.args = args;
+	}
+
 	public static void main (String[] args) {
-		Start start = new Start();
+		Start start = new Start(args);
 		Bootstrap.main(args, start);
 
 

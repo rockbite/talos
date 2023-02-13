@@ -39,6 +39,8 @@ import com.talosvfx.talos.editor.project2.SharedStage;
 import com.talosvfx.talos.editor.utils.WindowUtils;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.glfw.GLFWDropCallback;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -47,11 +49,15 @@ import static org.lwjgl.glfw.GLFW.glfwSetDropCallback;
 import static org.lwjgl.system.MemoryUtil.*;
 
 public class TalosLauncher implements ILauncher {
-
+	private static Logger logger = LoggerFactory.getLogger(TalosLauncher.class);
 	public Array<Lwjgl3Window> openedWindows = new Array<>();
 	public ObjectMap<IWindowDialog, Lwjgl3Window> windowMap = new ObjectMap<>();
 
 	public static void main (String[] arg) {
+		logger.info("Program args {}", arg);
+
+
+
 		Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
 		config.setWindowedMode(1200, 900);
 		config.setMaximized(false);

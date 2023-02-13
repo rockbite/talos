@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -37,8 +38,6 @@ public class CustomLauncher implements Launcher {
     public static final String ARGUMENT_PROPERTY_KEY_PREFIX = DOMAIN_PREFIX + ".argument";
     public static final String SYSTEM_PROPERTY_KEY_PREFIX = DOMAIN_PREFIX + ".system";
 
-    @InjectTarget(required = false)
-    private List<String> args;
     private Start start;
 
     public CustomLauncher (Start start) {
@@ -54,9 +53,6 @@ public class CustomLauncher implements Launcher {
 
     }
 
-    public CustomLauncher (List<String> args) {
-        this.args = args;
-    }
 
     @Override
     public void run(LaunchContext context) {
@@ -65,8 +61,9 @@ public class CustomLauncher implements Launcher {
         String mainClass = config.getResolvedProperty(MAIN_CLASS_PROPERTY_KEY);
 
         List<String> localArgs = new ArrayList<>();
-        if (this.args != null)
-            localArgs.addAll(this.args);
+        if (start.args != null) {
+            localArgs.addAll(Arrays.asList(start.args));
+        }
 
         // use TreeMap to sort by key
         Map<Integer, String> argMap = new TreeMap<>();

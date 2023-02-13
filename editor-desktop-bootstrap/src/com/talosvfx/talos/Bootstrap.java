@@ -61,6 +61,7 @@ public class Bootstrap extends Application implements Delegate {
 
 
 	private static Start start;
+	private static String[] args;
 	@FXML
 	Label updateLabel;
 
@@ -412,6 +413,7 @@ public class Bootstrap extends Application implements Delegate {
 
 
 	public static void main (String[] args, Start start) {
+		Bootstrap.args = args;
 		Bootstrap.start = start;
 
 		Platform.startup(new Runnable() {
