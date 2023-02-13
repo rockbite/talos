@@ -58,6 +58,12 @@ public class TalosControl implements Observer {
             return;
         }
 
+        if (event.getPath().equals("file/new/project")) {
+            SharedResources.appManager.removeAll();
+            ProjectSplash projectSplash = new ProjectSplash();
+            projectSplash.show(SharedResources.stage);
+        }
+
         if(event.getPath().equals("window/panels/close_all")) {
             SharedResources.appManager.closeAllFloatingWindows();
             return;
