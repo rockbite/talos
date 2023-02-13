@@ -31,7 +31,7 @@ jobs:
         - name: Build bootstrap and package
           run: |
             ./gradlew editor-bootstrap-desktop:dist
-            cd editor-desktop-boostrap
+            cd editor-desktop-bootstrap
             ./${{ matrix.jpackage-script }}
 
         - name: Install SSH Key
