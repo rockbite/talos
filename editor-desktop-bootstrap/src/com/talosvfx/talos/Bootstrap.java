@@ -31,9 +31,12 @@ import okhttp3.Response;
 import okhttp3.ResponseBody;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.update4j.Archive;
 import org.update4j.Configuration;
 import org.update4j.UpdateOptions;
+import org.update4j.UpdateResult;
 import org.update4j.service.DefaultLauncher;
 import org.update4j.service.Delegate;
 
@@ -54,8 +57,11 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 public class Bootstrap extends Application implements Delegate {
 
+	private static final Logger logger = LoggerFactory.getLogger(Bootstrap.class);
+
 
 	private static Start start;
+	private static String[] args;
 	@FXML
 	Label updateLabel;
 
@@ -97,19 +103,37 @@ public class Bootstrap extends Application implements Delegate {
 
 			updateLabel.setText("Updating to " + currentConfig.getResolvedProperty("version"));
 
+			logger.info("updating");
+
 			Configuration finalConfig = currentConfig;
 
 			progressBar.setVisible(true);
 			Task<Void> doUpdate = new Task<Void>() {
 				@Override
 				protected Void call () throws Exception {
-					Path zip = Paths.get("talos.zip");
-					if (finalConfig.update(UpdateOptions.archive(zip).updateHandler(appUpdater)).getException() == null) {
-						try {
-							Archive.read(zip).install();
-						} catch (Exception e) {
-							e.printStackTrace();
+					logger.info("HIYA");
+					Path zip = Paths.get(currentConfig.getResolvedProperty("user.location") + "/talos.zip");
+					logger.info("got zip");
+					try {
+						UpdateOptions.ArchiveUpdateOptions archive = UpdateOptions.archive(zip);
+						logger.info("Got achive");
+						UpdateOptions.ArchiveUpdateOptions options = archive.updateHandler(appUpdater);
+						logger.info("options");
+						UpdateResult update = finalConfig.update(options);
+						if (update.getException() == null) {
+							try {
+								logger.info("installing");
+								Archive.read(zip).install();
+								logger.info("installed");
+							} catch (Exception e) {
+								logger.info("failed");
+								e.printStackTrace();
+							}
+						} else {
+							logger.error("exception in update", update.getException());
 						}
+					} catch (Exception e) {
+						logger.error("Some error", e);
 					}
 
 					Platform.runLater(new Runnable() {
@@ -274,7 +298,7 @@ public class Bootstrap extends Application implements Delegate {
 
 		URL resource = getClass().getResource("root.css");
 		if (resource == null) {
-			System.out.println("NO css found");
+			logger.info("NO css found");
 		} else {
 			scene.getStylesheets().add(resource.toExternalForm());
 		}
@@ -383,12 +407,13 @@ public class Bootstrap extends Application implements Delegate {
 
 	@Override
 	public void main (List<String> args) throws Throwable {
-		System.out.println("main");
+		logger.info("main");
 	}
 
 
 
 	public static void main (String[] args, Start start) {
+		Bootstrap.args = args;
 		Bootstrap.start = start;
 
 		Platform.startup(new Runnable() {
