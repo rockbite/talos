@@ -36,12 +36,38 @@ jobs:
           cd editor-desktop-bootstrap
           ./package-mac.sh
 
+      - name: Upload installer for Mac
+        if: runner.os == 'macOS'
+        uses: actions/upload-artifact@v3
+        with:
+          name: mac-installer
+          path: editor-desktop-bootstrap/target/talos/TalosVFX-1.0.pkg
+
       - name: Build Windows
         if: runner.os == 'Windows'
         run: |
           cd editor-desktop-bootstrap
           bash ./package-win.sh
 
+      - name: Upload installer for windows
+        if: runner.os == 'Windows'
+        uses: actions/upload-artifact@v3
+        with:
+          name: win-installer
+          path: editor-desktop-bootstrap/target/talos/TalosVFX-1.0.msi
+
+
+  upload:
+    needs: installer-matrix
+    name: Upload installer binaries
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download installers
+        uses: actions/download-artifact@v3
+        with:
+          name: [ mac-installer, win-installer ]
+      - name: Print the final result
+        run: ls
       - name: Install SSH Key
         uses: shimataro/ssh-key-action@v2
         with:
@@ -50,3 +76,4 @@ jobs:
 
       - name: Adding Known Hosts
         run: ssh-keyscan -H ${{ secrets.SSH_SERVER }} >> ~/.ssh/known_hosts
+
