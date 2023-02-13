@@ -25,10 +25,21 @@ jobs:
           distribution: 'adopt'
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
-        
+
       - name: Build bootstrap and package
         run: |
-          ./gradlew editor-bootstrap-desktop:dist
+          ./gradlew editor-desktop-bootstrap:dist
+
+      - name: Build Mac
+        if: runner.os == 'macOS'
+        run: |
+          cd editor-desktop-bootstrap
+          ./package-mac.sh
+      - name: Build Windows
+        if: runner.os == 'Windows'
+        run: |
+          cd editor-desktop-bootstrap
+          ./package-win.sh
 
       - name: Install SSH Key
         uses: shimataro/ssh-key-action@v2
