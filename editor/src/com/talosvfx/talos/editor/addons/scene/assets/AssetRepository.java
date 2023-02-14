@@ -219,7 +219,7 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 		void clearFileHandleGameAssets () {
 			fileHandleGameAssetObjectMap.clear();
 
-			System.out.println("Cleared file handles in file handle game asset map.");
+			logger.info("Cleared file handles in file handle game asset map.");
 		}
 
 		void putUUIDRawAsset(UUID uuid, RawAsset rawAsset) {
@@ -231,7 +231,7 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 		void clearUUIDRawAssets () {
 			uuidRawAssetMap.clear();
 
-			System.out.println("Cleared uuids for raw asset map.");
+			logger.info("Cleared uuids for raw asset map.");
 		}
 
 		void putFileHandleRawAsset (FileHandle handle, RawAsset rawAsset) {
@@ -244,7 +244,7 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 		void clearFileHandleRawAssets () {
 			fileHandleRawAssetMap.clear();
 
-			System.out.println("Cleared file handle raw assets map.");
+			logger.info("Cleared file handle raw assets map.");
 		}
 
 		public GameAsset removeFileHandleGameAssetObjectMap (FileHandle handle) {
@@ -315,10 +315,10 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 		this.assetsRoot = null;
 
 		identifierGameAssetMap.clear();
-		System.out.println("Cleared identifiers in identifier game asset map.");
+		logger.info("Cleared identifiers in identifier game asset map.");
 
 		uniqueIdentifierGameAssetMap.clear();
-		System.out.println("Cleared uuids in unique identifier game asset map.");
+		logger.info("Cleared uuids in unique identifier game asset map.");
 
 		newFilesSeen.clear();
 
@@ -1246,7 +1246,7 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 		}
 
 		if (gameAsset.isBroken()) {
-			System.out.println("Asset is broken, skipping dispose for " + gameAsset.getRootRawAsset().handle.path());
+			logger.warn("Asset is broken, skipping dispose for " + gameAsset.getRootRawAsset().handle.path());
 		}
 
 		try {
@@ -1358,7 +1358,7 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 		} catch (Exception e) {
 			e.printStackTrace();
 			if (gameAsset != null) {
-				System.out.println("Asset "+ gameAsset.getRootRawAsset().handle.path() +" could not be disposed!");
+				logger.error("Asset "+ gameAsset.getRootRawAsset().handle.path() +" could not be disposed!");
 			}
 		}
 	}
