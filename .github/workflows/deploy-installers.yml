@@ -1,0 +1,89 @@
+name: Deploy Installers
+on:
+  push:
+    branches:
+      - talos-3d
+jobs:
+  installer-matrix:
+    strategy:
+      matrix:
+        os: [ "macos-latest", "windows-latest" ]
+    runs-on: ${{ matrix.os }}
+    env:
+      ORG_GRADLE_PROJECT_GITHUB_USERNAME: ${{ github.actor }}
+      ORG_GRADLE_PROJECT_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      ORG_GRADLE_PROJECT_snapshotUsername: ${{ secrets.NEXUS_USERNAME }}
+      ORG_GRADLE_PROJECT_snapshotPassword: ${{ secrets.NEXUS_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17.0.2'
+          distribution: 'adopt'
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Build bootstrap and package
+        run: |
+          ./gradlew editor-desktop-bootstrap:dist
+
+      - name: Build Mac
+        if: runner.os == 'macOS'
+        run: |
+          cd editor-desktop-bootstrap
+          ./package-mac.sh
+
+      - name: Upload installer for Mac
+        if: runner.os == 'macOS'
+        uses: actions/upload-artifact@v3
+        with:
+          name: mac-installer
+          path: editor-desktop-bootstrap/target/talos/TalosVFX-1.0.pkg
+
+      - name: Build Windows
+        if: runner.os == 'Windows'
+        run: |
+          cd editor-desktop-bootstrap
+          bash ./package-win.sh
+
+      - name: Upload installer for windows
+        if: runner.os == 'Windows'
+        uses: actions/upload-artifact@v3
+        with:
+          name: win-installer
+          path: editor-desktop-bootstrap/target/talos/TalosVFX-1.0.msi
+
+
+  upload:
+    needs: installer-matrix
+    name: Upload installer binaries
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Mac installer
+        uses: actions/download-artifact@v3
+        with:
+          name: mac-installer
+
+      - name: Download  Windows installers
+        uses: actions/download-artifact@v3
+        with:
+          name: win-installer
+
+      - name: Print the final result
+        run: ls
+      - name: Install SSH Key
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          known_hosts: 'just-a-placeholder-so-we-dont-get-errors'
+
+      - name: Adding Known Hosts
+        run: ssh-keyscan -H ${{ secrets.SSH_SERVER }} >> ~/.ssh/known_hosts
+
+      - name: Deploy binaries with scp
+        run: | 
+          scp TalosVFX-1.0.msi ${{secrets.SSH_SERVER_USER }}@${{secrets.SSH_SERVER }}:/var/www/editor.talosvfx.com/installers
+          scp TalosVFX-1.0.pkg ${{secrets.SSH_SERVER_USER }}@${{secrets.SSH_SERVER }}:/var/www/editor.talosvfx.com/installers

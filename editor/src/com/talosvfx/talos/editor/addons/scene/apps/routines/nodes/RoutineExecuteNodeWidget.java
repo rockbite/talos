@@ -58,14 +58,6 @@ public class RoutineExecuteNodeWidget extends AbstractRoutineNodeWidget {
         if(sceneAsset != null && sceneAsset.type == GameAssetType.SCENE) {
             ScenePreviewApp scenePreviewApp = nodeStage.openPreviewWindow(sceneAsset);
             scenePreviewApp.reload();
-            container = scenePreviewApp.getWorkspaceWidget().currentScene;
-            Array<GameObject> cameraGoList = container.root.getChildrenByComponent(CameraComponent.class, new Array<>());
-            if(cameraGoList != null && !cameraGoList.isEmpty()) {
-                cameraGO = cameraGoList.first();
-            } else {
-                cameraGO = null;
-            }
-            scenePreviewApp.getWorkspaceWidget().setCameraGO(cameraGO);
         } else {
             return false;
         }

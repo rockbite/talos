@@ -3,14 +3,13 @@ package com.talosvfx.talos.editor.addons.scene.apps.routines.ui;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.SelectBox;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ObjectMap;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.RoutineStage;
+import com.talosvfx.talos.editor.project2.apps.ScenePreviewApp;
 import com.talosvfx.talos.runtime.routine.RoutineInstance;
 import com.talosvfx.talos.editor.data.RoutineStageData;
 import com.talosvfx.talos.editor.nodes.widgets.ValueWidget;
@@ -23,13 +22,15 @@ public class RoutineControlWindow extends Table {
 
     private final Table content;
     private final RoutineStage routineStage;
-    private final SelectBox selectBox;
+    private final SelectBox<String> selectBox;
     private final RoundedFlatButton playButton;
     private final ValueWidget speedValueWidget;
     private final RoundedFlatButton pauseButton;
     private final RoundedFlatButton cameraLockBtn;
+    private Array<Integer> executorIndexToIdMap;
 
     public RoutineControlWindow(RoutineStage routineStage) {
+        executorIndexToIdMap = new Array<>();
         setTouchable(Touchable.enabled);
         this.routineStage = routineStage;
 
@@ -48,7 +49,7 @@ public class RoutineControlWindow extends Table {
         row();
         add(content).grow().pad(5);
 
-        selectBox = new SelectBox(SharedResources.skin);
+        selectBox = new SelectBox<>(SharedResources.skin);
         content.add(selectBox).width(100);
 
         playButton = new RoundedFlatButton();
@@ -63,17 +64,17 @@ public class RoutineControlWindow extends Table {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 if(routineStage.isPlaying()) {
-                    routineStage.stop();
+                    routineStage.stop(getSelected());
                     updatePlayState();
                 } else {
                     Object selected = selectBox.getSelected();
                     if (selected != null) {
-                        routineStage.play(selected.toString());
+                        routineStage.play(getSelected());
                         updatePlayState();
                     }
                 }
                 if (routineStage.isPaused()) {
-                    routineStage.resume();
+                    routineStage.resume(getSelected());
                     updatePauseState();
                 }
             }
@@ -83,10 +84,10 @@ public class RoutineControlWindow extends Table {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 if(routineStage.isPaused()) {
-                    routineStage.resume();
+                    routineStage.resume(getSelected());
                     updatePauseState();
                 } else {
-                    routineStage.pause();
+                    routineStage.pause(getSelected());
                     updatePauseState();
                 }
             }
@@ -103,7 +104,7 @@ public class RoutineControlWindow extends Table {
         speedValueWidget.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                routineStage.setTimeScale(speedValueWidget.getValue());
+                routineStage.setTimeScale(speedValueWidget.getValue(), getSelected());
             }
         });
 
@@ -116,9 +117,44 @@ public class RoutineControlWindow extends Table {
         cameraLockBtn.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                routineStage.lockCamera(cameraLockBtn.isChecked());
+                routineStage.lockCamera(cameraLockBtn.isChecked(), getSelected());
             }
         });
+
+        selectBox.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                ScenePreviewApp currentScenePreviewApp = routineStage.getPreviewAppIfOpened(getSelected());
+                if (currentScenePreviewApp != null) {
+                    cameraLockBtn.setChecked(currentScenePreviewApp.getWorkspaceWidget().isLockCamera());
+
+                    if (routineStage.isPlaying()) {
+                        routineStage.stop(getSelected());
+                        updatePlayState();
+                    }
+
+                    if (currentScenePreviewApp.getWorkspaceWidget().isPaused()) {
+                        routineStage.pause(getSelected());
+                    } else {
+                        routineStage.resume(getSelected());
+                    }
+                    updatePauseState();
+                } else {
+                    reset();
+                }
+            }
+        });
+
+    }
+
+    public void reset(){
+        cameraLockBtn.setChecked(false);
+        if (routineStage.isPlaying()) {
+            routineStage.stop(getSelected());
+            updatePlayState();
+        }
+        routineStage.resume(getSelected());
+        updatePauseState();
     }
 
     private void updatePauseState() {
@@ -128,15 +164,22 @@ public class RoutineControlWindow extends Table {
             pauseButton.setText("Pause");
         }
     }
-
     public void update() {
         RoutineStageData data = routineStage.data;
         RoutineInstance instance = routineStage.data.getRoutineInstance();
 
         Array<RoutineExecutorNode> executors = instance.getNodesByClass(RoutineExecutorNode.class);
         Array<String> titles = new Array<>();
+        ObjectMap<String, Integer> nameCountMap = new ObjectMap<>();
+        executorIndexToIdMap.clear();
         for (RoutineExecutorNode executor : executors) {
             String title = executor.getTitle();
+            nameCountMap.put(title, nameCountMap.get(title, 0) + 1);
+            int id = executor.uniqueId;
+            executorIndexToIdMap.add(id);
+            if (nameCountMap.get(title) > 1) {
+                title += "(" + (nameCountMap.get(title) - 1) + ")";
+            }
             titles.add(title);
         }
         selectBox.setItems(titles);
@@ -144,6 +187,9 @@ public class RoutineControlWindow extends Table {
         speedValueWidget.setValue(routineStage.getTimeScale());
     }
 
+    private int getSelected(){
+        return executorIndexToIdMap.get(selectBox.getSelectedIndex());
+    }
 
 
     private void updatePlayState() {

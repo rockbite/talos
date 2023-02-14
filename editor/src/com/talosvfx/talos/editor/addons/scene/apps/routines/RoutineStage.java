@@ -23,7 +23,6 @@ import com.talosvfx.talos.editor.notifications.events.dynamicnodestage.*;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.project2.apps.ScenePreviewApp;
 import com.talosvfx.talos.runtime.routine.RoutineNode;
-import com.talosvfx.talos.runtime.routine.nodes.RoutineExecutorNode;
 import com.talosvfx.talos.runtime.scene.Scene;
 import lombok.Getter;
 import org.slf4j.Logger;
@@ -45,7 +44,6 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
     private boolean paused = false;
     @Getter
     private boolean playing;
-    private ScenePreviewApp scenePreviewApp;
 
     private boolean cameraLocked = false;
 
@@ -153,6 +151,28 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
             // do this with any async
         }
     }
+
+    private GameAsset getAssetIfExist(int uniqueId) {
+        NodeWidget node = nodeBoard.findNode(uniqueId);
+        if (node != null) {
+            RoutineExecuteNodeWidget executorWidget = (RoutineExecuteNodeWidget) node;
+
+            GameAssetWidget assetWidget = (GameAssetWidget) executorWidget.getWidget("scene");
+            GameAsset sceneAsset = assetWidget.getValue();
+
+            return sceneAsset;
+        }
+        return null;
+    }
+
+    public ScenePreviewApp getPreviewAppIfOpened(int uniqueId){
+        GameAsset asset = getAssetIfExist(uniqueId);
+        if (asset != null) {
+            return SharedResources.appManager.getAppIfOpened(asset, ScenePreviewApp.class);
+        }
+        return null;
+    }
+
 
     public void routineUpdated() {
         routineUpdated(false);
@@ -292,76 +312,74 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
     public void act() {
         if(data == null) return;
         data.getRoutineInstance().tick(getDelta());
-        if(scenePreviewApp != null) {
-            if (data.getRoutineInstance() != null) {
-                scenePreviewApp.setSpeed(timeScale * data.getRoutineInstance().getTimeScale());
-            } else {
-                scenePreviewApp.setSpeed(timeScale);
-            }
-        }
     }
 
     public ScenePreviewApp openPreviewWindow(GameAsset<Scene> gameAsset) {
-        scenePreviewApp = SharedResources.appManager.openAppIfNotOpened(gameAsset, ScenePreviewApp.class);
-
-        return scenePreviewApp;
+        return SharedResources.appManager.openAppIfNotOpened(gameAsset, ScenePreviewApp.class);
     }
 
     public void resetNodes() {
         nodeBoard.resetNodes();
     }
 
-    public void play(String executorName) {
-        RoutineInstance routineInstance = data.getRoutineInstance();
-        RoutineExecutorNode node = (RoutineExecutorNode) routineInstance.getCustomLookup().get(executorName);
-        if(node != null) {
-            RoutineExecuteNodeWidget executorWidget = (RoutineExecuteNodeWidget) nodeBoard.findNode(node.uniqueId);
+    public void play(int uniqueId) {
+            RoutineExecuteNodeWidget executorWidget = (RoutineExecuteNodeWidget) nodeBoard.findNode(uniqueId);
             boolean result = executorWidget.startPlay();
 
             if(result) {
                 playing = true;
-                lockCamera(cameraLocked);
+                lockCamera(cameraLocked, uniqueId);
             }
-        }
     }
 
-    public void stop() {
+    public void stop(int uniqueId) {
         RoutineInstance routineInstance = data.getRoutineInstance();
         routineInstance.stop();
-        if (scenePreviewApp != null) {
-            scenePreviewApp.reload();
+        ScenePreviewApp previewApp = getPreviewAppIfOpened(uniqueId);
+        if (previewApp != null) {
+            previewApp.reload();
         }
         playing = false;
         //timeScale = 1f;
     }
 
-    public void resume() {
+    public void resume(int uniqueId) {
         paused = false;
         data.getRoutineInstance().setPaused(paused);
-        if (scenePreviewApp != null) {
-            scenePreviewApp.setPaused(paused);
+        ScenePreviewApp previewApp = getPreviewAppIfOpened(uniqueId);
+        if (previewApp != null) {
+            previewApp.setPaused(paused);
         }
     }
 
-    public void pause() {
+    public void pause(int uniqueId) {
         paused = true;
         data.getRoutineInstance().setPaused(paused);
-        if (scenePreviewApp != null) {
-            scenePreviewApp.setPaused(paused);
+        ScenePreviewApp previewApp = getPreviewAppIfOpened(uniqueId);
+        if (previewApp != null) {
+            previewApp.setPaused(paused);
         }
     }
 
-    public void setTimeScale(float timeScale) {
+    public void setTimeScale(float timeScale, int uniqueId) {
         this.timeScale = timeScale;
-        if(scenePreviewApp != null) {
-            scenePreviewApp.setSpeed(timeScale);
+        ScenePreviewApp previewApp = getPreviewAppIfOpened(uniqueId);
+        if(previewApp != null) {
+            previewApp.setSpeed(timeScale);
+
+            if (data.getRoutineInstance() != null) {
+                previewApp.setSpeed(timeScale * data.getRoutineInstance().getTimeScale());
+            } else {
+                previewApp.setSpeed(timeScale);
+            }
         }
     }
 
-    public void lockCamera(boolean checked) {
+    public void lockCamera(boolean checked, int uniqueId) {
         cameraLocked = checked;
-        if(scenePreviewApp != null) {
-            scenePreviewApp.setLockCamera(checked);
+        ScenePreviewApp previewApp = getPreviewAppIfOpened(uniqueId);
+        if(previewApp != null) {
+            previewApp.setLockCamera(checked);
         }
     }
 }
