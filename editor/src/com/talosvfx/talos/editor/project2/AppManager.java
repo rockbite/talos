@@ -312,7 +312,17 @@ public class AppManager extends InputAdapter implements Observer {
 	}
 
 	public <T, U extends BaseApp<T>> U openAppIfNotOpened (GameAsset<T> asset, Class<U> app) {
+		U openedApp = getAppIfOpened(asset, app);
+		if (openedApp != null) {
+			return openedApp;
+		}
+		return openApp(asset, app);
+	}
+
+	public <T, U extends BaseApp<T>> U getAppIfOpened(GameAsset<T> asset, Class<U> app) {
 		Array<? extends BaseApp<?>> baseApps = baseAppsOpenForGameAsset.get(asset);
+		if(baseApps == null)
+			return null;
 		for (BaseApp<?> baseApp : baseApps) {
 			if(baseApp.getClass().equals(app)) {
 				if(!baseApp.gridAppReference.isTabActive()) {
@@ -321,8 +331,7 @@ public class AppManager extends InputAdapter implements Observer {
 				return (U) baseApp;
 			}
 		}
-
-		return openApp(asset, app);
+		return null;
 	}
 
 

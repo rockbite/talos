@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.PolygonBatch;
+import com.badlogic.gdx.utils.Array;
 import com.talosvfx.talos.editor.addons.scene.MainRenderer;
 
 import com.talosvfx.talos.editor.project2.AppManager;
@@ -44,6 +45,8 @@ public class ScenePreviewStage extends ViewportWidget implements Observer {
 
 	@Setter@Getter
 	private boolean paused =false;
+
+	@Getter
 	private boolean lockCamera = false;
 
 	public ScenePreviewStage () {
@@ -130,6 +133,14 @@ public class ScenePreviewStage extends ViewportWidget implements Observer {
 			scene.load(TempHackUtil.hackIt(currentContainer.getAsString()));
 
 			currentScene = scene;
+
+			Array<GameObject> cameraGoList = currentScene.root.getChildrenByComponent(CameraComponent.class, new Array<>());
+			if(cameraGoList != null && !cameraGoList.isEmpty()) {
+				cameraGO = cameraGoList.first();
+			} else {
+				cameraGO = null;
+			}
+			setCameraGO(cameraGO);
 		}
 	}
 

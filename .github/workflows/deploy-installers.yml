@@ -62,10 +62,16 @@ jobs:
     name: Upload installer binaries
     runs-on: ubuntu-latest
     steps:
-      - name: Download installers
+      - name: Download Mac installer
         uses: actions/download-artifact@v3
         with:
-          name: [ mac-installer, win-installer ]
+          name: mac-installer
+
+      - name: Download  Windows installers
+        uses: actions/download-artifact@v3
+        with:
+          name: win-installer
+
       - name: Print the final result
         run: ls
       - name: Install SSH Key
@@ -77,3 +83,7 @@ jobs:
       - name: Adding Known Hosts
         run: ssh-keyscan -H ${{ secrets.SSH_SERVER }} >> ~/.ssh/known_hosts
 
+      - name: Deploy binaries with scp
+        run: | 
+          scp TalosVFX-1.0.msi ${{secrets.SSH_SERVER_USER }}@${{secrets.SSH_SERVER }}:/var/www/editor.talosvfx.com/installers
+          scp TalosVFX-1.0.pkg ${{secrets.SSH_SERVER_USER }}@${{secrets.SSH_SERVER }}:/var/www/editor.talosvfx.com/installers
