@@ -28,7 +28,7 @@ import com.esotericsoftware.spine.SkeletonData;
 import com.talosvfx.talos.editor.addons.scene.events.*;
 import com.talosvfx.talos.editor.addons.scene.events.meta.MetaDataReloadedEvent;
 import com.talosvfx.talos.editor.addons.scene.events.explorer.DirectoryMovedEvent;
-import com.talosvfx.talos.editor.project2.AppManager;
+import com.talosvfx.talos.editor.notifications.events.ProjectUnloadEvent;
 import com.talosvfx.talos.runtime.assets.AMetadata;
 import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
 import com.talosvfx.talos.editor.data.RoutineStageData;
@@ -64,6 +64,7 @@ import com.talosvfx.talos.runtime.utils.TempHackUtil;
 import com.talosvfx.talos.runtime.vfx.ParticleEffectDescriptor;
 import com.talosvfx.talos.runtime.vfx.assets.AssetProvider;
 import com.talosvfx.talos.runtime.vfx.serialization.ExportData;
+import lombok.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -215,16 +216,35 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 			System.out.println("Put file handle game asset " + handle.path() + " " + gameAsset.nameIdentifier);
 		}
 
-		void putUUIRawAsset (UUID uuid, RawAsset rawAsset) {
+		void clearFileHandleGameAssets () {
+			fileHandleGameAssetObjectMap.clear();
+
+			logger.info("Cleared file handles in file handle game asset map.");
+		}
+
+		void putUUIDRawAsset(UUID uuid, RawAsset rawAsset) {
 			uuidRawAssetMap.put(uuid, rawAsset);
 
 			System.out.println("Put uuid " + uuid.toString() + " " + rawAsset.handle.path());
 		}
+
+		void clearUUIDRawAssets () {
+			uuidRawAssetMap.clear();
+
+			logger.info("Cleared uuids for raw asset map.");
+		}
+
 		void putFileHandleRawAsset (FileHandle handle, RawAsset rawAsset) {
 			fileHandleRawAssetMap.put(handle, rawAsset);
 
 			System.out.println("Put file handle raw " + handle.path() + " " + rawAsset.handle.path());
 
+		}
+
+		void clearFileHandleRawAssets () {
+			fileHandleRawAssetMap.clear();
+
+			logger.info("Cleared file handle raw assets map.");
 		}
 
 		public GameAsset removeFileHandleGameAssetObjectMap (FileHandle handle) {
@@ -289,6 +309,34 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 //				loadChangesFromScripts(AssetRepository.this::fileVisit);
 			}
 		});
+	}
+
+	public void unloadAssets () {
+		this.assetsRoot = null;
+
+		identifierGameAssetMap.clear();
+		logger.info("Cleared identifiers in identifier game asset map.");
+
+		uniqueIdentifierGameAssetMap.clear();
+		logger.info("Cleared uuids in unique identifier game asset map.");
+
+		newFilesSeen.clear();
+
+		// dispose all game assets
+		for (ObjectMap.Entry<FileHandle, GameAsset> entry : dataMaps.fileHandleGameAssetObjectMap) {
+			FileHandle key = entry.key;
+			GameAsset<?> value = entry.value;
+
+			if (key.isDirectory()) continue;
+
+
+			disposeGameAssetForType(value);
+		}
+
+		// clear data maps
+		dataMaps.clearFileHandleGameAssets();
+		dataMaps.clearUUIDRawAssets();
+		dataMaps.clearFileHandleRawAssets();
 	}
 
 	private void loadChangesFromScripts(Function<Path, FileVisitResult> function) {
@@ -1185,6 +1233,64 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 		return gameAssetOut;
 	}
 
+	public void disposeGameAssetForType (@NonNull GameAsset<?> gameAsset) {
+		GameAssetType assetTypeFromExtension = gameAsset.type;
+
+		if (!assetTypeFromExtension.isRootGameAsset()) {
+			throw new GdxRuntimeException("Trying to dispose a game asset from a non root asset");
+		}
+
+		if (gameAsset.isBroken()) {
+			logger.warn("Asset is broken, skipping dispose for " + gameAsset.getRootRawAsset().handle.path());
+		}
+
+		try {
+			switch (assetTypeFromExtension) {
+			case SPRITE:
+
+				GameAsset<Texture> textureGameAsset = (GameAsset<Texture>) gameAsset;
+				textureGameAsset.getResource().dispose();
+				break;
+			case ATLAS:
+				GameAsset<TextureAtlas> textureAtlasGameAsset = (GameAsset<TextureAtlas>) gameAsset;
+				textureAtlasGameAsset.getResource().dispose();
+				break;
+
+			case SKELETON:
+				// TODO: 14.02.23 figure out how to dispose skeleton's atlas
+				break;
+			case SOUND:
+
+				GameAsset<Music> musicGameAsset = (GameAsset<Music>) gameAsset;
+				musicGameAsset.getResource().dispose();
+				break;
+			case VFX_OUTPUT:
+				break;
+			case VFX:
+				break;
+			case SCRIPT:
+				break;
+			case ROUTINE:
+				break;
+			case PREFAB:
+				break;
+			case SCENE:
+				break;
+			case TILE_PALETTE:
+				break;
+			case LAYOUT_DATA:
+				break;
+			case DIRECTORY:
+				break;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			if (gameAsset != null) {
+				logger.error("Asset "+ gameAsset.getRootRawAsset().handle.path() +" could not be disposed!");
+			}
+		}
+	}
+
 	public void saveMetaData (AMetadata metaData, boolean useGlobalState) {
 		if (useGlobalState) {
 			GlobalSaveStateSystem.MetaDataUpdateStateObject metaDataUpdateStateObject = new GlobalSaveStateSystem.MetaDataUpdateStateObject(metaData);
@@ -1366,7 +1472,7 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 				rawAsset.metaData = createMetaDataForAsset(rawAsset);
 			}
 
-			dataMaps.putUUIRawAsset(rawAsset.metaData.uuid, rawAsset);
+			dataMaps.putUUIDRawAsset(rawAsset.metaData.uuid, rawAsset);
 			dataMaps.putFileHandleRawAsset(fileHandle, rawAsset);
 
 			System.out.println("Raw asset created" + rawAsset.handle.path());
@@ -1382,6 +1488,11 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 	@EventHandler
 	public void onProjectLoad (ProjectLoadedEvent projectLoadedEvent) {
 		loadAssetsForProject(projectLoadedEvent.getProjectData().rootProjectDir());
+	}
+
+	@EventHandler
+	public void onProjectUnload (ProjectUnloadEvent projectUnloadEvent) {
+		unloadAssets();
 	}
 
 	@EventHandler
