@@ -31,6 +31,8 @@ public class DynamicItemListWidget<T> extends PropertyWidget<Array<T>> {
         String updateName (T t, String newText);
 
         void onUpdate();
+
+        void onDeleteNode(T t);
     }
 
 
@@ -157,6 +159,7 @@ public class DynamicItemListWidget<T> extends PropertyWidget<Array<T>> {
                     }
                 }
                 list.remove(selection.first());
+                interaction.onDeleteNode(selection.first().getObject());
                 rootNodes = list.getRootNodes();
                 if (rootNodes.size > 0) {
                     selection.clear();
@@ -164,7 +167,6 @@ public class DynamicItemListWidget<T> extends PropertyWidget<Array<T>> {
                     if (index < 0) index = 0;
                     selection.add(rootNodes.get(index));
                 }
-
                 callValueChanged(makeDataArray());
             }
         }
