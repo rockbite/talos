@@ -102,6 +102,16 @@ public class ScenePropertyProvider implements IPropertyProvider {
 				int preferredLayerIndex = SharedResources.currentProject.getSceneData().getPreferredSceneLayer().getIndex();
 				itemListWidget.list.addNodeToSelectionByIndex(preferredLayerIndex);
 			}
+
+			@Override
+			public void onDeleteNode(ItemData itemData) {
+				SceneData sceneData = SharedResources.currentProject.getSceneData();
+				if(itemData.text.equals(sceneData.getPreferredSceneLayer().getName())){
+					sceneData.setPreferredSceneLayer("Default");
+					int preferredLayerIndex = sceneData.getPreferredSceneLayer().getIndex();
+					itemListWidget.list.addNodeToSelectionByIndex(preferredLayerIndex);
+				}
+			}
 		});
 		itemListWidget.list.addItemListener(new FilteredTree.ItemListener<ItemData>() {
 			@Override

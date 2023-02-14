@@ -1259,8 +1259,8 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
 			boolean foundLayer = false;
 			for (SceneLayer sceneLayer : layerList) {
-				if (sceneLayer.getIndex() == component.sortingLayer.getIndex()) {
-					component.setSortingLayer(sceneLayer);
+				if (sceneLayer.getName().equals(component.sortingLayer.getName())) {
+					component.getSortingLayer().setIndex(sceneLayer.getIndex());
 					foundLayer = true;
 					break;
 				}

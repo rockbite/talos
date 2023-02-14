@@ -72,6 +72,11 @@ public class MapComponentProvider extends RendererComponentProvider<MapComponent
 			public void onUpdate() {
 
 			}
+
+			@Override
+			public void onDeleteNode(TalosLayer talosLayer) {
+
+			}
 		});
 
 		talosLayerPropertiesWidget = new TalosLayerPropertiesWidget(null, new Supplier<TalosLayer>() {
