@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.*;
 import com.kotcrab.vis.ui.util.dialog.Dialogs;
+import com.kotcrab.vis.ui.util.dialog.OptionDialogListener;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.runtime.assets.GameAssetType;
@@ -59,9 +60,35 @@ public class TalosControl implements Observer {
         }
 
         if (event.getPath().equals("file/new/project")) {
-            SharedResources.appManager.removeAll();
-            ProjectSplash projectSplash = new ProjectSplash();
-            projectSplash.show(SharedResources.stage);
+            if (SharedResources.appManager.hasChangesToSave()) {
+                SharedResources.appManager.requestConfirmationToCloseWithoutSave(new OptionDialogListener() {
+                    @Override
+                    public void yes() {
+                        SharedResources.appManager.removeAll();
+                        SharedResources.projectLoader.unloadProject();
+                        ProjectSplash projectSplash = new ProjectSplash();
+                        projectSplash.show(SharedResources.stage);
+                    }
+
+                    @Override
+                    public void no() {
+                        SharedResources.appManager.removeAll();
+                        SharedResources.projectLoader.unloadProject();
+                        ProjectSplash projectSplash = new ProjectSplash();
+                        projectSplash.show(SharedResources.stage);
+                    }
+
+                    @Override
+                    public void cancel() {
+                        // do nothing
+                    }
+                });
+            } else {
+                SharedResources.appManager.removeAll();
+                SharedResources.projectLoader.unloadProject();
+                ProjectSplash projectSplash = new ProjectSplash();
+                projectSplash.show(SharedResources.stage);
+            }
         }
 
         if(event.getPath().equals("window/panels/close_all")) {
@@ -125,7 +152,26 @@ public class TalosControl implements Observer {
         }
 
         if(event.getPath().equals("file/quit")) {
-            Gdx.app.exit();
+            if (SharedResources.appManager.hasChangesToSave()) {
+                SharedResources.appManager.requestConfirmationToCloseWithoutSave(new OptionDialogListener() {
+                    @Override
+                    public void yes() {
+                        Gdx.app.exit();
+                    }
+
+                    @Override
+                    public void no() {
+                        Gdx.app.exit();
+                    }
+
+                    @Override
+                    public void cancel() {
+                        // do nothing
+                    }
+                });
+            } else {
+                Gdx.app.exit();
+            }
         }
     }
 
