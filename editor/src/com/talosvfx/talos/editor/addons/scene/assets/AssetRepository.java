@@ -64,6 +64,7 @@ import com.talosvfx.talos.runtime.utils.TempHackUtil;
 import com.talosvfx.talos.runtime.vfx.ParticleEffectDescriptor;
 import com.talosvfx.talos.runtime.vfx.assets.AssetProvider;
 import com.talosvfx.talos.runtime.vfx.serialization.ExportData;
+import lombok.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -319,6 +320,27 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 		uniqueIdentifierGameAssetMap.clear();
 		System.out.println("Cleared uuids in unique identifier game asset map.");
 
+		newFilesSeen.clear();
+
+		// dispose all game assets
+		for (ObjectMap.Entry<FileHandle, GameAsset> entry : dataMaps.fileHandleGameAssetObjectMap) {
+			FileHandle key = entry.key;
+			GameAsset<?> value = entry.value;
+
+			if (key.isDirectory()) continue;
+
+			try {
+				GameAssetType assetTypeFromExtension = GameAssetType.getAssetTypeFromExtension(key.extension());
+
+				if (assetTypeFromExtension.isRootGameAsset()) {
+					disposeGameAssetForType(assetTypeFromExtension, value);
+				}
+			} catch (GameAssetType.NoAssetTypeException e) {
+				//It's not an asset
+			}
+		}
+
+		// clear data maps
 		dataMaps.clearFileHandleGameAssets();
 		dataMaps.clearUUIDRawAssets();
 		dataMaps.clearFileHandleRawAssets();
@@ -1216,6 +1238,129 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 		}
 
 		return gameAssetOut;
+	}
+
+	public void disposeGameAssetForType (GameAssetType assetTypeFromExtension, @NonNull GameAsset<?> gameAsset) {
+		if (!assetTypeFromExtension.isRootGameAsset()) {
+			throw new GdxRuntimeException("Trying to dispose a game asset from a non root asset");
+		}
+
+		if (gameAsset.isBroken()) {
+			System.out.println("Asset is broken, skipping dispose for " + gameAsset.getRootRawAsset().handle.path());
+		}
+
+		try {
+			switch (assetTypeFromExtension) {
+			case SPRITE:
+
+				GameAsset<Texture> textureGameAsset = (GameAsset<Texture>) gameAsset;
+				textureGameAsset.getResource().dispose();
+
+				// destroy links
+				textureGameAsset.getRootRawAsset().gameAssetReferences.clear();
+				textureGameAsset.dependentRawAssets.clear();
+
+				break;
+			case ATLAS:
+				GameAsset<TextureAtlas> textureAtlasGameAsset = (GameAsset<TextureAtlas>) gameAsset;
+				textureAtlasGameAsset.getResource().dispose();
+
+				// destroy links
+				textureAtlasGameAsset.getRootRawAsset().gameAssetReferences.clear();
+				textureAtlasGameAsset.dependentGameAssets.clear();
+
+				break;
+
+			case SKELETON:
+				GameAsset<SkeletonData> skeletonDataGameAsset = (GameAsset<SkeletonData>) gameAsset;
+				// TODO: 14.02.23 figure out how to dispose skeleton's atlas
+//				 destroy links
+				skeletonDataGameAsset.getRootRawAsset().gameAssetReferences.clear();
+				skeletonDataGameAsset.dependentRawAssets.clear();
+
+				break;
+			case SOUND:
+
+				GameAsset<Music> musicGameAsset = (GameAsset<Music>) gameAsset;
+				musicGameAsset.getResource().dispose();
+
+				// destroy links
+				musicGameAsset.getRootRawAsset().gameAssetReferences.clear();
+				musicGameAsset.dependentGameAssets.clear();
+
+				break;
+			case VFX_OUTPUT:
+
+				GameAsset<ParticleEffectDescriptor> particleEffectDescriptorGameAsset = (GameAsset<ParticleEffectDescriptor>) gameAsset;
+				// destroy links
+				particleEffectDescriptorGameAsset.getRootRawAsset().gameAssetReferences.clear();
+				particleEffectDescriptorGameAsset.dependentRawAssets.clear();
+
+				break;
+			case VFX:
+
+				GameAsset<VFXProjectData> vfxProjectDataGameAsset = (GameAsset<VFXProjectData>) gameAsset;
+				// destroy links
+				vfxProjectDataGameAsset.getRootRawAsset().gameAssetReferences.clear();
+				vfxProjectDataGameAsset.dependentRawAssets.clear();
+
+				break;
+			case SCRIPT:
+
+				GameAsset<String> scriptGameAsset = (GameAsset<String>) gameAsset;
+				// destroy links
+				scriptGameAsset.getRootRawAsset().gameAssetReferences.clear();
+				scriptGameAsset.dependentRawAssets.clear();
+
+				break;
+			case ROUTINE:
+
+				GameAsset<RoutineStageData> routineStageDataGameAsset = (GameAsset<RoutineStageData>) gameAsset;
+				// destroy links
+				routineStageDataGameAsset.getRootRawAsset().gameAssetReferences.clear();
+				routineStageDataGameAsset.dependentRawAssets.clear();
+
+				break;
+			case PREFAB:
+
+				GameAsset<Prefab> prefabGameAsset = (GameAsset<Prefab>) gameAsset;
+				// destroy links
+				prefabGameAsset.getRootRawAsset().gameAssetReferences.clear();
+				prefabGameAsset.dependentRawAssets.clear();
+
+				break;
+			case SCENE:
+
+				GameAsset<Scene> sceneGameAsset = (GameAsset<Scene>) gameAsset;
+				// destroy links
+				sceneGameAsset.getRootRawAsset().gameAssetReferences.clear();
+				sceneGameAsset.dependentRawAssets.clear();
+
+				break;
+			case TILE_PALETTE:
+
+				GameAsset<TilePaletteData> paletteGameAsset = (GameAsset<TilePaletteData>) gameAsset;
+				// destroy links
+				paletteGameAsset.getRootRawAsset().gameAssetReferences.clear();
+				paletteGameAsset.dependentRawAssets.clear();
+
+				break;
+			case LAYOUT_DATA:
+				GameAsset<LayoutJsonStructure> layoutGridGameAsset = (GameAsset<LayoutJsonStructure>) gameAsset;
+				// destroy links
+				layoutGridGameAsset.getRootRawAsset().gameAssetReferences.clear();
+				layoutGridGameAsset.dependentRawAssets.clear();
+
+				break;
+			case DIRECTORY:
+				break;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			if (gameAsset != null) {
+				System.out.println("Asset "+ gameAsset.getRootRawAsset().handle.path() +" could not be disposed!");
+			}
+		}
 	}
 
 	public void saveMetaData (AMetadata metaData, boolean useGlobalState) {
