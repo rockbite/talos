@@ -5,6 +5,8 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.*;
 import com.kotcrab.vis.ui.util.dialog.Dialogs;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
+import com.talosvfx.talos.editor.notifications.events.assets.AssetChangeDirectoryEvent;
+import com.talosvfx.talos.editor.project2.apps.ProjectExplorerApp;
 import com.talosvfx.talos.editor.utils.Toasts;
 import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.runtime.assets.GameAssetType;
@@ -176,6 +178,11 @@ public class TalosControl implements Observer {
                         saveCallback.accept(destination);
 
                         AssetRepository.getInstance().rawAssetCreated(destination, true);
+
+                        // change to file's directory
+                        AssetChangeDirectoryEvent assetChangeDirectoryEvent = Notifications.obtainEvent(AssetChangeDirectoryEvent.class);
+                        assetChangeDirectoryEvent.setPath(destination.parent());
+                        Notifications.fireEvent(assetChangeDirectoryEvent);
                     } else {
                         Toasts.getInstance().showErrorToast("Path doesn't belong to the project. Didn't save!");
                     }
