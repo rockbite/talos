@@ -21,7 +21,6 @@ import com.talosvfx.talos.editor.notifications.events.assets.GameAssetOpenEvent;
 import com.talosvfx.talos.editor.notifications.events.assets.MenuItemClickedEvent;
 import com.talosvfx.talos.editor.widgets.ui.menu.MainMenu;
 import com.talosvfx.talos.runtime.maps.TilePaletteData;
-import lombok.Data;
 
 import java.util.function.Consumer;
 
