@@ -5,6 +5,7 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.*;
 import com.kotcrab.vis.ui.util.dialog.Dialogs;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
+import com.talosvfx.talos.editor.utils.Toasts;
 import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.runtime.assets.GameAssetType;
 import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
@@ -19,6 +20,10 @@ import com.talosvfx.talos.editor.notifications.events.MenuPopupOpenCommand;
 import com.talosvfx.talos.editor.notifications.events.assets.GameAssetOpenEvent;
 import com.talosvfx.talos.editor.notifications.events.assets.MenuItemClickedEvent;
 import com.talosvfx.talos.editor.widgets.ui.menu.MainMenu;
+import com.talosvfx.talos.runtime.maps.TilePaletteData;
+import lombok.Data;
+
+import java.util.function.Consumer;
 
 import static com.talosvfx.talos.editor.layouts.LayoutGrid.LayoutJsonStructure;
 
@@ -56,6 +61,33 @@ public class TalosControl implements Observer {
             SharedResources.projectLoader.loadProject(talosProjectData);
 
             return;
+        }
+
+        if(event.getPath().equals("file/new/routine")) {
+            // create routine
+            askToSaveFile("rt", (newScriptDestination) -> newScriptDestination.writeString("{}", false));
+        } else if (event.getPath().equals("file/new/vfx")) {
+            // create vfx
+            askToSaveFile("tls", (newParticleDestination) -> {
+                FileHandle effectFileHandle = AssetRepository.getInstance().copySampleParticleToProject(newParticleDestination.parent());
+                AssetRepository.getInstance().moveFile(effectFileHandle, newParticleDestination, false, true);
+            });
+        } else if (event.getPath().equals("file/new/script")) {
+            // create script
+            askToSaveFile("ts", (newScriptDestination) -> {
+                FileHandle templateScript = Gdx.files.internal("addons/scene/missing/ScriptTemplate.ts");
+
+                String templateString = templateScript.readString();
+                templateString = templateString.replaceAll("%TEMPLATE_NAME%", newScriptDestination.nameWithoutExtension());
+                newScriptDestination.writeString(templateString, false);
+            });
+        } else if (event.getPath().equals("file/new/palette")) {
+            // palette
+            askToSaveFile("ttp", (newPaletteDestination) -> {
+                Json json = new Json(JsonWriter.OutputType.json);
+                String templateString = json.toJson(new TilePaletteData());
+                newPaletteDestination.writeString(templateString, false);
+            });
         }
 
         if(event.getPath().equals("window/panels/close_all")) {
@@ -121,6 +153,36 @@ public class TalosControl implements Observer {
         if(event.getPath().equals("file/quit")) {
             Gdx.app.exit();
         }
+    }
+
+    private void askToSaveFile (String extension, Consumer<FileHandle> saveCallback) {
+        FileSystemInteraction.instance().showSaveFileChooser(extension, new FileChooserListener() {
+            @Override
+            public void selected(Array<FileHandle> files) {
+                if (files.size == 1) {
+                    FileHandle target = files.first();
+                    if (target.isDirectory()) {
+                        return;
+                    }
+                    if (!target.extension().equals(extension)) {
+                        target = target.parent().child(target.nameWithoutExtension() + "." + extension);
+                    }
+                    if (target.nameWithoutExtension().trim().equals("")) {
+                        target = target.parent().child("untitled." + extension);
+                    }
+                    if (SharedResources.currentProject.isPathInsideProject(target.path())) {
+                        FileHandle destination = AssetImporter.suggestNewNameForFileHandle(target.parent().path(), target.nameWithoutExtension(), extension);
+
+                        // use destination to save the file
+                        saveCallback.accept(destination);
+
+                        AssetRepository.getInstance().rawAssetCreated(destination, true);
+                    } else {
+                        Toasts.getInstance().showErrorToast("Path doesn't belong to the project. Didn't save!");
+                    }
+                }
+            }
+        });
     }
 
     @EventHandler
