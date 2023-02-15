@@ -12,8 +12,6 @@
         </menu>
         <separator/>
         <menu name="save" title="Save"/>
-        <menu name="save_as" title="Save As..."/>
-        <menu name="save_copy" title="Save Copy"/>
         <separator/>
         <menu name="import" title="Import">
             <inject name="other" />
