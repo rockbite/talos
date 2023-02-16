@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.collision.BoundingBox;
@@ -136,6 +137,29 @@ public class EightPointGizmo extends Gizmo {
 				controlRect.draw(batch, parentAlpha);
 			}
 
+
+			Vector2 vec = new Vector2(Gdx.input.getX(), Gdx.input.getY());
+
+			viewport.screenToLocalCoordinates(vec);
+			vec = viewport.getWorldFromLocal(vec.x, vec.y);
+
+			if (isOnTouchedPoint(vec.x, vec.y)) {
+				ControlPoint controlPoint = getTouchedPoint(vec.x, vec.y);
+				if (controlPoint.pointType == CORNER) {
+					CursorUtil.setDynamicModeCursor(CursorUtil.CursorType.RESIZE);
+				} else {
+					if (controlPoint.id == TOP_MIDDLE || controlPoint.id == BOTTOM_MIDDLE) {
+						CursorUtil.setDynamicModeCursor(CursorUtil.CursorType.RESIZE);
+					} else {
+						CursorUtil.setDynamicModeCursor(CursorUtil.CursorType.RESIZE);
+					}
+				}
+			}
+			if (isOnTouchedRotationArea(vec.x, vec.y)) {
+				CursorUtil.setDynamicModeCursor(CursorUtil.CursorType.ROTATE);
+			}
+		}
+
 //			batch.end();
 //			ShapeRenderer shapeRenderer = new ShapeRenderer();
 //			shapeRenderer.setProjectionMatrix(batch.getProjectionMatrix());
@@ -148,25 +172,7 @@ public class EightPointGizmo extends Gizmo {
 //
 //			shapeRenderer.dispose();
 //			batch.begin();
-		}
 
-		Vector2 vec = new Vector2(Gdx.input.getX(), Gdx.input.getY());
-
-		viewport.screenToLocalCoordinates(vec);
-		vec = viewport.getWorldFromLocal(vec.x, vec.y);
-
-		if (isOnTouchedPoint(vec.x, vec.y)) {
-			ControlPoint controlPoint = getTouchedPoint(vec.x, vec.y);
-			if (controlPoint.pointType == CORNER) {
-				CursorUtil.setDynamicModeCursor(CursorUtil.CursorType.RESIZE);
-			} else {
-				if (controlPoint.id == TOP_MIDDLE || controlPoint.id == BOTTOM_MIDDLE) {
-					CursorUtil.setDynamicModeCursor(CursorUtil.CursorType.RESIZE);
-				} else {
-					CursorUtil.setDynamicModeCursor(CursorUtil.CursorType.RESIZE);
-				}
-			}
-		}
 
 	}
 
@@ -221,6 +227,12 @@ public class EightPointGizmo extends Gizmo {
 	private ControlPoint currentManipulatingPoint = null;
 	private Vector2 controlPointOffset = new Vector2();
 
+	private Vector2 rotationStartVector = new Vector2();
+	private Vector2 testVector = new Vector2();
+	private float startRotation;
+	private float startWorldRotation;
+
+	private boolean rotating;
 	@Override
 	public void touchDown (float x, float y, int button) {
 		userInteracted = true;
@@ -233,6 +245,20 @@ public class EightPointGizmo extends Gizmo {
 			currentManipulatingPoint = touchedPoint;
 
 			controlPointOffset.set(x, y).sub(touchedPoint.position);
+		} else {
+
+			boolean onTouchedRotationArea = isOnTouchedRotationArea(x, y);
+			if (onTouchedRotationArea) {
+				rotating = true;
+				int touchedRotationArea = getTouchedRotationArea(x, y);
+
+				//
+				TransformComponent transformComponent = gameObject.getComponent(TransformComponent.class);
+				rotationStartVector.set(x, y).sub(transformComponent.worldPosition);
+				startRotation = transformComponent.rotation;
+				startWorldRotation = transformComponent.worldRotation;
+
+			}
 
 		}
 	}
@@ -247,7 +273,26 @@ public class EightPointGizmo extends Gizmo {
 
 		if (currentManipulatingPoint != null) {
 			movePointByDelta(x, y, deltaX, deltaY, currentManipulatingPoint);
+		} else if (rotating) {
+			testVector.set(x, y).sub(gameObject.getComponent(TransformComponent.class).worldPosition);
+			processRotation(rotationStartVector, testVector);
+
 		}
+	}
+
+	private void processRotation (Vector2 rotationStartVector, Vector2 testVector) {
+		float angleDegDiff = rotationStartVector.angleDeg(testVector);
+
+		TransformComponent transformComponent = gameObject.getComponent(TransformComponent.class);
+		transformComponent.rotation = startRotation - angleDegDiff;
+		transformComponent.worldRotation = startWorldRotation - angleDegDiff;
+
+
+		SceneUtils.componentUpdated(gameObjectContainer, gameObject, transformComponent, true);
+
+		SpriteRendererComponent spriteRenderComponent = gameObject.getComponent(SpriteRendererComponent.class);
+		componentToPoints(transformComponent, spriteRenderComponent);
+
 	}
 
 	private void movePointByDelta (float x, float y, float deltaX, float deltaY, ControlPoint currentManipulatingPoint) {
@@ -388,6 +433,9 @@ public class EightPointGizmo extends Gizmo {
 				controlPoint.position.add(transformComponent.worldPosition);
 			}
 
+			updateTransformFromControlPoints();
+
+
 		}
 		break;
 		case MIDDLE: {
@@ -406,9 +454,13 @@ public class EightPointGizmo extends Gizmo {
 				float height = Math.abs(controlPoints.get(TOP_LEFT).position.y - controlPoints.get(BOTTOM_LEFT).position.y);
 
 				boolean invertedX = controlPoints.get(LEFT_MIDDLE).position.x > controlPoints.get(RIGHT_MIDDLE).position.x;
+				boolean invertedY = controlPoints.get(TOP_LEFT).position.y  < controlPoints.get(BOTTOM_LEFT).position.y;
 
 				if (invertedX) {
 					width *= -1;
+				}
+				if (invertedY) {
+					height *= -1;
 				}
 
 				controlPoints.get(TOP_RIGHT).position.set(stationaryPoint.position.x + width, stationaryPoint.position.y + height / 2f);
@@ -426,9 +478,13 @@ public class EightPointGizmo extends Gizmo {
 				float height = Math.abs(controlPoints.get(TOP_LEFT).position.y - controlPoints.get(BOTTOM_LEFT).position.y);
 
 				boolean invertedX = controlPoints.get(LEFT_MIDDLE).position.x > controlPoints.get(RIGHT_MIDDLE).position.x;
+				boolean invertedY = controlPoints.get(TOP_LEFT).position.y  < controlPoints.get(BOTTOM_LEFT).position.y;
 
 				if (invertedX) {
 					width *= -1;
+				}
+				if (invertedY) {
+					height *= -1;
 				}
 
 				controlPoints.get(TOP_LEFT).position.set(stationaryPoint.position.x - width, stationaryPoint.position.y + height / 2f);
@@ -443,8 +499,12 @@ public class EightPointGizmo extends Gizmo {
 				float width = Math.abs(controlPoints.get(BOTTOM_RIGHT).position.x - controlPoints.get(BOTTOM_LEFT).position.x);
 				float height = Math.abs(currentManipulatingPoint.position.y - stationaryPoint.position.y);
 
+				boolean invertedX = controlPoints.get(TOP_LEFT).position.x > controlPoints.get(TOP_RIGHT).position.x;
 				boolean invertedY = controlPoints.get(BOTTOM_MIDDLE).position.y > controlPoints.get(TOP_MIDDLE).position.y;
 
+				if (invertedX) {
+					width *= -1;
+				}
 				if (invertedY) {
 					height *= -1;
 				}
@@ -462,8 +522,12 @@ public class EightPointGizmo extends Gizmo {
 				float width = Math.abs(controlPoints.get(BOTTOM_RIGHT).position.x - controlPoints.get(BOTTOM_LEFT).position.x);
 				float height = Math.abs(currentManipulatingPoint.position.y - stationaryPoint.position.y);
 
+				boolean invertedX = controlPoints.get(TOP_LEFT).position.x > controlPoints.get(TOP_RIGHT).position.x;
 				boolean invertedY = controlPoints.get(BOTTOM_MIDDLE).position.y > controlPoints.get(TOP_MIDDLE).position.y;
 
+				if (invertedX) {
+					width *= -1;
+				}
 				if (invertedY) {
 					height *= -1;
 				}
@@ -480,34 +544,37 @@ public class EightPointGizmo extends Gizmo {
 				controlPoint.position.rotateDeg(transformComponent.worldRotation);
 				controlPoint.position.add(transformComponent.worldPosition);
 			}
+
+			updateTransformFromControlPoints();
+
 		}
 
 		break;
 		}
 
-		updateTransformFromControlPoints();
 	}
 
 	private void updateTransformFromControlPoints () {
 		//Oh god
 		TransformComponent transformComponent = gameObject.getComponent(TransformComponent.class);
 
-		for (ControlPoint controlPoint : controlPoints) {
-			controlPoint.position.sub(transformComponent.worldPosition);
-			controlPoint.position.rotateDeg(-transformComponent.worldRotation);
-		}
+		//Center
 
 		ControlPoint bottomLeftControlPoint = controlPoints.get(BOTTOM_LEFT);
 		ControlPoint bottomRightControlPoint = controlPoints.get(BOTTOM_RIGHT);
 		ControlPoint topRightControlPoint = controlPoints.get(TOP_RIGHT);
 
+		float centerX = (topRightControlPoint.position.x + bottomLeftControlPoint.position.x) / 2f;
+		float centerY = (topRightControlPoint.position.y + bottomLeftControlPoint.position.y) / 2f;
+
+		for (ControlPoint controlPoint : controlPoints) {
+			controlPoint.position.sub(transformComponent.worldPosition);
+			controlPoint.position.rotateDeg(-transformComponent.worldRotation);
+		}
+
 		//May be negative
 		float totalWidth = bottomRightControlPoint.position.x - bottomLeftControlPoint.position.x;
 		float totalHeight = topRightControlPoint.position.y - bottomRightControlPoint.position.y;
-
-		//Center
-		float centerX = (topRightControlPoint.position.x + bottomLeftControlPoint.position.x) / 2f;
-		float centerY = (topRightControlPoint.position.y + bottomLeftControlPoint.position.y) / 2f;
 
 		for (ControlPoint controlPoint : controlPoints) {
 			controlPoint.position.rotateDeg(transformComponent.worldRotation);
@@ -516,7 +583,16 @@ public class EightPointGizmo extends Gizmo {
 
 		Vector2 out = new Vector2();
 		out.set(centerX, centerY);
-		out.add(transformComponent.worldPosition);
+
+		//Offset needs to change depending on rotation because we are dealing in unrotated coords
+		int howMany90Rots = MathUtils.floor(transformComponent.worldRotation / 90);
+		int howMany180Rots = MathUtils.floor(transformComponent.worldRotation / 180f);
+
+		int sig = (int) Math.pow(-1, howMany90Rots + howMany180Rots);
+
+		sig = 1;
+
+		out.scl(sig, sig);
 
 		GameObject.setPositionFromWorldPosition(gameObject, out);
 		SceneUtils.componentUpdated(gameObjectContainer, gameObject, transformComponent, true);
@@ -576,6 +652,7 @@ public class EightPointGizmo extends Gizmo {
 
 		userInteracted = false;
 		currentManipulatingPoint = null;
+		rotating = false;
 	}
 
 	@Override
@@ -586,17 +663,61 @@ public class EightPointGizmo extends Gizmo {
 		if (isOnTouchedPoint(x, y)) {
 			return true;
 		}
-//		if (isOnTouchedRotationArea(x, y)) {
-//			return true;
-//		}
+		if (isOnTouchedRotationArea(x, y)) {
+			return true;
+		}
 
 		return false;
 	}
 
-//	protected boolean isOnTouchedRotationArea (float x, float y) {
-//		int touchedRA = getTouchedRotationArea(x, y);
-//		return touchedRA >= -1;
-//	}
+	protected boolean isOnTouchedRotationArea (float x, float y) {
+		int touchedRA = getTouchedRotationArea(x, y);
+		return touchedRA != -1;
+	}
+
+
+	Vector2 tempRot = new Vector2();
+
+	private boolean collidesRotArea (ControlPoint controlPoint, float x, float y) {
+		float radius = 40f * worldPerPixel;
+
+		TransformComponent transformComponent = gameObject.getComponent(TransformComponent.class);
+		Vector2 center = transformComponent.worldPosition;
+
+		tempRot.set(controlPoint.position).sub(center);
+
+		float len = tempRot.len();
+		len += radius;
+
+		Vector2 nor = tempRot.nor();
+		nor.scl(len);
+		nor.add(transformComponent.worldPosition);
+
+		if (nor.dst(x, y) < radius) {
+			return true;
+		}
+		return false;
+
+	}
+
+	private int getTouchedRotationArea (float x, float y) {
+
+
+		if (collidesRotArea(controlPoints.get(BOTTOM_LEFT), x, y)) {
+			return 0;
+		}
+		if (collidesRotArea(controlPoints.get(TOP_LEFT), x, y)) {
+			return 1;
+		}
+		if (collidesRotArea(controlPoints.get(TOP_RIGHT), x, y)) {
+			return 2;
+		}
+		if (collidesRotArea(controlPoints.get(BOTTOM_RIGHT), x, y)) {
+			return 3;
+		}
+
+		return -1;
+	}
 
 	protected boolean isOnTouchedPoint (float x, float y) {
 		ControlPoint touchedPoint = getTouchedPoint(x, y);
