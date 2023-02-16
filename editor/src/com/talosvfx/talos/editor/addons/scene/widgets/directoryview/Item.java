@@ -14,6 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Scaling;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
+import com.talosvfx.talos.editor.utils.FileUtils;
 import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.runtime.assets.GameAssetType;
 import com.talosvfx.talos.runtime.scene.GameObject;import com.talosvfx.talos.editor.project2.SharedResources;
@@ -70,10 +71,13 @@ class Item extends Widget implements ActorCloneable<Item> {
 				icon.setDrawable(SharedResources.skin.getDrawable("ic-folder-big"));
 			}
 		} else {
-			icon.setDrawable(SharedResources.skin.getDrawable("ic-file-big"));
-			String extension = fileHandle.extension();
-			if (GameAssetType.SPRITE.getExtensions().contains(extension.toLowerCase(Locale.US))) {
+			final String extension = fileHandle.extension().toLowerCase(Locale.US);
+			if (GameAssetType.SPRITE.getExtensions().contains(extension)) {
+				// preview the asset instead of setting an icon
 				updatePreview();
+			} else {
+				// get and set the icon by the type of the extension
+				icon.setDrawable(FileUtils.getFileIconByType(extension));
 			}
 		}
 
