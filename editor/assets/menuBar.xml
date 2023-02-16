@@ -15,9 +15,10 @@
         <menu name="save_as" title="Save As..."/>
         <menu name="save_copy" title="Save Copy"/>
         <separator/>
-        <menu name="import" title="Import">
-            <inject name="other" />
-        </menu>
+<!--        Need to decide on this -->
+<!--        <menu name="import" title="Import">-->
+<!--            <inject name="other" />-->
+<!--        </menu>-->
         <menu name="export" title="Export">
             <menu name="project" title="Project Export" />
             <inject name="other" />
