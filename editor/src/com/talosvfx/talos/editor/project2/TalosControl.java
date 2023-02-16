@@ -48,15 +48,35 @@ public class TalosControl implements Observer {
         // TODO: switch this to some kind of reflection thing? or like map to instance thing *but how about startsWith things
         // or at least start delegating this into methods
 
-        if(event.getPath().startsWith("file/open")) {
+        if(event.getPath().equals("file/open")) {
             openProjectByChoosingFile();
             return;
         }
 
         if(event.getPath().startsWith("file/open_recent")) {
             String path = (String) event.getPayload();
-            TalosProjectData talosProjectData = TalosProjectData.loadFromFile(Gdx.files.internal(path));
-            SharedResources.projectLoader.loadProject(talosProjectData);
+            FileHandle handle = new FileHandle(path);
+
+            if (SharedResources.appManager.hasChangesToSave()) {
+                SharedResources.appManager.requestConfirmationToCloseWithoutSave(new OptionDialogListener() {
+                    @Override
+                    public void yes() {
+                        validateAndOpenProject(handle);
+                    }
+
+                    @Override
+                    public void no() {
+                        validateAndOpenProject(handle);
+                    }
+
+                    @Override
+                    public void cancel() {
+                        // do nothing
+                    }
+                });
+            } else {
+                validateAndOpenProject(handle);
+            }
 
             return;
         }
@@ -230,10 +250,39 @@ public class TalosControl implements Observer {
         FileSystemInteraction.instance().showFileChooser("tlsprj", new FileChooserListener() {
             @Override
             public void selected(Array<FileHandle> files) {
-                boolean success = validateAndOpenProject(files.first());
-                if (success) {
-                    if(after != null) {
-                        after.run();
+                if (SharedResources.appManager.hasChangesToSave()) {
+                    SharedResources.appManager.requestConfirmationToCloseWithoutSave(new OptionDialogListener() {
+                        @Override
+                        public void yes() {
+                            boolean success = validateAndOpenProject(files.first());
+                            if (success) {
+                                if(after != null) {
+                                    after.run();
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void no() {
+                            boolean success = validateAndOpenProject(files.first());
+                            if (success) {
+                                if(after != null) {
+                                    after.run();
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void cancel() {
+                            // do nothing
+                        }
+                    });
+                } else {
+                    boolean success = validateAndOpenProject(files.first());
+                    if (success) {
+                        if(after != null) {
+                            after.run();
+                        }
                     }
                 }
             }
@@ -259,13 +308,7 @@ public class TalosControl implements Observer {
         if (projectToTryToLoad != null) {
             TalosProjectData talosProjectData = TalosProjectData.loadFromFile(projectToTryToLoad);
             if (talosProjectData != null) {
-                try {
-                    SharedResources.projectLoader.loadProject(talosProjectData);
-                    return true;
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    return false;
-                }
+                return validateAndOpenProject(talosProjectData);
             } else {
                 Dialogs.showErrorDialog(SharedResources.stage, "No valid project found to load");
             }
@@ -275,6 +318,19 @@ public class TalosControl implements Observer {
 
         return false;
 
+    }
+
+    private boolean validateAndOpenProject (TalosProjectData talosProjectData) {
+        try {
+            // unload old project, before loading new one
+            SharedResources.projectLoader.unloadProject();
+
+            SharedResources.projectLoader.loadProject(talosProjectData);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     @EventHandler
