@@ -6,6 +6,7 @@ import com.badlogic.gdx.utils.*;
 import com.kotcrab.vis.ui.util.dialog.Dialogs;
 import com.kotcrab.vis.ui.util.dialog.OptionDialogListener;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
+import com.talosvfx.talos.editor.addons.scene.events.save.SaveRequest;
 import com.talosvfx.talos.editor.addons.scene.events.save.ExportRequest;
 import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.runtime.assets.GameAssetType;
@@ -94,6 +95,10 @@ public class TalosControl implements Observer {
 
         if(event.getPath().equals("file/export/project")) {
             Notifications.quickFire(ExportRequest.class);
+        }
+
+        if(event.getPath().equals("file/save")) {
+            Notifications.quickFire(SaveRequest.class);
         }
 
         if(event.getPath().equals("window/panels/close_all")) {
