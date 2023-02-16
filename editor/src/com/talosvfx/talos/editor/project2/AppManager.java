@@ -6,9 +6,9 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.GdxRuntimeException;
-import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.utils.*;
+import com.kotcrab.vis.ui.util.dialog.Dialogs;
+import com.kotcrab.vis.ui.util.dialog.OptionDialogListener;
 import com.talosvfx.talos.editor.addons.scene.apps.spriteeditor.SpriteEditorApp;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.RoutineEditorApp;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
@@ -671,5 +671,90 @@ public class AppManager extends InputAdapter implements Observer {
 		}
 
 		return false; //Never do anything with touches, its just passive detection
+	}
+
+	public void requestConfirmationToCloseWithoutSave (OptionDialogListener finalListener) {
+		Array<GameAsset<?>> assetsToSave = new Array<>();
+
+		for (GameAsset<?> gameAsset : baseAppsOpenForGameAsset.keys()) {
+			if (gameAsset.isDummy() || gameAsset == AppManager.singletonAsset) {
+				continue;
+			}
+
+			boolean itemChangedAndUnsaved = SharedResources.globalSaveStateSystem.isItemChangedAndUnsaved(gameAsset);
+			if (itemChangedAndUnsaved) {
+				assetsToSave.add(gameAsset);
+			}
+		}
+
+		if (!assetsToSave.isEmpty()) {
+			asyncHandleUnsavedAssets(assetsToSave, 0, finalListener);
+		}
+	}
+
+	private void asyncHandleUnsavedAssets(Array<GameAsset<?>> assetsToSave, int index, OptionDialogListener finalListener) {
+		GameAsset<?> gameAsset = assetsToSave.get(index);
+
+		Dialogs.OptionDialog dialog = new SaveOrCloseWithoutSavingDialog(gameAsset, new OptionDialogListener() {
+			@Override
+			public void yes() {
+				// save and proceed to next dialog
+				AssetRepository.getInstance().saveGameAssetResourceJsonToFile(gameAsset);
+				if (index == assetsToSave.size - 1) {
+					finalListener.yes();
+				} else {
+					asyncHandleUnsavedAssets(assetsToSave, index + 1, finalListener);
+				}
+			}
+
+			@Override
+			public void no() {
+				// do not save and skip to next dialog
+				if (index == assetsToSave.size - 1) {
+					finalListener.no();
+				} else {
+					asyncHandleUnsavedAssets(assetsToSave, index + 1, finalListener);
+				}
+			}
+
+			@Override
+			public void cancel() {
+				// close dialog and cancel quit operation
+				finalListener.cancel();
+			}
+		});
+		SharedResources.stage.addActor(dialog.fadeIn());
+	}
+
+	private static class SaveOrCloseWithoutSavingDialog extends Dialogs.OptionDialog {
+
+		private static final String titlePrefix = "Asset ";
+		private static final String titlePostfix = " have been modified";
+		private static final String textPrefix = "Do you want to save changes you made in asset:\n";
+		private static final String textPostfix = "\nYour changes will be lost if you don't save them.";
+		private SaveOrCloseWithoutSavingDialog(GameAsset<?> gameAsset, OptionDialogListener listener)  {
+			super(
+					titlePrefix + gameAsset.nameIdentifier + titlePostfix,
+					textPrefix + gameAsset.getRootRawAsset().handle + textPostfix,
+					Dialogs.OptionDialogType.YES_NO_CANCEL,
+					listener);
+			getTitleLabel().setAlignment(Align.center);
+			setYesButtonText("Save");
+			setNoButtonText("Don't Save");
+			setCancelButtonText("Cancel");
+		}
+	}
+
+	public boolean hasChangesToSave () {
+		for (Array<? extends BaseApp<?>> value : baseAppsOpenForGameAsset.values()) {
+			if (value != null) {
+				for (BaseApp<?> baseApp : value) {
+					if (baseApp.hasChangesToSave()) {
+						return true;
+					}
+				}
+			}
+		}
+		return false;
 	}
 }

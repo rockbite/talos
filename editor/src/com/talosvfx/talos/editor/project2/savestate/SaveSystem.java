@@ -5,6 +5,7 @@ import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.files.FileHandle;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
+import com.talosvfx.talos.editor.addons.scene.events.save.ExportRequest;
 import com.talosvfx.talos.editor.addons.scene.events.save.SaveRequest;
 import com.talosvfx.talos.editor.notifications.CommandEventHandler;
 import com.talosvfx.talos.editor.notifications.EventHandler;
@@ -55,6 +56,11 @@ public class SaveSystem implements Observer {
 
 	@CommandEventHandler(commandType = Commands.CommandType.EXPORT)
 	public void onExportAction (CommandEvent actionEvent) {
+		Notifications.quickFire(ExportRequest.class);
+	}
+
+	@EventHandler
+	public void onExport (ExportRequest event) {
 		TalosProjectData currentProject = SharedResources.currentProject;
 		Preferences projectPrefs = TalosLocalPrefs.Instance().getProjectPrefs();
 		String exportScript = projectPrefs.getString("project.general.exportScript", "");
