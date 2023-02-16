@@ -5,7 +5,11 @@ import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.ObjectSet;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.notifications.CommandEventHandler;
+import com.talosvfx.talos.editor.notifications.EventHandler;
+import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.commands.enums.Commands;
+import com.talosvfx.talos.editor.notifications.events.ProjectUnloadEvent;
+import com.talosvfx.talos.editor.notifications.events.ProjectUnloadEvent;
 import com.talosvfx.talos.editor.notifications.events.commands.CommandEvent;
 import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.runtime.assets.RawAsset;
@@ -197,4 +201,13 @@ public class GlobalSaveStateSystem implements Observer {
 	public void onRedoAction (CommandEvent actionEvent) {
 		SharedResources.globalSaveStateSystem.onRedoRequest();
 	}
+
+	@EventHandler
+	public void onProjectUnload(ProjectUnloadEvent projectUnloadEvent) {
+		redoStateObjects.clear();
+		undoStateObjects.clear();
+		hasChanges.clear();
+		rawStringHistoryMap.clear();
+	}
+
 }
