@@ -24,7 +24,6 @@ public class EightPointGizmo extends Gizmo {
 
 	private static final Logger logger = LoggerFactory.getLogger(SpriteTransformGizmo.class);
 
-
 	public enum ControlPointType {
 		CORNER,
 		MIDDLE
@@ -170,7 +169,7 @@ public class EightPointGizmo extends Gizmo {
 
 		drawPixelLine(batch, BOTTOM_LEFT, TOP_LEFT, pixelSize, true);
 		drawPixelLine(batch, TOP_LEFT, TOP_RIGHT, pixelSize, false);
-		drawPixelLine(batch, BOTTOM_RIGHT, TOP_RIGHT,pixelSize, true);
+		drawPixelLine(batch, BOTTOM_RIGHT, TOP_RIGHT, pixelSize, true);
 		drawPixelLine(batch, BOTTOM_LEFT, BOTTOM_RIGHT, pixelSize, false);
 
 		batch.setColor(Color.WHITE);
@@ -178,6 +177,7 @@ public class EightPointGizmo extends Gizmo {
 	}
 
 	Vector2 temp3 = new Vector2();
+
 	private void drawPixelLine (Batch batch, int from, int to, float pixelSize, boolean vertical) {
 		TransformComponent transformComponent = gameObject.getComponent(TransformComponent.class);
 
@@ -191,11 +191,10 @@ public class EightPointGizmo extends Gizmo {
 		float length = temp3.len();
 
 		if (vertical) {
-			batch.draw(whitePixelRegion, midPointX - pixelSize/2f, midPointY - length/2f, pixelSize/2f, length/2f, pixelSize, length, 1f, 1f, transformComponent.worldRotation);
+			batch.draw(whitePixelRegion, midPointX - pixelSize / 2f, midPointY - length / 2f, pixelSize / 2f, length / 2f, pixelSize, length, 1f, 1f, transformComponent.worldRotation);
 		} else {
-			batch.draw(whitePixelRegion, midPointX - length/2f, midPointY - pixelSize/2f, length/2f, pixelSize/2f, length, pixelSize, 1f, 1f, transformComponent.worldRotation);
+			batch.draw(whitePixelRegion, midPointX - length / 2f, midPointY - pixelSize / 2f, length / 2f, pixelSize / 2f, length, pixelSize, 1f, 1f, transformComponent.worldRotation);
 		}
-
 
 	}
 
@@ -234,29 +233,29 @@ public class EightPointGizmo extends Gizmo {
 	private void movePointByDelta (float x, float y, float deltaX, float deltaY, ControlPoint currentManipulatingPoint) {
 
 		TransformComponent transformComponent = gameObject.getComponent(TransformComponent.class);
+		currentManipulatingPoint.position.set(x, y).sub(controlPointOffset);
+
+		//We move all other points apart from the opposite point which is always 4 away
+
+		//If its a corner, we moving a bunch of these points
+
+		int id = currentManipulatingPoint.id;
+
+		int ignore = id + 4;
+		ignore %= 8;
+		if (ignore < 0)
+			ignore += 8;
+
+		ControlPoint stationaryPoint = controlPoints.get(ignore);
 
 		switch (currentManipulatingPoint.pointType) {
-		case CORNER:
-
-			currentManipulatingPoint.position.set(x, y).sub(controlPointOffset);
-
-			//We move all other points apart from the opposite point which is always 4 away
-
-			//If its a corner, we moving a bunch of these points
-
-			int id = currentManipulatingPoint.id;
-
-			int ignore = id + 4;
-			ignore %= 8;
-			if (ignore < 0) ignore += 8;
+		case CORNER: {
 
 			//Lets update the 2 other corners, -2 + 2
 
-			ControlPoint stationaryPoint = controlPoints.get(ignore);
 			BoundingBox rect = getUnrotateRectFromOppositeCorners(currentManipulatingPoint, stationaryPoint);
 
 			//Unrotate all points
-
 
 			for (ControlPoint controlPoint : controlPoints) {
 				controlPoint.position.sub(transformComponent.worldPosition);
@@ -270,13 +269,10 @@ public class EightPointGizmo extends Gizmo {
 
 			//We can do this because we are unrotated rect atm
 
-
-
 			//brain cant work it the algorithm, gonna do monkey way
 
 			if (stationaryPoint.id == TOP_LEFT) {
 				//Do the other corners
-
 
 				//Have to compare it to things we are taking truth from
 				boolean invertedX = controlPoints.get(TOP_LEFT).position.x > controlPoints.get(BOTTOM_RIGHT).position.x;
@@ -289,13 +285,12 @@ public class EightPointGizmo extends Gizmo {
 					height *= -1;
 				}
 
-
 				controlPoints.get(TOP_RIGHT).position.set(stationaryPoint.position.x + width, stationaryPoint.position.y);
 				controlPoints.get(BOTTOM_LEFT).position.set(stationaryPoint.position.x, stationaryPoint.position.y - height);
-				controlPoints.get(TOP_MIDDLE).position.set(stationaryPoint.position.x + width/2f, stationaryPoint.position.y);
-				controlPoints.get(RIGHT_MIDDLE).position.set(stationaryPoint.position.x + width, stationaryPoint.position.y - height/2f);
-				controlPoints.get(LEFT_MIDDLE).position.set(stationaryPoint.position.x, stationaryPoint.position.y - height/2f);
-				controlPoints.get(BOTTOM_MIDDLE).position.set(stationaryPoint.position.x + width/2f, stationaryPoint.position.y - height);
+				controlPoints.get(TOP_MIDDLE).position.set(stationaryPoint.position.x + width / 2f, stationaryPoint.position.y);
+				controlPoints.get(RIGHT_MIDDLE).position.set(stationaryPoint.position.x + width, stationaryPoint.position.y - height / 2f);
+				controlPoints.get(LEFT_MIDDLE).position.set(stationaryPoint.position.x, stationaryPoint.position.y - height / 2f);
+				controlPoints.get(BOTTOM_MIDDLE).position.set(stationaryPoint.position.x + width / 2f, stationaryPoint.position.y - height);
 			}
 
 			if (stationaryPoint.id == BOTTOM_RIGHT) {
@@ -312,16 +307,14 @@ public class EightPointGizmo extends Gizmo {
 					height *= -1;
 				}
 
-
 				controlPoints.get(TOP_RIGHT).position.set(stationaryPoint.position.x, stationaryPoint.position.y + height);
 				controlPoints.get(BOTTOM_LEFT).position.set(stationaryPoint.position.x - width, stationaryPoint.position.y);
 
-				controlPoints.get(TOP_MIDDLE).position.set(stationaryPoint.position.x - width/2f, stationaryPoint.position.y + height);
-				controlPoints.get(RIGHT_MIDDLE).position.set(stationaryPoint.position.x, stationaryPoint.position.y + height/2f);
-				controlPoints.get(LEFT_MIDDLE).position.set(stationaryPoint.position.x - width, stationaryPoint.position.y + height/2f);
-				controlPoints.get(BOTTOM_MIDDLE).position.set(stationaryPoint.position.x - width/2f, stationaryPoint.position.y);
+				controlPoints.get(TOP_MIDDLE).position.set(stationaryPoint.position.x - width / 2f, stationaryPoint.position.y + height);
+				controlPoints.get(RIGHT_MIDDLE).position.set(stationaryPoint.position.x, stationaryPoint.position.y + height / 2f);
+				controlPoints.get(LEFT_MIDDLE).position.set(stationaryPoint.position.x - width, stationaryPoint.position.y + height / 2f);
+				controlPoints.get(BOTTOM_MIDDLE).position.set(stationaryPoint.position.x - width / 2f, stationaryPoint.position.y);
 			}
-
 
 			if (stationaryPoint.id == BOTTOM_LEFT) {
 				//Do the other corners
@@ -340,10 +333,10 @@ public class EightPointGizmo extends Gizmo {
 				controlPoints.get(TOP_LEFT).position.set(stationaryPoint.position.x, stationaryPoint.position.y + height);
 				controlPoints.get(BOTTOM_RIGHT).position.set(stationaryPoint.position.x + width, stationaryPoint.position.y);
 
-				controlPoints.get(TOP_MIDDLE).position.set(stationaryPoint.position.x + width/2f, stationaryPoint.position.y + height);
-				controlPoints.get(RIGHT_MIDDLE).position.set(stationaryPoint.position.x + width, stationaryPoint.position.y + height/2f);
-				controlPoints.get(LEFT_MIDDLE).position.set(stationaryPoint.position.x, stationaryPoint.position.y + height/2f);
-				controlPoints.get(BOTTOM_MIDDLE).position.set(stationaryPoint.position.x + width/2f, stationaryPoint.position.y);
+				controlPoints.get(TOP_MIDDLE).position.set(stationaryPoint.position.x + width / 2f, stationaryPoint.position.y + height);
+				controlPoints.get(RIGHT_MIDDLE).position.set(stationaryPoint.position.x + width, stationaryPoint.position.y + height / 2f);
+				controlPoints.get(LEFT_MIDDLE).position.set(stationaryPoint.position.x, stationaryPoint.position.y + height / 2f);
+				controlPoints.get(BOTTOM_MIDDLE).position.set(stationaryPoint.position.x + width / 2f, stationaryPoint.position.y);
 			}
 
 			if (stationaryPoint.id == TOP_RIGHT) {
@@ -360,14 +353,113 @@ public class EightPointGizmo extends Gizmo {
 					height *= -1;
 				}
 
-
 				controlPoints.get(TOP_LEFT).position.set(stationaryPoint.position.x - width, stationaryPoint.position.y);
 				controlPoints.get(BOTTOM_RIGHT).position.set(stationaryPoint.position.x, stationaryPoint.position.y - height);
 
-				controlPoints.get(TOP_MIDDLE).position.set(stationaryPoint.position.x - width/2f, stationaryPoint.position.y);
-				controlPoints.get(RIGHT_MIDDLE).position.set(stationaryPoint.position.x, stationaryPoint.position.y - height/2f);
-				controlPoints.get(LEFT_MIDDLE).position.set(stationaryPoint.position.x - width, stationaryPoint.position.y - height/2f);
-				controlPoints.get(BOTTOM_MIDDLE).position.set(stationaryPoint.position.x - width/2f, stationaryPoint.position.y - height);
+				controlPoints.get(TOP_MIDDLE).position.set(stationaryPoint.position.x - width / 2f, stationaryPoint.position.y);
+				controlPoints.get(RIGHT_MIDDLE).position.set(stationaryPoint.position.x, stationaryPoint.position.y - height / 2f);
+				controlPoints.get(LEFT_MIDDLE).position.set(stationaryPoint.position.x - width, stationaryPoint.position.y - height / 2f);
+				controlPoints.get(BOTTOM_MIDDLE).position.set(stationaryPoint.position.x - width / 2f, stationaryPoint.position.y - height);
+			}
+
+			//put them back into space
+			for (ControlPoint controlPoint : controlPoints) {
+				controlPoint.position.rotateDeg(transformComponent.worldRotation);
+				controlPoint.position.add(transformComponent.worldPosition);
+			}
+
+		}
+		break;
+		case MIDDLE: {
+			currentManipulatingPoint.position.set(x, y).sub(controlPointOffset);
+
+
+			for (ControlPoint controlPoint : controlPoints) {
+				controlPoint.position.sub(transformComponent.worldPosition);
+				controlPoint.position.rotateDeg(-transformComponent.worldRotation);
+			}
+
+
+			if (stationaryPoint.id == LEFT_MIDDLE) {
+				//Left middle,. y has to match stationary point
+				currentManipulatingPoint.position.y = stationaryPoint.position.y;
+
+
+				float width = Math.abs(currentManipulatingPoint.position.x - stationaryPoint.position.x);
+				float height = Math.abs(controlPoints.get(TOP_LEFT).position.y - controlPoints.get(BOTTOM_LEFT).position.y);
+
+
+				boolean invertedX = controlPoints.get(LEFT_MIDDLE).position.x > controlPoints.get(RIGHT_MIDDLE).position.x;
+
+				if (invertedX) {
+					width *= -1;
+				}
+
+				controlPoints.get(TOP_RIGHT).position.set(stationaryPoint.position.x + width, stationaryPoint.position.y + height/2f);
+				controlPoints.get(BOTTOM_RIGHT).position.set(stationaryPoint.position.x + width, stationaryPoint.position.y - height/2f);
+				controlPoints.get(TOP_MIDDLE).position.x = stationaryPoint.position.x + width/2f;
+				controlPoints.get(BOTTOM_MIDDLE).position.x = stationaryPoint.position.x + width/2f;
+
+			}
+
+			if (stationaryPoint.id == RIGHT_MIDDLE) {
+				//Left middle,. y has to match stationary point
+				currentManipulatingPoint.position.y = stationaryPoint.position.y;
+
+
+				float width = Math.abs(currentManipulatingPoint.position.x - stationaryPoint.position.x);
+				float height = Math.abs(controlPoints.get(TOP_LEFT).position.y - controlPoints.get(BOTTOM_LEFT).position.y);
+
+
+				boolean invertedX = controlPoints.get(LEFT_MIDDLE).position.x > controlPoints.get(RIGHT_MIDDLE).position.x;
+
+				if (invertedX) {
+					width *= -1;
+				}
+
+				controlPoints.get(TOP_LEFT).position.set(stationaryPoint.position.x - width, stationaryPoint.position.y + height/2f);
+				controlPoints.get(BOTTOM_LEFT).position.set(stationaryPoint.position.x - width, stationaryPoint.position.y - height/2f);
+				controlPoints.get(TOP_MIDDLE).position.x = stationaryPoint.position.x - width/2f;
+				controlPoints.get(BOTTOM_MIDDLE).position.x = stationaryPoint.position.x - width/2f;
+			}
+
+			if (stationaryPoint.id == BOTTOM_MIDDLE) {
+				currentManipulatingPoint.position.x = stationaryPoint.position.x;
+
+
+				float width = Math.abs(controlPoints.get(BOTTOM_RIGHT).position.x - controlPoints.get(BOTTOM_LEFT).position.x);
+				float height = Math.abs(currentManipulatingPoint.position.y - stationaryPoint.position.y);
+
+				boolean invertedY = controlPoints.get(BOTTOM_MIDDLE).position.y > controlPoints.get(TOP_MIDDLE).position.y;
+
+				if (invertedY) {
+					height *= -1;
+				}
+
+				controlPoints.get(TOP_LEFT).position.set(stationaryPoint.position.x - width/2f, stationaryPoint.position.y + height);
+				controlPoints.get(TOP_RIGHT).position.set(stationaryPoint.position.x + width/2f, stationaryPoint.position.y + height);
+
+				controlPoints.get(LEFT_MIDDLE).position.y = stationaryPoint.position.y + height/2f;
+				controlPoints.get(RIGHT_MIDDLE).position.y = stationaryPoint.position.y + height/2f;
+			}
+
+			if (stationaryPoint.id == TOP_MIDDLE) {
+				currentManipulatingPoint.position.x = stationaryPoint.position.x;
+
+				float width = Math.abs(controlPoints.get(BOTTOM_RIGHT).position.x - controlPoints.get(BOTTOM_LEFT).position.x);
+				float height = Math.abs(currentManipulatingPoint.position.y - stationaryPoint.position.y);
+
+				boolean invertedY = controlPoints.get(BOTTOM_MIDDLE).position.y > controlPoints.get(TOP_MIDDLE).position.y;
+
+				if (invertedY) {
+					height *= -1;
+				}
+
+				controlPoints.get(BOTTOM_LEFT).position.set(stationaryPoint.position.x - width/2f, stationaryPoint.position.y - height);
+				controlPoints.get(BOTTOM_RIGHT).position.set(stationaryPoint.position.x + width/2f, stationaryPoint.position.y - height);
+
+				controlPoints.get(LEFT_MIDDLE).position.y = stationaryPoint.position.y - height/2f;
+				controlPoints.get(RIGHT_MIDDLE).position.y = stationaryPoint.position.y - height/2f;
 			}
 
 
@@ -376,13 +468,10 @@ public class EightPointGizmo extends Gizmo {
 				controlPoint.position.rotateDeg(transformComponent.worldRotation);
 				controlPoint.position.add(transformComponent.worldPosition);
 			}
-
-
-			break;
-		case MIDDLE:
-			break;
 		}
 
+		break;
+		}
 
 		updateTransformFromControlPoints();
 	}
@@ -413,7 +502,6 @@ public class EightPointGizmo extends Gizmo {
 			controlPoint.position.add(transformComponent.worldPosition);
 		}
 
-
 		Vector2 out = new Vector2();
 		out.set(centerX, centerY);
 		out.add(transformComponent.worldPosition);
@@ -435,12 +523,12 @@ public class EightPointGizmo extends Gizmo {
 			SceneUtils.componentUpdated(gameObjectContainer, gameObject, spriteRendererComponent, true);
 		}
 
-
 	}
 
 	private Vector2 temp = new Vector2();
 	private Vector2 temp2 = new Vector2();
 	private BoundingBox boundingBox = new BoundingBox();
+
 	private BoundingBox getUnrotateRectFromOppositeCorners (ControlPoint currentManipulatingPoint, ControlPoint stationaryPoint) {
 		//Find the midpoint
 		float midX = (currentManipulatingPoint.position.x + stationaryPoint.position.x) / 2f;
@@ -462,12 +550,10 @@ public class EightPointGizmo extends Gizmo {
 
 		//We should have a rect now from two opposite points, we just need to figure outn which is max
 
-
 		boundingBox.clr();
 
 		boundingBox.ext(temp.x, temp.y, 0);
 		boundingBox.ext(temp2.x, temp2.y, 0);
-
 
 		return boundingBox;
 	}
@@ -512,7 +598,9 @@ public class EightPointGizmo extends Gizmo {
 			}
 		}
 		return null;
-	};
+	}
+
+	;
 
 	private boolean isPointHit (Vector2 point, float x, float y) {
 		float dst = point.dst(x, y);
@@ -526,6 +614,7 @@ public class EightPointGizmo extends Gizmo {
 	}
 
 	private float[] verts = new float[2 * 4];
+
 	public void getBounds (Polygon boundingPolygon) {
 
 		TransformComponent transformComponent = gameObject.getComponent(TransformComponent.class);
@@ -535,21 +624,20 @@ public class EightPointGizmo extends Gizmo {
 		float signWidth = Math.signum(spriteRendererComponent.size.x);
 		float signHeight = Math.signum(spriteRendererComponent.size.y);
 
-
 		float width = signWidth * spriteRendererComponent.size.x * transformComponent.worldScale.x;
 		float height = signHeight * spriteRendererComponent.size.y * transformComponent.worldScale.y;
 
-		verts[0] = -width/2f;
-		verts[1] = -height/2f;
+		verts[0] = -width / 2f;
+		verts[1] = -height / 2f;
 
-		verts[2] = -width/2f;
-		verts[3] = height/2f;
+		verts[2] = -width / 2f;
+		verts[3] = height / 2f;
 
-		verts[4] = width/2f;
-		verts[5] = height/2f;
+		verts[4] = width / 2f;
+		verts[5] = height / 2f;
 
-		verts[6] = width/2f;
-		verts[7] = -height/2f;
+		verts[6] = width / 2f;
+		verts[7] = -height / 2f;
 
 		boundingPolygon.setPosition(transformComponent.worldPosition.x, transformComponent.worldPosition.y);
 		boundingPolygon.setVertices(verts);
