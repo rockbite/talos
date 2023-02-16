@@ -1,5 +1,25 @@
 
 uiskin.png
+size: 512, 64
+format: RGBA8888
+filter: MipMapLinearLinear, Linear
+repeat: none
+generated-font-12
+  rotate: false
+  xy: 2, 2
+  size: 508, 25
+  orig: 512, 512
+  offset: 1, 487
+  index: -1
+generated-font-15
+  rotate: false
+  xy: 2, 29
+  size: 507, 31
+  orig: 512, 512
+  offset: 1, 481
+  index: -1
+
+uiskin2.png
 size: 2048, 128
 format: RGBA8888
 filter: Nearest, Nearest
@@ -2050,21 +2070,21 @@ select-up
   index: -1
 selection
   rotate: false
-  xy: 1837, 50
+  xy: 1420, 8
   size: 1, 1
   orig: 1, 1
   offset: 0, 0
   index: -1
 separator
   rotate: false
-  xy: 1420, 8
+  xy: 1420, 5
   size: 1, 1
   orig: 1, 1
   offset: 0, 0
   index: -1
 separator-menu
   rotate: false
-  xy: 1420, 5
+  xy: 1420, 2
   size: 1, 1
   orig: 1, 1
   offset: 0, 0
@@ -2508,7 +2528,7 @@ timeline-top-bar-bg
   index: -1
 timeline-white-bg
   rotate: false
-  xy: 1420, 2
+  xy: 1478, 12
   size: 1, 1
   split: 0, 0, 0, 0
   orig: 1, 1
@@ -2623,7 +2643,7 @@ tree-minus
   index: -1
 tree-over
   rotate: false
-  xy: 1478, 12
+  xy: 1531, 68
   size: 1, 1
   orig: 1, 1
   offset: 0, 0
@@ -2730,7 +2750,7 @@ vis-radio-tick-disabled
   index: -1
 vis-red
   rotate: false
-  xy: 1531, 68
+  xy: 537, 3
   size: 1, 1
   orig: 1, 1
   offset: 0, 0
@@ -2742,6 +2762,13 @@ white
   split: 1, 1, 1, 1
   pad: 0, 0, 0, 0
   orig: 3, 3
+  offset: 0, 0
+  index: -1
+white-pixel
+  rotate: false
+  xy: 1837, 49
+  size: 2, 2
+  orig: 2, 2
   offset: 0, 0
   index: -1
 white_frame
@@ -2823,24 +2850,4 @@ window_dark
   pad: 0, 0, 0, 0
   orig: 20, 48
   offset: 0, 0
-  index: -1
-
-uiskin2.png
-size: 512, 64
-format: RGBA8888
-filter: MipMapLinearLinear, Linear
-repeat: none
-generated-font-12
-  rotate: false
-  xy: 2, 2
-  size: 508, 25
-  orig: 512, 512
-  offset: 1, 487
-  index: -1
-generated-font-15
-  rotate: false
-  xy: 2, 29
-  size: 507, 31
-  orig: 512, 512
-  offset: 1, 481
   index: -1
