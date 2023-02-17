@@ -34,23 +34,26 @@ public class FileUtils {
     }
 
     public static Drawable getFileIconByType (String extension) {
+        if (GameAssetType.SCRIPT.getExtensions().contains(extension)) {
+            return SharedResources.skin.getDrawable("ic-script");
+        }
+        if (GameAssetType.PREFAB.getExtensions().contains(extension)) {
+            return SharedResources.skin.getDrawable("ic-prefab");
+        }
+        if (GameAssetType.SKELETON.getExtensions().contains(extension)) {
+            return SharedResources.skin.getDrawable("ic-spine");
+        }
+        if (GameAssetType.VFX.getExtensions().contains(extension)) {
+            return SharedResources.skin.getDrawable("ic-vfx");
+        }
+        if (GameAssetType.ROUTINE.getExtensions().contains(extension)) {
+            return SharedResources.skin.getDrawable("ic-routine");
+        }
         if (GameAssetType.SCENE.getExtensions().contains(extension)) {
             return SharedResources.skin.getDrawable("ic-new-scene");
         }
         if (GameAssetType.TILE_PALETTE.getExtensions().contains(extension)) {
             return SharedResources.skin.getDrawable("ic-pallete");
-        }
-        if (GameAssetType.PREFAB.getExtensions().contains(extension)) {
-            return SharedResources.skin.getDrawable("ic-prefab");
-        }
-        if (GameAssetType.ROUTINE.getExtensions().contains(extension)) {
-            return SharedResources.skin.getDrawable("ic-routine");
-        }
-        if (GameAssetType.SCRIPT.getExtensions().contains(extension)) {
-            return SharedResources.skin.getDrawable("ic-script");
-        }
-        if (GameAssetType.VFX.getExtensions().contains(extension)) {
-            return SharedResources.skin.getDrawable("ic-vfx");
         }
         // default
         return SharedResources.skin.getDrawable("ic-file-big");
