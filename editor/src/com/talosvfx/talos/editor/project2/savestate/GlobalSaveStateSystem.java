@@ -6,9 +6,7 @@ import com.badlogic.gdx.utils.ObjectSet;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.notifications.CommandEventHandler;
 import com.talosvfx.talos.editor.notifications.EventHandler;
-import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.commands.enums.Commands;
-import com.talosvfx.talos.editor.notifications.events.ProjectUnloadEvent;
 import com.talosvfx.talos.editor.notifications.events.ProjectUnloadEvent;
 import com.talosvfx.talos.editor.notifications.events.commands.CommandEvent;
 import com.talosvfx.talos.runtime.assets.GameAsset;
@@ -28,21 +26,23 @@ public class GlobalSaveStateSystem implements Observer {
 
 	private static final Logger logger = LoggerFactory.getLogger(GlobalSaveStateSystem.class);
 
-    public static abstract class StateObject {
+	public static abstract class StateObject {
 
 		private long counter = 0;
 		private static long globalCounter = 1;
 
 		private boolean persisted;
 
-		StateObject () {
+		StateObject() {
 			counter = globalCounter++;
 		}
-		abstract void restore ();
 
-		abstract StateObject beforeRestore ();
+		/** Restore to snapshot state. */
+		abstract void applyState();
+
+		/** Provides snapshot of current state in scene. */
+		abstract StateObject currentState();
 	}
-
 
 	public static class MetaDataUpdateStateObject extends StateObject {
 		private AMetadata metadata;
@@ -63,7 +63,7 @@ public class GlobalSaveStateSystem implements Observer {
 		}
 
 		@Override
-		void restore () {
+		void applyState() {
 
 			FileHandle metaHandle = AssetImporter.getMetadataHandleFor(metadata.link.handle);
 
@@ -75,7 +75,7 @@ public class GlobalSaveStateSystem implements Observer {
 		}
 
 		@Override
-		StateObject beforeRestore () {
+		StateObject currentState() {
 			FileHandle metaHandle = AssetImporter.getMetadataHandleFor(metadata.link.handle);
 			String before = metaHandle.readString();
 			GlobalSaveStateSystem.MetaDataUpdateStateObject stateBeforeRestore = new GlobalSaveStateSystem.MetaDataUpdateStateObject(metadata, before);
@@ -100,7 +100,7 @@ public class GlobalSaveStateSystem implements Observer {
 		}
 
 		@Override
-		void restore () {
+		void applyState() {
 			SharedResources.globalSaveStateSystem.rawStringHistoryMap.put(gameAsset, asString);
 
 			AssetRepository.getInstance().reloadGameAssetFromString(gameAsset, asString);
@@ -109,7 +109,7 @@ public class GlobalSaveStateSystem implements Observer {
 		}
 
 		@Override
-		StateObject beforeRestore () {
+		StateObject currentState() {
 			String before = SharedResources.globalSaveStateSystem.rawStringHistoryMap.get(gameAsset);
 			GlobalSaveStateSystem.GameAssetUpdateStateObject stateBeforeRestore = new GlobalSaveStateSystem.GameAssetUpdateStateObject(gameAsset, before);
 			return stateBeforeRestore;
@@ -175,9 +175,10 @@ public class GlobalSaveStateSystem implements Observer {
 			Toasts.getInstance().showErrorToast("Nothing left to undo");
 		} else {
 			StateObject pop = undoStateObjects.pop();
-			StateObject before = pop.beforeRestore();
+			// keep current state, before undo, so you can `redo` to it
+			StateObject before = pop.currentState();
 			redoStateObjects.push(before);
-			pop.restore();
+			pop.applyState();
 		}
 	}
 
@@ -186,9 +187,10 @@ public class GlobalSaveStateSystem implements Observer {
 			Toasts.getInstance().showErrorToast("Nothing left to redo");
 		} else {
 			StateObject pop = redoStateObjects.pop();
-			StateObject before = pop.beforeRestore();
+			// keep current state, before redo, so you can `undo` to it
+			StateObject before = pop.currentState();
 			undoStateObjects.push(before);
-			pop.restore();
+			pop.applyState();
 		}
 	}
 
