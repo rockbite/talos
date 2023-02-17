@@ -596,14 +596,17 @@ public class EightPointGizmo extends Gizmo {
 
 		out.scl(sig, sig);
 
-		GameObject.setPositionFromWorldPosition(gameObject, out);
+		TransformComponent.worldToLocal(gameObject.getParent(), out);
+		transformComponent.position.set(out);
+
+
 		SceneUtils.componentUpdated(gameObjectContainer, gameObject, transformComponent, true);
 		transformChanged = true;
 
 		if (gameObject.hasComponent(SpriteRendererComponent.class)) {
 			//we set the size to the sprite's shit taking into account the scale
 
-			Vector2 scale = transformComponent.scale;
+			Vector2 scale = transformComponent.worldScale;
 
 			float totalWidthScaleConsidered = totalWidth / scale.x;
 			float totalHeightScaleConsidered = totalHeight / scale.y;
