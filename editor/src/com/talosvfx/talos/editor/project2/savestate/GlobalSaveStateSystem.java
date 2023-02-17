@@ -26,21 +26,23 @@ public class GlobalSaveStateSystem implements Observer {
 
 	private static final Logger logger = LoggerFactory.getLogger(GlobalSaveStateSystem.class);
 
-
-
-    public static abstract class StateObject {
+	public static abstract class StateObject {
 
 		private long counter = 0;
 		private static long globalCounter = 1;
 
 		private boolean persisted;
 
-		StateObject () {
+		StateObject() {
 			counter = globalCounter++;
 		}
-		abstract void restore ();
-	}
 
+		/** Restore to snapshot state. */
+		abstract void applyState();
+
+		/** Provides snapshot of current state in scene. */
+		abstract StateObject currentState();
+	}
 
 	public static class MetaDataUpdateStateObject extends StateObject {
 		private AMetadata metadata;
@@ -54,8 +56,14 @@ public class GlobalSaveStateSystem implements Observer {
 			asString = metaHandle.readString();
 		}
 
+		private MetaDataUpdateStateObject (AMetadata metadata, String data) {
+			super();
+			this.metadata = metadata;
+			asString = data;
+		}
+
 		@Override
-		void restore () {
+		void applyState() {
 
 			FileHandle metaHandle = AssetImporter.getMetadataHandleFor(metadata.link.handle);
 
@@ -65,32 +73,52 @@ public class GlobalSaveStateSystem implements Observer {
 
 			Toasts.getInstance().showInfoToast("Undone " + metadata.getClass().getSimpleName() + " state");
 		}
+
+		@Override
+		StateObject currentState() {
+			FileHandle metaHandle = AssetImporter.getMetadataHandleFor(metadata.link.handle);
+			String before = metaHandle.readString();
+			GlobalSaveStateSystem.MetaDataUpdateStateObject stateBeforeRestore = new GlobalSaveStateSystem.MetaDataUpdateStateObject(metadata, before);
+			return stateBeforeRestore;
+		}
 	}
 	public static class GameAssetUpdateStateObject extends StateObject {
 
 		private GameAsset<?> gameAsset;
-		private String asSTring;
+		private String asString;
 
 		public GameAssetUpdateStateObject (GameAsset<?> gameAsset) {
 			super();
 			this.gameAsset = gameAsset;
-			asSTring = SharedResources.globalSaveStateSystem.getAndIncrementLatestGameAssetAsString(gameAsset);
+			asString = SharedResources.globalSaveStateSystem.getAndIncrementLatestGameAssetAsString(gameAsset);
 		}
 
-
+		private GameAssetUpdateStateObject (GameAsset<?> gameAsset, String data) {
+			super();
+			this.gameAsset = gameAsset;
+			asString = data;
+		}
 
 		@Override
-		void restore () {
-			SharedResources.globalSaveStateSystem.rawStringHistoryMap.put(gameAsset, asSTring);
+		void applyState() {
+			SharedResources.globalSaveStateSystem.rawStringHistoryMap.put(gameAsset, asString);
 
-			AssetRepository.getInstance().reloadGameAssetFromString(gameAsset, asSTring);
+			AssetRepository.getInstance().reloadGameAssetFromString(gameAsset, asString);
 
 			Toasts.getInstance().showInfoToast("Undone " + gameAsset.getResource().getClass().getSimpleName() + " [" + gameAsset.type + "] state");
+		}
+
+		@Override
+		StateObject currentState() {
+			String before = SharedResources.globalSaveStateSystem.rawStringHistoryMap.get(gameAsset);
+			GlobalSaveStateSystem.GameAssetUpdateStateObject stateBeforeRestore = new GlobalSaveStateSystem.GameAssetUpdateStateObject(gameAsset, before);
+			return stateBeforeRestore;
 		}
 	}
 
 
-	private Stack<StateObject> stateObjects = new Stack<>();
+	private Stack<StateObject> undoStateObjects = new Stack<>();
+	private Stack<StateObject> redoStateObjects = new Stack<>();
 	private ObjectSet<GameAsset<?>> hasChanges = new ObjectSet<>();
 	private ObjectMap<GameAsset<?>, String> rawStringHistoryMap = new ObjectMap<>();
 
@@ -123,7 +151,9 @@ public class GlobalSaveStateSystem implements Observer {
 	}
 
 	public void pushItem (StateObject assetUpdateStateObject) {
-		stateObjects.push(assetUpdateStateObject);
+		redoStateObjects.clear();
+
+		undoStateObjects.push(assetUpdateStateObject);
 		if (assetUpdateStateObject instanceof GameAssetUpdateStateObject) {
 			addToGameAssetStates((GameAssetUpdateStateObject) assetUpdateStateObject);
 		}
@@ -141,11 +171,26 @@ public class GlobalSaveStateSystem implements Observer {
 	}
 
 	public void onUndoRequest () {
-		if (stateObjects.isEmpty()) {
+		if (undoStateObjects.isEmpty()) {
 			Toasts.getInstance().showErrorToast("Nothing left to undo");
 		} else {
-			StateObject pop = stateObjects.pop();
-			pop.restore();
+			StateObject pop = undoStateObjects.pop();
+			// keep current state, before undo, so you can `redo` to it
+			StateObject before = pop.currentState();
+			redoStateObjects.push(before);
+			pop.applyState();
+		}
+	}
+
+	public void onRedoRequest () {
+		if (redoStateObjects.isEmpty()) {
+			Toasts.getInstance().showErrorToast("Nothing left to redo");
+		} else {
+			StateObject pop = redoStateObjects.pop();
+			// keep current state, before redo, so you can `undo` to it
+			StateObject before = pop.currentState();
+			undoStateObjects.push(before);
+			pop.applyState();
 		}
 	}
 
@@ -154,11 +199,17 @@ public class GlobalSaveStateSystem implements Observer {
 		SharedResources.globalSaveStateSystem.onUndoRequest();
 	}
 
+	@CommandEventHandler(commandType = Commands.CommandType.REDO)
+	public void onRedoAction (CommandEvent actionEvent) {
+		SharedResources.globalSaveStateSystem.onRedoRequest();
+	}
 
 	@EventHandler
 	public void onProjectUnload(ProjectUnloadEvent projectUnloadEvent) {
-		stateObjects.clear();
+		redoStateObjects.clear();
+		undoStateObjects.clear();
 		hasChanges.clear();
 		rawStringHistoryMap.clear();
 	}
+
 }
