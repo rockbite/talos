@@ -4,8 +4,9 @@ import com.talosvfx.talos.editor.nodes.DynamicNodeStage;
 import com.talosvfx.talos.editor.nodes.NodeBoard;
 import com.talosvfx.talos.editor.notifications.ContextRequiredEvent;
 import com.talosvfx.talos.editor.notifications.TalosEvent;
+import com.talosvfx.talos.editor.notifications.events.AbstractContextRequiredEvent;
 
-public class NodeConnectionRemovedEvent extends ContextRequiredEvent<DynamicNodeStage<?>> {
+public class NodeConnectionRemovedEvent extends AbstractContextRequiredEvent<DynamicNodeStage<?>> {
 
         private NodeBoard.NodeConnection connection;
 

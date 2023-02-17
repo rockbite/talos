@@ -8,11 +8,18 @@ import com.badlogic.gdx.utils.reflect.Annotation;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.Method;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
+import com.talosvfx.talos.editor.addons.scene.apps.routines.RoutineEditorApp;
+import com.talosvfx.talos.editor.notifications.commands.enums.Commands;
+import com.talosvfx.talos.editor.notifications.events.commands.ICommandEvent;
 import lombok.Getter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Notifications {
 
 	private static Notifications instance;
+
+	private static final Logger logger = LoggerFactory.getLogger(Notifications.class);
 
 	private ObjectMap<Class<? extends TalosEvent>, Array<EventRunner>> invocationMap = new ObjectMap<>();
 	private ObjectMap<Observer, ObjectMap<Class<? extends TalosEvent>, EventRunner>> observerInvocationMap = new ObjectMap<>();
@@ -31,6 +38,15 @@ public class Notifications {
 			this.observer = observer;
 		}
 		public abstract void runEvent (TalosEvent event);
+	}
+
+	public abstract class CommandEventRunner extends EventRunner {
+		private Commands.CommandType commandType;
+
+		public CommandEventRunner(Observer observer, Commands.CommandType commandType) {
+			super(observer);
+			this.commandType = commandType;
+		}
 	}
 
 	private static Notifications getInstance () {
@@ -72,13 +88,23 @@ public class Notifications {
 
 		for (Method method : declaredMethods) {
 			final Annotation declaredAnnotation = method.getDeclaredAnnotation(EventHandler.class);
-			if (declaredAnnotation == null)
+			final Annotation declaredCommandAnnotation = method.getDeclaredAnnotation(CommandEventHandler.class);
+			if (declaredAnnotation == null && declaredCommandAnnotation == null)
 				continue;
 
-			EventHandler eventHandler = declaredAnnotation.getAnnotation(EventHandler.class);
+			boolean isCommandEvent = declaredCommandAnnotation != null;
 
-			if (eventHandler == null)
-				continue;
+			if (!isCommandEvent) {
+				EventHandler eventHandler = declaredAnnotation.getAnnotation(EventHandler.class);
+				if (eventHandler == null) {
+					continue;
+				}
+			} else {
+				CommandEventHandler eventHandler = declaredCommandAnnotation.getAnnotation(CommandEventHandler.class);
+				if (eventHandler == null) {
+					continue;
+				}
+			}
 
 			//Events should only have one param, and that param should be of instance Event
 			if (method.getParameterTypes().length == 1 && ClassReflection.isAssignableFrom(TalosEvent.class, method.getParameterTypes()[0])) {
@@ -86,16 +112,31 @@ public class Notifications {
 
 				method.setAccessible(true);
 
-				EventRunner eventRunner = new EventRunner(observer) {
-					@Override
-					public void runEvent (TalosEvent event) {
-						try {
-							method.invoke(observer, event);
-						} catch (ReflectionException e) {
-							e.printStackTrace();
+				EventRunner eventRunner;
+				if (isCommandEvent) {
+					CommandEventHandler commandAnnotation = declaredCommandAnnotation.getAnnotation(CommandEventHandler.class);
+					eventRunner = new CommandEventRunner(observer, commandAnnotation.commandType()) {
+						@Override
+						public void runEvent(TalosEvent event) {
+							try {
+								method.invoke(observer, event);
+							} catch (ReflectionException e) {
+								e.printStackTrace();
+							}
 						}
-					}
-				};
+					};
+				} else {
+					eventRunner = new EventRunner(observer) {
+						@Override
+						public void runEvent (TalosEvent event) {
+							try {
+								method.invoke(observer, event);
+							} catch (ReflectionException e) {
+								e.printStackTrace();
+							}
+						}
+					};
+				}
 
 				if (!invocationMap.containsKey(event)) {
 					invocationMap.put(event, new Array<>());
@@ -129,6 +170,18 @@ public class Notifications {
 	}
 
 	private void testAndFireEvent (EventRunner eventRunner, TalosEvent event) {
+		if (event instanceof ICommandEvent) {
+			if (!(eventRunner instanceof CommandEventRunner)) {
+				return;
+			}
+
+			CommandEventRunner commandEventRunner = (CommandEventRunner) eventRunner;
+			if (commandEventRunner.commandType != ((ICommandEvent) event).getCommandType()) {
+				return;
+			}
+		}
+
+
 		if (event instanceof ContextRequiredEvent) {
 			if (!(eventRunner.getObserver() instanceof EventContextProvider)) {
 				throw new GdxRuntimeException("Invalid event handler. Events that extend ContextRequiredEvent must have their " +
@@ -140,12 +193,11 @@ public class Notifications {
 			Object eventContextObject = ((ContextRequiredEvent<?>) event).getContext();
 
 			if (eventContextObject == null) {
-				throw new GdxRuntimeException("Invalid event, context must be provided");
+				logger.warn("firing event with no context provided");
 			}
 			if (!(eventContextObject == eventContextProvider.getContext())) {
 				return;
 			}
-
 		}
 		eventRunner.runEvent(event);
 	}

@@ -61,8 +61,6 @@ public class TalosProjectData implements Json.Serializable {
 		JsonValue jsonValue = jsonReader.parse(Gdx.files.internal("layouts/basic.json"));
 		talosProjectData.jsonLayoutRepresentation = jsonValue;
 
-		talosProjectData.save();
-
 		return talosProjectData;
 	}
 

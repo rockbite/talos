@@ -3,13 +3,14 @@ package com.talosvfx.talos.runtime.scene.components;
 import com.badlogic.gdx.math.collision.BoundingBox;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
+import com.talosvfx.talos.runtime.RuntimeContext;
 import com.talosvfx.talos.runtime.scene.GameObject;
 import com.talosvfx.talos.runtime.scene.SceneLayer;
 
 
 public abstract class RendererComponent extends AComponent implements Json.Serializable {
 
-    public SceneLayer sortingLayer = SceneLayer.DEFAULT_SCENE_LAYER;
+    public SceneLayer sortingLayer;
     public int orderingInLayer;
 
     public boolean visible = true;
@@ -26,7 +27,7 @@ public abstract class RendererComponent extends AComponent implements Json.Seria
 
     @Override
     public void write (Json json) {
-        json.writeValue("sortingSceneLayer", sortingLayer);
+        json.writeValue("sortingSceneLayer", (sortingLayer != null) ? sortingLayer : RuntimeContext.getInstance().sceneData.getPreferredSceneLayer());
         json.writeValue("orderingInLayer", orderingInLayer);
         json.writeValue("visible", visible);
         json.writeValue("childrenVisible", childrenVisible);
@@ -35,7 +36,7 @@ public abstract class RendererComponent extends AComponent implements Json.Seria
 
     @Override
     public void read (Json json, JsonValue jsonData) {
-        sortingLayer = json.readValue("sortingSceneLayer", SceneLayer.class, SceneLayer.DEFAULT_SCENE_LAYER, jsonData);
+        sortingLayer = json.readValue("sortingSceneLayer", SceneLayer.class,  RuntimeContext.getInstance().sceneData.getPreferredSceneLayer(), jsonData);
         orderingInLayer = jsonData.getInt("orderingInLayer", 0);
         visible = jsonData.getBoolean("visible", true);
         childrenVisible = jsonData.getBoolean("childrenVisible", true);
@@ -46,7 +47,7 @@ public abstract class RendererComponent extends AComponent implements Json.Seria
     @Override
     public void reset() {
         super.reset();
-        sortingLayer = SceneLayer.DEFAULT_SCENE_LAYER;
+        sortingLayer = RuntimeContext.getInstance().sceneData.getPreferredSceneLayer();
         orderingInLayer = 0;
         visible = true;
         childrenVisible = true;

@@ -29,6 +29,16 @@ public class LayoutContent extends LayoutItem {
 		addContent(app);
 	}
 
+	@Override
+	public void act(float delta) {
+		super.act(delta);
+		for (LayoutApp value : apps.values()) {
+			if (activeApp != value) {
+				value.actInBackground(delta);
+			}
+		}
+	}
+
 	public LayoutContent (Skin skin, LayoutGrid grid) {
 		super(skin, grid);
 

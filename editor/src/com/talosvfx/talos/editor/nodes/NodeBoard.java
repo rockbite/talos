@@ -150,19 +150,6 @@ public class NodeBoard<T extends DynamicNodeStageData> extends WidgetGroup imple
 		curvePoints[2] = new Vector2();
 		curvePoints[3] = new Vector2();
 
-		addListener(new ClickListener() {
-
-			@Override
-			public boolean keyUp (InputEvent event, int keycode) {
-				if (event.isHandled())
-					return super.keyUp(event, keycode);
-				if (keycode == Input.Keys.DEL || keycode == Input.Keys.FORWARD_DEL) {
-					deleteSelectedNodes();
-				}
-				return super.keyUp(event, keycode);
-			}
-		});
-
 		Notifications.registerObserver(this);
 
 		addActor(groupContainer);
@@ -564,8 +551,6 @@ public class NodeBoard<T extends DynamicNodeStageData> extends WidgetGroup imple
 	}
 
 	public void addNodeToSelection (NodeWidget node) {
-		SharedResources.stage.setKeyboardFocus(node);
-
 		selectedNodes.add(node);
 		updateSelectionBackgrounds();
 	}

@@ -21,6 +21,17 @@ plugins {
 }
 
 
+
+import com.badlogic.gdx.files.FileHandle
+import com.badlogic.gdx.utils.XmlReader
+import com.squareup.javapoet.ClassName
+import com.squareup.javapoet.FieldSpec
+import com.squareup.javapoet.JavaFile
+import com.squareup.javapoet.MethodSpec
+import com.squareup.javapoet.TypeSpec
+
+import javax.lang.model.element.Modifier
+
 dependencies {
 
     api libs.bongo.engine
@@ -32,6 +43,8 @@ dependencies {
 
 
     implementation libs.string.similarity
+
+    implementation libs.spine.libgdx
 
     implementation libs.snakeyaml
 
@@ -59,6 +72,63 @@ def getGitHash = { ->
         standardOutput = stdout
     }
     return stdout.toString().trim()
+}
+
+task generateCommandsEnum () {
+    doFirst {
+        TypeSpec.Builder builder = TypeSpec.classBuilder("Commands").addModifiers(Modifier.PUBLIC)
+                .addJavadoc("This is a generated class. It shouldn't be modified by hand, as the changes would be " +
+                "overridden.\n")
+                .addJavadoc("To regenerate this class, call generateCommandsEnum task from Gradle.\n" +
+                        "The XML file is located in editor/assets/commands.xml")
+        def file = rootProject.file("editor/assets/commands.xml")
+        XmlReader xmlReader = new XmlReader()
+        XmlReader.Element root = xmlReader.parse(new FileHandle(file))
+
+        TypeSpec.Builder packageEnumBuilder = TypeSpec.enumBuilder("CommandGroup").addModifiers(Modifier.PUBLIC)
+
+        for (XmlReader.Element commandGroup : root.getChildrenByName("commandGroup")) {
+            String packageName = commandGroup.getAttribute("package")
+            packageEnumBuilder.addEnumConstant(packageName.toUpperCase())
+        }
+
+        TypeSpec builtEnum = packageEnumBuilder.build()
+
+        TypeSpec.Builder enumBuilder = TypeSpec.enumBuilder("CommandType").addModifiers(Modifier.PUBLIC)
+        enumBuilder.addField(FieldSpec.builder(String.class, "uniqueName", Modifier.PUBLIC, Modifier.FINAL).build())
+        enumBuilder.addField(FieldSpec.builder(String.class, "name", Modifier.PUBLIC, Modifier.FINAL).build())
+        enumBuilder.addField(FieldSpec.builder(String.class, "description", Modifier.PUBLIC, Modifier.FINAL).build())
+        enumBuilder.addField(FieldSpec.builder(ClassName.bestGuess("com.talosvfx.talos.editor.notifications.commands.enums.Commands.CommandGroup"), "commandType", Modifier.PUBLIC, Modifier.FINAL).build())
+
+
+        MethodSpec uniqueName = MethodSpec.constructorBuilder()
+                .addParameter(String.class, "uniqueName")
+        .addParameter(String.class, "name")
+        .addParameter(String.class, "description")
+        .addParameter(String.class, "commandType")
+        .addStatement("this.uniqueName = uniqueName;\n" +
+                "this.name = name;\n" +
+                "this.description = description;\n" +
+                "this.commandType = CommandGroup.valueOf(commandType);").build()
+        enumBuilder.addMethod(uniqueName)
+
+        for (XmlReader.Element commandGroup : root.getChildrenByName("commandGroup")) {
+            String packageName = commandGroup.getAttribute("package")
+            for (XmlReader.Element command : commandGroup.getChildrenByName("command")) {
+                enumBuilder.addEnumConstant(command.getAttribute("name").replaceAll(" ", "_").toUpperCase(),
+                        TypeSpec.anonymousClassBuilder("\$S, \$S, \$S, \$S", command.getAttribute("uniqueName"),
+                                command.getAttribute("name"), command.getAttribute("description"), packageName.toUpperCase()).build())
+            }
+        }
+
+        builder.addType(builtEnum).addType(enumBuilder.build())
+
+        TypeSpec clazzBuild = builder.build();
+        final JavaFile.Builder fileBuilder = JavaFile.builder("com.talosvfx.talos.editor.notifications.commands.enums", clazzBuild);
+        JavaFile javaFile = fileBuilder.build()
+        def destination = new File("$projectDir/src/")
+        javaFile.writeTo(destination)
+    }
 }
 
 task packageSources(type: Jar, dependsOn: classes) {
@@ -102,10 +172,6 @@ def getBuildInfo () {
     return buildInfo
 }
 
-import com.squareup.javapoet.FieldSpec
-import com.squareup.javapoet.JavaFile
-import com.squareup.javapoet.MethodSpec
-import com.squareup.javapoet.TypeSpec
 import javax.lang.model.element.Modifier
 import com.badlogic.gdx.Application
 import com.badlogic.gdx.Gdx

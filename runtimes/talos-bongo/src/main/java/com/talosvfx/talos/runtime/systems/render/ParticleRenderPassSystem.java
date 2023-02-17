@@ -149,6 +149,8 @@ public class ParticleRenderPassSystem extends RenderPassSystem implements Partic
 				}
 			}
 
+			if (particleEmitter.getEmitterModule() == null) continue;
+
 			final DrawableModule drawableModule = particleEmitter.getDrawableModule();
 			if (drawableModule == null) continue;
 

@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.talosvfx.talos.editor.addons.scene.SceneUtils;
@@ -41,8 +42,9 @@ public class SpriteTransformGizmo extends SmartTransformGizmo {
         }
 
     }
+    private float[] verts = new float[2 * 4];
 
-    public void getBounds (Rectangle rectangle) {
+    public void getBounds (Polygon boundingPolygon) {
 
         TransformComponent transformComponent = gameObject.getComponent(TransformComponent.class);
         SpriteRendererComponent spriteRendererComponent = gameObject.getComponent(SpriteRendererComponent.class);
@@ -51,13 +53,27 @@ public class SpriteTransformGizmo extends SmartTransformGizmo {
         float signWidth = Math.signum(spriteRendererComponent.size.x);
         float signHeight = Math.signum(spriteRendererComponent.size.y);
 
-        rectangle.set(
-                signWidth * -spriteRendererComponent.size.x / 2f, signHeight * -spriteRendererComponent.size.y / 2f,
-                signWidth * spriteRendererComponent.size.x, signHeight * spriteRendererComponent.size.y
-        );
 
-        rectangle.x += transformComponent.worldPosition.x;
-        rectangle.y += transformComponent.worldPosition.y;
+        float width = signWidth * spriteRendererComponent.size.x;
+        float height = signHeight * spriteRendererComponent.size.y;
+
+        verts[0] = -width/2f;
+        verts[1] = -height/2f;
+
+        verts[2] = -width/2f;
+        verts[3] = height/2f;
+
+        verts[4] = width/2f;
+        verts[5] = height/2f;
+
+        verts[6] = width/2f;
+        verts[7] = -height/2f;
+
+        boundingPolygon.setPosition(transformComponent.worldPosition.x, transformComponent.worldPosition.y);
+        boundingPolygon.setVertices(verts);
+        boundingPolygon.setOrigin(0, 0);
+        boundingPolygon.setRotation(transformComponent.worldRotation);
+
     }
 
     @Override

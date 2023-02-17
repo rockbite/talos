@@ -2,8 +2,10 @@ package com.talosvfx.talos;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.LifecycleListener;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -14,12 +16,12 @@ import com.rockbite.bongo.engine.systems.RenderPassSystem;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.assets.TalosAssetProvider;
 import com.talosvfx.talos.editor.notifications.Notifications;
+import com.talosvfx.talos.editor.notifications.commands.CommandsSystem;
 import com.talosvfx.talos.editor.notifications.events.FinishInitializingEvent;
 import com.talosvfx.talos.editor.notifications.events.ProjectLoadedEvent;
 import com.talosvfx.talos.editor.project2.*;
 import com.talosvfx.talos.editor.project2.localprefs.TalosLocalPrefs;
 import com.talosvfx.talos.editor.project2.input.InputHandling;
-import com.talosvfx.talos.editor.project2.input.Shortcuts;
 import com.talosvfx.talos.editor.project2.savestate.GlobalSaveStateSystem;
 import com.talosvfx.talos.editor.project2.savestate.SaveSystem;
 import com.talosvfx.talos.editor.socket.SocketServer;
@@ -39,6 +41,7 @@ public class TalosMain2 extends ApplicationAdapter {
 	private Skin skin;
 	private Stage stage;
 	private Table layoutGridContainer;
+	private CommandsSystem commandsSystem;
 
 	public TalosMain2(ILauncher launcher) {
 		this.launcher = launcher;
@@ -47,14 +50,15 @@ public class TalosMain2 extends ApplicationAdapter {
 	@Override
 	public void create () {
 		super.create();
+		commandsSystem = new CommandsSystem();
 
 		AssetRepository.init();
-		SharedResources.projectLoader = this::projectLoader;
+		SharedResources.projectLoader = new ProjectLoaderImpl();
 		SharedResources.appManager = new AppManager();
 		SharedResources.inputHandling = new InputHandling();
 		SharedResources.globalDragAndDrop = new GlobalDragAndDrop();
 		SharedResources.globalSaveStateSystem = new GlobalSaveStateSystem();
-
+		SharedResources.commandsSystem = this.commandsSystem;
 		TalosVFXUtils.talosAssetProvider = new TalosAssetProvider();
 
 		RuntimeContext instance = RuntimeContext.getInstance();
@@ -71,12 +75,13 @@ public class TalosMain2 extends ApplicationAdapter {
 
 		TalosVFXUtils.init();
 
-		stage = new Stage(new ScreenViewport(), new PolygonSpriteBatchMultiTextureMULTIBIND(3000, null));
+		stage = new SharedStage(new ScreenViewport(), new PolygonSpriteBatchMultiTextureMULTIBIND(3000, null));
 
 		SharedResources.stage = stage;
 		SharedResources.ui = new UIController();
 
 		layoutGridContainer = new Table();
+		((ProjectLoaderImpl) SharedResources.projectLoader).setLayoutGridContainer(layoutGridContainer);
 
 		Table fullScreen = new Table();
 		fullScreen.setFillParent(true);
@@ -94,7 +99,6 @@ public class TalosMain2 extends ApplicationAdapter {
 
 		stage.addActor(fullScreen);
 
-		SharedResources.inputHandling.addPermanentInputProcessor(new Shortcuts());
 		SharedResources.inputHandling.addPermanentInputProcessor(stage);
 		SharedResources.inputHandling.setGDXMultiPlexer();
 
@@ -104,28 +108,6 @@ public class TalosMain2 extends ApplicationAdapter {
 
 		openProjectExplorer();
 	}
-
-	private void projectLoader (TalosProjectData projectData) {
-		SharedResources.currentProject = projectData;
-
-		TalosLocalPrefs.Instance().updateProject(projectData);
-
-		layoutGridContainer.clearChildren();
-		layoutGridContainer.add(projectData.getLayoutGrid()).grow();
-
-
-		ProjectLoadedEvent projectLoadedEvent = Notifications.obtainEvent(ProjectLoadedEvent.class);
-		projectLoadedEvent.setProjectData(projectData);
-		Notifications.fireEvent(projectLoadedEvent);
-
-		projectData.loadLayout();
-
-		//todo: move this somewhere else
-		SocketServer.getInstance();
-
-		RuntimeContext.getInstance().setSceneData(projectData.getSceneData());
-	}
-
 
 	private void openProjectExplorer () {
 		ProjectSplash projectSplash = new ProjectSplash();
@@ -140,10 +122,9 @@ public class TalosMain2 extends ApplicationAdapter {
 		Gdx.gl.glClearColor(0.13f, 0.13f, 0.13f, 1f);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
+		commandsSystem.act(Gdx.graphics.getDeltaTime());
 		stage.act();
 		stage.draw();
-
-
 	}
 
 

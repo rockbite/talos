@@ -3,9 +3,10 @@ package com.talosvfx.talos.editor.addons.scene.events.commands;
 import com.talosvfx.talos.runtime.scene.GameObject;
 import com.talosvfx.talos.runtime.scene.GameObjectContainer;
 import com.talosvfx.talos.editor.notifications.ContextRequiredEvent;
+import com.talosvfx.talos.editor.notifications.events.AbstractContextRequiredEvent;
 import lombok.Getter;
 
-public class GONameChangeCommand extends ContextRequiredEvent<GameObjectContainer> {
+public class GONameChangeCommand extends AbstractContextRequiredEvent<GameObjectContainer> {
 
     @Getter
     private GameObject go;
@@ -23,6 +24,7 @@ public class GONameChangeCommand extends ContextRequiredEvent<GameObjectContaine
 
     @Override
     public void reset() {
-
+        super.reset();
+        go = null;
     }
 }

@@ -48,8 +48,8 @@ public class SpritePropertiesEditorWindow extends SpriteEditorWindow {
         widthWidget = WidgetFactory.generate(this, "width", "Width");
         heightWidget = WidgetFactory.generate(this, "height", "Height");
 
-        ((FloatPropertyWidget) widthWidget).configureFromValues(0, Integer.MAX_VALUE, 1);
-        ((FloatPropertyWidget) heightWidget).configureFromValues(0, Integer.MAX_VALUE, 1);
+        ((FloatPropertyWidget) widthWidget).configureFromValues(1, 4096, 1);
+        ((FloatPropertyWidget) heightWidget).configureFromValues(1, 4096, 1);
 
         // create panel
         final CollapsableWidget sizePanel = new CollapsableWidget("Size");

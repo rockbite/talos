@@ -3,8 +3,9 @@ package com.talosvfx.talos.editor.notifications.events.dynamicnodestage;
 import com.talosvfx.talos.editor.nodes.DynamicNodeStage;
 import com.talosvfx.talos.editor.nodes.NodeBoard;
 import com.talosvfx.talos.editor.notifications.ContextRequiredEvent;
+import com.talosvfx.talos.editor.notifications.events.AbstractContextRequiredEvent;
 
-public class NodeConnectionCreatedEvent extends ContextRequiredEvent<DynamicNodeStage<?>> {
+public class NodeConnectionCreatedEvent extends AbstractContextRequiredEvent<DynamicNodeStage<?>> {
 
     private NodeBoard.NodeConnection connection;
 

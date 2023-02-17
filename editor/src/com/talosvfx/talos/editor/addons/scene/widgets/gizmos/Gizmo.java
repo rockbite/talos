@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -38,7 +39,7 @@ public abstract class Gizmo extends Actor implements Pool.Poolable {
 
     protected float worldPerPixel = 1f;
 
-    protected Rectangle hitBox = new Rectangle();
+    protected Polygon hitBox = new Polygon();
 
     protected boolean selected = false;
 
@@ -117,7 +118,7 @@ public abstract class Gizmo extends Actor implements Pool.Poolable {
         worldPerPixel = totalWorldWidth / totalScreenSpaceParentSize;
     }
 
-    void getHitBox(Rectangle rectangle) {
+    void getHitBox(Polygon boudningPolygon) {
 
     }
 

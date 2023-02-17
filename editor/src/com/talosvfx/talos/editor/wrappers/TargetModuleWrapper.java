@@ -13,6 +13,7 @@ import com.talosvfx.talos.editor.widgets.ui.PreviewWidget;
 import com.talosvfx.talos.runtime.vfx.Slot;
 import com.talosvfx.talos.runtime.vfx.modules.AbstractModule;
 import com.talosvfx.talos.runtime.vfx.modules.TargetModule;
+import com.talosvfx.talos.runtime.vfx.modules.Vector3Module;
 
 public class TargetModuleWrapper extends ModuleWrapper<TargetModule> implements IDragPointProvider {
 
@@ -95,8 +96,8 @@ public class TargetModuleWrapper extends ModuleWrapper<TargetModule> implements 
     @Override
     public Class<? extends AbstractModule>  getSlotsPreferredModule(Slot slot) {
 
-        if(slot.getIndex() == TargetModule.FROM) return TalosMain.Instance().UIStage().getPreferred3DVectorClass();;
-        if(slot.getIndex() == TargetModule.TO) return TalosMain.Instance().UIStage().getPreferred3DVectorClass();;
+        if(slot.getIndex() == TargetModule.FROM) return Vector3Module.class;
+        if(slot.getIndex() == TargetModule.TO) return Vector3Module.class;
 
         return null;
     }

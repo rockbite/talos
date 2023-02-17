@@ -3,8 +3,9 @@
         <menu name="new" title="New" icon="icon-folder-new">
             <menu name="project" title="Project" />
             <menu name="routine" title="Routine" />
-            <menu name="vfx" title="VFX" />
-            <menu name="shader" title="Shader" />
+            <menu name="vfx" title="Particle Effect" />
+            <menu name="script" title="Script" />
+            <menu name="palette" title="Palette" />
         </menu>
         <menu name="open" title="Open" icon="icon-folder"/>
         <menu name="open_recent" title="Open Recent">
@@ -12,12 +13,11 @@
         </menu>
         <separator/>
         <menu name="save" title="Save"/>
-        <menu name="save_as" title="Save As..."/>
-        <menu name="save_copy" title="Save Copy"/>
         <separator/>
-        <menu name="import" title="Import">
-            <inject name="other" />
-        </menu>
+<!--        Need to decide on this -->
+<!--        <menu name="import" title="Import">-->
+<!--            <inject name="other" />-->
+<!--        </menu>-->
         <menu name="export" title="Export">
             <menu name="project" title="Project Export" />
             <inject name="other" />
@@ -29,19 +29,21 @@
         <menu name="undo" title="Undo"/>
         <menu name="redo" title="Redo"/>
         <separator/>
-        <menu name="cut" title="Cut" />
-        <menu name="copy" title="Copy" />
-        <menu name="paste" title="Paste" />
-        <menu name="delete" title="Delete" />
-        <separator/>
+<!--        <menu name="cut" title="Cut" />-->
+<!--        <menu name="copy" title="Copy" />-->
+<!--        <menu name="paste" title="Paste" />-->
+<!--        <menu name="delete" title="Delete" />-->
+<!--        <separator/>-->
         <menu name="preferences" title="Preferences"/>
     </menu>
     <menu name="window" title="Window">
-        <menu name="panels" title="Panels">
-            <menu name="close_all" title="Close all floating panels"/>
-            <separator/>
-            <inject name="panel_list"/>
-        </menu>
+<!--        does not need panels item for now, because there are no usable items -->
+<!--        <menu name="panels" title="Panels">-->
+<!--&lt;!&ndash;            does not need close_all for now, because floating panels feature is not present &ndash;&gt;-->
+<!--&lt;!&ndash;            <menu name="close_all" title="Close all floating panels"/>&ndash;&gt;-->
+<!--            <separator/>-->
+<!--            <inject name="panel_list"/>-->
+<!--        </menu>-->
         <separator/>
         <menu name="layouts" title="Layouts">
             <menu name="save_layout" title="Save As New"/>

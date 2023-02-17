@@ -19,11 +19,7 @@ package com.talosvfx.talos.editor.wrappers;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.runtime.vfx.Slot;
 
-import com.talosvfx.talos.runtime.vfx.modules.AbstractModule;
-import com.talosvfx.talos.runtime.vfx.modules.CurveModule;
-import com.talosvfx.talos.runtime.vfx.modules.GradientColorModule;
-import com.talosvfx.talos.runtime.vfx.modules.ParticleModule;
-import com.talosvfx.talos.runtime.vfx.modules.StaticValueModule;
+import com.talosvfx.talos.runtime.vfx.modules.*;
 
 public class ParticleModuleWrapper extends ModuleWrapper<ParticleModule> {
 
@@ -79,7 +75,7 @@ public class ParticleModuleWrapper extends ModuleWrapper<ParticleModule> {
     public Class<? extends AbstractModule>  getSlotsPreferredModule(Slot slot) {
 
         if(slot.getIndex() == ParticleModule.LIFE) return StaticValueModule.class;
-        if(slot.getIndex() == ParticleModule.PIVOT) TalosMain.Instance().UIStage().getPreferred3DVectorClass();
+        if(slot.getIndex() == ParticleModule.PIVOT) return Vector3Module.class;
         if(slot.getIndex() == ParticleModule.COLOR) return GradientColorModule.class;
         if(slot.getIndex() == ParticleModule.TRANSPARENCY) return CurveModule.class;
 

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox fx:id="rootPane" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <HBox prefHeight="100.0" prefWidth="200.0" spacing="30.0">
+         <children>
+            <VBox spacing="5.0">
+               <children>
+                  <Label text="Version Select" />
+                  <ComboBox fx:id="versionBox" onAction="#onVersionBoxSelect" prefWidth="150.0" promptText="Version" style="-fx-background-radius: 5px; -fx-border-radius: 5px;" />
+               </children>
+            </VBox>
+         </children>
+         <padding>
+            <Insets left="30.0" top="30.0" />
+         </padding></HBox>
+      <VBox fx:id="centerBox" alignment="CENTER" spacing="10.0">
+         <children>
+            <Label fx:id="updateLabel" alignment="CENTER" minHeight="100.0" minWidth="200.0" text="Checking for updates" textAlignment="CENTER" textFill="WHITE" textOverrun="CENTER_ELLIPSIS" wrapText="true" VBox.vgrow="ALWAYS">
+               <VBox.margin>
+                  <Insets />
+               </VBox.margin></Label>
+            <ProgressBar fx:id="progressBar" minWidth="300.0" progress="0.0">
+               <VBox.margin>
+                  <Insets />
+               </VBox.margin></ProgressBar>
+         </children>
+         <padding>
+            <Insets bottom="30.0" left="50.0" right="50.0" top="30.0" />
+         </padding>
+         <VBox.margin>
+            <Insets left="100.0" right="100.0" />
+         </VBox.margin>
+      </VBox>
+      <HBox alignment="CENTER_RIGHT">
+         <children>
+            <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" spacing="40.0" HBox.hgrow="ALWAYS">
+               <children>
+                  <CheckBox fx:id="autoLaunchCheckbox" mnemonicParsing="false" onAction="#onAutoLaunch" text="Auto launch" />
+               </children>
+               <opaqueInsets>
+                  <Insets />
+               </opaqueInsets>
+               <padding>
+                  <Insets left="20.0" />
+               </padding>
+            </HBox>
+            <HBox alignment="CENTER_RIGHT" prefHeight="100.0" prefWidth="200.0" spacing="20.0">
+               <children>
+                  <Button fx:id="updateButton" alignment="CENTER_RIGHT" contentDisplay="CENTER" mnemonicParsing="false" onAction="#onUpdateButton" style="-fx-background-radius: 20px; -fx-border-radius: 20px;" text="Update" />
+                  <Button fx:id="launchButton" defaultButton="true" mnemonicParsing="false" onAction="#onLaunchButton" style="-fx-background-radius: 20px; -fx-border-radius: 20px;" text="Launch">
+                     <opaqueInsets>
+                        <Insets />
+                     </opaqueInsets>
+                  </Button>
+               </children>
+               <padding>
+                  <Insets right="40.0" />
+               </padding>
+            </HBox>
+         </children>
+      </HBox>
+   </children>
+</VBox>

@@ -18,10 +18,7 @@ package com.talosvfx.talos;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
-import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
-import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
-import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Window;
+import com.badlogic.gdx.backends.lwjgl3.*;
 import com.badlogic.gdx.graphics.glutils.HdpiMode;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -30,6 +27,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.ScreenUtils;
+import com.badlogic.gdx.utils.SharedLibraryLoader;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.rockbite.bongo.engine.render.PolygonSpriteBatchMultiTextureMULTIBIND;
 import com.talosvfx.talos.editor.dialogs.IWindowDialog;
@@ -37,9 +35,12 @@ import com.talosvfx.talos.editor.layouts.LayoutApp;
 import com.talosvfx.talos.editor.layouts.LayoutContent;
 import com.talosvfx.talos.editor.layouts.LayoutGrid;
 import com.talosvfx.talos.editor.project2.SharedResources;
+import com.talosvfx.talos.editor.project2.SharedStage;
 import com.talosvfx.talos.editor.utils.WindowUtils;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.glfw.GLFWDropCallback;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -48,14 +49,18 @@ import static org.lwjgl.glfw.GLFW.glfwSetDropCallback;
 import static org.lwjgl.system.MemoryUtil.*;
 
 public class TalosLauncher implements ILauncher {
-
+	private static Logger logger = LoggerFactory.getLogger(TalosLauncher.class);
 	public Array<Lwjgl3Window> openedWindows = new Array<>();
 	public ObjectMap<IWindowDialog, Lwjgl3Window> windowMap = new ObjectMap<>();
 
 	public static void main (String[] arg) {
+		logger.info("Program args {}", arg);
+
+
+
 		Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
 		config.setWindowedMode(1200, 900);
-		config.setMaximized(true);
+		config.setMaximized(false);
 		config.useVsync(true);
 		config.setHdpiMode(HdpiMode.Logical);
 		config.setBackBufferConfig(1,1,1,1,8,8, 0);
@@ -118,7 +123,7 @@ public class TalosLauncher implements ILauncher {
 					public void create () {
 						super.create();
 
-						stage = new Stage(new ScreenViewport(), new PolygonSpriteBatchMultiTextureMULTIBIND());
+						stage = new SharedStage(new ScreenViewport(), new PolygonSpriteBatchMultiTextureMULTIBIND());
 						SharedResources.inputHandling.addPermanentInputProcessor(stage);
 						SharedResources.inputHandling.setGDXMultiPlexer();
 
@@ -200,7 +205,23 @@ public class TalosLauncher implements ILauncher {
 	}
 
 	private static void afterCreated () {
+
+
+
+
 		final Lwjgl3Graphics graphics = (Lwjgl3Graphics)Gdx.graphics;
+
+
+		if (SharedLibraryLoader.isMac) {
+			Gdx.app.postRunnable(new Runnable() {
+				@Override
+				public void run () {
+					graphics.getWindow().restoreWindow();
+					graphics.getWindow().focusWindow();
+				}
+			});
+
+		}
 		glfwSetDropCallback(graphics.getWindow().getWindowHandle(), new GLFWDropCallback() {
 			@Override
 			public void invoke (long window, int count, long names) {
@@ -219,6 +240,7 @@ public class TalosLauncher implements ILauncher {
 						final int y = Gdx.input.getY();
 
 						SharedResources.globalDragAndDrop.fakeDragDrop(x, y, filesPaths);
+
 					}
 				});
 			}
@@ -232,5 +254,17 @@ public class TalosLauncher implements ILauncher {
 		}
 		openedWindows.clear();
 		windowMap.clear();
+
+		new Thread(new Runnable() {
+			@Override
+			public void run () {
+				try {
+					Thread.sleep(1);
+				} catch (InterruptedException e) {
+					throw new RuntimeException(e);
+				}
+				System.exit(0);
+			}
+		}).start();
 	}
 }

@@ -38,6 +38,7 @@ import com.talosvfx.talos.editor.widgets.ui.EditableLabel;
 import com.talosvfx.talos.editor.widgets.ui.FilteredTree;
 import info.debatty.java.stringsimilarity.JaroWinkler;
 import info.debatty.java.stringsimilarity.interfaces.StringSimilarity;
+import lombok.Getter;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
@@ -63,6 +64,9 @@ public class ProjectExplorerWidget extends Table implements Observer {
 
     public boolean isCutting = false;
     public Array<FileHandle> filesToManipulate = new Array<>();
+
+    @Getter
+    private SplitPane splitPane;
 
     public ProjectExplorerWidget() {
         Skin skin = SharedResources.skin;
@@ -132,7 +136,7 @@ public class ProjectExplorerWidget extends Table implements Observer {
         scrollPaneTable.add(scrollPane).height(0).grow();
 
         directoryViewWidget = new DirectoryViewWidget(this);
-        SplitPane splitPane = new SplitPane(scrollPaneTable, directoryViewWidget, false, SharedResources.skin);
+        splitPane = new SplitPane(scrollPaneTable, directoryViewWidget, false, SharedResources.skin);
         splitPane.setSplitAmount(0.35f);
 
         container.add(splitPane).grow();
@@ -179,7 +183,6 @@ public class ProjectExplorerWidget extends Table implements Observer {
             @Override
             public void selected (FilteredTree.Node node) {
                 select(node);
-                directoryViewWidget.openDirectory((String) node.getObject());
             }
 
             @Override
@@ -624,8 +627,6 @@ public class ProjectExplorerWidget extends Table implements Observer {
         rootNode.setExpanded(true);
 
         rootNode.expandAll();
-
-        directoryViewWidget.openDirectory(root.path());
     }
 
     private void traversePath(FileHandle path, int currDepth, int maxDepth, FilteredTree.Node node) {

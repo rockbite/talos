@@ -50,6 +50,7 @@ import com.kotcrab.vis.ui.widget.VisLabel;
 import com.kotcrab.vis.ui.widget.VisSelectBox;
 import com.kotcrab.vis.ui.widget.VisTable;
 import com.kotcrab.vis.ui.widget.VisTextField;
+import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.EightPointGizmo;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.render.Render;
 import com.talosvfx.talos.editor.addons.scene.events.GameObjectSelectionChanged;
@@ -438,6 +439,8 @@ public abstract class ViewportWidget extends Table {
 							hitGizmo.touchDown(hitCords.x, hitCords.y, button);
 						}
 
+						event.stop();
+
 						return true;
 					} else {
 						Gizmo testGizmo = hitGizmoGameObject(hitCords.x, hitCords.y, selection.first());
@@ -449,6 +452,7 @@ public abstract class ViewportWidget extends Table {
 							hitGizmo = testGizmo;
 
 							hitGizmo.touchDown(hitCords.x, hitCords.y, button);
+							event.stop();
 							return true;
 
 						} else {
@@ -500,6 +504,9 @@ public abstract class ViewportWidget extends Table {
 					} else {
 						hitGizmo = hitGizmo(hitCords.x, hitCords.y);
 						if (canTouchGizmo(hitGizmo)) {
+
+							selectGameObject(hitGizmo.getGameObject());
+
 							hitGizmo.touchDown(hitCords.x, hitCords.y, button);
 							getStage().setKeyboardFocus(ViewportWidget.this);
 							event.handle();
@@ -614,6 +621,7 @@ public abstract class ViewportWidget extends Table {
 		if (testGizmo instanceof GroupSelectionGizmo) return true;
 
 		if (!testGizmo.getGameObject().isEditorVisible()) return false;
+		if (testGizmo.getGameObject().isEditorTransformLocked()) return false;
 
 		return true;
 	}
@@ -697,10 +705,10 @@ public abstract class ViewportWidget extends Table {
 		}
 
 		//Lets check for 'smart' linking
-		if (gameObjectGizmoMap.containsKey(TransformGizmo.class) && gameObjectGizmoMap.containsKey(SpriteTransformGizmo.class)) {
+		if (gameObjectGizmoMap.containsKey(TransformGizmo.class) && gameObjectGizmoMap.containsKey(EightPointGizmo.class)) {
 			TransformGizmo transformGizmo = (TransformGizmo)gameObjectGizmoMap.get(TransformGizmo.class);
-			SpriteTransformGizmo smartTransformGizmo = (SpriteTransformGizmo)gameObjectGizmoMap.get(SpriteTransformGizmo.class);
-			transformGizmo.linkToSmart(smartTransformGizmo);
+			EightPointGizmo eightPointGizmo = (EightPointGizmo)gameObjectGizmoMap.get(EightPointGizmo.class);
+			transformGizmo.linkToSmart(eightPointGizmo);
 		}
 
 

@@ -21,12 +21,16 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.talosvfx.talos.TalosMain;
+import com.talosvfx.talos.editor.notifications.Notifications;
+import com.talosvfx.talos.editor.notifications.events.deprecatedparticles.RegisterDragPoints;
+import com.talosvfx.talos.editor.notifications.events.deprecatedparticles.UnRegisterDragPoints;
 import com.talosvfx.talos.editor.widgets.ui.DragPoint;
 import com.talosvfx.talos.editor.widgets.ui.PreviewWidget;
 import com.talosvfx.talos.runtime.vfx.Slot;
 
 import com.talosvfx.talos.runtime.vfx.modules.AbstractModule;
 import com.talosvfx.talos.runtime.vfx.modules.FromToModule;
+import com.talosvfx.talos.runtime.vfx.modules.Vector3Module;
 
 public class FromToModuleWrapper extends ModuleWrapper<FromToModule> implements IDragPointProvider {
 
@@ -40,14 +44,16 @@ public class FromToModuleWrapper extends ModuleWrapper<FromToModule> implements 
 
     @Override
     protected void wrapperSelected() {
-        PreviewWidget previewWidget = TalosMain.Instance().UIStage().PreviewWidget();
-        previewWidget.registerForDragPoints(this);
+        RegisterDragPoints registerDragPoints = Notifications.obtainEvent(RegisterDragPoints.class);
+        registerDragPoints.setRegisterForDragPoints(this);
+        Notifications.fireEvent(registerDragPoints);
     }
 
     @Override
     protected void wrapperDeselected() {
-        PreviewWidget previewWidget = TalosMain.Instance().UIStage().PreviewWidget();
-        previewWidget.unregisterDragPoints(this);
+        UnRegisterDragPoints unregisterDragPoints = Notifications.obtainEvent(UnRegisterDragPoints.class);
+        unregisterDragPoints.setUnRegisterForDragPoints(this);
+        Notifications.fireEvent(unregisterDragPoints);
     }
 
     @Override
@@ -117,8 +123,8 @@ public class FromToModuleWrapper extends ModuleWrapper<FromToModule> implements 
     @Override
     public Class<? extends AbstractModule>  getSlotsPreferredModule(Slot slot) {
 
-        if(slot.getIndex() == FromToModule.FROM) return TalosMain.Instance().UIStage().getPreferred3DVectorClass();;
-        if(slot.getIndex() == FromToModule.TO) return TalosMain.Instance().UIStage().getPreferred3DVectorClass();;
+        if(slot.getIndex() == FromToModule.FROM) return Vector3Module.class;
+        if(slot.getIndex() == FromToModule.TO) return Vector3Module.class;
 
         return null;
     }

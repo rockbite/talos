@@ -10,6 +10,8 @@ import com.badlogic.gdx.math.Vector3;
 import com.rockbite.bongo.engine.camera.BongoCameraController;
 import com.talosvfx.talos.editor.utils.CameraController;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.function.Supplier;
 
@@ -24,6 +26,15 @@ public class ViewportViewSettings {
 
 
 	private final CameraController twoDimensionalCameraController;
+
+
+	@Getter
+	private boolean disableCamera;
+
+
+	public void setDisableCamera (boolean disableCamera) {
+		this.disableCamera = disableCamera;
+	}
 
 
 	private float fov = 69;
@@ -54,7 +65,8 @@ public class ViewportViewSettings {
 		orthographicCamera = new OrthographicCamera(10, 10);
 		perspectiveCamera = new PerspectiveCamera(fov, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
-		orthographicCamera.position.set(0, 0, 1);
+		orthographicCamera.position.set(0, 0, 5);
+		orthographicCamera.lookAt(new Vector3(0, 0, 0));
 
 		perspectiveCamera.position.set(0, 0, 5);
 		perspectiveCamera.lookAt(new Vector3(0, 0, 0));
@@ -107,6 +119,9 @@ public class ViewportViewSettings {
 
 		twoDimensionalCameraController.setCamera(currentCamera);
 		threeDimensionalCameraController.setCamera(currentCamera);
+
+		twoDimensionalCameraController.setDisabled(disableCamera);
+		threeDimensionalCameraController.setDisabled(disableCamera);
 
 		if (is3D) {
 			currentCameraController = threeDimensionalCameraController;

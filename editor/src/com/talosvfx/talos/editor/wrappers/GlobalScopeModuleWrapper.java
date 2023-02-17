@@ -26,8 +26,15 @@ import com.badlogic.gdx.utils.JsonValue;
 import com.kotcrab.vis.ui.VisUI;
 import com.kotcrab.vis.ui.widget.VisSelectBox;
 import com.talosvfx.talos.TalosMain;
+import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
+import com.talosvfx.talos.editor.notifications.Notifications;
+import com.talosvfx.talos.editor.notifications.events.deprecatedparticles.RegisterDragPoints;
+import com.talosvfx.talos.editor.notifications.events.deprecatedparticles.UnRegisterDragPoints;
+import com.talosvfx.talos.editor.project2.SharedResources;
+import com.talosvfx.talos.editor.serialization.VFXProjectData;
 import com.talosvfx.talos.editor.widgets.ui.DragPoint;
 import com.talosvfx.talos.editor.widgets.ui.PreviewWidget;
+import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.runtime.vfx.modules.GlobalScopeModule;
 import com.talosvfx.talos.runtime.vfx.values.NumericalValue;
 import com.talosvfx.talos.editor.widgets.ui.common.zoomWidgets.SelectBoxWithZoom;
@@ -37,6 +44,8 @@ public class GlobalScopeModuleWrapper extends ModuleWrapper<GlobalScopeModule> i
     SelectBox<String> selectBox;
 
     DragPoint dragPoint;
+
+    private boolean loading;
 
     @Override
     protected void configureSlots() {
@@ -53,24 +62,26 @@ public class GlobalScopeModuleWrapper extends ModuleWrapper<GlobalScopeModule> i
         addOutputSlot("output", GlobalScopeModule.OUTPUT);
     }
 
+
     @Override
-    public void setModule(GlobalScopeModule module) {
-        super.setModule(module);
-        NumericalValue value = TalosMain.Instance().globalScope.getDynamicValue(module.getKey());
+    public void onGraphSet () {
+        super.onGraphSet();
+        NumericalValue value = getModule().getScope().getDynamicValue(module.getKey());
         dragPoint.set(value.get(0), value.get(1));
     }
 
     @Override
     protected void wrapperSelected() {
-        PreviewWidget previewWidget = TalosMain.Instance().UIStage().PreviewWidget();
-        previewWidget.registerForDragPoints(this);
-        updateFromSelectBox();
+        RegisterDragPoints registerDragPoints = Notifications.obtainEvent(RegisterDragPoints.class);
+        registerDragPoints.setRegisterForDragPoints(this);
+        Notifications.fireEvent(registerDragPoints);
     }
 
     @Override
     protected void wrapperDeselected() {
-        PreviewWidget previewWidget = TalosMain.Instance().UIStage().PreviewWidget();
-        previewWidget.unregisterDragPoints(this);
+        UnRegisterDragPoints unregisterDragPoints = Notifications.obtainEvent(UnRegisterDragPoints.class);
+        unregisterDragPoints.setUnRegisterForDragPoints(this);
+        Notifications.fireEvent(unregisterDragPoints);
     }
 
     protected SelectBoxWithZoom addSelectBox(Array<String> values) {
@@ -82,7 +93,9 @@ public class GlobalScopeModuleWrapper extends ModuleWrapper<GlobalScopeModule> i
         selectBox.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                updateFromSelectBox();
+                if (!loading) {
+                    updateFromSelectBox();
+                }
             }
         });
 
@@ -98,8 +111,11 @@ public class GlobalScopeModuleWrapper extends ModuleWrapper<GlobalScopeModule> i
         String selected = selectBox.getSelected();
         int key = Integer.parseInt(selected);
         module.setKey(key);
-        NumericalValue value = TalosMain.Instance().globalScope.getDynamicValue(key);
+        NumericalValue value = getModule().getScope().getDynamicValue(key);
         dragPoint.set(value.get(0), value.get(1));
+
+        GameAsset<VFXProjectData> gameAsset = moduleBoardWidget.app.getGameAsset();
+        AssetRepository.getInstance().assetChanged(gameAsset);
     }
 
     @Override
@@ -114,12 +130,14 @@ public class GlobalScopeModuleWrapper extends ModuleWrapper<GlobalScopeModule> i
 
     @Override
     public void dragPointChanged(DragPoint point) {
-        TalosMain.Instance().globalScope.setDynamicValue(module.getKey(), dragPoint.position);
+        getModule().getScope().setDynamicValue(module.getKey(), dragPoint.position);
     }
 
     @Override
     public void read(Json json, JsonValue jsonData) {
+        loading = true;
         super.read(json, jsonData);
         selectBox.setSelected(module.getKey()+"");
+        loading = false;
     }
 }

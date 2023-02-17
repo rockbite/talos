@@ -1,0 +1,33 @@
+p {
+    color: white;
+}
+
+#rootPane {
+    -fx-background-image: url("splash.png");
+    -fx-background-size: cover;
+    -fx-background-position: center center;
+    -fx-background-color: #222222;
+}
+#centerBox {
+    -fx-background-color: rgba(0.2, 0.2, 0.2, 0.5);
+}
+
+#autoLaunchCheckbox .box {
+    -fx-border-style: solid;
+    -fx-border-radius: 5px;
+}
+#launchButton:focused {
+    -fx-border-style: solid;
+}
+
+#autoLaunchCheckbox:focused .box {
+    -fx-border-style: solid;
+    -fx-border-radius: 5px;
+}
+
+#autoLaunchCheckbox:focused .mark {
+    -fx-border-style: solid;
+    -fx-border-radius: 5px;
+    -fx-border-width: 0px;
+}
+

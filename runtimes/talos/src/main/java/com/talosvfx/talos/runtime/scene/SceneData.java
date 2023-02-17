@@ -1,7 +1,6 @@
 package com.talosvfx.talos.runtime.scene;
 
 import com.badlogic.gdx.utils.Array;
-import com.talosvfx.talos.runtime.scene.SceneLayer;
 import lombok.Data;
 
 @Data
@@ -11,6 +10,8 @@ public class SceneData {
 			new SceneLayer("Default", 0),
 			new SceneLayer("UI", 1),
 	new SceneLayer("Misc", 2)});
+
+	private SceneLayer preferredSceneLayer;
 
 
 	public SceneLayer getSceneLayerByName (String layerName) {
@@ -23,4 +24,13 @@ public class SceneData {
 		return null;
 	}
 
+	public void setPreferredSceneLayer(String sceneLayer){
+		preferredSceneLayer = getSceneLayerByName(sceneLayer);
+	}
+
+	public SceneLayer getPreferredSceneLayer(){
+		if(preferredSceneLayer == null)
+			return getSceneLayerByName("Default");
+		return preferredSceneLayer;
+	}
 }

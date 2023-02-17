@@ -3,11 +3,10 @@ package com.talosvfx.talos.editor.notifications.events.dynamicnodestage;
 import com.badlogic.gdx.utils.Array;
 import com.talosvfx.talos.editor.nodes.DynamicNodeStage;
 import com.talosvfx.talos.editor.nodes.NodeWidget;
-import com.talosvfx.talos.editor.notifications.ContextRequiredEvent;
-import com.talosvfx.talos.editor.notifications.TalosEvent;
+import com.talosvfx.talos.editor.notifications.events.AbstractContextRequiredEvent;
 import lombok.Getter;
 
-public class NodeRemovedEvent extends ContextRequiredEvent<DynamicNodeStage<?>> {
+public class NodeRemovedEvent extends AbstractContextRequiredEvent<DynamicNodeStage<?>> {
 
     @Getter
     private Array<NodeWidget> nodes = new Array<>();

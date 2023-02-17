@@ -191,6 +191,7 @@ public class TextValueWidget extends AbstractWidget<String> {
     }
 
     private void showEditMode() {
+        if (getStage() == null) return;
         if(editing.isVisible()) return;
 
         getStage().setKeyboardFocus(textField);

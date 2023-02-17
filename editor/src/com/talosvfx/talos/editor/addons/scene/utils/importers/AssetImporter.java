@@ -9,6 +9,7 @@ import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
+import com.talosvfx.talos.editor.utils.Toasts;
 import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.runtime.assets.GameAssetType;
 import com.talosvfx.talos.editor.addons.scene.events.FileNameChanged;
@@ -230,6 +231,10 @@ public class AssetImporter {
         //Game resource event
         GameAsset<?> assetForPath = AssetRepository.getInstance().getAssetForPath(fileHandle, true);
         if (assetForPath != null) {
+            if (assetForPath.isBroken()) {
+                Toasts.getInstance().showErrorToast("Asset is broken, you cannot open it");
+                return;
+            }
             if (SharedResources.appManager.canOpenInTalos(assetForPath)) {
                 SharedResources.appManager.openNewAsset(assetForPath);
                 return;

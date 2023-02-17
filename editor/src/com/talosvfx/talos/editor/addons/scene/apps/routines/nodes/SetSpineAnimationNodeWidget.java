@@ -2,6 +2,7 @@ package com.talosvfx.talos.editor.addons.scene.apps.routines.nodes;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.Value;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
@@ -50,12 +51,20 @@ public class SetSpineAnimationNodeWidget extends AbstractRoutineNodeWidget {
             loadList(reference);
         }
 
-        String animation = jsonValue.get("properties").getString("animation", selectBox.getOptions().first());
+        Array<String> options = selectBox.getOptions();
+        if (options.isEmpty()) {
+            return;
+        }
+
+        String animation = jsonValue.get("properties").getString("animation", options.first());
         selectBox.setValue(animation);
     }
 
     private void loadList(GameAssetWidget reference) {
         GameAsset<SkeletonData> value = reference.getValue();
+
+        if (value == null) return;
+
         SkeletonData skeletonData = value.getResource();
         Array<Animation> animations = skeletonData.getAnimations();
         Array<String> names = new Array<>();

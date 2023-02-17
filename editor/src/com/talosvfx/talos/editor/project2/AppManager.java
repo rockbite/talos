@@ -6,9 +6,9 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.GdxRuntimeException;
-import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.utils.*;
+import com.kotcrab.vis.ui.util.dialog.Dialogs;
+import com.kotcrab.vis.ui.util.dialog.OptionDialogListener;
 import com.talosvfx.talos.editor.addons.scene.apps.spriteeditor.SpriteEditorApp;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.RoutineEditorApp;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
@@ -19,6 +19,7 @@ import com.talosvfx.talos.editor.addons.scene.events.save.SaveRequest;
 import com.talosvfx.talos.editor.layouts.LayoutApp;
 import com.talosvfx.talos.editor.layouts.LayoutContent;
 import com.talosvfx.talos.editor.layouts.LayoutGrid;
+import com.talosvfx.talos.editor.notifications.EventContextProvider;
 import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.Observer;
@@ -29,10 +30,14 @@ import com.talosvfx.talos.editor.project2.localprefs.TalosLocalPrefs;
 import com.talosvfx.talos.editor.widgets.ui.menu.MainMenu;
 import com.talosvfx.talos.runtime.assets.meta.EmptyMetadata;
 import lombok.Getter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.UUID;
 
 public class AppManager extends InputAdapter implements Observer {
+
+	private static final Logger logger = LoggerFactory.getLogger(AppManager.class);
 
 	private static final Object dummyObject = new Object();
 	public static final GameAsset<Object> singletonAsset = new GameAsset<>("singleton", GameAssetType.DIRECTORY);
@@ -93,7 +98,7 @@ public class AppManager extends InputAdapter implements Observer {
 			gameAsset = AssetRepository.getInstance().findFirstOfType(gameAssetType);
 			if (gameAsset == null) {
 				//Create a dummy of that type
-				gameAsset = AssetRepository.getInstance().createDummyAsset(gameAssetType);
+				gameAsset = (GameAsset<T>)dummyAsset;
 			}
 		} else {
 			if (gameAssetUniqueIdentifier != null) {
@@ -113,8 +118,6 @@ public class AppManager extends InputAdapter implements Observer {
 		Array<BaseApp<T>> baseApps = (Array<BaseApp<T>>)baseAppsOpenForGameAsset.get(gameAsset);
 		baseApps.add(baseAppForGameAsset);
 
-		SharedResources.mainMenu.askToInject(menuOpenAppListProvider, PANEL_LIST_MENU_PATH);
-
 		return baseAppForGameAsset;
 	}
 
@@ -129,8 +132,6 @@ public class AppManager extends InputAdapter implements Observer {
 				}
 			}
 		}
-
-		SharedResources.mainMenu.askToInject(menuOpenAppListProvider, PANEL_LIST_MENU_PATH);
 	}
 
 	public Array<BaseApp> getAppInstances() {
@@ -171,11 +172,33 @@ public class AppManager extends InputAdapter implements Observer {
 		return null;
 	}
 
+	public void onAssetDeleted (GameAsset<?> gameAsset) {
+		Array<? extends BaseApp<?>> appsForGameAsset = baseAppsOpenForGameAsset.remove(gameAsset);
+
+		if (gameAsset.isBroken()) return;
+
+		if (appsForGameAsset == null) return;
+
+		for (BaseApp app : appsForGameAsset) {
+			//Swapping registers for assets
+			if (!baseAppsOpenForGameAsset.containsKey(dummyAsset)) {
+				baseAppsOpenForGameAsset.put(dummyAsset, new Array<>());
+			}
+
+			Array<BaseApp<?>> baseApps = (Array<BaseApp<?>>)baseAppsOpenForGameAsset.get(dummyAsset);
+			if (!baseApps.contains(app, true)) {
+				baseApps.add(app);
+			}
+
+			app.updateForGameAsset(dummyAsset);
+		}
+	}
+
 	//	app manager that interacts, some are singletons, some are per instances, all are tied to some kind of object
 
 	//Grid layout needs to be able to be setup with layout specific in mind
 
-	public abstract static class BaseApp<T> {
+	public abstract static class BaseApp<T> implements EventContextProvider<BaseApp<T>> {
 		protected boolean singleton;
 
 		@Getter
@@ -186,7 +209,9 @@ public class AppManager extends InputAdapter implements Observer {
 
 		public void updateForGameAsset (GameAsset<T> gameAsset) {
 			this.gameAsset = gameAsset;
-
+			if (getGridAppReference() != null) {
+				getGridAppReference().updateTabName(getAppName());
+			}
 		}
 
 		public abstract String getAppName ();
@@ -207,6 +232,11 @@ public class AppManager extends InputAdapter implements Observer {
 
 		public boolean hasChangesToSave () {
 			return SharedResources.globalSaveStateSystem.isItemChangedAndUnsaved(gameAsset);
+		}
+
+		@Override
+		public BaseApp<T> getContext() {
+			return this;
 		}
 	}
 
@@ -282,7 +312,17 @@ public class AppManager extends InputAdapter implements Observer {
 	}
 
 	public <T, U extends BaseApp<T>> U openAppIfNotOpened (GameAsset<T> asset, Class<U> app) {
+		U openedApp = getAppIfOpened(asset, app);
+		if (openedApp != null) {
+			return openedApp;
+		}
+		return openApp(asset, app);
+	}
+
+	public <T, U extends BaseApp<T>> U getAppIfOpened(GameAsset<T> asset, Class<U> app) {
 		Array<? extends BaseApp<?>> baseApps = baseAppsOpenForGameAsset.get(asset);
+		if(baseApps == null)
+			return null;
 		for (BaseApp<?> baseApp : baseApps) {
 			if(baseApp.getClass().equals(app)) {
 				if(!baseApp.gridAppReference.isTabActive()) {
@@ -291,16 +331,13 @@ public class AppManager extends InputAdapter implements Observer {
 				return (U) baseApp;
 			}
 		}
-
-		return openApp(asset, app);
+		return null;
 	}
 
 
 	public <T, U extends BaseApp<T>> U openApp (GameAsset<T> asset, Class<U> app) {
 		U baseAppForGameAsset = createBaseAppForGameAsset(asset, app);
 		createAppAndPlaceInGrid(asset, SharedResources.currentProject.getLayoutGrid(), baseAppForGameAsset);
-
-		SharedResources.mainMenu.askToInject(menuOpenAppListProvider, PANEL_LIST_MENU_PATH);
 
 		return baseAppForGameAsset;
 	}
@@ -336,14 +373,32 @@ public class AppManager extends InputAdapter implements Observer {
 			createAppAndPlaceInGrid(gameAsset, layoutGrid, baseApp);
 		}
 
-		if(!appsToCreate.isEmpty()) {
-			SharedResources.mainMenu.askToInject(menuOpenAppListProvider, PANEL_LIST_MENU_PATH);
-		}
-
 		for (BaseApp<T> baseApp : appsToUpdate) {
+			if (baseApp.getGameAsset() != gameAsset) {
+				//Need to swap in the registry
+				if (baseApp.getGameAsset() != dummyAsset) {
+					logger.warn("Probably should never happen, be careful of this case");
+				} else {
+					swapInRegistry(baseApp, gameAsset);
+				}
+
+			}
 			baseApp.updateForGameAsset(gameAsset);
 		}
 
+	}
+
+	private <T> void swapInRegistry (BaseApp<T> existingApp, GameAsset<T> newGameAsset) {
+		GameAsset<T> oldAsset = existingApp.getGameAsset();
+		Array<BaseApp<?>> baseApps = (Array<BaseApp<?>>)baseAppsOpenForGameAsset.get(oldAsset);
+		baseApps.removeValue(existingApp, true);
+
+		//Add it to the right registry
+		if (!baseAppsOpenForGameAsset.containsKey(newGameAsset)) {
+			baseAppsOpenForGameAsset.put(newGameAsset, new Array<>());
+		}
+		Array<BaseApp<?>> newBaseAppsArray = (Array<BaseApp<?>>)baseAppsOpenForGameAsset.get(newGameAsset);
+		newBaseAppsArray.add(existingApp);
 	}
 
 	public void removeAll () {
@@ -442,12 +497,34 @@ public class AppManager extends InputAdapter implements Observer {
 	}
 
 	private <T, U extends BaseApp<T>> Array<U> getAppsToUpdate (GameAsset<T> gameAsset) {
+		Array<U> appsToUpdate = new Array<>();
+
 		if (baseAppsOpenForGameAsset.containsKey(gameAsset)) {
 			//Unsafe type
 			Array<U> baseApps = (Array<U>)baseAppsOpenForGameAsset.get(gameAsset);
-			return baseApps;
+			appsToUpdate.addAll(baseApps);
 		}
-		return new Array<>();
+
+		if (gameAsset != dummyAsset && gameAsset != singletonAsset) {
+			//Add all dummys that are not already in appsToUpdate by class, and that are active and matching the game asset repo
+
+			Array<Class<BaseApp>> appsForGameAssetType = appRegistry.getAppsForGameAssetType(gameAsset);
+
+			Array<? extends BaseApp> anyDummyAppsOpen = getAppsToUpdate(dummyAsset);
+			for (BaseApp<T> objectBaseApp : anyDummyAppsOpen) {
+				//Is the base app a type we want?
+
+				Class<BaseApp> aClass = (Class<BaseApp>)objectBaseApp.getClass();
+
+				if (appsForGameAssetType.contains(aClass, false)) {
+					appsToUpdate.add((U)objectBaseApp);
+				}
+
+			}
+		}
+
+
+		return appsToUpdate;
 	}
 
 	private <T, U extends BaseApp<T>> U createBaseAppForGameAsset (GameAsset<T> gameAsset, Class<U> aClass) {
@@ -522,12 +599,23 @@ public class AppManager extends InputAdapter implements Observer {
 			}
 		};
 
-		SharedResources.mainMenu.registerMenuProvider(menuOpenAppListProvider, PANEL_LIST_MENU_PATH);
 		SharedResources.mainMenu.registerMenuProvider(menuAppListProvider, APP_LIST_MENU_PATH);
 	}
 
 	public void closeAllFloatingWindows() {
 		// todo: close all floating windows
+	}
+
+	public BaseApp getFocusedApp () {
+		Array<BaseApp> appInstances = getAppInstances();
+		for (BaseApp appInstance : appInstances) {
+			boolean isFocused = appInstance.getGridAppReference().isTabFocused();
+			if (isFocused) {
+				return appInstance;
+			}
+		}
+
+		return null;
 	}
 
 	@EventHandler
@@ -543,25 +631,23 @@ public class AppManager extends InputAdapter implements Observer {
 		}
 
 		// save preferences
-		TalosLocalPrefs.savePrefs();
+		if (SharedResources.currentProject != null) { // cannot save prefs, if no project open
+			TalosLocalPrefs.savePrefs();
+		}
 
 		//Save the selected app if it needs it
 
-		for (BaseApp appInstance : appInstances) {
-			boolean isFocused = appInstance.getGridAppReference().isTabFocused();
-
-			if (isFocused) {
-				GameAsset<?> gameAsset = appInstance.gameAsset;
-				if (gameAsset.isDummy() || gameAsset == AppManager.singletonAsset) continue;
-
-				boolean itemChangedAndUnsaved = SharedResources.globalSaveStateSystem.isItemChangedAndUnsaved(gameAsset);
-				if (itemChangedAndUnsaved) {
-					AssetRepository.getInstance().saveGameAssetResourceJsonToFile(gameAsset);
-					return;
-				}
-
+		BaseApp focusedApp = getFocusedApp();
+		if (focusedApp != null) { // no app may be in focus
+			GameAsset<?> gameAsset = focusedApp.gameAsset;
+			if (gameAsset.isDummy() || gameAsset == AppManager.singletonAsset) {
+				return;
 			}
 
+			boolean itemChangedAndUnsaved = SharedResources.globalSaveStateSystem.isItemChangedAndUnsaved(gameAsset);
+			if (itemChangedAndUnsaved) {
+				AssetRepository.getInstance().saveGameAssetResourceJsonToFile(gameAsset);
+			}
 		}
 	}
 
@@ -585,5 +671,90 @@ public class AppManager extends InputAdapter implements Observer {
 		}
 
 		return false; //Never do anything with touches, its just passive detection
+	}
+
+	public void requestConfirmationToCloseWithoutSave (OptionDialogListener finalListener) {
+		Array<GameAsset<?>> assetsToSave = new Array<>();
+
+		for (GameAsset<?> gameAsset : baseAppsOpenForGameAsset.keys()) {
+			if (gameAsset.isDummy() || gameAsset == AppManager.singletonAsset) {
+				continue;
+			}
+
+			boolean itemChangedAndUnsaved = SharedResources.globalSaveStateSystem.isItemChangedAndUnsaved(gameAsset);
+			if (itemChangedAndUnsaved) {
+				assetsToSave.add(gameAsset);
+			}
+		}
+
+		if (!assetsToSave.isEmpty()) {
+			asyncHandleUnsavedAssets(assetsToSave, 0, finalListener);
+		}
+	}
+
+	private void asyncHandleUnsavedAssets(Array<GameAsset<?>> assetsToSave, int index, OptionDialogListener finalListener) {
+		GameAsset<?> gameAsset = assetsToSave.get(index);
+
+		Dialogs.OptionDialog dialog = new SaveOrCloseWithoutSavingDialog(gameAsset, new OptionDialogListener() {
+			@Override
+			public void yes() {
+				// save and proceed to next dialog
+				AssetRepository.getInstance().saveGameAssetResourceJsonToFile(gameAsset);
+				if (index == assetsToSave.size - 1) {
+					finalListener.yes();
+				} else {
+					asyncHandleUnsavedAssets(assetsToSave, index + 1, finalListener);
+				}
+			}
+
+			@Override
+			public void no() {
+				// do not save and skip to next dialog
+				if (index == assetsToSave.size - 1) {
+					finalListener.no();
+				} else {
+					asyncHandleUnsavedAssets(assetsToSave, index + 1, finalListener);
+				}
+			}
+
+			@Override
+			public void cancel() {
+				// close dialog and cancel quit operation
+				finalListener.cancel();
+			}
+		});
+		SharedResources.stage.addActor(dialog.fadeIn());
+	}
+
+	private static class SaveOrCloseWithoutSavingDialog extends Dialogs.OptionDialog {
+
+		private static final String titlePrefix = "Asset ";
+		private static final String titlePostfix = " have been modified";
+		private static final String textPrefix = "Do you want to save changes you made in asset:\n";
+		private static final String textPostfix = "\nYour changes will be lost if you don't save them.";
+		private SaveOrCloseWithoutSavingDialog(GameAsset<?> gameAsset, OptionDialogListener listener)  {
+			super(
+					titlePrefix + gameAsset.nameIdentifier + titlePostfix,
+					textPrefix + gameAsset.getRootRawAsset().handle + textPostfix,
+					Dialogs.OptionDialogType.YES_NO_CANCEL,
+					listener);
+			getTitleLabel().setAlignment(Align.center);
+			setYesButtonText("Save");
+			setNoButtonText("Don't Save");
+			setCancelButtonText("Cancel");
+		}
+	}
+
+	public boolean hasChangesToSave () {
+		for (Array<? extends BaseApp<?>> value : baseAppsOpenForGameAsset.values()) {
+			if (value != null) {
+				for (BaseApp<?> baseApp : value) {
+					if (baseApp.hasChangesToSave()) {
+						return true;
+					}
+				}
+			}
+		}
+		return false;
 	}
 }

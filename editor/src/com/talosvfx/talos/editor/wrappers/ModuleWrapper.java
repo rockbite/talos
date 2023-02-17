@@ -101,6 +101,10 @@ public abstract class ModuleWrapper<T extends AbstractModule> extends VisWindow 
 
     }
 
+    public void onGraphSet () {
+
+    }
+
     class SlotRowData {
         String title;
         int key;

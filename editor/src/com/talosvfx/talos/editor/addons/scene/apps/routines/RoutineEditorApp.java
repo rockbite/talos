@@ -2,7 +2,6 @@ package com.talosvfx.talos.editor.addons.scene.apps.routines;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.ui.RoutineControlWindow;
@@ -10,6 +9,10 @@ import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.editor.data.RoutineStageData;
 import com.talosvfx.talos.editor.layouts.DummyLayoutApp;
 import com.talosvfx.talos.editor.notifications.Notifications;
+import com.talosvfx.talos.editor.notifications.CommandEventHandler;
+import com.talosvfx.talos.editor.notifications.Observer;
+import com.talosvfx.talos.editor.notifications.commands.enums.Commands;
+import com.talosvfx.talos.editor.notifications.events.commands.CommandContextEvent;
 import com.talosvfx.talos.editor.project2.AppManager;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.project2.apps.preferences.ContainerOfPrefs;
@@ -17,9 +20,10 @@ import com.talosvfx.talos.editor.project2.apps.preferences.ViewportPreferences;
 import com.talosvfx.talos.editor.project2.localprefs.TalosLocalPrefs;
 import com.talosvfx.talos.editor.project2.vfxui.GenericStageWrappedViewportWidget;
 import com.talosvfx.talos.editor.project2.vfxui.GenericStageWrappedWidget;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class RoutineEditorApp extends AppManager.BaseApp<RoutineStageData> implements ContainerOfPrefs<ViewportPreferences>, GameAsset.GameAssetUpdateListener {
-
+public class RoutineEditorApp extends AppManager.BaseApp<RoutineStageData> implements ContainerOfPrefs<ViewportPreferences>, GameAsset.GameAssetUpdateListener, Observer {
     public final RoutineControlWindow controlWindow;
     public RoutineStage routineStage;
     public VariableCreationWindow variableCreationWindow;
@@ -29,7 +33,10 @@ public class RoutineEditorApp extends AppManager.BaseApp<RoutineStageData> imple
 
     public Table uiContent;
 
+    private static final Logger logger = LoggerFactory.getLogger(RoutineEditorApp.class);
+
     public RoutineEditorApp() {
+        Notifications.registerObserver(this);
         routineStage = new RoutineStage(this, SharedResources.skin);
         routineStageWrapper = new GenericStageWrappedViewportWidget(routineStage.getRootActor()) {
 
@@ -91,18 +98,51 @@ public class RoutineEditorApp extends AppManager.BaseApp<RoutineStageData> imple
                 SharedResources.inputHandling.removePriorityInputProcessor(routineUIStageWrapper.getStage());
                 SharedResources.inputHandling.removePriorityInputProcessor(routineStageWrapper.getStage());
                 SharedResources.inputHandling.setGDXMultiPlexer();
-
-                Stage stage = routineStageWrapper.getStage();
             }
-
 
             @Override
             protected void onTouchFocused () {
                 SharedResources.stage.setKeyboardFocus(routineStageWrapper);
             }
+
+            @Override
+            public void actInBackground(float delta) {
+                super.actInBackground(delta);
+                routineStage.act();
+            }
         };
 
         this.gridAppReference = app;
+    }
+
+    @CommandEventHandler(commandType = Commands.CommandType.COPY)
+    public void onCopyCommand (CommandContextEvent event) {
+        routineStage.getNodeBoard().copySelectedModules();
+    }
+
+    @CommandEventHandler(commandType = Commands.CommandType.PASTE)
+    public void onPasteCommand (CommandContextEvent event) {
+        routineStage.getNodeBoard().pasteFromClipboard();
+    }
+
+    @CommandEventHandler(commandType = Commands.CommandType.SELECT_ALL)
+    public void onSelectAllCommand (CommandContextEvent event) {
+        routineStage.getNodeBoard().selectAllNodes();
+    }
+
+    @CommandEventHandler(commandType = Commands.CommandType.GROUP)
+    public void onGroupCommand (CommandContextEvent event) {
+        routineStage.getNodeBoard().createGroupFromSelectedNodes();
+    }
+
+    @CommandEventHandler(commandType = Commands.CommandType.UNGROUP)
+    public void onUngroupCommand (CommandContextEvent event) {
+        routineStage.getNodeBoard().ungroupSelectedNodes();
+    }
+
+    @CommandEventHandler(commandType = Commands.CommandType.DELETE)
+    public void onDeleteCommand (CommandContextEvent event) {
+        routineStage.getNodeBoard().deleteSelectedNodes();
     }
 
     @Override

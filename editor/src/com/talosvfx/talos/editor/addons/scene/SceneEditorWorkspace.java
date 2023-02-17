@@ -27,6 +27,7 @@ import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.logic.IPropertyHolder;
 import com.talosvfx.talos.editor.addons.scene.logic.MultiPropertyHolder;
 import com.talosvfx.talos.editor.addons.scene.logic.PropertyWrapperProviders;
+import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.CurveGizmo;
 import com.talosvfx.talos.runtime.RuntimeContext;
 import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.runtime.assets.GameAssetType;
@@ -359,11 +360,12 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 				}
 
 				upWillClear = true;
+				upWillClear = false;
 				dragged = false;
 
 				Vector2 hitCords = getWorldFromLocal(x, y);
 
-				if (button == 1 && !event.isCancelled()) {
+				if (button == 1 && !event.isCancelled() && !event.isStopped()) {
 					final Vector2 vec = new Vector2(Gdx.input.getX(), Gdx.input.getY());
 					screenToLocalCoordinates(vec);
 					localToStageCoordinates(vec);
@@ -446,6 +448,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
 			@Override
 			public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
+
 				// set focus to scene
 				SharedResources.stage.setKeyboardFocus(SceneEditorWorkspace.this);
 
@@ -483,39 +486,6 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
 				selectionRect.setVisible(false);
 			}
-
-			@Override
-			public boolean keyDown (InputEvent event, int keycode) {
-
-				if (keycode == Input.Keys.DEL || keycode == Input.Keys.FORWARD_DEL) {
-					ObjectSet<GameObject> deleteList = new ObjectSet<>();
-					deleteList.addAll(selection);
-					requestSelectionClear();
-					deleteGameObjects(deleteList);
-				}
-
-				if (keycode == Input.Keys.C && ctrlPressed()) {
-					copySelected();
-				}
-
-				if (keycode == Input.Keys.V && ctrlPressed()) {
-					pasteFromClipboard();
-				}
-
-				if (keycode == Input.Keys.A && ctrlPressed()) {
-					selectAll();
-				}
-
-				if (keycode == Input.Keys.G && ctrlPressed()) {
-					convertSelectedIntoGroup();
-				}
-
-				if (keycode == Input.Keys.ESCAPE) {
-					escapePressed();
-				}
-
-				return super.keyDown(event, keycode);
-			}
 		};
 
 		addListener(inputListener);
@@ -551,12 +521,19 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		removeFromSelection(removeFromSelectionEvent.getGameObject());
 	}
 
-	private void escapePressed() {
+	public void deleteSelected () {
+		ObjectSet<GameObject> deleteList = new ObjectSet<>();
+		deleteList.addAll(selection);
+		requestSelectionClear();
+		deleteGameObjects(deleteList);
+	}
+
+	public void escapePressed() {
 		performSelectionClear();
 		mapEditorState.escapePressed();
 	}
 
-	private void convertSelectedIntoGroup () {
+	public void convertSelectedIntoGroup () {
 		if (selection.isEmpty() || selection.size == 1) {
 			return;
 		}
@@ -770,13 +747,6 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		}
 	}
 
-	public void openScene (FileHandle fileHandle) {
-		Scene scene = new Scene();
-		scene.path = fileHandle.path();
-		openSavableContainer(scene);
-		//TalosMain.Instance().UIStage().saveProjectAction();
-	}
-
 	@Override
 	public SavableContainer getContext() {
 		return currentContainer;
@@ -979,7 +949,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		Notifications.fireEvent(Notifications.obtainEvent(PropertyHolderSelected.class).setTarget(propertyHolder));
 	}
 
-	private void selectAll () {
+	public void selectAll () {
 		selection.clear();
 		Array<GameObject> gameObjects = currentContainer.getGameObjects();
 		if (gameObjects != null) {
@@ -1289,8 +1259,8 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
 			boolean foundLayer = false;
 			for (SceneLayer sceneLayer : layerList) {
-				if (sceneLayer.getIndex() == component.sortingLayer.getIndex()) {
-					component.setSortingLayer(sceneLayer);
+				if (sceneLayer.getName().equals(component.sortingLayer.getName())) {
+					component.getSortingLayer().setIndex(sceneLayer.getIndex());
 					foundLayer = true;
 					break;
 				}

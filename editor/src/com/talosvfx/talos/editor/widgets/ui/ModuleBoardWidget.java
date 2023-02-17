@@ -48,7 +48,7 @@ import org.slf4j.Logger;
 public class ModuleBoardWidget extends WidgetGroup {
 
     private static Logger logger = LoggerFactory.getLogger(ModuleBoardWidget.class);
-    private final ParticleNodeEditorApp app;
+    public ParticleNodeEditorApp app;
     ShapeRenderer shapeRenderer;
 
     public ObjectMap<ParticleEmitterWrapper, Array<ModuleWrapper>> moduleWrappers = new ObjectMap<>();
@@ -82,6 +82,7 @@ public class ModuleBoardWidget extends WidgetGroup {
     private boolean ccCurrentIsInput = false;
     public boolean ccCurrentlyRemoving = false;
 
+    private Stage uiStage;
     public ModuleBoardWidget (ParticleNodeEditorApp app) {
         super();
 
@@ -98,18 +99,6 @@ public class ModuleBoardWidget extends WidgetGroup {
         addActor(moduleContainer);
 
         shapeRenderer = Render.instance().shapeRenderer();
-
-        addListener(new ClickListener() {
-
-            @Override
-            public boolean keyUp (InputEvent event, int keycode) {
-                if (event.isHandled()) return super.keyUp(event, keycode);
-                if (keycode == Input.Keys.DEL || keycode == Input.Keys.FORWARD_DEL) {
-                    deleteSelectedWrappers();
-                }
-                return super.keyUp(event, keycode);
-            }
-        });
     }
 
     public Array<NodeConnection> getCurrentConnections () {
@@ -262,15 +251,9 @@ public class ModuleBoardWidget extends WidgetGroup {
     public void sendInStage (Stage stage) {
 
         stage.addListener(new InputListener() {
-
-
             @Override
             public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
                 super.touchDown(event, x, y, pointer, button);
-
-                if (button == 1) {
-                    showPopup();
-                }
 
                 if (!event.isHandled()) {
                     clearSelection();
@@ -278,10 +261,29 @@ public class ModuleBoardWidget extends WidgetGroup {
                     return false;
                 }
 
+
                 return false;
             }
+        });
+    }
+
+    public void sendInUIStage (Stage stage) {
+        uiStage = stage;
+
+        uiStage.addListener(new InputListener() {
+            @Override
+            public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
+                super.touchDown(event, x, y, pointer, button);
+
+                if (button == 1) {
+                    clearSelection();
+                    showPopup();
+                    return true;
+                }
 
 
+                return false;
+            }
         });
     }
 
@@ -443,10 +445,9 @@ public class ModuleBoardWidget extends WidgetGroup {
 
         final Vector2 vec = new Vector2(Gdx.input.getX(), Gdx.input.getY());
 
-        Stage uiStage = getStage();
-        uiStage.screenToStageCoordinates(vec);
-
-        TalosVFXUtils.getModuleListPopup().showPopup(uiStage, vec, this);
+        if (uiStage != null) {
+            TalosVFXUtils.getModuleListPopup().showPopup(uiStage, vec, this);
+        }
     }
 
     public void deleteSelectedWrappers () {
@@ -479,15 +480,18 @@ public class ModuleBoardWidget extends WidgetGroup {
         // TalosMain.Instance().UIStage().PreviewWidget().unregisterDragPoints();
     }
 
-    public <T extends AbstractModule, U extends ModuleWrapper<T>> U createModule (Class<T> clazz, float x, float y) {
+    public <T extends AbstractModule, U extends ModuleWrapper<T>> U createModule (Class<T> clazz, float screenX, float screenY) {
         final T module;
         try {
             module = ClassReflection.newInstance(clazz);
 
             if (currentEmitterGraph.addModule(module)) {
-                final U moduleWrapper = createModuleWrapper(module, x, y);
+                final U moduleWrapper = createModuleWrapper(module, screenX, screenY);
                 moduleWrapper.setModuleToDefaults();
                 module.setModuleGraph(currentEmitterGraph);
+                moduleWrapper.onGraphSet();
+
+                selectWrapper(moduleWrapper);
 
                 // save here
                 app.dataModified();
@@ -505,13 +509,13 @@ public class ModuleBoardWidget extends WidgetGroup {
 
     /**
      * @param module
-     * @param x in screen coordinate space
-     * @param y in screen coordinate space
+     * @param screenX in screen coordinate space
+     * @param screenY in screen coordinate space
      * @param <T>
      * @param <U>
      * @return
      */
-    public <T extends AbstractModule, U extends ModuleWrapper<T>> U createModuleWrapper (T module, float x, float y) {
+    public <T extends AbstractModule, U extends ModuleWrapper<T>> U createModuleWrapper (T module, float screenX, float screenY) {
         ModuleWrapper<T> moduleWrapper = null;
 
         if (module == null) return null;
@@ -530,14 +534,13 @@ public class ModuleBoardWidget extends WidgetGroup {
             module.setIndex(id);
             moduleWrapper.setBoard(this);
 
-            tmp.set(x, Gdx.graphics.getHeight() - y);
+            tmp.set(screenX, screenY);
             moduleContainer.screenToLocalCoordinates(tmp);
 
             moduleWrapper.setPosition(tmp.x - moduleWrapper.getWidth() / 2f, tmp.y - moduleWrapper.getHeight() / 2f);
             getModuleWrappers().add(moduleWrapper);
             moduleContainer.addActor(moduleWrapper);
 
-            selectWrapper(moduleWrapper);
         } catch (ReflectionException e) {
             e.printStackTrace();
         }

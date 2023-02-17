@@ -1,13 +1,10 @@
 package com.talosvfx.talos.editor.layouts;
 
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
-import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -294,5 +291,10 @@ public class DummyLayoutApp<T> implements LayoutApp {
     @Override
     public LayoutContent getLayoutContent () {
         return layoutContent;
+    }
+
+    @Override
+    public void actInBackground(float delta) {
+        // do nothing by default
     }
 }
