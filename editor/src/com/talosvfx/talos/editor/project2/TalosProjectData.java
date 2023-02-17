@@ -138,4 +138,8 @@ public class TalosProjectData implements Json.Serializable {
 
 		return false;
 	}
+
+	public String getCurrentJsonLayoutRepresentation() {
+		return layoutGrid.writeToJsonString();
+	}
 }

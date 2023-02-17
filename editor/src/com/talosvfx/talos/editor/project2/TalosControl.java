@@ -170,24 +170,18 @@ public class TalosControl implements Observer {
         }
 
         if(event.getPath().equals("window/layouts/save_layout")) {
-            JsonValue jsonValue = SharedResources.currentProject.getJsonLayoutRepresentation();
-            String data = jsonValue.toJson(JsonWriter.OutputType.json);
+            String jsonValue = SharedResources.currentProject.getCurrentJsonLayoutRepresentation();
 
             String ext = GameAssetType.LAYOUT_DATA.getExtensions().first();
             FileSystemInteraction.instance().showSaveFileChooser(ext, new FileChooserListener() {
                 @Override
                 public void selected(Array<FileHandle> files) {
                     FileHandle file = files.first();
-                    boolean pathInsideProject = SharedResources.currentProject.isPathInsideProject(file.path());
-                    if(pathInsideProject) {
-                        // use file chooser to get the file path
-                        FileHandle destination = AssetImporter.suggestNewNameForFileHandle(file.parent().path(), file.nameWithoutExtension(), ext);
-                        destination.writeString(data, false);
-
-                        AssetRepository.getInstance().rawAssetCreated(destination, true);
-                    } else {
-                        // show error message
+                    if (!file.extension().equals("." + ext)) {
+                        file = file.parent().child(file.nameWithoutExtension() + "." + ext);
                     }
+                    // use file chooser to get the file path
+                    file.writeString(jsonValue, false);
                 }
             });
         } else {
