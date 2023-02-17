@@ -60,6 +60,9 @@ public class EightPointGizmo extends Gizmo {
 
 	private boolean userInteracted = false;
 
+	private boolean transformChanged;
+	private boolean spriteRenderComponentChanged;
+
 	public EightPointGizmo () {
 		for (int i = 0; i < 8; i++) {
 			controlPoints.add(new ControlPoint(-1, CORNER));//dummy
@@ -276,7 +279,6 @@ public class EightPointGizmo extends Gizmo {
 		} else if (rotating) {
 			testVector.set(x, y).sub(gameObject.getComponent(TransformComponent.class).worldPosition);
 			processRotation(rotationStartVector, testVector);
-
 		}
 	}
 
@@ -596,6 +598,7 @@ public class EightPointGizmo extends Gizmo {
 
 		GameObject.setPositionFromWorldPosition(gameObject, out);
 		SceneUtils.componentUpdated(gameObjectContainer, gameObject, transformComponent, true);
+		transformChanged = true;
 
 		if (gameObject.hasComponent(SpriteRendererComponent.class)) {
 			//we set the size to the sprite's shit taking into account the scale
@@ -609,6 +612,8 @@ public class EightPointGizmo extends Gizmo {
 			spriteRendererComponent.size.set(totalWidthScaleConsidered, totalHeightScaleConsidered);
 
 			SceneUtils.componentUpdated(gameObjectContainer, gameObject, spriteRendererComponent, true);
+
+			spriteRenderComponentChanged = true;
 		}
 
 	}
@@ -650,6 +655,22 @@ public class EightPointGizmo extends Gizmo {
 	public void touchUp (float x, float y) {
 		super.touchUp(x, y);
 
+
+		boolean updateTransform = transformChanged || rotating;
+
+		boolean slowChangeSent = false;
+
+		if (updateTransform) {
+			SceneUtils.componentUpdated(gameObjectContainer, gameObject, gameObject.getComponent(TransformComponent.class), slowChangeSent);
+			slowChangeSent = true;
+		}
+		if (spriteRenderComponentChanged) {
+			SceneUtils.componentUpdated(gameObjectContainer, gameObject, gameObject.getComponent(TransformComponent.class), slowChangeSent);
+		}
+
+
+		transformChanged = false;
+		spriteRenderComponentChanged = false;
 		userInteracted = false;
 		currentManipulatingPoint = null;
 		rotating = false;
