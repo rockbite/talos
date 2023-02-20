@@ -3,6 +3,7 @@ package com.talosvfx.talos.editor.addons.scene.widgets.directoryview;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.*;
@@ -47,6 +48,7 @@ public class DirectoryViewWidget extends Table {
 	private static final FileFilter DIRECTORY_VIEW_FILE_FILTER = new DirectoryViewFileFilter();
 	private final ScrollPane scrollPane;
 	private final ProjectExplorerWidget projectExplorerWidget;
+	private final Label currentFileLabel;
 
 	private Array<Item> selected = new Array<>();
 
@@ -109,7 +111,27 @@ public class DirectoryViewWidget extends Table {
 				items.invalidateHierarchy();
 			}
 		});
-		add(slider).width(125).pad(5, 10, 5, 10).expandX().right();
+
+		Table bottomBarTable = new Table();
+		bottomBarTable.setBackground(SharedResources.skin.newDrawable("white", Color.valueOf("#505050ff")));
+		bottomBarTable.defaults().padLeft(10);
+		currentFileLabel = new Label("No file selected", SharedResources.skin) {
+			@Override
+			public void act (float delta) {
+				super.act(delta);
+				if (selected.size == 1) {
+					currentFileLabel.setText(selected.first().fileHandle.path().split(SharedResources.currentProject.rootProjectDir().path())[1]);
+				} else if (selected.size == 0) {
+					currentFileLabel.setText("No file selected");
+				} else {
+					currentFileLabel.setText("Multiple files selected");
+				}
+			}
+		};
+		bottomBarTable.add(currentFileLabel);
+		bottomBarTable.add(slider).width(125).pad(5, 10, 5, 10).expandX().right();
+
+		add(bottomBarTable).growX();
 
 		slider.setValue(50f + (125 - 50) / 2f);
 		items.setCellSize(slider.getValue());

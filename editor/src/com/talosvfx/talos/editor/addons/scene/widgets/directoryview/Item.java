@@ -71,7 +71,7 @@ class Item extends Widget implements ActorCloneable<Item> {
 				icon.setDrawable(SharedResources.skin.getDrawable("ic-folder-big"));
 			}
 		} else {
-			final String extension = fileHandle.extension().toLowerCase(Locale.US);
+			final String extension = fileHandle.extension().toLowerCase(Locale.US); //ew
 			if (GameAssetType.SPRITE.getExtensions().contains(extension)) {
 				// preview the asset instead of setting an icon
 				updatePreview();
