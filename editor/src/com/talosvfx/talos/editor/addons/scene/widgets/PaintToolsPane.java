@@ -122,6 +122,14 @@ public class PaintToolsPane extends Table implements Observer {
             }
         });
 
+        addListener(new ClickListener() {
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                // disable clicking through pool pane
+                event.cancel();
+                return super.touchDown(event, x, y, pointer, button);
+            }
+        });
     }
 
     private void applyChannelFilterToColor() {
