@@ -130,7 +130,9 @@ public class SceneHierarchyApp extends AppManager.BaseApp<Scene> implements Game
 
 		// stupid hack
 		// TODO: 12.01.23 fix so root is not generated everytime
-		preference.setRootOpen(hierarchyWidget.getTree().getRootNodes().first().isExpanded());
+		if (!hierarchyWidget.getTree().getRootNodes().isEmpty()) { // in case of dummy app no root node exists
+			preference.setRootOpen(hierarchyWidget.getTree().getRootNodes().first().isExpanded());
+		}
 
 		return preference;
 	}
