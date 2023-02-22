@@ -1045,10 +1045,6 @@ public abstract class ViewportWidget extends Table {
 			enableClickListener();
 		}
 
-		for (int i = 0; i < this.gizmos.gizmoList.size; i++) {
-			Gizmo gizmo = this.gizmos.gizmoList.get(i);
-			gizmo.act(delta);
-		}
 	}
 
 	protected void drawAxis () {
@@ -1304,6 +1300,7 @@ public abstract class ViewportWidget extends Table {
 			Gizmo gizmo = this.gizmos.gizmoList.get(i);
 			gizmo.setSizeForUIElements(getWidth(),getWorldWidth() * zoom);
 
+			gizmo.act(Gdx.graphics.getDeltaTime()); //ACt next to gizmo bceause its kind of out of sync with SCene
 			gizmo.draw(batch, parentAlpha);
 		}
 	}
