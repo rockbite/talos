@@ -5,12 +5,15 @@ import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.Constructor;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
+import com.talosvfx.talos.editor.addons.scene.apps.routines.providers.RoutinePropertyHolder;
+import com.talosvfx.talos.editor.addons.scene.apps.routines.providers.RoutinePropertyProvider;
 import com.talosvfx.talos.editor.addons.scene.logic.componentwrappers.*;
 import com.talosvfx.talos.editor.addons.scene.logic.metawrappers.AMetaDataHolder;
 import com.talosvfx.talos.editor.addons.scene.logic.metawrappers.AMetaDataProvider;
 import com.talosvfx.talos.editor.addons.scene.logic.metawrappers.PrefabMetaDataHolder;
 import com.talosvfx.talos.editor.addons.scene.logic.metawrappers.SpineMetaDataProvider;
 import com.talosvfx.talos.editor.addons.scene.logic.metawrappers.SpriteMetaDataProvider;
+import com.talosvfx.talos.editor.data.RoutineStageData;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.IPropertyProvider;
 import com.talosvfx.talos.runtime.assets.meta.AtlasMetadata;
 import com.talosvfx.talos.runtime.assets.meta.DirectoryMetadata;
@@ -58,6 +61,7 @@ public class PropertyWrapperProviders {
 		propertyHoldersForClass.put(Scene.class, ScenePropertyHolder.class);
 		propertyHoldersForClass.put(Prefab.class, PrefabPropertyHolder.class);
 		propertyHoldersForClass.put(GameObject.class, GameObjectPropertyHolder.class);
+		propertyHoldersForClass.put(RoutineStageData.class, RoutinePropertyHolder.class);
 
 		//metas
 		propertyHoldersForClass.put(AtlasMetadata.class, AMetaDataHolder.class);
@@ -75,6 +79,7 @@ public class PropertyWrapperProviders {
 		//objects
 		propertyProvidersForClass.put(Scene.class, ScenePropertyProvider.class);
 		propertyProvidersForClass.put(GameObject.class, GameObjectPropertyProvider.class);
+		propertyProvidersForClass.put(RoutineStageData.class, RoutinePropertyProvider.class);
 
 		//metas=
 		propertyProvidersForClass.put(AtlasMetadata.class, AMetaDataProvider.class);
@@ -101,6 +106,9 @@ public class PropertyWrapperProviders {
 		propertyProvidersForClass.put(SpriteRendererComponent.class, SpriteRendererComponentProvider.class);
 		propertyProvidersForClass.put(TileDataComponent.class, TileDataComponentProvider.class);
 		propertyProvidersForClass.put(TransformComponent.class, TransformComponentProvider.class);
+
+
+		//Routine Nodes
 
 		boolean componentSafetyCheckFailed = false;
 		try (ScanResult scanResult = new ClassGraph().enableAllInfo().acceptPackages(AComponent.class.getPackage().getName())

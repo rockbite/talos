@@ -1107,7 +1107,14 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 			case ROUTINE:
 
 				if (gameAssetOut == null) {
-					GameAsset<RoutineStageData> asset = new GameAsset<>(gameAssetIdentifier, assetTypeFromExtension);
+					GameAsset<RoutineStageData> asset = new GameAsset<RoutineStageData>(gameAssetIdentifier, assetTypeFromExtension) {
+						@Override
+						public void setUpdated() {
+							getResource().setName(getRootRawAsset().handle.nameWithoutExtension());
+							super.setUpdated();
+						}
+					};
+
 					gameAssetOut = asset;
 
 
@@ -1118,6 +1125,8 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 				}
 
 				RoutineStageData routineStageData = json.fromJson(RoutineStageData.class, TempHackUtil.hackIt(value.handle.readString()));
+
+				routineStageData.setName(value.handle.nameWithoutExtension());
 
 				((GameAsset<RoutineStageData>) gameAssetOut).setResourcePayload(routineStageData);
 

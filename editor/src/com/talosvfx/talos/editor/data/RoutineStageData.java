@@ -13,9 +13,14 @@ import com.talosvfx.talos.runtime.routine.serialization.BaseRoutineData;
 import com.talosvfx.talos.runtime.scene.utils.propertyWrappers.PropertyType;
 import com.talosvfx.talos.runtime.scene.utils.propertyWrappers.PropertyWrapper;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 @Data
 public class RoutineStageData extends DynamicNodeStageData implements BaseRoutineData {
+
+	@Getter@Setter
+	protected transient String name;
 
 	private transient RoutineInstance routineInstance;
 
