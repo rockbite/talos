@@ -28,6 +28,7 @@ import com.talosvfx.talos.editor.addons.scene.logic.IPropertyHolder;
 import com.talosvfx.talos.editor.addons.scene.logic.MultiPropertyHolder;
 import com.talosvfx.talos.editor.addons.scene.logic.PropertyWrapperProviders;
 import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.CurveGizmo;
+import com.talosvfx.talos.editor.project2.AppManager;
 import com.talosvfx.talos.runtime.RuntimeContext;
 import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.runtime.assets.GameAssetType;
@@ -331,7 +332,9 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
 			@Override
 			public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
-
+				if (gameAsset.equals(AppManager.dummyAsset)) {
+					return false;
+				}
 				if (mapEditorState.isEditing()) {
 					if (mapEditorState.isPainting()) {
 						//Place a tile and return
