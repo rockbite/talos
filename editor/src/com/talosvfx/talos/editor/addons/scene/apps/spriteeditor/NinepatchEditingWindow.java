@@ -1,19 +1,25 @@
 package com.talosvfx.talos.editor.addons.scene.apps.spriteeditor;
 
+import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
+import com.talosvfx.talos.runtime.assets.AMetadata;
 import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.runtime.assets.meta.SpriteMetadata;
+
+import java.util.Arrays;
 
 public class NinepatchEditingWindow extends SpriteEditorWindow {
     public EditPanel editPanel;
@@ -37,10 +43,16 @@ public class NinepatchEditingWindow extends SpriteEditorWindow {
     // TODO: 28.12.22 something
 
     private SpriteMetadataListener listener;
+    private final Texture dummyTexture;
+    private final SpriteMetadata dummyMetadata;
+    private TextButton saveMetaDataButton;
 
 
-    public NinepatchEditingWindow (SpriteEditor spriteEditor) {
+    public NinepatchEditingWindow(SpriteEditor spriteEditor) {
         super(spriteEditor);
+        dummyTexture = new Texture(100, 100, Pixmap.Format.RGBA8888);
+        dummyMetadata = new SpriteMetadata();
+        dummyMetadata.borderData = new int[]{0, 0, 0, 0};
 
         setListener((left, right, top, bottom) -> {
             SpriteMetadata metaData = (SpriteMetadata) gameAsset.getRootRawAsset().metaData;
@@ -56,7 +68,7 @@ public class NinepatchEditingWindow extends SpriteEditorWindow {
         initRightPanel();
     }
 
-    private void initEditPanel () {
+    private void initEditPanel() {
         editPanel = new EditPanel(new EditPanel.EditPanelListener() {
             @Override
             public void changed(float left, float right, float top, float bottom) {
@@ -74,7 +86,7 @@ public class NinepatchEditingWindow extends SpriteEditorWindow {
         addActor(editPanel);
     }
 
-    private void initRightPanel () {
+    private void initRightPanel() {
         // init nine patch preview
         ninePatchPreview = new NinePatchPreview();
 
@@ -91,11 +103,10 @@ public class NinepatchEditingWindow extends SpriteEditorWindow {
         topProperty = new NumberPanel();
         bottomProperty = new NumberPanel();
 
-        TextButton saveSpriteMetaData = new TextButton("Save", SharedResources.skin);
-        saveSpriteMetaData.addListener(new ClickListener() {
+        saveMetaDataButton = new TextButton("Save", SharedResources.skin);
+        saveMetaDataButton.addListener(new ChangeListener() {
             @Override
-            public void clicked(InputEvent event, float x, float y) {
-                super.clicked(event, x, y);
+            public void changed(ChangeEvent event, Actor actor) {
                 saveAndClose();
             }
         });
@@ -121,7 +132,7 @@ public class NinepatchEditingWindow extends SpriteEditorWindow {
         propertiesPanel.row();
         propertiesPanel.add(numberControls).expand().right();
         propertiesPanel.row();
-        propertiesPanel.add(saveSpriteMetaData).size(60, 40).bottom().right().padTop(10);
+        propertiesPanel.add(saveMetaDataButton).size(60, 40).bottom().right().padTop(10);
         addActor(propertiesPanel);
 
         // add property listeners
@@ -243,7 +254,7 @@ public class NinepatchEditingWindow extends SpriteEditorWindow {
         });
     }
 
-    public void saveAndClose () {
+    public void saveAndClose() {
         if (listener != null) {
             listener.changed(
                     (int) editPanel.getLeft(),
@@ -292,7 +303,7 @@ public class NinepatchEditingWindow extends SpriteEditorWindow {
         editPanel.setSize(getWidth() - 2.0f * pad - propertiesPanel.getPrefWidth() - space, getHeight() - 2.0f * pad);
     }
 
-    private void layoutWrapped () {
+    private void layoutWrapped() {
         propertiesPanel.setPosition(pad + propertiesPanel.getPrefWidth() / 2f, pad + propertiesPanel.getPrefHeight() / 2f);
         float remainingHeight = getHeight() - 2.0f * pad - space - propertiesPanel.getPrefHeight();
         remainingHeight = Math.max(remainingHeight, editPanel.getPrefHeight());
@@ -301,11 +312,23 @@ public class NinepatchEditingWindow extends SpriteEditorWindow {
     }
 
     @Override
-    public void updateForGameAsset (GameAsset<Texture> gameAsset) {
+    public void updateForGameAsset(GameAsset<Texture> gameAsset) {
         super.updateForGameAsset(gameAsset);
 
-        final SpriteMetadata metadata = (SpriteMetadata) gameAsset.getRootRawAsset().metaData;
-        this.texture = gameAsset.getResource();
+        final SpriteMetadata metadata;
+        AMetadata aMetadata = gameAsset.getRootRawAsset().metaData;
+        if (aMetadata instanceof SpriteMetadata && aMetadata != null) {
+            metadata = (SpriteMetadata) aMetadata;
+        } else {
+            metadata = dummyMetadata;
+            Arrays.fill(metadata.borderData, 0);
+        }
+
+        if (gameAsset.getResource() != null) {
+            this.texture = gameAsset.getResource();
+        } else {
+            this.texture = dummyTexture;
+        }
 
         // clamp metadata values in case they are invalid
         metadata.borderData[0] = MathUtils.clamp(metadata.borderData[0], 0, texture.getWidth());
@@ -346,7 +369,7 @@ public class NinepatchEditingWindow extends SpriteEditorWindow {
     }
 
     @Override
-    public void setScrollFocus () {
+    public void setScrollFocus() {
         SharedResources.stage.setScrollFocus(editPanel);
     }
 
@@ -358,18 +381,18 @@ public class NinepatchEditingWindow extends SpriteEditorWindow {
         public static final float WIDTH = 175.0f;
         public static final float HEIGHT = 175.0f;
 
-        public void show (NinePatchDrawable patchDrawable) {
+        public void show(NinePatchDrawable patchDrawable) {
             clearChildren();
             Image vertical = new Image(patchDrawable) {
                 {
                     float w = NinePatchPreview.WIDTH / 4f - 5;
                     float h = 3 * NinePatchPreview.HEIGHT / 4f;
                     float width = patchDrawable.getMinWidth();
-                    float height =  patchDrawable.getMinHeight();
+                    float height = patchDrawable.getMinHeight();
                     float upscaled_width, upscaled_height;
                     if (width < height) {
                         upscaled_width = width;
-                        upscaled_height = height * ( h / w);
+                        upscaled_height = height * (h / w);
                     } else {
                         upscaled_width = width;
                         upscaled_height = height * ((width * h) / (height * w));
@@ -396,10 +419,10 @@ public class NinepatchEditingWindow extends SpriteEditorWindow {
                     float w = NinePatchPreview.WIDTH;
                     float h = NinePatchPreview.HEIGHT / 4f - 5;
                     float width = patchDrawable.getMinWidth();
-                    float height =  patchDrawable.getMinHeight();
+                    float height = patchDrawable.getMinHeight();
                     float upscaled_width, upscaled_height;
                     if (width > height) {
-                        upscaled_width = width * ((w/height) / (h/width));
+                        upscaled_width = width * ((w / height) / (h / width));
                         upscaled_height = height;
                     } else {
                         upscaled_width = width * (w / h);
@@ -414,5 +437,17 @@ public class NinepatchEditingWindow extends SpriteEditorWindow {
             addActor(square);
             addActor(horizontal);
         }
+    }
+
+    @Override
+    public void disableListeners() {
+        super.disableListeners();
+        saveMetaDataButton.setDisabled(true);
+    }
+
+    @Override
+    public void restoreListeners() {
+        super.restoreListeners();
+        saveMetaDataButton.setDisabled(false);
     }
 }

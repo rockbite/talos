@@ -1,10 +1,13 @@
 package com.talosvfx.talos.editor.addons.scene.apps.spriteeditor;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.runtime.assets.GameAsset;
@@ -24,9 +27,13 @@ public class SpritePropertiesEditorWindow extends SpriteEditorWindow {
     // color property widget
     public Color color = new Color(Color.WHITE);
     private PropertyWidget colorWidget;
+    private final Texture dummyTexture;
+    private SquareButton resizeSaveButton;
+    private SquareButton colourSaveButton;
 
     public SpritePropertiesEditorWindow (SpriteEditor spriteEditor) {
         super(spriteEditor);
+        dummyTexture = new Texture(100, 100, Pixmap.Format.RGBA8888);
 
         padTop(10).defaults().growX().padLeft(10).padRight(5).space(3);
 
@@ -66,13 +73,12 @@ public class SpritePropertiesEditorWindow extends SpriteEditorWindow {
 
         // init save button
         final Label buttonLabel = new Label("Save", SharedResources.skin);
-        final SquareButton saveButton = new SquareButton(SharedResources.skin, buttonLabel, "Save");
-        saveButton.setStyle(new Button.ButtonStyle(saveButton.getStyle()));
-        saveButton.getStyle().checked = saveButton.getStyle().up;
-        saveButton.addListener(new ClickListener() {
+        resizeSaveButton = new SquareButton(SharedResources.skin, buttonLabel, "Save");
+        resizeSaveButton.setStyle(new Button.ButtonStyle(resizeSaveButton.getStyle()));
+        resizeSaveButton.getStyle().checked = resizeSaveButton.getStyle().up;
+        resizeSaveButton.addListener(new ChangeListener() {
             @Override
-            public void clicked(InputEvent event, float x, float y) {
-                super.clicked(event, x, y);
+            public void changed(ChangeEvent event, Actor actor) {
                 AssetRepository.getInstance().resizeAsset(gameAsset, (int) width, (int) height);
             }
         });
@@ -83,7 +89,7 @@ public class SpritePropertiesEditorWindow extends SpriteEditorWindow {
         sizePanel.getContent().row();
         sizePanel.getContent().add(heightWidget).growX();
         sizePanel.getContent().row();
-        sizePanel.getContent().add(saveButton).expandX().left().padTop(5);
+        sizePanel.getContent().add(resizeSaveButton).expandX().left().padTop(5);
         return sizePanel;
     }
 
@@ -94,13 +100,12 @@ public class SpritePropertiesEditorWindow extends SpriteEditorWindow {
 
         // init save button
         final Label buttonLabel = new Label("Save", SharedResources.skin);
-        final SquareButton saveButton = new SquareButton(SharedResources.skin, buttonLabel, "Save");
-        saveButton.setStyle(new Button.ButtonStyle(saveButton.getStyle()));
-        saveButton.getStyle().checked = saveButton.getStyle().up;
-        saveButton.addListener(new ClickListener() {
+        colourSaveButton = new SquareButton(SharedResources.skin, buttonLabel, "Save");
+        colourSaveButton.setStyle(new Button.ButtonStyle(colourSaveButton.getStyle()));
+        colourSaveButton.getStyle().checked = colourSaveButton.getStyle().up;
+        colourSaveButton.addListener(new ChangeListener() {
             @Override
-            public void clicked(InputEvent event, float x, float y) {
-                super.clicked(event, x, y);
+            public void changed(ChangeEvent event, Actor actor) {
                 AssetRepository.getInstance().fillAssetColor(gameAsset, color);
             }
         });
@@ -109,7 +114,7 @@ public class SpritePropertiesEditorWindow extends SpriteEditorWindow {
         colorPanel.getContent().padLeft(40).defaults().space(3);
         colorPanel.getContent().add(colorWidget).growX();
         colorPanel.getContent().row();
-        colorPanel.getContent().add(saveButton).expandX().left().padTop(5);
+        colorPanel.getContent().add(colourSaveButton).expandX().left().padTop(5);
 
         return colorPanel;
     }
@@ -118,12 +123,31 @@ public class SpritePropertiesEditorWindow extends SpriteEditorWindow {
     public void updateForGameAsset (GameAsset<Texture> gameAsset) {
         this.gameAsset = gameAsset;
 
-        final Texture texture = gameAsset.getResource();
+        final Texture texture;
+        if (gameAsset.getResource() != null) {
+            texture = gameAsset.getResource();
+        } else {
+            texture = dummyTexture;
+        }
 
         widthWidget.valueChanged((float) texture.getTextureData().getWidth());
         heightWidget.valueChanged((float) texture.getTextureData().getHeight());
 
         widthWidget.updateValue();
         heightWidget.updateValue();
+    }
+
+    @Override
+    public void disableListeners() {
+        super.disableListeners();
+        resizeSaveButton.setDisabled(true);
+        colourSaveButton.setDisabled(true);
+    }
+
+    @Override
+    public void restoreListeners() {
+        super.restoreListeners();
+        resizeSaveButton.setDisabled(false);
+        colourSaveButton.setDisabled(false);
     }
 }
