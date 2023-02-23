@@ -7,7 +7,7 @@ import com.kotcrab.vis.ui.util.dialog.Dialogs;
 import com.kotcrab.vis.ui.util.dialog.OptionDialogListener;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.notifications.events.assets.AssetChangeDirectoryEvent;
-import com.talosvfx.talos.editor.project2.apps.ProjectExplorerApp;
+import com.talosvfx.talos.editor.project2.localprefs.TalosLocalPrefs;
 import com.talosvfx.talos.editor.utils.Toasts;
 import com.talosvfx.talos.editor.addons.scene.events.save.SaveRequest;
 import com.talosvfx.talos.editor.addons.scene.events.save.ExportRequest;
@@ -45,7 +45,17 @@ public class TalosControl implements Observer {
     @EventHandler
     public void onMenuPopupOpenCommand (MenuPopupOpenCommand menuPopupOpenCommand) {
        if (menuPopupOpenCommand.getPath().equals("window/layouts")) {
-            SharedResources.mainMenu.askToInject(customLayoutListProvider, "window/layouts/custom_list");
+           SharedResources.mainMenu.registerMenuProvider(new MainMenu.IMenuProvider() {
+               @Override
+               public void inject(String path, MainMenu menu) {
+                   Array<String> customLayouts = TalosLocalPrefs.Instance().getCustomLayouts();
+
+                   for(String customLayoutPath : customLayouts) {
+                       FileHandle handle = Gdx.files.absolute(customLayoutPath);
+                       menu.addItem(path, handle.path(), handle.name(), null, handle);
+                   }
+               }
+           }, "window/layouts/custom_list");
        }
     }
 
@@ -183,6 +193,8 @@ public class TalosControl implements Observer {
                     }
                     // use file chooser to get the file path
                     file.writeString(jsonValue, false);
+
+                    TalosLocalPrefs.Instance().addCustomLayout(file.path());
                 }
             });
         } else {
@@ -289,20 +301,6 @@ public class TalosControl implements Observer {
                 }
             }
         }, "window/layouts/list");
-
-        // load custom layout lists
-        customLayoutListProvider = new MainMenu.IMenuProvider() {
-            @Override
-            public void inject(String path, MainMenu menu) {
-                Array<GameAsset<LayoutJsonStructure>> layouts = AssetRepository.getInstance().getAssetsForType(GameAssetType.LAYOUT_DATA);
-                for (GameAsset<LayoutJsonStructure> layout : layouts) {
-                    FileHandle handle = layout.getRootRawAsset().handle;
-                    menu.addItem(path, handle.name(), handle.nameWithoutExtension(), null, handle);
-                }
-            }
-        };
-        SharedResources.mainMenu.registerMenuProvider(customLayoutListProvider, "window/layouts/custom_list");
-
     }
 
     public void openProjectByChoosingFile() {

@@ -547,16 +547,19 @@ public class NodeBoard<T extends DynamicNodeStageData> extends WidgetGroup imple
 
 	public void selectNode (NodeWidget node) {
 		clearSelection();
+		nodeStage.onNodeSelectionChange();
 		addNodeToSelection(node);
 	}
 
 	public void addNodeToSelection (NodeWidget node) {
 		selectedNodes.add(node);
+		nodeStage.onNodeSelectionChange();
 		updateSelectionBackgrounds();
 	}
 
 	public void removeNodeFromSelection (NodeWidget node) {
 		selectedNodes.remove(node);
+		nodeStage.onNodeSelectionChange();
 		updateSelectionBackgrounds();
 	}
 

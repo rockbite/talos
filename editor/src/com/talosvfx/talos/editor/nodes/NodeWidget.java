@@ -13,13 +13,18 @@ import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.XmlReader;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
+import com.talosvfx.talos.editor.addons.scene.logic.IPropertyHolder;
 import com.talosvfx.talos.editor.nodes.widgets.*;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.events.dynamicnodestage.NodeDataModifiedEvent;
+import com.talosvfx.talos.editor.widgets.propertyWidgets.IPropertyProvider;
+import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
 import com.talosvfx.talos.editor.widgets.ui.EditableLabel;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 
-public abstract class NodeWidget extends EmptyWindow implements Json.Serializable {
+import java.util.function.Supplier;
+
+public abstract class NodeWidget extends EmptyWindow implements Json.Serializable, IPropertyProvider {
 
     protected EditableLabel title;
 
@@ -637,4 +642,37 @@ public abstract class NodeWidget extends EmptyWindow implements Json.Serializabl
     public String getType(String name) {
         return typeMap.get(name);
     }
+
+    @Override
+    public Array<PropertyWidget> getListOfProperties () {
+        Array<PropertyWidget> properties = new Array<>();
+
+        com.talosvfx.talos.editor.widgets.propertyWidgets.LabelWidget labelWidget = new com.talosvfx.talos.editor.widgets.propertyWidgets.LabelWidget("Name", new Supplier<String>() {
+            @Override
+            public String get () {
+                return nodeName;
+            }
+        });
+        properties.add(labelWidget);
+
+        return properties;
+    }
+
+    @Override
+    public String getPropertyBoxTitle () {
+        return "Node properties";
+    }
+
+    @Override
+    public int getPriority () {
+        return 0;
+    }
+
+    @Override
+    public Class<? extends IPropertyProvider> getType () {
+        return this.getClass();
+    }
+
+    //    public Array<PropertyWidget> getListOfProperties ();
+
 }
