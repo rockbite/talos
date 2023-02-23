@@ -69,6 +69,7 @@ public class SceneEditorApp extends AppManager.BaseApp<Scene> implements GameAss
 	public void updateForGameAsset (GameAsset<Scene> gameAsset) {
 		super.updateForGameAsset(gameAsset);
 
+		// TODO: 23.02.23 dummy refactor
 		if (AppManager.dummyAsset == (GameAsset) gameAsset) {
 			return;
 		}

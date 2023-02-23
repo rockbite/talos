@@ -102,6 +102,7 @@ public class ModuleBoardWidget extends WidgetGroup {
     }
 
     public Array<NodeConnection> getCurrentConnections () {
+        // TODO: 23.02.23 dummmy refactor
         if (currentEmitterWrapper == null) {
             return new Array<>();
         }
@@ -116,6 +117,7 @@ public class ModuleBoardWidget extends WidgetGroup {
     }
 
     public Array<ModuleWrapper> getModuleWrappers () {
+        // TODO: 23.02.23 dummy refactor
         if (currentEmitterWrapper == null) {
             return new Array<>();
         }
@@ -208,6 +210,7 @@ public class ModuleBoardWidget extends WidgetGroup {
     }
 
     public Array<ModuleWrapperGroup> getGroups () {
+        // TODO: 23.02.23 dummy refactor
         if (currentEmitterWrapper == null) {
             return new Array<>();
         }
