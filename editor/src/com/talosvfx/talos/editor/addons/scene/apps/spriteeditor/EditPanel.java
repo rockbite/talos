@@ -89,6 +89,12 @@ public class EditPanel extends Table {
 
             @Override
             public boolean mouseMoved(InputEvent event, float x, float y) {
+
+                // TODO: 23.02.23 dummy refactor
+                if (image == null) {
+                    return true;
+                }
+
                 // set the active side
                 activeSide = 0;
                 tmp.set(x, y);
@@ -170,6 +176,12 @@ public class EditPanel extends Table {
 
             @Override
             public void touchDragged (InputEvent event, float x, float y, int pointer) {
+
+                // TODO: 23.02.23 dummy refactor
+                if (image == null) {
+                    return;
+                }
+
                 isDragging = true;
                 if (activeSide == 0) { // move image
                     current.set(x, y);
@@ -242,6 +254,10 @@ public class EditPanel extends Table {
     public void drawChildren(Batch batch, float parentAlpha) {
         super.drawChildren(batch, parentAlpha);
 
+        if (image == null) {
+            return;
+        }
+
         Gdx.gl.glEnable(GL20.GL_BLEND);
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 
@@ -274,6 +290,11 @@ public class EditPanel extends Table {
     @Override
     public void act(float delta) {
         super.act(delta);
+
+        // TODO: 23.02.23 dummy refactor
+        if (image == null) {
+            return;
+        }
 
         bounds.x = image.getX() - image.getOriginX() * zoom + texture.getWidth() / 2f;
         bounds.y = image.getY() - image.getOriginY() * zoom + texture.getHeight() / 2f;
