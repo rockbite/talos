@@ -366,6 +366,9 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 				Vector2 hitCords = getWorldFromLocal(x, y);
 
 				if (button == 1 && !event.isCancelled() && !event.isStopped()) {
+					if (currentContainer == null) {
+						return true;
+					}
 					final Vector2 vec = new Vector2(Gdx.input.getX(), Gdx.input.getY());
 					screenToLocalCoordinates(vec);
 					localToStageCoordinates(vec);
@@ -759,10 +762,18 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 	}
 
 	public void copySelected () {
+		if (currentContainer == null) {
+			return;
+		}
+
 		SceneUtils.copy(gameAsset, selection);
 	}
 
 	public void pasteFromClipboard () {
+		if (currentContainer == null) {
+			return;
+		}
+
 		SceneUtils.paste(gameAsset);
 	}
 
@@ -950,6 +961,10 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 	}
 
 	public void selectAll () {
+		if (currentContainer == null) {
+			return;
+		}
+
 		selection.clear();
 		Array<GameObject> gameObjects = currentContainer.getGameObjects();
 		if (gameObjects != null) {
