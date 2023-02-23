@@ -112,6 +112,10 @@ public class ModuleBoardWidget extends WidgetGroup {
     }
 
     public Array<ModuleWrapper> getModuleWrappers () {
+        if (currentEmitterWrapper == null) {
+            return new Array<>();
+        }
+
         Array<ModuleWrapper> arr = moduleWrappers.get(currentEmitterWrapper);
         if (arr == null) {
             arr = new Array<>();
