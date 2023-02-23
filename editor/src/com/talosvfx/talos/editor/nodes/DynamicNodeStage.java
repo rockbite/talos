@@ -211,6 +211,12 @@ public abstract class DynamicNodeStage<T extends DynamicNodeStageData> extends W
                     nodeBoard.clearSelection();
                 }
 
+                selectionRect.setVisible(false);
+
+                // TODO: 23.02.23 dummy refactor
+                if (data == null) {
+                    return;
+                }
                 if(button == 1 && !event.isCancelled()) {
                     showPopup();
                 }
@@ -219,7 +225,6 @@ public abstract class DynamicNodeStage<T extends DynamicNodeStageData> extends W
                     nodeBoard.userSelectionApply(rectangle);
                 }
 
-                selectionRect.setVisible(false);
             }
         });
 
