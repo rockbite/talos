@@ -102,6 +102,10 @@ public class ModuleBoardWidget extends WidgetGroup {
     }
 
     public Array<NodeConnection> getCurrentConnections () {
+        if (currentEmitterWrapper == null) {
+            return new Array<>();
+        }
+
         Array<NodeConnection> arr = nodeConnections.get(currentEmitterWrapper);
         if (arr == null) {
             arr = new Array<>();
@@ -204,6 +208,10 @@ public class ModuleBoardWidget extends WidgetGroup {
     }
 
     public Array<ModuleWrapperGroup> getGroups () {
+        if (currentEmitterWrapper == null) {
+            return new Array<>();
+        }
+
         Array<ModuleWrapperGroup> arr = groups.get(currentEmitterWrapper);
         if (arr == null) {
             arr = new Array<>();

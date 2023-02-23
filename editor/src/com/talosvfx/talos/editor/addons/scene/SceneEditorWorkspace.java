@@ -165,6 +165,10 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 	}
 
 	public void getChildrenHavingComponentClass (GameObject root, Class<? extends AComponent> componentClass, Array<GameObject> array) {
+		if (root == null) {
+			return;
+		}
+
 		if (root.hasComponent(componentClass)) {
 			array.add(root);
 		}
