@@ -234,6 +234,17 @@ public class AppManager extends InputAdapter implements Observer {
 			return SharedResources.globalSaveStateSystem.isItemChangedAndUnsaved(gameAsset);
 		}
 
+		public boolean hasAssetUsed() {
+			final GameAsset<T> gameAsset = getGameAsset();
+			if (gameAsset != null) {
+				final AppManager.BaseApp<?> focusedApp = SharedResources.appManager.getFocusedApp();
+				if (focusedApp != null) {
+					return gameAsset.equals(focusedApp.getGameAsset());
+				}
+			}
+			return false;
+		}
+
 		@Override
 		public BaseApp<T> getContext() {
 			return this;
