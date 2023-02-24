@@ -264,6 +264,11 @@ public class ParticleNodeEditorApp extends AppManager.BaseApp<VFXProjectData> im
 
 		super.updateForGameAsset(gameAsset);
 
+		// TODO: 23.02.23 dummy refactor
+		if (AppManager.dummyAsset == (GameAsset) gameAsset) {
+			return;
+		}
+
 		loadProject(gameAsset.getResource());
 
 		TalosLocalPrefs.getAppPrefs(gameAsset, this);

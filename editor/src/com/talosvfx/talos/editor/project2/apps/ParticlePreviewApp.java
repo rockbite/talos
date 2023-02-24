@@ -58,6 +58,11 @@ public class ParticlePreviewApp extends AppManager.BaseApp<VFXProjectData> imple
 	public void updateForGameAsset (GameAsset<VFXProjectData> gameAsset) {
 		super.updateForGameAsset(gameAsset);
 
+		// TODO: 23.02.23 dummy refactor
+		if (AppManager.dummyAsset == (GameAsset) gameAsset) {
+			return;
+		}
+
 		preview3D.setParticleEffect(gameAsset.getResource());
 
 		Gdx.app.postRunnable(new Runnable() {

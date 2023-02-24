@@ -244,6 +244,12 @@ public class NinepatchEditingWindow extends SpriteEditorWindow {
     }
 
     public void saveAndClose () {
+
+        // TODO: 23.02.23 dummy refactor
+        if (gameAsset == null) {
+            return;
+        }
+
         if (listener != null) {
             listener.changed(
                     (int) editPanel.getLeft(),
