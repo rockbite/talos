@@ -98,6 +98,13 @@ public class CommandParser {
 
         if (type.equalsIgnoreCase("keyboard")) {
             String primaryKeyString = keyStrings[keyStrings.length - 1];
+            for (ModifierKey value : ModifierKey.values()) {
+                if (value.toString().equals(primaryKeyString.toUpperCase())) {
+                    logger.error("WRONG CONFIGURATION FOR COMMAND");
+                    throw new GdxRuntimeException("LAST KEY CAN'T BE MODIFIER KEY, SPECIFY REGULAR KEY - " + primaryKeyString);
+                }
+            }
+
             int primaryKey = customKeyNames.containsKey(primaryKeyString) ? customKeyNames.get(primaryKeyString) : Input.Keys.valueOf(primaryKeyString);
             if (primaryKey == -1) {
                 logger.error("WRONG CONFIGURATION FOR COMMAND");
