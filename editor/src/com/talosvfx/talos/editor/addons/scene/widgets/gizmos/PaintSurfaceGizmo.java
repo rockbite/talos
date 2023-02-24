@@ -11,10 +11,13 @@ import com.badlogic.gdx.graphics.glutils.PixmapTextureData;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
+import com.badlogic.gdx.utils.Pools;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.talosvfx.talos.editor.addons.scene.events.PaintSurfaceResize;
 import com.talosvfx.talos.editor.addons.scene.widgets.PaintToolsPane;
@@ -124,18 +127,19 @@ public class PaintSurfaceGizmo extends Gizmo implements Observer, GameAsset.Game
     }
 
     private void drawBrushToBuffer() {
+        final PaintSurfaceComponent surface = gameObject.getComponent(PaintSurfaceComponent.class);
+        final TransformComponent transformComponent = gameObject.getComponent(TransformComponent.class);
+        final Vector2 surfaceSize = surface.size;
+        final Texture resource = surface.getGameResource().getResource();
 
-        PaintSurfaceComponent surface = gameObject.getComponent(PaintSurfaceComponent.class);
-        TransformComponent transformComponent = gameObject.getComponent(TransformComponent.class);
-        // figure out mouse pos on the texture
-
+        // get mouse unit cords
         mouseCordsOnScene.set(viewport.getMouseCordsOnScene());
 
-        Vector2 surfaceSize = surface.size;
-        int worldWidth = ((int) surfaceSize.x);
-        int worldHeight = ((int) surfaceSize.y);
-        tmp.set(transformComponent.position).sub(worldWidth / 2f, worldHeight / 2f).sub(mouseCordsOnScene).scl(-1);
+        // get mouse pixel cords
+        final float mouseXPosOnSceneInPixels = (mouseCordsOnScene.x + surfaceSize.x / 2.0f - transformComponent.position.x) * resource.getWidth();
+        final float mouseYPosOnSceneInPixels = (mouseCordsOnScene.y - surfaceSize.y / 2.0f - transformComponent.position.y) * resource.getHeight() * -1.0f;
 
+        // start drawing
         frameBuffer.begin();
         innerBatch.begin();
 
@@ -147,13 +151,16 @@ public class PaintSurfaceGizmo extends Gizmo implements Observer, GameAsset.Game
             innerBatch.setBlendFunctionSeparate(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, GL20.GL_SRC_ALPHA, GL20.GL_ONE);
         }
 
-        innerBatch.draw(brushTexture,
-                tmp.x - brushTexture.getWidth() / 2f, worldHeight - (tmp.y - brushTexture.getHeight() / 2f) - brushTexture.getHeight(), brushTexture.getWidth(), brushTexture.getHeight());
+        final float brushWidthInPixels = brushTexture.getWidth();
+        final float brushHeightInPixels = brushTexture.getHeight();
+        final float brushXPosInPixels = mouseXPosOnSceneInPixels / surfaceSize.x - brushWidthInPixels / 2.0f;
+        final float brushYPosInPixels = mouseYPosOnSceneInPixels / surfaceSize.y - brushHeightInPixels / 2.0f;
 
+        innerBatch.draw(brushTexture, brushXPosInPixels, brushYPosInPixels, brushWidthInPixels, brushHeightInPixels);
         innerBatch.end();
 
-
-        Pixmap pixmap = Pixmap.createFromFrameBuffer(0, 0, worldWidth, worldHeight);
+        // update pixmap
+        final Pixmap pixmap = Pixmap.createFromFrameBuffer(0, 0, resource.getWidth(), resource.getHeight());
 
         frameBuffer.end();
 
@@ -161,34 +168,32 @@ public class PaintSurfaceGizmo extends Gizmo implements Observer, GameAsset.Game
     }
 
     private void updateAssetFromPixmap (Pixmap pixmap, boolean updateListeners) {
-        PaintSurfaceComponent surface = gameObject.getComponent(PaintSurfaceComponent.class);
-        Vector2 surfaceSize = surface.size;
-        int worldWidth = ((int) surfaceSize.x);
-        int worldHeight = ((int) surfaceSize.y);
+        final PaintSurfaceComponent surface = gameObject.getComponent(PaintSurfaceComponent.class);
+        final GameAsset<Texture> gameAsset = surface.gameAsset;
 
-        int width = worldWidth;
-        int height = worldHeight;
-        GameAsset<Texture> gameAsset = surface.gameAsset;
-        if (!gameAsset.isBroken()) {
-            Texture resource = gameAsset.getResource();
-            TextureData textureData = resource.getTextureData();
-            width = textureData.getWidth();
-            height = textureData.getHeight();
-            if (textureData instanceof PixmapTextureData) {
-                textureData.consumePixmap().dispose();
-            }
-            resource.dispose();
+        if (gameAsset.isBroken()) return;
+
+        final Texture resource = gameAsset.getResource();
+        final int width = resource.getWidth();
+        final int height = resource.getHeight();
+
+        final TextureData textureData = resource.getTextureData();
+        if (textureData instanceof PixmapTextureData) {
+            textureData.consumePixmap().dispose();
         }
+        resource.dispose();
 
-        Pixmap newPixmap = new Pixmap(width, height, pixmap.getFormat());
+        final Pixmap newPixmap = new Pixmap(width, height, pixmap.getFormat());
         newPixmap.drawPixmap(pixmap,
                 0, 0, pixmap.getWidth(), pixmap.getHeight(),
                 0, 0, newPixmap.getWidth(), newPixmap.getHeight()
         );
-        Texture texture = new Texture(newPixmap);
 
+        final Texture texture = new Texture(newPixmap);
         texture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
+
         surface.gameAsset.setResourcePayload(texture);
+
         if (updateListeners) {
             surface.gameAsset.listeners.removeValue(this, true);
             surface.gameAsset.setUpdated();
@@ -213,12 +218,7 @@ public class PaintSurfaceGizmo extends Gizmo implements Observer, GameAsset.Game
     }
 
     private boolean canDraw () {
-        return frameBuffer != null;
-    }
-
-    @Override
-    public void touchUp(float x, float y) {
-
+        return frameBuffer != null && brushTexture != null;
     }
 
     @Override
@@ -245,13 +245,13 @@ public class PaintSurfaceGizmo extends Gizmo implements Observer, GameAsset.Game
         }
         Texture resource = gameResource.getResource();
         resource.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
-        Vector2 bufferSize = surface.size;
-        int worldWidth = ((int) bufferSize.x);
-        int worldHeight = ((int) bufferSize.y);
-        frameBuffer = new FrameBuffer(Pixmap.Format.RGBA8888, worldWidth, worldHeight, false);
 
-        Viewport viewport = new FitViewport(worldWidth, worldHeight);
-        viewport.setWorldSize(worldWidth, worldHeight);
+        final int widthInPixels = resource.getWidth();
+        final int heightInPixels = resource.getHeight();
+
+        frameBuffer = new FrameBuffer(Pixmap.Format.RGBA8888, widthInPixels, heightInPixels, false);
+
+        final Viewport viewport = new FitViewport(widthInPixels, heightInPixels);
         viewport.apply(true);
 
         frameBuffer.begin();
@@ -261,11 +261,10 @@ public class PaintSurfaceGizmo extends Gizmo implements Observer, GameAsset.Game
         innerBatch.begin();
         innerBatch.setProjectionMatrix(viewport.getCamera().combined);
         Gdx.gl20.glDisable(GL20.GL_SCISSOR_TEST);
-        innerBatch.draw(resource, 0, 0f, worldWidth, worldHeight,
-                0, 0, resource.getWidth(), resource.getHeight(),
-                false, true);
+        innerBatch.draw(resource, 0.0f, 0.0f, widthInPixels, heightInPixels, 0, 0, resource.getWidth(), resource.getHeight(), false, true);
         innerBatch.end();
-        Pixmap fromFrameBuffer = Pixmap.createFromFrameBuffer(0, 0, worldWidth, worldHeight);
+
+        final Pixmap fromFrameBuffer = Pixmap.createFromFrameBuffer(0, 0, widthInPixels, heightInPixels);
         frameBuffer.end();
 
         updateAssetFromPixmap(fromFrameBuffer, updateListeners);
@@ -284,30 +283,43 @@ public class PaintSurfaceGizmo extends Gizmo implements Observer, GameAsset.Game
         }
     }
 
-    private void createBrushTexture() {
+    private void createBrushTexture () {
         int size = paintToolsPane.getSize();
         float opacity = paintToolsPane.getOpacity();
         float hardness = paintToolsPane.getHardness();
         float maxShift = 0.25f;
         float shift = (1f - hardness) * maxShift;
-        int boxSize = (int) (size * (1f + shift));
-        Color tempColor = new Color();
 
-        Pixmap pixmap = new Pixmap(boxSize, boxSize, Pixmap.Format.RGBA8888);
-        for (int x = 0; x < pixmap.getWidth(); x++) {
-            for (int y = 0; y < pixmap.getHeight(); y++) {
-                tempColor.set(paintToolsPane.getColor());
-                float dstFromCenter = (tmp.set(boxSize / 2f, boxSize / 2f).dst(x + 0.5f, y + 0.5f)) / (boxSize / 2f);
+        final int xRadius = (int) (size * (1f + shift));
+        final int yRadius = (int) (size * (1f + shift));
+        final Color tempColor = new Color();
+
+        final int width = xRadius * 2;
+        final int height = yRadius * 2;
+        final Pixmap pixmap = new Pixmap(width, height, Pixmap.Format.RGBA8888);
+
+        final int majorAxisLength = Math.max(xRadius, yRadius);
+
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                // set center
+                tmp.set(xRadius, yRadius);
+                // dist from center
+                float dstFromCenter = tmp.dst(x, y);
+                // map distance to a range of 0 to 1
+                float mappedDistanceFromCenter = dstFromCenter / majorAxisLength * 2.0f;
+
                 float point = 1f - shift * 2f;
                 float fadeOff;
-                if (dstFromCenter < point) {
+                if (mappedDistanceFromCenter < point) {
                     fadeOff = 1;
-                } else if (dstFromCenter > 1f) {
+                } else if (mappedDistanceFromCenter > 1f) {
                     fadeOff = 0;
                 } else {
-                    fadeOff = 1f - (MathUtils.clamp(dstFromCenter, point, 1f) - point) * 2f;
+                    fadeOff = 1f - (MathUtils.clamp(mappedDistanceFromCenter, point, 1f) - point) * 2f;
                 }
 
+                tempColor.set(paintToolsPane.getColor());
                 tempColor.a = fadeOff * opacity;
 
                 if (paintToolsPane.getCurrentTool() == PaintToolsPane.Tool.ERASER) {
