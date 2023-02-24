@@ -54,7 +54,8 @@ public class MenuRow extends Table {
 
         add(label).pad(4).padLeft(7).padRight(16).left().expandX();
 
-        add(shortcut).padRight(2).right().expandX();
+        // TODO: 24.02.23 bind commands from keymap
+        add().padRight(2).right().expandX();
 
         add(collapseImage).right().padRight(3).padLeft(3).size(10).padTop(2);
 
