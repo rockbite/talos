@@ -242,6 +242,12 @@ public class TalosControl implements Observer {
                 Gdx.app.exit();
             }
         }
+
+        if (event.getPath().startsWith("help")) {
+            if (event.getPath().endsWith("about")) {
+                SharedResources.ui.showAboutTalosDialog();
+            }
+        }
     }
 
     private void askToSaveFile (String extension, Consumer<FileHandle> saveCallback) {
