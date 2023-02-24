@@ -60,6 +60,5 @@
     <menu name="help" title="Help">
         <menu name="about" title="About Talos"/>
         <menu name="docs" title="Online Documentation"/>
-        <menu name="updates" title="Check for Updates"/>
     </menu>
 </root>
