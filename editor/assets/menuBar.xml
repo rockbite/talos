@@ -59,7 +59,12 @@
     </menu>
     <menu name="help" title="Help">
         <menu name="about" title="About Talos"/>
+<<<<<<< Updated upstream
         <menu name="docs" title="Online Documentation"/>
         <menu name="updates" title="Check for Updates"/>
+=======
+<!--        TODO: Add docs, back when we have decent documentation -->
+<!--        <menu name="docs" title="Online Documentation"/>-->
+>>>>>>> Stashed changes
     </menu>
 </root>
