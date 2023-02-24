@@ -14,7 +14,7 @@
         <separator/>
         <menu name="save" title="Save"/>
         <separator/>
-<!--        Need to decide on this -->
+<!--        TODO: Need to decide on this -->
 <!--        <menu name="import" title="Import">-->
 <!--            <inject name="other" />-->
 <!--        </menu>-->
@@ -37,9 +37,9 @@
         <menu name="preferences" title="Preferences"/>
     </menu>
     <menu name="window" title="Window">
-<!--        does not need panels item for now, because there are no usable items -->
+<!--        TODO: does not need panels item for now, because there are no usable items -->
 <!--        <menu name="panels" title="Panels">-->
-<!--&lt;!&ndash;            does not need close_all for now, because floating panels feature is not present &ndash;&gt;-->
+<!--&lt;!&ndash;            TODO: does not need close_all for now, because floating panels feature is not present &ndash;&gt;-->
 <!--&lt;!&ndash;            <menu name="close_all" title="Close all floating panels"/>&ndash;&gt;-->
 <!--            <separator/>-->
 <!--            <inject name="panel_list"/>-->
@@ -59,6 +59,7 @@
     </menu>
     <menu name="help" title="Help">
         <menu name="about" title="About Talos"/>
-        <menu name="docs" title="Online Documentation"/>
+<!--        TODO: Add docs, back when we have decent documentation -->
+<!--        <menu name="docs" title="Online Documentation"/>-->
     </menu>
 </root>
