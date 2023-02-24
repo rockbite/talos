@@ -86,6 +86,10 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
 
     @Override
     protected void onBaseStageSelected () {
+        if (gameAsset == null) {
+            return;
+        }
+
         Notifications.fireEvent(Notifications.obtainEvent(PropertyHolderSelected.class).setTarget(PropertyWrapperProviders.getOrCreateHolder(this.gameAsset.getResource())));
     }
 

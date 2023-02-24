@@ -61,6 +61,5 @@
         <menu name="about" title="About Talos"/>
 <!--        TODO: Add docs, back when we have decent documentation -->
 <!--        <menu name="docs" title="Online Documentation"/>-->
-        <menu name="updates" title="Check for Updates"/>
     </menu>
 </root>

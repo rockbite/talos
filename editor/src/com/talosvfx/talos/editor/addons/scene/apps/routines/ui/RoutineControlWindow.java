@@ -63,6 +63,12 @@ public class RoutineControlWindow extends Table {
         playButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+
+                // TODO: 23.02.23 dummy refactor
+                if (routineStage.data == null) {
+                    return;
+                }
+
                 if(routineStage.isPlaying()) {
                     routineStage.stop(getSelected());
                     updatePlayState();
@@ -83,6 +89,12 @@ public class RoutineControlWindow extends Table {
         pauseButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+
+                // TODO: 23.02.23 dummy refactor
+                if (routineStage.data == null) {
+                    return;
+                }
+
                 if(routineStage.isPaused()) {
                     routineStage.resume(getSelected());
                     updatePauseState();
@@ -104,6 +116,10 @@ public class RoutineControlWindow extends Table {
         speedValueWidget.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
+                if (routineStage.data == null) {
+                    return;
+                }
+
                 routineStage.setTimeScale(speedValueWidget.getValue(), getSelected());
             }
         });
@@ -117,6 +133,11 @@ public class RoutineControlWindow extends Table {
         cameraLockBtn.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
+                // TODO: 23.02.23 dummy refactor
+                if (routineStage.data == null) {
+                    return;
+                }
+
                 routineStage.lockCamera(cameraLockBtn.isChecked(), getSelected());
             }
         });

@@ -5,6 +5,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -40,33 +41,33 @@ public class DummyLayoutApp<T> implements LayoutApp {
 
     private class TabWidget extends Table {
 
-        private Table highlight = new Table();
-        private Table changes = new Table();
-
+        private final Table highlight = new Table();
+        private final Table changes = new Table();
+        private final Table assetUsed = new Table();
 
         public TabWidget () {
+            // highlight table
+            final Image highlightStrip  = new Image(SharedResources.skin.newDrawable("white", ColorLibrary.BORDER_BLUE));
             highlight.setFillParent(true);
+            highlight.add(highlightStrip).expand().fillX().height(4).bottom();
+            highlight.setVisible(false);
             addActor(highlight);
 
-            changes.setFillParent(true);
-            addActor(changes);
-
-            Table highlightPixel = new Table();
-            highlightPixel.setBackground(SharedResources.skin.newDrawable("white", ColorLibrary.BORDER_BLUE));
-
-            highlight.bottom();
-            highlight.defaults().bottom();
-            highlight.add(highlightPixel).growX().height(4).bottom();
-
-            highlight.setVisible(false);
-
-            VisLabel changesLabel = new VisLabel("*");
+            // changes table
+            final  VisLabel changesLabel = new VisLabel("*");
             changesLabel.setColor(ColorLibrary.ORANGE);
-
-            changes.top().left();
-            changes.defaults().top().left();
+            changes.setFillParent(true);
+            changes.top().left().defaults().top().left();
             changes.add(changesLabel).top();
             changes.setVisible(false);
+            addActor(changes);
+
+            // asset used table
+            final Image assetUsedStrip  = new Image(SharedResources.skin.newDrawable("white", ColorLibrary.CHINESE_SILVER));
+            assetUsed.setFillParent(true);
+            assetUsed.add(assetUsedStrip).expand().fillX().height(4).bottom();
+            assetUsed.setVisible(false);
+            addActor(assetUsed);
         }
 
         public void setFocused (boolean focused) {
@@ -78,10 +79,15 @@ public class DummyLayoutApp<T> implements LayoutApp {
             changes.setVisible(hasChangesToShow);
         }
 
+        public void setAssetUsed (boolean isAssetUsed) {
+            assetUsed.setVisible(isAssetUsed);
+        }
+
         @Override
         public void act (float delta) {
             super.act(delta);
             setChanges(DummyLayoutApp.this.baseApp.hasChangesToSave());
+            setAssetUsed(DummyLayoutApp.this.baseApp.hasAssetUsed());
         }
     }
 

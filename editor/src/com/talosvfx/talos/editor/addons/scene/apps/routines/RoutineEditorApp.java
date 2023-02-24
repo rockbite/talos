@@ -156,6 +156,12 @@ public class RoutineEditorApp extends AppManager.BaseApp<RoutineStageData> imple
         }
 
         super.updateForGameAsset(gameAsset);
+
+        // TODO: 23.02.23 dummy refactor
+        if (AppManager.dummyAsset == (GameAsset) gameAsset) {
+            return;
+        }
+
         TalosLocalPrefs.getAppPrefs(gameAsset, this);
 
         routineStage.loadFrom(gameAsset);

@@ -234,6 +234,17 @@ public class AppManager extends InputAdapter implements Observer {
 			return SharedResources.globalSaveStateSystem.isItemChangedAndUnsaved(gameAsset);
 		}
 
+		public boolean hasAssetUsed() {
+			final GameAsset<T> gameAsset = getGameAsset();
+			if (gameAsset != null) {
+				final AppManager.BaseApp<?> focusedApp = SharedResources.appManager.getFocusedApp();
+				if (focusedApp != null) {
+					return gameAsset.equals(focusedApp.getGameAsset());
+				}
+			}
+			return false;
+		}
+
 		@Override
 		public BaseApp<T> getContext() {
 			return this;
@@ -309,6 +320,27 @@ public class AppManager extends InputAdapter implements Observer {
 
 	public <T> boolean canOpenInTalos (GameAsset<T> gameAsset) {
 		return appRegistry.hasAssetType(gameAsset.type);
+	}
+
+	public <T, U extends BaseApp<T>> boolean canOpenInApp (GameAsset<T> asset, Class<U> app) {
+		// TODO: 23.02.23 write logic to check if app support singleton asset, hacked for now.
+		//  Currently ProjectExplorer is the only app, that works wth singleton asset.
+		if (asset.equals(singletonAsset)) {
+			if (app.equals(ProjectExplorerApp.class)) {
+				return true;
+			} else {
+				return false;
+			}
+		} else if (asset.equals(dummyAsset)) {
+			// technically all apps support dummy app for now
+			return true;
+		}
+
+		if (!canOpenInTalos(asset)) {
+			return false;
+		}
+
+		return appRegistry.getAppsForGameAssetType(asset).contains((Class<BaseApp<T>>) app, false);
 	}
 
 	public <T, U extends BaseApp<T>> U openAppIfNotOpened (GameAsset<T> asset, Class<U> app) {

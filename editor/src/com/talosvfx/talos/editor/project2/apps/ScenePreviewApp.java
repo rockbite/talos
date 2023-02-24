@@ -52,6 +52,11 @@ public class ScenePreviewApp extends AppManager.BaseApp<Scene> implements Observ
     public void updateForGameAsset(GameAsset<Scene> gameAsset) {
         super.updateForGameAsset(gameAsset);
 
+        // TODO: 23.02.23 dummy refactor
+        if (AppManager.dummyAsset == (GameAsset) gameAsset) {
+            return;
+        }
+
         workspaceWidget.setFromGameAsset(gameAsset);
 
         TalosLocalPrefs.getAppPrefs(gameAsset, this);
