@@ -271,35 +271,25 @@ public class ModuleBoardWidget extends WidgetGroup {
                 super.touchDown(event, x, y, pointer, button);
 
                 if (!event.isHandled()) {
-                    clearSelection();
-                    stage.unfocusAll();
-                    return false;
+                    if (button == 1) {
+                        clearSelection();
+                        showPopup();
+                        return true;
+                    } else {
+                        clearSelection();
+                        stage.unfocusAll();
+                        return false;
+                    }
                 }
-
-
                 return false;
             }
         });
     }
 
+
     public void sendInUIStage (Stage stage) {
         uiStage = stage;
 
-        uiStage.addListener(new InputListener() {
-            @Override
-            public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
-                super.touchDown(event, x, y, pointer, button);
-
-                if (button == 1) {
-                    clearSelection();
-                    showPopup();
-                    return true;
-                }
-
-
-                return false;
-            }
-        });
     }
 
     public static class ClipboardPayload {
