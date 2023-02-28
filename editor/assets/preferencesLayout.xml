@@ -14,7 +14,7 @@
             <block name="general" title="General">
                 <path name = "exportPath" default=""  project="true">Export Path</path>
 <!--                TODO: bring back when re-doing scripts -->
-<!--                <string name="exportScript" project="true" default="">Export Script Relative</string>-->
+<!--                <string name="exportScript" project="true" default="">Export Script</string>-->
             </block>
         </tab>
         <tab name="keymap" title="Keymap">
