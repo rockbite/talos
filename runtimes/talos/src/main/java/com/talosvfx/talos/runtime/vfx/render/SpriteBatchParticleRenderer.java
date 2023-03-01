@@ -34,7 +34,6 @@ import com.talosvfx.talos.runtime.vfx.modules.MeshGeneratorModule;
 import com.talosvfx.talos.runtime.vfx.modules.ParticlePointDataGeneratorModule;
 import com.talosvfx.talos.runtime.vfx.modules.SpriteMaterialModule;
 import com.talosvfx.talos.runtime.vfx.utils.DefaultShaders;
-import com.talosvfx.talos.runtime.vfx.values.DrawableValue;
 
 public class SpriteBatchParticleRenderer implements ParticleRenderer {
 
@@ -127,8 +126,6 @@ public class SpriteBatchParticleRenderer implements ParticleRenderer {
 	@Override
 	public void render (float[] verts, MaterialModule materialModule) {
 		if (materialModule instanceof SpriteMaterialModule) {
-			DrawableValue drawableValue = ((SpriteMaterialModule)materialModule).getDrawableValue();
-			TextureRegion textureRegion = drawableValue.getDrawable().getTextureRegion();
 
 
 		}

@@ -9,12 +9,10 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.talosvfx.talos.runtime.vfx.Particle;
-import com.talosvfx.talos.runtime.vfx.ParticleDrawable;
 import com.talosvfx.talos.runtime.vfx.ParticlePointData;
 import com.talosvfx.talos.runtime.vfx.ParticlePointGroup;
 import com.talosvfx.talos.runtime.vfx.ScopePayload;
 import com.talosvfx.talos.runtime.vfx.render.ParticleRenderer;
-import com.talosvfx.talos.runtime.vfx.values.DrawableValue;
 import com.talosvfx.talos.runtime.vfx.values.ModuleValue;
 import com.talosvfx.talos.runtime.vfx.values.NumericalValue;
 
