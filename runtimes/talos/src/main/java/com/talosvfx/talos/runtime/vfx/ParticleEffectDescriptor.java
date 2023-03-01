@@ -21,13 +21,15 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.Json;
-import com.talosvfx.talos.runtime.vfx.assets.AssetProvider;
+import com.talosvfx.talos.runtime.assets.BaseAssetRepository;
 import com.talosvfx.talos.runtime.vfx.modules.AbstractModule;
 import com.talosvfx.talos.runtime.vfx.modules.DrawableModule;
 import com.talosvfx.talos.runtime.vfx.modules.EmitterModule;
 import com.talosvfx.talos.runtime.vfx.modules.ParticleModule;
 import com.talosvfx.talos.runtime.vfx.serialization.ConnectionData;
 import com.talosvfx.talos.runtime.vfx.serialization.ExportData;
+import lombok.Getter;
+import lombok.Setter;
 
 public class ParticleEffectDescriptor {
 
@@ -36,22 +38,19 @@ public class ParticleEffectDescriptor {
 	 */
 	public Array<ParticleEmitterDescriptor> emitterModuleGraphs = new Array<>();
 
-	private AssetProvider assetProvider;
-
 	private ParticleEffectInstance processsingEffectReference;
 
 	public ParticleEffectDescriptor () {
 
 	}
 
-	public ParticleEffectDescriptor(FileHandle fileHandle, AssetProvider provider) {
-		setAssetProvider(provider);
+	public ParticleEffectDescriptor (FileHandle fileHandle, BaseAssetRepository assetRepository) {
 		load(fileHandle);
 	}
 
 	public void addEmitter (ParticleEmitterDescriptor emitter) {
-	    emitterModuleGraphs.add(emitter);
-    }
+		emitterModuleGraphs.add(emitter);
+	}
 
 	public void removeEmitter (ParticleEmitterDescriptor emitter) {
 		emitterModuleGraphs.removeValue(emitter, true);
@@ -69,7 +68,7 @@ public class ParticleEffectDescriptor {
 	public static ExportData getExportData (FileHandle fileHandle) {
 		Json json = new Json();
 		ParticleEmitterDescriptor.registerModules();
-		for (Class clazz: ParticleEmitterDescriptor.registeredModules) {
+		for (Class clazz : ParticleEmitterDescriptor.registeredModules) {
 			json.addClassTag(clazz.getSimpleName(), clazz);
 		}
 
@@ -131,11 +130,11 @@ public class ParticleEffectDescriptor {
 		}
 	}
 
-	public ParticleEffectInstance createEffectInstance() {
+	public ParticleEffectInstance createEffectInstance () {
 		ParticleEffectInstance particleEffectInstance = new ParticleEffectInstance(this);
 		setEffectReference(particleEffectInstance);
 
-		for(ParticleEmitterDescriptor emitterDescriptor: emitterModuleGraphs) {
+		for (ParticleEmitterDescriptor emitterDescriptor : emitterModuleGraphs) {
 			particleEffectInstance.addEmitter(emitterDescriptor);
 		}
 
@@ -147,15 +146,15 @@ public class ParticleEffectDescriptor {
 		return particleEffectInstance;
 	}
 
-	public boolean isContinuous() {
-		for(ParticleEmitterDescriptor emitterDescriptor: emitterModuleGraphs) {
-			if(emitterDescriptor.getEmitterModule() == null || emitterDescriptor.getParticleModule() == null) {
+	public boolean isContinuous () {
+		for (ParticleEmitterDescriptor emitterDescriptor : emitterModuleGraphs) {
+			if (emitterDescriptor.getEmitterModule() == null || emitterDescriptor.getParticleModule() == null) {
 				return false;
 			}
-			if(getInstanceReference() == null) {
+			if (getInstanceReference() == null) {
 				return false;
 			}
-			if(emitterDescriptor.isContinuous()) {
+			if (emitterDescriptor.isContinuous()) {
 				return true;
 			}
 		}
@@ -163,26 +162,19 @@ public class ParticleEffectDescriptor {
 		return false;
 	}
 
-	public AssetProvider getAssetProvider () {
-		return assetProvider;
-	}
-
-	public void setAssetProvider (AssetProvider assetProvider) {
-		this.assetProvider = assetProvider;
-	}
-
-	public void setEffectReference(ParticleEffectInstance particleEffectInstance) {
+	public void setEffectReference (ParticleEffectInstance particleEffectInstance) {
 		processsingEffectReference = particleEffectInstance;
 	}
 
-	public ParticleEffectInstance getInstanceReference() {
+	public ParticleEffectInstance getInstanceReference () {
 		return processsingEffectReference;
 	}
 
-
 	public boolean different (ParticleEffectDescriptor descriptor) {
-		if (this != descriptor) return true;
-		if (this.emitterModuleGraphs.size != descriptor.emitterModuleGraphs.size) return true;
+		if (this != descriptor)
+			return true;
+		if (this.emitterModuleGraphs.size != descriptor.emitterModuleGraphs.size)
+			return true;
 
 		return false;
 	}

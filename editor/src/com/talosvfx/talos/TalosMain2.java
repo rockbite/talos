@@ -14,7 +14,6 @@ import com.kotcrab.vis.ui.VisUI;
 import com.rockbite.bongo.engine.render.PolygonSpriteBatchMultiTextureMULTIBIND;
 import com.rockbite.bongo.engine.systems.RenderPassSystem;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
-import com.talosvfx.talos.editor.assets.TalosAssetProvider;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.commands.CommandsSystem;
 import com.talosvfx.talos.editor.notifications.events.FinishInitializingEvent;
@@ -59,7 +58,6 @@ public class TalosMain2 extends ApplicationAdapter {
 		SharedResources.globalDragAndDrop = new GlobalDragAndDrop();
 		SharedResources.globalSaveStateSystem = new GlobalSaveStateSystem();
 		SharedResources.commandsSystem = this.commandsSystem;
-		TalosVFXUtils.talosAssetProvider = new TalosAssetProvider();
 
 		RuntimeContext instance = RuntimeContext.getInstance();
 		instance.AssetRepository = AssetRepository.getInstance();

@@ -18,7 +18,6 @@ package com.talosvfx.talos.editor.serialization;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.*;
-import com.talosvfx.talos.editor.assets.TalosAssetProvider;
 import com.talosvfx.talos.editor.project2.TalosVFXUtils;
 import com.talosvfx.talos.editor.wrappers.ModuleWrapper;
 import com.talosvfx.talos.editor.wrappers.WrapperRegistry;
@@ -37,20 +36,6 @@ public class VFXProjectSerializer {
      * Very naughty
      * @param data
      */
-    public void prereadhack (String data) {
-        JsonReader jsonReader = new JsonReader();
-        final JsonValue parse = jsonReader.parse(data);
-        final JsonValue metaData = parse.get("metaData");
-        if(metaData != null) {
-            final JsonValue resourcePaths = metaData.get("resourcePaths");
-            if (resourcePaths != null) {
-                final TalosAssetProvider projectAssetProvider = TalosVFXUtils.talosAssetProvider;
-                for (JsonValue resourcePath : resourcePaths) {
-                    projectAssetProvider.addUnknownResource(resourcePath.asString());
-                }
-            }
-        }
-    }
 
     public static VFXProjectData readTalosTLSProject (FileHandle fileHandle) {
         if(!fileHandle.exists()) return null;

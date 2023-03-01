@@ -102,9 +102,7 @@ public class QuadMeshGeneratorModule extends MeshGeneratorModule {
 		float V2 = 1f;
 
 		if (materialModule instanceof SpriteMaterialModule) {
-			DrawableValue drawableValue = ((SpriteMaterialModule)materialModule).getDrawableValue();
-			ParticleDrawable drawable = drawableValue.getDrawable();
-			TextureRegion textureRegion = drawable.getTextureRegion();
+			TextureRegion textureRegion = ((SpriteMaterialModule)materialModule).getTextureRegion();
 			U = textureRegion.getU();
 			U2 = textureRegion.getU2();
 			V = textureRegion.getV();

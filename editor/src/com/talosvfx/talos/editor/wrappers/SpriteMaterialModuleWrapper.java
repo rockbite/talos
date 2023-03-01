@@ -42,7 +42,7 @@ public class SpriteMaterialModuleWrapper extends ModuleWrapper<SpriteMaterialMod
 
     @Override
     public void setModuleToDefaults () {
-        module.assetIdentifier = "white";
+        module.setToDefault();
     }
 
     @Override
@@ -65,7 +65,7 @@ public class SpriteMaterialModuleWrapper extends ModuleWrapper<SpriteMaterialMod
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 asset = selector.getValue();
-                module.setAsset(asset.nameIdentifier);
+                module.setGameAsset(asset);
             }
         });
     }

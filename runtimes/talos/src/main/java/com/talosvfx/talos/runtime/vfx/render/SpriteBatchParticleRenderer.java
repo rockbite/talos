@@ -137,8 +137,7 @@ public class SpriteBatchParticleRenderer implements ParticleRenderer {
 	@Override
 	public void render (float[] verts, int vertCount, short[] tris, int triCount, MaterialModule materialModule) {
 		if (materialModule instanceof SpriteMaterialModule) {
-			DrawableValue drawableValue = ((SpriteMaterialModule)materialModule).getDrawableValue();
-			TextureRegion textureRegion = drawableValue.getDrawable().getTextureRegion();
+			TextureRegion textureRegion = ((SpriteMaterialModule)materialModule).getTextureRegion();
 
 			final Texture texture = textureRegion.getTexture();
 

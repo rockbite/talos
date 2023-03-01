@@ -35,7 +35,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.kotcrab.vis.ui.VisUI;
 import com.kotcrab.vis.ui.widget.VisTextButton;
-import com.talosvfx.talos.runtime.assets.AtlasAssetProvider;
 import com.talosvfx.talos.runtime.test.utils.CameraController;
 import com.talosvfx.talos.runtime.vfx.ParticleEffectDescriptor;
 import com.talosvfx.talos.runtime.vfx.ParticleEffectInstance;
@@ -78,8 +77,7 @@ public class ParticleControlTest extends ApplicationAdapter {
 		atlas.addRegion("spot", new TextureRegion(new TextureRegion(new Texture(Gdx.files.internal("spot.png")))));
 
 
-		AtlasAssetProvider atlasAssetProvider = new AtlasAssetProvider(atlas);
-		ParticleEffectDescriptor descriptor = new ParticleEffectDescriptor(Gdx.files.internal("test.p"), atlasAssetProvider);
+		ParticleEffectDescriptor descriptor = new ParticleEffectDescriptor(Gdx.files.internal("test.p"), null);
 
 
 		particleEffectInstance = descriptor.createEffectInstance();

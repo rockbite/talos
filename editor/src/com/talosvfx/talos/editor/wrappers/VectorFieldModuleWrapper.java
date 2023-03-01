@@ -8,13 +8,16 @@ import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.project.FileTracker;
-import com.talosvfx.talos.editor.assets.TalosAssetProvider;
 import com.talosvfx.talos.editor.project2.TalosVFXUtils;
 import com.talosvfx.talos.runtime.vfx.modules.VectorFieldModule;
 import com.talosvfx.talos.runtime.vfx.utils.VectorField;
 import com.talosvfx.talos.editor.widgets.ui.common.zoomWidgets.LabelWithZoom;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class VectorFieldModuleWrapper extends ModuleWrapper<VectorFieldModule> {
+
+    private static final Logger logger = LoggerFactory.getLogger(VectorFieldModuleWrapper.class);
 
     Label vectorFieldLabel;
 
@@ -43,18 +46,20 @@ public class VectorFieldModuleWrapper extends ModuleWrapper<VectorFieldModule> {
             FileHandle handle = Gdx.files.absolute(path);
             VectorField vectorField = new VectorField();
             vectorField.setBakedData(handle);
-            TalosAssetProvider assetProvider = TalosVFXUtils.talosAssetProvider;
-            assetProvider.addVectorField(handle.nameWithoutExtension(), vectorField);
-            setVectorField(vectorField, handle.nameWithoutExtension());
+
+            logger.error("File drop vector field redo");
+//            TalosAssetProvider assetProvider = TalosVFXUtils.talosAssetProvider;
+//            assetProvider.addVectorField(handle.nameWithoutExtension(), vectorField);
+//            setVectorField(vectorField, handle.nameWithoutExtension());
 
             TalosMain.Instance().FileTracker().trackFile(handle, new FileTracker.Tracker() {
                 @Override
                 public void updated(FileHandle handle) {
                     VectorField vectorField = new VectorField();
                     vectorField.setBakedData(handle);
-                    TalosAssetProvider assetProvider = TalosVFXUtils.talosAssetProvider;
-                    assetProvider.addVectorField(handle.nameWithoutExtension(), vectorField);
-                    setVectorField(vectorField, handle.nameWithoutExtension());
+//                    TalosAssetProvider assetProvider = TalosVFXUtils.talosAssetProvider;
+//                    assetProvider.addVectorField(handle.nameWithoutExtension(), vectorField);
+//                    setVectorField(vectorField, handle.nameWithoutExtension());
                 }
             });
         }
