@@ -870,7 +870,6 @@ public class FilteredTree<T> extends WidgetGroup {
                 matchingNode.node.setVisible(true);
                 setAllParentsNotFiltered(matchingNode.node);
                 setAllChildrenNotFiltered(matchingNode.node);
-                System.out.println("MATCHED " + matchingNode.node.name +" " + matchingNode.score + " " + matchingNode.contained);
             } else {
                 matchingNode.node.filtered = true;
                 matchingNode.node.setVisible(false);
