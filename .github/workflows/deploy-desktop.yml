@@ -61,6 +61,6 @@ jobs:
             Developer: [`${{ github.actor }}`](https://github.com/${{ github.actor }})
             GH Actions Run: [`${{ github.run_id }}`](https://github.com/${{github.repository}}/actions/runs/${{github.run_id}}) 
             Commit SHA: [`${{ github.sha }}`](https://github.com/${{github.repository}}/commit/${{github.sha}})
-            Branch: [`${{ GITHUB_REF_NAME }}`]
+            Branch: [`${{ github.ref_name }}`]
             State: [`${{ job.status }}`]
           embed-color: 15548997
