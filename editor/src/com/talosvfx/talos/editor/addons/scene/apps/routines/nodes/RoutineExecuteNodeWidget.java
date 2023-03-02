@@ -16,6 +16,7 @@ import com.talosvfx.talos.editor.nodes.widgets.GameAssetWidget;
 import com.talosvfx.talos.editor.nodes.widgets.TextValueWidget;
 import com.talosvfx.talos.editor.project2.apps.ScenePreviewApp;
 import com.talosvfx.talos.runtime.scene.SavableContainer;
+import com.talosvfx.talos.runtime.scene.Scene;
 import com.talosvfx.talos.runtime.scene.components.CameraComponent;
 
 public class RoutineExecuteNodeWidget extends AbstractRoutineNodeWidget {
@@ -50,7 +51,7 @@ public class RoutineExecuteNodeWidget extends AbstractRoutineNodeWidget {
         nodeStage.resetNodes();
 
         GameAssetWidget assetWidget = (GameAssetWidget)getWidget("scene");
-        GameAsset sceneAsset = assetWidget.getValue();
+        GameAsset<Scene> sceneAsset = assetWidget.getValue();
 
         GameObject cameraGO = null;
 
@@ -58,6 +59,15 @@ public class RoutineExecuteNodeWidget extends AbstractRoutineNodeWidget {
         if(sceneAsset != null && sceneAsset.type == GameAssetType.SCENE) {
             ScenePreviewApp scenePreviewApp = nodeStage.openPreviewWindow(sceneAsset);
             scenePreviewApp.reload();
+
+            container = scenePreviewApp.getWorkspaceWidget().currentScene;
+            Array<GameObject> cameraGoList = container.root.getChildrenByComponent(CameraComponent.class, new Array<>());
+            if(cameraGoList != null && !cameraGoList.isEmpty()) {
+                cameraGO = cameraGoList.first();
+            } else {
+                cameraGO = null;
+            }
+
         } else {
             return false;
         }
