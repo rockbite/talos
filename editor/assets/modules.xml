@@ -32,10 +32,6 @@
         <module name = "Color" wrapper = "ColorModuleWrapper">ColorModule</module>
         <module name = "Gradient" wrapper = "GradientColorModuleWrapper">GradientColorModule</module>
     </category>
-    <category name = "Rendering">
-        <module name = "Ribbon Renderer" wrapper = "RibbonModuleWrapper">RibbonModule</module>
-        <module name = "Nine Patch Renderer" wrapper = "NinePatchModuleWrapper">NinePatchModule</module>
-    </category>
     <category name = "Materials">
         <module name = "SpriteMaterial" wrapper = "SpriteMaterialModuleWrapper">SpriteMaterialModule</module>
     </category>

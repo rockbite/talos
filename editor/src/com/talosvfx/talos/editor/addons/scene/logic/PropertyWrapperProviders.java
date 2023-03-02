@@ -164,6 +164,7 @@ public class PropertyWrapperProviders {
 			throw new GdxRuntimeException("Holder must be registered in PropertyWrapperProviders");
 		}
 
+		logger.error("Holder must be registered in PropertyWrapperProviders for type: {}", clazz);
 		throw new GdxRuntimeException("Holder must be registered in PropertyWrapperProviders");
 	}
 
