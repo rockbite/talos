@@ -108,6 +108,7 @@ public class ParticleEmitterDescriptor {
             registeredModules.add(SingleParticlePointDataGeneratorModule.class);
             registeredModules.add(QuadMeshGeneratorModule.class);
             registeredModules.add(SpriteMaterialModule.class);
+            registeredModules.add(DrawableModule.class);
         }
     }
 
