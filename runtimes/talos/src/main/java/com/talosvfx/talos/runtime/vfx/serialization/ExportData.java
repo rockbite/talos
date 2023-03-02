@@ -26,6 +26,8 @@ import java.util.function.Supplier;
 
 public class ExportData extends BaseVFXProjectData {
 
+    public ExportData () {}
+
     public Array<EmitterExportData> emitters = new Array<>();
 
     public ExportMetadata metadata = new ExportMetadata();
@@ -50,12 +52,16 @@ public class ExportData extends BaseVFXProjectData {
     public static class ExportMetadata {
         public Array<String> resources = new Array<>();
         public String versionString;
+
+        public ExportMetadata () {}
     }
 
     public static class EmitterExportData {
         public String name;
         public Array<AbstractModule> modules = new Array<>();
         public Array<ConnectionData> connections = new Array<>();
+
+        public EmitterExportData () {}
 
         @Override
         public String toString () {
