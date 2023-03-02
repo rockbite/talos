@@ -211,7 +211,6 @@ public abstract class DynamicNodeStage<T extends DynamicNodeStageData> extends W
                     nodeBoard.clearSelection();
                 }
 
-                selectionRect.setVisible(false);
 
                 // TODO: 23.02.23 dummy refactor
                 if (data == null) {
@@ -223,6 +222,7 @@ public abstract class DynamicNodeStage<T extends DynamicNodeStageData> extends W
 
                 if(selectionRect.isVisible()) {
                     nodeBoard.userSelectionApply(rectangle);
+                    selectionRect.setVisible(false);
                 }
 
             }
