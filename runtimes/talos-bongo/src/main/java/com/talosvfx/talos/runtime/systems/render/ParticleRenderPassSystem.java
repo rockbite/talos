@@ -30,7 +30,6 @@ import com.talosvfx.talos.runtime.vfx.modules.ParticlePointDataGeneratorModule;
 import com.talosvfx.talos.runtime.vfx.modules.SpriteMaterialModule;
 import com.talosvfx.talos.runtime.vfx.render.ParticleRenderer;
 import com.talosvfx.talos.runtime.vfx.render.p3d.Simple3DBatch;
-import com.talosvfx.talos.runtime.vfx.values.DrawableValue;
 
 public class ParticleRenderPassSystem extends RenderPassSystem implements ParticleRenderer {
 

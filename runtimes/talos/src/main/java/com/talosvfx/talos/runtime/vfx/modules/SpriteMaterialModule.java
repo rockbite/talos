@@ -27,16 +27,11 @@ import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.runtime.assets.GameAssetType;
 import com.talosvfx.talos.runtime.assets.GameResourceOwner;
 import com.talosvfx.talos.runtime.vfx.ParticleEmitterDescriptor;
-import com.talosvfx.talos.runtime.vfx.render.drawables.TextureRegionDrawable;
-import com.talosvfx.talos.runtime.vfx.values.DrawableValue;
 import com.talosvfx.talos.runtime.vfx.values.ModuleValue;
 
-import java.util.UUID;
 
 public class SpriteMaterialModule extends MaterialModule implements GameResourceOwner<Texture>, GameAsset.GameAssetUpdateListener {
 
-	@Deprecated
-	private DrawableValue userDrawable;
 
 	private transient TextureRegion region;
 
@@ -54,14 +49,7 @@ public class SpriteMaterialModule extends MaterialModule implements GameResource
 		moduleOutput = new ModuleValue<>();
 		moduleOutput.setModule(this);
 
-		userDrawable = new DrawableValue();
-		userDrawable.setEmpty(true);
-
 		createOutputSlot(MATERIAL_MODULE, moduleOutput);
-	}
-
-	public DrawableValue getDrawableValue () {
-		return userDrawable;
 	}
 
 	@Override
