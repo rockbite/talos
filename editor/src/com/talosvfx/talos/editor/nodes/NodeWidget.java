@@ -127,6 +127,7 @@ public abstract class NodeWidget extends EmptyWindow implements Json.Serializabl
         widgetClassMap.put("dynamicValue", ValueWidget.class);
         widgetClassMap.put("inputText", TextValueWidget.class);
         widgetClassMap.put("button", ButtonWidget.class);
+        widgetClassMap.put("goSelector", GOSelectionWidget.class);
         // group is handled manually for now
     }
 

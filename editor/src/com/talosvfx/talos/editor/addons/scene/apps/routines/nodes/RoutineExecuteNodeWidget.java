@@ -6,6 +6,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.XmlReader;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.RoutineStage;
+import com.talosvfx.talos.editor.nodes.widgets.GOSelectionWidget;
 import com.talosvfx.talos.runtime.routine.RoutineInstance;
 import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.runtime.assets.GameAssetType;
@@ -38,6 +39,10 @@ public class RoutineExecuteNodeWidget extends AbstractRoutineNodeWidget {
                startPlay();
             }
         });
+
+        // super hacker
+        GOSelectionWidget goSelectionWidget = (GOSelectionWidget)getWidget("target");
+        goSelectionWidget.setRoutineExecuteNodeWidget(this);
 
     }
 

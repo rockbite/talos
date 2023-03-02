@@ -278,7 +278,14 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
             String key = stringAbstractWidgetEntry.key;
             AbstractWidget value = stringAbstractWidgetEntry.value;
 
-            if (value instanceof TextValueWidget || value instanceof SelectWidget || value instanceof ValueWidget || value instanceof GameAssetWidget || value instanceof ColorWidget || value instanceof CheckBoxWidget || value instanceof ProbabilityChoiceWidget.ProbabilityWidget) {
+            if (value instanceof TextValueWidget
+                    || value instanceof SelectWidget
+                    || value instanceof ValueWidget
+                    || value instanceof GameAssetWidget
+                    || value instanceof ColorWidget
+                    || value instanceof CheckBoxWidget
+                    || value instanceof ProbabilityChoiceWidget.ProbabilityWidget
+                    || value instanceof GOSelectionWidget) {
                 logicNode.setProperty(key, value.getValue());
                 setRoutineDirty = true;
             }
