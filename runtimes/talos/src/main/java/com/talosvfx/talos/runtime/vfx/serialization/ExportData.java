@@ -26,7 +26,9 @@ import java.util.function.Supplier;
 
 public class ExportData extends BaseVFXProjectData {
 
-    public ExportData () {}
+    public ExportData () {
+        super();
+    }
 
     public Array<EmitterExportData> emitters = new Array<>();
 
