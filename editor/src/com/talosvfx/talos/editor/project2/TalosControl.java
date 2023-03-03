@@ -129,6 +129,13 @@ public class TalosControl implements Observer {
             }
         }
 
+        if(event.getPath().equals("edit/undo")) {
+            SharedResources.globalSaveStateSystem.onUndoRequest();
+        }
+        if(event.getPath().equals("edit/redo")) {
+            SharedResources.globalSaveStateSystem.onRedoRequest();
+        }
+
         if(event.getPath().equals("file/new/routine")) {
             // create routine
             askToSaveFile("rt", (newScriptDestination) -> newScriptDestination.writeString("{}", false));
