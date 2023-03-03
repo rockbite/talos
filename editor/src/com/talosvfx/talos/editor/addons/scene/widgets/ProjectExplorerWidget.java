@@ -252,12 +252,13 @@ public class ProjectExplorerWidget extends Table implements Observer {
             }
         };
 
-		String pathString = "";
-		for (String path : paths) {
-			pathString += path + "\n";
+        String[] message = new String[paths.size + 1];
+        message[0] = "Are you sure you want to delete the paths:";
+		for (int i = 0; i < paths.size; i++) {
+            message[i + 1] = paths.get(i);
 		}
 
-        showYesNoDialog("Delete files?", "Are you sure you want to delete the paths: \n" + pathString, runnable, new Runnable() {
+        showYesNoDialog("Delete files?", message, runnable, new Runnable() {
             @Override
             public void run () {
 
@@ -811,10 +812,17 @@ public class ProjectExplorerWidget extends Table implements Observer {
         select(event.getNewHandle().path());
     }
 
+    /** Use for short messages. */
     public void showYesNoDialog (String title, String message, Runnable yes, Runnable no) {
 		YesNoDialog yesNoDialog = new YesNoDialog(title, message, yes, no);
 		getStage().addActor(yesNoDialog.fadeIn());
 	}
+
+    /** Use for long messages. */
+    public void showYesNoDialog (String title, String[] message, Runnable yes, Runnable no) {
+        YesNoDialog yesNoDialog = new YesNoDialog(title, message, yes, no);
+        getStage().addActor(yesNoDialog.fadeIn());
+    }
 
     public void showKeepStopReplaceDialog (String title, String message, Runnable keep, Runnable stop, Runnable replace) {
         KeepStopReplaceDialog keepStopReplaceDialog = new KeepStopReplaceDialog(title, message, keep, stop, replace);
