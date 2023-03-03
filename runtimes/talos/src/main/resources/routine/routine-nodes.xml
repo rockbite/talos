@@ -4,7 +4,7 @@
             <value port="input" name="startSignal" type="signal">execute</value>
             <inputText name="title" default="main">Title</inputText>
             <asset name="scene" type="SCENE">scene</asset>
-            <inputText name="target" default="">Target</inputText>
+            <goSelector name="target" default="">Target</goSelector>
             <button name="playButton">Play</button>
             <value port="output" name="outSignal" type="signal">start</value>
         </module>
@@ -430,11 +430,6 @@
                 <value port="input" name="in3" type="signal">in</value>
             </group>
             <value port="output" name="out" type="signal">out</value>
-        </module>
-        <module name = "GOSelectorNode" title = "Game Object Selector" keywords = "" class = "RoutineNodeWidget">
-            <value port="input" name="input" type="signal">in</value>
-            <inputText name="target" default="">Target</inputText>
-            <value port="output" name="outSignal" type="signal">out</value>
         </module>
         <module name = "SetVisibilityNode" title = "Set Visibility" keywords = "" class = "RoutineNodeWidget">
             <value port="input" name="input" type="signal">in</value>
