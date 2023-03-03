@@ -5,9 +5,11 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.kotcrab.vis.ui.widget.color.ColorPicker;
 import com.kotcrab.vis.ui.widget.color.ColorPickerAdapter;
+import com.talosvfx.talos.editor.notifications.TalosEvent;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 
@@ -79,8 +81,10 @@ public class ColorPropertyWidget extends PropertyWidget<Color> {
     @Override
     public Actor getSubWidget() {
         Skin skin = SharedResources.skin;
+        Table wrapper = new Table();
+        wrapper.setSize(20,20);
+        wrapper.setBackground(skin.newDrawable("transparent"));
         box = new Image(skin.newDrawable(ColorLibrary.SHAPE_SQUARE));
-        box.setSize(20, 20);
 
         box.addListener(new ClickListener() {
             @Override
@@ -89,8 +93,9 @@ public class ColorPropertyWidget extends PropertyWidget<Color> {
                 SharedResources.stage.addActor(colorPicker.fadeIn());
             }
         });
+        wrapper.add(box).grow();
 
-        return box;
+        return wrapper;
     }
 
     @Override
