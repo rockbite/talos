@@ -50,6 +50,7 @@ import com.kotcrab.vis.ui.widget.VisLabel;
 import com.kotcrab.vis.ui.widget.VisSelectBox;
 import com.kotcrab.vis.ui.widget.VisTable;
 import com.kotcrab.vis.ui.widget.VisTextField;
+import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.EightPointGizmo;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.render.Render;
 import com.talosvfx.talos.editor.addons.scene.events.GameObjectSelectionChanged;
@@ -704,10 +705,10 @@ public abstract class ViewportWidget extends Table {
 		}
 
 		//Lets check for 'smart' linking
-		if (gameObjectGizmoMap.containsKey(TransformGizmo.class) && gameObjectGizmoMap.containsKey(SpriteTransformGizmo.class)) {
+		if (gameObjectGizmoMap.containsKey(TransformGizmo.class) && gameObjectGizmoMap.containsKey(EightPointGizmo.class)) {
 			TransformGizmo transformGizmo = (TransformGizmo)gameObjectGizmoMap.get(TransformGizmo.class);
-			SpriteTransformGizmo smartTransformGizmo = (SpriteTransformGizmo)gameObjectGizmoMap.get(SpriteTransformGizmo.class);
-			transformGizmo.linkToSmart(smartTransformGizmo);
+			EightPointGizmo eightPointGizmo = (EightPointGizmo)gameObjectGizmoMap.get(EightPointGizmo.class);
+			transformGizmo.linkToSmart(eightPointGizmo);
 		}
 
 
@@ -1044,10 +1045,6 @@ public abstract class ViewportWidget extends Table {
 			enableClickListener();
 		}
 
-		for (int i = 0; i < this.gizmos.gizmoList.size; i++) {
-			Gizmo gizmo = this.gizmos.gizmoList.get(i);
-			gizmo.act(delta);
-		}
 	}
 
 	protected void drawAxis () {
@@ -1303,6 +1300,7 @@ public abstract class ViewportWidget extends Table {
 			Gizmo gizmo = this.gizmos.gizmoList.get(i);
 			gizmo.setSizeForUIElements(getWidth(),getWorldWidth() * zoom);
 
+			gizmo.act(Gdx.graphics.getDeltaTime()); //ACt next to gizmo bceause its kind of out of sync with SCene
 			gizmo.draw(batch, parentAlpha);
 		}
 	}

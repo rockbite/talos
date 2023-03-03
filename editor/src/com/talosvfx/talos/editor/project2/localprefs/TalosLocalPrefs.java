@@ -28,6 +28,8 @@ public class TalosLocalPrefs {
 	public static class LocalPrefData {
 		private Array<RecentProject> recentProjects = new Array<>();
 
+		private Array<String> customLayouts = new Array<>();
+
 		@Getter
 		private ObjectMap<String, String> globalPrefs = new ObjectMap<>();
 
@@ -118,6 +120,31 @@ public class TalosLocalPrefs {
 
 		localPrefData.recentProjects.sort();
 		return localPrefData.recentProjects;
+	}
+
+	public Array<String> getCustomLayouts () {
+
+		// reevaluate this list
+		boolean listUpdated = false;
+		for (int i = localPrefData.customLayouts.size - 1; i >= 0; i--) {
+			String customLayout = localPrefData.customLayouts.get(i);
+			if(!Gdx.files.absolute(customLayout).exists()) {
+				localPrefData.customLayouts.removeIndex(i);
+				listUpdated = true;
+			}
+		}
+
+		if (listUpdated) {
+			save();
+		}
+
+		localPrefData.customLayouts.sort();
+		return localPrefData.customLayouts;
+	}
+
+	public void addCustomLayout(String path) {
+		TalosLocalPrefs.Instance().getCustomLayouts().add(path);
+		TalosLocalPrefs.Instance().save();
 	}
 
 	public void setGlobalData(String key, String value) {

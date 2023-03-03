@@ -30,7 +30,6 @@ import com.talosvfx.talos.runtime.vfx.modules.ParticlePointDataGeneratorModule;
 import com.talosvfx.talos.runtime.vfx.modules.SpriteMaterialModule;
 import com.talosvfx.talos.runtime.vfx.render.ParticleRenderer;
 import com.talosvfx.talos.runtime.vfx.render.p3d.Simple3DBatch;
-import com.talosvfx.talos.runtime.vfx.values.DrawableValue;
 
 public class ParticleRenderPassSystem extends RenderPassSystem implements ParticleRenderer {
 
@@ -180,8 +179,8 @@ public class ParticleRenderPassSystem extends RenderPassSystem implements Partic
 	@Override
 	public void render (float[] verts, MaterialModule materialModule) {
 		if (materialModule instanceof SpriteMaterialModule) {
-			DrawableValue drawableValue = ((SpriteMaterialModule)materialModule).getDrawableValue();
-			TextureRegion textureRegion = drawableValue.getDrawable().getTextureRegion();
+			TextureRegion textureRegion = ((SpriteMaterialModule)materialModule).getTextureRegion();
+
 
 			simple3DBatch.render(verts, textureRegion.getTexture());
 		}
@@ -191,8 +190,7 @@ public class ParticleRenderPassSystem extends RenderPassSystem implements Partic
 	@Override
 	public void render (float[] verts, int vertCount, short[] tris, int triCount, MaterialModule materialModule) {
 		if (materialModule instanceof SpriteMaterialModule) {
-			DrawableValue drawableValue = ((SpriteMaterialModule)materialModule).getDrawableValue();
-			TextureRegion textureRegion = drawableValue.getDrawable().getTextureRegion();
+			TextureRegion textureRegion = ((SpriteMaterialModule)materialModule).getTextureRegion();
 
 			simple3DBatch.render(verts, vertCount, tris, triCount, textureRegion.getTexture());
 		}

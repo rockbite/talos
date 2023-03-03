@@ -7,6 +7,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
+import com.talosvfx.talos.editor.project2.AppManager;
 import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.FloatPropertyWidget;
@@ -73,6 +74,12 @@ public class SpritePropertiesEditorWindow extends SpriteEditorWindow {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 super.clicked(event, x, y);
+
+                // TODO: 23.02.23 dummy refactor
+                if (gameAsset == null) {
+                    return;
+                }
+
                 AssetRepository.getInstance().resizeAsset(gameAsset, (int) width, (int) height);
             }
         });
@@ -101,6 +108,12 @@ public class SpritePropertiesEditorWindow extends SpriteEditorWindow {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 super.clicked(event, x, y);
+
+                // TODO: 23.02.23 dummy refactor
+                if (gameAsset == null) {
+                    return;
+                }
+
                 AssetRepository.getInstance().fillAssetColor(gameAsset, color);
             }
         });

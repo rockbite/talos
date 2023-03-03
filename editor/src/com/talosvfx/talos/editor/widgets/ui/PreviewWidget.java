@@ -284,6 +284,12 @@ public abstract class PreviewWidget extends ViewportWidget {
 	}
 
 	public void checkForChanges() {
+
+		// TODO: 23.02.23 dummy refactor
+		if (vfxProjectData == null) {
+			return;
+		}
+
 		ParticleEffectDescriptor dataDescriptor = vfxProjectData.getDescriptorSupplier().get();
 
 		if (this.descriptor != dataDescriptor || vfxNeedsUpdate()) {

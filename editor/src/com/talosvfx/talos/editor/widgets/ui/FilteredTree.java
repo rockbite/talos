@@ -821,29 +821,39 @@ public class FilteredTree<T> extends WidgetGroup {
         }
     }
 
-    private double getSimilarityScore(String s1, String s2) {
+    private double getSimilarityScore(String against, String test) {
         JaroWinkler jaroWinkler = new JaroWinkler();
-        double value = jaroWinkler.similarity(s1, s2);
+
+        if (against.contains(test)) {
+            return 1;
+        }
+
+
+        double value = jaroWinkler.similarity(against, test) * 0.05f;
 
         return value;
     }
 
 
-    public void gatherMatchingScores (Array<Node<T>> nodes, String filter, Array<MatchingNode<T>> results) {
+    public void gatherMatchingScores (Array<Node<T>> nodes, String filter, Array<MatchingNode<T>> results, double parentScore) {
         for (int i = 0; i < nodes.size; i++) {
-            MatchingNode<T> mNode = new MatchingNode<>(nodes.get(i),
-                    getSimilarityScore(nodes.get(i).getName().toLowerCase(), filter.toLowerCase()),
-                    nodes.get(i).getName().toLowerCase().contains(filter.toLowerCase()));
+            Node<T> nodeToCheck = nodes.get(i);
+            double similarityScore = getSimilarityScore(nodeToCheck.getName().toLowerCase(), filter.toLowerCase());
+
+            double totalScore = similarityScore + parentScore;
+
+            MatchingNode<T> mNode = new MatchingNode<>(nodeToCheck, totalScore,
+                    nodeToCheck.getName().toLowerCase().contains(filter.toLowerCase()));
             if(!results.contains(mNode, false)) {
                 results.add(mNode);
             }
-            gatherMatchingScores(nodes.get(i).children, filter, results);
+            gatherMatchingScores(nodeToCheck.children, filter, results, similarityScore);
         }
     }
 
     public void smartFilter(String filter) {
         Array<MatchingNode<T>> results = new Array<>();
-        gatherMatchingScores(rootNodes, filter, results);
+        gatherMatchingScores(rootNodes, filter, results, 0);
         smartFilter(results);
 
         expandAll();
@@ -854,14 +864,15 @@ public class FilteredTree<T> extends WidgetGroup {
 
     private void smartFilter (Array<MatchingNode<T>> nodes) {
         for (int i = 0; i < nodes.size; i++) {
-            if (nodes.get(i).filterPositive()) {
-                nodes.get(i).node.filtered = false;
-                nodes.get(i).node.setVisible(true);
-                setAllParentsNotFiltered(nodes.get(i).node);
-                setAllChildrenNotFiltered(nodes.get(i).node);
+            MatchingNode<T> matchingNode = nodes.get(i);
+            if (matchingNode.filterPositive()) {
+                matchingNode.node.filtered = false;
+                matchingNode.node.setVisible(true);
+                setAllParentsNotFiltered(matchingNode.node);
+                setAllChildrenNotFiltered(matchingNode.node);
             } else {
-                nodes.get(i).node.filtered = true;
-                nodes.get(i).node.setVisible(false);
+                matchingNode.node.filtered = true;
+                matchingNode.node.setVisible(false);
             }
         }
     }

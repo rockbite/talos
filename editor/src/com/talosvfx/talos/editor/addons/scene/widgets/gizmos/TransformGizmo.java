@@ -21,7 +21,7 @@ public class TransformGizmo extends Gizmo {
     private Vector2 prevTouch = new Vector2();
     private Vector2 vec1 = new Vector2();
     private boolean wasDragged = false;
-    private SpriteTransformGizmo spriteTransformGizmo;
+    private EightPointGizmo spriteTransformGizmo;
     private BoundingBox selectionBounds = new BoundingBox();
     private boolean haveBounds = false;
 
@@ -207,7 +207,12 @@ public class TransformGizmo extends Gizmo {
         return true;
     }
 
-    public void linkToSmart (SpriteTransformGizmo spriteTransformGizmo) {
+    public void linkToSmart (EightPointGizmo spriteTransformGizmo) {
         this.spriteTransformGizmo = spriteTransformGizmo;
+    }
+
+    @Override
+    public int getPriority () {
+        return 1;
     }
 }

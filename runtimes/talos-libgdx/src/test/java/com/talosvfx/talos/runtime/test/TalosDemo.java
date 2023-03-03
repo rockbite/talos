@@ -13,7 +13,6 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.talosvfx.talos.runtime.vfx.ParticleEffectDescriptor;
 import com.talosvfx.talos.runtime.vfx.ParticleEffectInstance;
-import com.talosvfx.talos.runtime.assets.AtlasAssetProvider;
 import com.talosvfx.talos.runtime.vfx.render.SpriteBatchParticleRenderer;
 
 public class TalosDemo extends ApplicationAdapter {
@@ -53,12 +52,11 @@ public class TalosDemo extends ApplicationAdapter {
         atlas.addRegion("spot", new TextureRegion(new TextureRegion(new Texture(Gdx.files.internal("spot.png")))));
 
 
-        AtlasAssetProvider atlasAssetProvider = new AtlasAssetProvider(atlas);
 
         /**
          * Creating particle effect instance from particle effect descriptor
          */
-        ParticleEffectDescriptor effectDescriptor = new ParticleEffectDescriptor(Gdx.files.internal("test.p"), atlasAssetProvider);
+        ParticleEffectDescriptor effectDescriptor = new ParticleEffectDescriptor(Gdx.files.internal("test.p"), null);
         effect = effectDescriptor.createEffectInstance();
 
         defaultRenderer = new SpriteBatchParticleRenderer(viewport.getCamera());

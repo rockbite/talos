@@ -62,7 +62,6 @@ import com.talosvfx.talos.runtime.scene.components.MapComponent;
 import com.talosvfx.talos.runtime.scene.components.ScriptComponent;
 import com.talosvfx.talos.runtime.utils.TempHackUtil;
 import com.talosvfx.talos.runtime.vfx.ParticleEffectDescriptor;
-import com.talosvfx.talos.runtime.vfx.assets.AssetProvider;
 import com.talosvfx.talos.runtime.vfx.serialization.ExportData;
 import lombok.NonNull;
 import org.slf4j.Logger;
@@ -979,34 +978,6 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 					}
 
 					ParticleEffectDescriptor particleEffectDescriptor = new ParticleEffectDescriptor();
-					particleEffectDescriptor.setAssetProvider(new AssetProvider() {
-						@Override
-						public <T> T findAsset(String assetName, Class<T> clazz) {
-							GameAsset<?> gameAsset = findGameAsset(assetName, clazz);
-							return (T) new Sprite(((Texture) gameAsset.getResource()));
-						}
-
-						@Override
-						public <T> GameAsset<?> findGameAsset(String assetName, Class<T> clazz) {
-							if (Sprite.class.isAssignableFrom(clazz)) {
-								GameAsset<T> gameAsset = getAssetForIdentifier(assetName, GameAssetType.SPRITE);
-
-								if (gameAsset != null) {
-									if (createLinks) {
-										for (RawAsset dependentRawAsset : gameAsset.dependentRawAssets) {
-											particleEffectDescriptorGameAsset.dependentRawAssets.add(dependentRawAsset);
-										}
-									}
-									return gameAsset;
-								} else {
-									particleEffectDescriptorGameAsset.setBroken(new Exception("Cannot find " + assetName));
-								}
-							}
-
-							throw new GdxRuntimeException("Couldn't find asset " + assetName + " for type " + clazz);
-						}
-					});
-
 					RawAsset rawAssetPFile = dataMaps.fileHandleRawAssetMap.get(value.handle);
 
 					try {
@@ -1026,28 +997,6 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 					GameAsset<ParticleEffectDescriptor> assetToUpdate = ((GameAsset<ParticleEffectDescriptor>)gameAssetOut);
 
 					ParticleEffectDescriptor particleEffectDescriptor = new ParticleEffectDescriptor();
-					particleEffectDescriptor.setAssetProvider(new AssetProvider() {
-						@Override
-						public <T> GameAsset<?> findGameAsset(String assetName, Class<T> clazz) {
-							if (Sprite.class.isAssignableFrom(clazz)) {
-								GameAsset<T> gameAsset = getAssetForIdentifier(assetName, GameAssetType.SPRITE);
-
-								if (gameAsset != null) {
-									return gameAsset;
-								} else {
-									assetToUpdate.setBroken(new Exception("Cannot find " + assetName));
-								}
-							}
-
-							throw new GdxRuntimeException("Couldn't find asset " + assetName + " for type " + clazz);
-						}
-
-						@Override
-						public <T> T findAsset (String assetName, Class<T> clazz) {
-							GameAsset<?> gameAsset = findGameAsset(assetName, clazz);
-							return (T) new Sprite(((Texture) gameAsset.getResource()));
-						}
-					});
 					try {
 						RawAsset rawAssetPFile = dataMaps.fileHandleRawAssetMap.get(value.handle);
 
@@ -1107,7 +1056,14 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 			case ROUTINE:
 
 				if (gameAssetOut == null) {
-					GameAsset<RoutineStageData> asset = new GameAsset<>(gameAssetIdentifier, assetTypeFromExtension);
+					GameAsset<RoutineStageData> asset = new GameAsset<RoutineStageData>(gameAssetIdentifier, assetTypeFromExtension) {
+						@Override
+						public void setUpdated() {
+							getResource().setName(getRootRawAsset().handle.nameWithoutExtension());
+							super.setUpdated();
+						}
+					};
+
 					gameAssetOut = asset;
 
 
@@ -1118,6 +1074,8 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 				}
 
 				RoutineStageData routineStageData = json.fromJson(RoutineStageData.class, TempHackUtil.hackIt(value.handle.readString()));
+
+				routineStageData.setName(value.handle.nameWithoutExtension());
 
 				((GameAsset<RoutineStageData>) gameAssetOut).setResourcePayload(routineStageData);
 

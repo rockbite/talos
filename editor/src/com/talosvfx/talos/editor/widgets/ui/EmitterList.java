@@ -46,6 +46,11 @@ public class EmitterList extends TimelineWidget<ParticleEmitterWrapper> {
 
             @Override
             protected void onToggleLoop (boolean loopEnabled) {
+                // TODO: 23.02.23 dummy refactor
+                if (preview == null) {
+                    return;
+                }
+
                 preview.getEffectInstance().loopable = loopEnabled;
             }
 
@@ -61,6 +66,11 @@ public class EmitterList extends TimelineWidget<ParticleEmitterWrapper> {
 
             @Override
             protected void onItemVisibilityChange (Object identifier, boolean isVisible) {
+                // TODO: 23.02.23 dummy refactor
+                if (preview == null) {
+                    return;
+                }
+
                 ParticleEmitterWrapper wrapper = (ParticleEmitterWrapper) identifier;
                 wrapper.isMuted = !isVisible;
                 preview.getEffectInstance().getEmitter(wrapper.getEmitter()).setVisible(isVisible);
@@ -84,12 +94,23 @@ public class EmitterList extends TimelineWidget<ParticleEmitterWrapper> {
 
             @Override
             protected void onSkipToStartClicked () {
+                // TODO: 23.02.23 dummy refactor
+                if (preview == null) {
+                    return;
+                }
+
                 preview.getEffectInstance().restart();
                 getActionWidget().getPlayButton().setChecked(true);
             }
 
             @Override
             protected void onPlayClicked () {
+
+                // TODO: 23.02.23 dummy refactor
+                if (preview == null) {
+                    return;
+                }
+
                 boolean play = getActionWidget().getPlayButton().isChecked();
 
                 if(play) {
@@ -102,6 +123,11 @@ public class EmitterList extends TimelineWidget<ParticleEmitterWrapper> {
 
             @Override
             protected void onDeleteClicked() {
+                // TODO: 23.02.23 dummy refactor
+                if (preview == null) {
+                    return;
+                }
+
                 Array<ParticleEmitterWrapper> selector = getSelector();
                 ParticleEmitterWrapper selectedItem = getSelectedItem();
                 if(selectedItem != null) {
@@ -142,6 +168,11 @@ public class EmitterList extends TimelineWidget<ParticleEmitterWrapper> {
     }
 
     private void createNewEmitterClicked() {
+        // TODO: 23.02.23 dummy refactor
+        if (preview == null) {
+            return;
+        }
+
         ParticleEmitterWrapper selectedItem = getSelectedItem();
         float sortPosition = 0;
         // if nothing is selected we are adding on top
@@ -257,6 +288,11 @@ public class EmitterList extends TimelineWidget<ParticleEmitterWrapper> {
     }
 
     public void removeEmitter (ParticleEmitterWrapper wrapper) {
+        // TODO: 23.02.23 dummy refactor
+        if (preview == null) {
+            return;
+        }
+
         editorApp.getModuleBoardWidget().removeEmitter(wrapper);
         preview.getEffectInstance().removeEmitterForEmitterDescriptor(wrapper.getEmitter());
         preview.getDescriptor().removeEmitter(wrapper.getEmitter());

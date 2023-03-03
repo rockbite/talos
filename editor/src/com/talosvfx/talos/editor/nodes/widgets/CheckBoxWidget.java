@@ -22,6 +22,10 @@ public class CheckBoxWidget extends AbstractWidget<Boolean> {
     @Override
     public void loadFromXML(XmlReader.Element element) {
         checkBox.setText(element.getText());
+
+        String defaultValueStr = element.getAttribute("default", "false");
+        boolean defaultValue = Boolean.parseBoolean(defaultValueStr);
+        checkBox.setChecked(defaultValue);
     }
 
     @Override

@@ -23,13 +23,12 @@ import com.talosvfx.talos.runtime.routine.serialization.RuntimeRoutineData;
 import com.talosvfx.talos.runtime.scene.Prefab;
 import com.talosvfx.talos.runtime.scene.Scene;
 import com.talosvfx.talos.runtime.vfx.ParticleEffectDescriptor;
-import com.talosvfx.talos.runtime.vfx.assets.AssetProvider;
 import com.talosvfx.talos.runtime.vfx.serialization.BaseVFXProjectData;
 import com.talosvfx.talos.runtime.vfx.serialization.ExportData;
 
 import java.util.UUID;
 
-public class RuntimeAssetRepository extends BaseAssetRepository implements AssetProvider {
+public class RuntimeAssetRepository extends BaseAssetRepository {
 	protected ObjectMap<GameAssetType, ObjectMap<String, GameAsset<?>>> identifierToGameAssetMap = new ObjectMap<>();
 	protected ObjectMap<UUID, GameAsset<?>> uuidGameAssetObjectMap = new ObjectMap<>();
 
@@ -64,20 +63,6 @@ public class RuntimeAssetRepository extends BaseAssetRepository implements Asset
 		loadType(GameAssetType.TILE_PALETTE, sorted, baseDir);
 
 		loadType(GameAssetType.LAYOUT_DATA, sorted, baseDir);
-	}
-
-	@Override
-	public <T> T findAsset (String assetName, Class<T> clazz) {
-		if (Sprite.class.isAssignableFrom(clazz)) {
-			GameAsset<Texture> resource = getAssetForIdentifier(assetName, GameAssetType.SPRITE);
-			return (T)new Sprite(resource.getResource());
-		}
-		throw new GdxRuntimeException("No asset found " + assetName + " " + clazz.getSimpleName());
-	}
-
-	@Override
-	public <T> GameAsset findGameAsset(String assetName, Class<T> clazz) {
-		throw new UnsupportedOperationException("Not supported operation");
 	}
 
 	private interface GameAssetLoader<T> {
@@ -177,7 +162,6 @@ public class RuntimeAssetRepository extends BaseAssetRepository implements Asset
 		ExportData vfxExportData = ParticleEffectDescriptor.getExportData(vfxPFile);
 
 		ParticleEffectDescriptor particleEffectDescriptor = new ParticleEffectDescriptor();
-		particleEffectDescriptor.setAssetProvider(this);
 
 		particleEffectDescriptor.load(vfxExportData);
 

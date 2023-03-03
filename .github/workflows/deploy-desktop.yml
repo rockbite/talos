@@ -50,3 +50,17 @@ jobs:
 
       - name: Execute repo gen
         run: ssh ${{secrets.SSH_SERVER_USER }}@${{secrets.SSH_SERVER }} 'bash -s' < ./editor-desktop-bootstrap/remote-repogen.sh
+
+      - name: Notify Discord
+        if: always()
+        uses: tsickert/discord-webhook@v5.3.0
+        with:
+          webhook-url: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          embed-title: New TalosVFX build available!
+          embed-description: |
+            Developer: [`${{ github.actor }}`](https://github.com/${{ github.actor }})
+            GH Actions Run: [`${{ github.run_id }}`](https://github.com/${{github.repository}}/actions/runs/${{github.run_id}}) 
+            Commit SHA: [`${{ github.sha }}`](https://github.com/${{github.repository}}/commit/${{github.sha}})
+            Branch: [`${{ github.ref_name }}`]
+            State: [`${{ job.status }}`]
+          embed-color: 15548997

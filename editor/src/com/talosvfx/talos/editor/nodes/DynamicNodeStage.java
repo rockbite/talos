@@ -161,6 +161,8 @@ public abstract class DynamicNodeStage<T extends DynamicNodeStageData> extends W
                     // unselect
                     if(!event.isHandled()) {
                         nodeBoard.clearSelection();
+
+                        onBaseStageSelected();
                     }
 
                     return super.touchDown(event, x, y, pointer, button);
@@ -209,19 +211,27 @@ public abstract class DynamicNodeStage<T extends DynamicNodeStageData> extends W
                     nodeBoard.clearSelection();
                 }
 
+
+                // TODO: 23.02.23 dummy refactor
+                if (data == null) {
+                    return;
+                }
                 if(button == 1 && !event.isCancelled()) {
                     showPopup();
                 }
 
                 if(selectionRect.isVisible()) {
                     nodeBoard.userSelectionApply(rectangle);
+                    selectionRect.setVisible(false);
                 }
 
-                selectionRect.setVisible(false);
             }
         });
 
     }
+
+    protected abstract void onBaseStageSelected ();
+
     protected void initActors() {
 //        GridRendererWrapper gridRenderer = new GridRendererWrapper(stage);
 //        stage.addActor(gridRenderer);
@@ -264,4 +274,6 @@ public abstract class DynamicNodeStage<T extends DynamicNodeStageData> extends W
     public DynamicNodeStage<?> getContext () {
        return this;
     }
+
+    public abstract void onNodeSelectionChange ();
 }

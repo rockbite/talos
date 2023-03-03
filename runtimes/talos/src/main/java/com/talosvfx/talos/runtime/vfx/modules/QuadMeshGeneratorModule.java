@@ -9,12 +9,10 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.talosvfx.talos.runtime.vfx.Particle;
-import com.talosvfx.talos.runtime.vfx.ParticleDrawable;
 import com.talosvfx.talos.runtime.vfx.ParticlePointData;
 import com.talosvfx.talos.runtime.vfx.ParticlePointGroup;
 import com.talosvfx.talos.runtime.vfx.ScopePayload;
 import com.talosvfx.talos.runtime.vfx.render.ParticleRenderer;
-import com.talosvfx.talos.runtime.vfx.values.DrawableValue;
 import com.talosvfx.talos.runtime.vfx.values.ModuleValue;
 import com.talosvfx.talos.runtime.vfx.values.NumericalValue;
 
@@ -102,9 +100,7 @@ public class QuadMeshGeneratorModule extends MeshGeneratorModule {
 		float V2 = 1f;
 
 		if (materialModule instanceof SpriteMaterialModule) {
-			DrawableValue drawableValue = ((SpriteMaterialModule)materialModule).getDrawableValue();
-			ParticleDrawable drawable = drawableValue.getDrawable();
-			TextureRegion textureRegion = drawable.getTextureRegion();
+			TextureRegion textureRegion = ((SpriteMaterialModule)materialModule).getTextureRegion();
 			U = textureRegion.getU();
 			U2 = textureRegion.getU2();
 			V = textureRegion.getV();

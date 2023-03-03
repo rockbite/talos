@@ -325,6 +325,11 @@ public class NodeBoard<T extends DynamicNodeStageData> extends WidgetGroup imple
 	}
 
 	public void deleteSelectedNodes () {
+		// TODO: 23.02.23 dummy refactor
+		if (nodeStage.data == null) {
+			return;
+		}
+
 		NodeRemovedEvent nodeRemovedEvent = Notifications.obtainEvent(NodeRemovedEvent.class);
 
 		for (NodeWidget node : selectedNodes) {
@@ -547,16 +552,19 @@ public class NodeBoard<T extends DynamicNodeStageData> extends WidgetGroup imple
 
 	public void selectNode (NodeWidget node) {
 		clearSelection();
+		nodeStage.onNodeSelectionChange();
 		addNodeToSelection(node);
 	}
 
 	public void addNodeToSelection (NodeWidget node) {
 		selectedNodes.add(node);
+		nodeStage.onNodeSelectionChange();
 		updateSelectionBackgrounds();
 	}
 
 	public void removeNodeFromSelection (NodeWidget node) {
 		selectedNodes.remove(node);
+		nodeStage.onNodeSelectionChange();
 		updateSelectionBackgrounds();
 	}
 
@@ -576,6 +584,12 @@ public class NodeBoard<T extends DynamicNodeStageData> extends WidgetGroup imple
 	}
 
 	public void updateSelectionBackgrounds () {
+
+		// TODO: 23.02.23 dummy refactor
+		if (nodeStage.data == null) {
+			 return;
+		}
+
 		for (NodeWidget wrapper : nodeStage.data.nodes) {
 			if (getSelectedNodes().contains(wrapper)) {
 				wrapper.setSelected(true);
@@ -586,6 +600,11 @@ public class NodeBoard<T extends DynamicNodeStageData> extends WidgetGroup imple
 	}
 
 	public void selectAllNodes () {
+		// TODO: 23.02.23 dummy refactor
+		if (nodeStage.data == null) {
+			return;
+		}
+
 		ObjectSet<NodeWidget> nodes = new ObjectSet<>();
 		for (NodeWidget node : getNodes()) {
 			nodes.add(node);
@@ -685,6 +704,11 @@ public class NodeBoard<T extends DynamicNodeStageData> extends WidgetGroup imple
 	}
 
 	public void copySelectedModules () {
+		// TODO: 23.02.23 dummy refactor
+		if (nodeStage.data == null) {
+			return;
+		}
+
 		Array<NodeConnection> connections = getSelectedConnections();
 		ObjectSet<NodeWidget> nodes = getSelectedNodes();
 		Array<NodeGroup> groups = getSelectedGroups();
@@ -700,6 +724,11 @@ public class NodeBoard<T extends DynamicNodeStageData> extends WidgetGroup imple
 	}
 
 	public void pasteFromClipboard () {
+		// TODO: 23.02.23 dummy refactor
+		if (nodeStage.data == null) {
+			return;
+		}
+
 		String clipboard = Gdx.app.getClipboard().getContents();
 
 		ObjectMap<Integer, NodeWidget> previousNodeIdMap = new ObjectMap<>();
@@ -907,10 +936,20 @@ public class NodeBoard<T extends DynamicNodeStageData> extends WidgetGroup imple
 	}
 
 	public void createGroupFromSelectedNodes () {
+		// TODO: 23.02.23 dummy refactor
+		if (nodeStage.data == null) {
+			return;
+		}
+
 		createGroupForNodes(getSelectedNodes());
 	}
 
 	public void ungroupSelectedNodes () {
+		// TODO: 23.02.23 dummy refactor
+		if (nodeStage.data == null) {
+			return;
+		}
+
 		ungroupNodes(getSelectedNodes());
 	}
 

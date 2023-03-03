@@ -5,6 +5,7 @@ import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.talosvfx.talos.runtime.RuntimeContext;
 import com.talosvfx.talos.runtime.scene.GameObject;
+import com.talosvfx.talos.runtime.scene.SceneData;
 import com.talosvfx.talos.runtime.scene.SceneLayer;
 
 
@@ -36,7 +37,7 @@ public abstract class RendererComponent extends AComponent implements Json.Seria
 
     @Override
     public void read (Json json, JsonValue jsonData) {
-        sortingLayer = json.readValue("sortingSceneLayer", SceneLayer.class,  RuntimeContext.getInstance().sceneData.getPreferredSceneLayer(), jsonData);
+        sortingLayer = json.readValue("sortingSceneLayer", SceneLayer.class, jsonData);
         orderingInLayer = jsonData.getInt("orderingInLayer", 0);
         visible = jsonData.getBoolean("visible", true);
         childrenVisible = jsonData.getBoolean("childrenVisible", true);

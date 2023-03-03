@@ -115,7 +115,10 @@ public class EditableLabel extends Table implements ActorCloneable {
     }
 
     public void finishTextEdit () {
-        setStaticMode();
+        finishTextEdit(false);
+    }
+    public void finishTextEdit (boolean skipFocusChanges) {
+        setStaticMode(skipFocusChanges);
         if(listener != null) {
             listener.changed(label.getText().toString());
         }
@@ -145,7 +148,11 @@ public class EditableLabel extends Table implements ActorCloneable {
         textField.selectAll();
     }
 
-    public void setStaticMode() {
+    public void setStaticMode () {
+        setStaticMode(false);
+    }
+
+    public void setStaticMode(boolean skipFocusChanges) {
         editMode = false;
         labelTable.setVisible(true);
         inputTable.setVisible(false);
@@ -153,9 +160,11 @@ public class EditableLabel extends Table implements ActorCloneable {
         label.setText(textField.getText());
         textField.clearSelection();
 
-        if (getStage() != null) {
-            if (getStage().getKeyboardFocus() == textField) {
-                getStage().setKeyboardFocus(keyboardFocus);
+        if (!skipFocusChanges) {
+            if (getStage() != null) {
+                if (getStage().getKeyboardFocus() == textField) {
+                    getStage().setKeyboardFocus(keyboardFocus);
+                }
             }
         }
     }

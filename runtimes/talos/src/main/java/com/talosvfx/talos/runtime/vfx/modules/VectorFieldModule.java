@@ -5,11 +5,14 @@ import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.talosvfx.talos.runtime.vfx.ParticleEmitterDescriptor;
 import com.talosvfx.talos.runtime.vfx.ScopePayload;
-import com.talosvfx.talos.runtime.vfx.assets.AssetProvider;
 import com.talosvfx.talos.runtime.vfx.utils.VectorField;
 import com.talosvfx.talos.runtime.vfx.values.NumericalValue;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class VectorFieldModule extends AbstractModule {
+
+    private static final Logger logger = LoggerFactory.getLogger(VectorFieldModule.class);
 
     public static final int SIZE_SCALE = 0;
     public static final int FORCE_SCALE = 1;
@@ -70,10 +73,12 @@ public class VectorFieldModule extends AbstractModule {
     @Override
     public void setModuleGraph(ParticleEmitterDescriptor graph) {
         super.setModuleGraph(graph);
-        final AssetProvider assetProvider = graph.getEffectDescriptor().getAssetProvider();
-        if(fgaFileName != null && !fgaFileName.isEmpty()) {
-            setVectorField(assetProvider.findAsset(fgaFileName, VectorField.class), fgaFileName);
-        }
+
+        logger.error("Not supported, fga needs to be made into an asset");
+//        final AssetProvider assetProvider = graph.getEffectDescriptor().getAssetProvider();
+//        if(fgaFileName != null && !fgaFileName.isEmpty()) {
+//            setVectorField(assetProvider.findAsset(fgaFileName, VectorField.class), fgaFileName);
+//        }
     }
 
     @Override

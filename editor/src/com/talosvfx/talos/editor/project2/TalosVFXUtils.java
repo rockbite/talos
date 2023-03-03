@@ -4,8 +4,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.XmlReader;
-import com.rockbite.bongo.engine.collections.SerializableObjectIntMap;
-import com.talosvfx.talos.editor.assets.TalosAssetProvider;
 import com.talosvfx.talos.editor.widgets.ui.ModuleListPopup;
 import com.talosvfx.talos.editor.wrappers.WrapperRegistry;
 import lombok.Getter;
@@ -13,8 +11,6 @@ import lombok.Getter;
 public class TalosVFXUtils {
 
 	public static ObjectMap<Class, String> moduleNames = new ObjectMap<>();
-
-	public static TalosAssetProvider talosAssetProvider;
 
 	@Getter
 	private static ModuleListPopup moduleListPopup;

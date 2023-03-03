@@ -1,10 +1,12 @@
 package com.talosvfx.talos.editor.widgets.propertyWidgets;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.FocusListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Selection;
 import com.badlogic.gdx.utils.Array;
 import com.talosvfx.talos.TalosMain;
@@ -197,6 +199,24 @@ public class DynamicItemListWidget<T> extends PropertyWidget<Array<T>> {
                 callValueChanged(makeDataArray());
             }
         });
+        editableLabel.addListener(new FocusListener() {
+            @Override
+            public void keyboardFocusChanged (FocusEvent event, Actor actor, boolean focused) {
+                super.keyboardFocusChanged(event, actor, focused);
+                if (!focused) {
+                    if (editableLabel.isEditMode()) {
+                        Gdx.app.postRunnable(new Runnable() {
+                            @Override
+                            public void run () {
+                                editableLabel.finishTextEdit(true);
+
+                            }
+                        });
+                    }
+                }
+            }
+        });
+
         FilteredTree.Node<T> node = new FilteredTree.Node<T>(interaction.getID(t), editableLabel);
         node.draggable = true;
         node.draggableInLayerOnly = draggableInLayerOnly;

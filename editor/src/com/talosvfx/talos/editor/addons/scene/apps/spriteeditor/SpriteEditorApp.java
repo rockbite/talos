@@ -40,6 +40,12 @@ public class SpriteEditorApp extends AppManager.BaseApp<Texture> {
     @Override
     public void updateForGameAsset (GameAsset<Texture> gameAsset) {
         super.updateForGameAsset(gameAsset);
+
+        // TODO: 23.02.23 dummy refactor
+        if (AppManager.dummyAsset == (GameAsset) gameAsset) {
+            return;
+        }
+
         spriteEditor.updateForGameAsset(gameAsset);
     }
 

@@ -322,13 +322,21 @@ public class GameObject implements GameObjectContainer, Json.Serializable {
     }
 
 
-    public static void setPositionFromWorldPosition (GameObject object, Vector2 worldPosition) {
+    public static void setPositionFromWorldPosition (GameObject object, Vector2 worldPosition, boolean changeScale, boolean changeRotation) {
         TransformComponent transformComponent = object.getComponent(TransformComponent.class);
         transformComponent.worldPosition.set(worldPosition);
-        projectInParentSpace(object.parent, object);
+        projectInParentSpace(object.parent, object, changeScale, changeRotation);
     }
 
-    public static void projectInParentSpace(GameObject parentToMoveTo, GameObject childThatHasMoved) {
+    public static void setPositionFromWorldPosition (GameObject object, Vector2 worldPosition) {
+        setPositionFromWorldPosition(object, worldPosition, true, true);
+    }
+
+
+    public static void projectInParentSpace (GameObject parentToMoveTo, GameObject childThatHasMoved) {
+        projectInParentSpace(parentToMoveTo, childThatHasMoved, true, true);
+    }
+    public static void projectInParentSpace(GameObject parentToMoveTo, GameObject childThatHasMoved, boolean changeScale, boolean changeRotation) {
         if (childThatHasMoved.hasComponent(TransformComponent.class)) {
             TransformComponent childPositionComponent = childThatHasMoved.getComponent(TransformComponent.class);
             TransformComponent parentPositionComponent = new TransformComponent();

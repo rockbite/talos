@@ -85,6 +85,11 @@ public class VariableCreationWindow extends Table {
                         .onClick(new BasicPopup.PopupListener<PropertyType>() {
                             @Override
                             public void itemClicked(PropertyType type) {
+                                // TODO: 23.02.23 dummy refactor
+                                if (routineStage.data == null) {
+                                    return;
+                                }
+
                                 PropertyWrapper<?> newPropertyWrapper = routineStage.data.createNewPropertyWrapper(type);
                                 giveEmptyNameTo(newPropertyWrapper);
 

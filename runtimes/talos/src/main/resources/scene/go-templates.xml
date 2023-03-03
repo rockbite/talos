@@ -61,7 +61,7 @@
         </component>
         <component className="SpriteRendererComponent">
             <gizmos>
-                <gizmo className="SpriteTransformGizmo"></gizmo>
+                <gizmo className="EightPointGizmo"></gizmo>
             </gizmos>
         </component>
         <component className="MapComponent">

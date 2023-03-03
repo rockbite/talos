@@ -165,6 +165,12 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 	}
 
 	public void getChildrenHavingComponentClass (GameObject root, Class<? extends AComponent> componentClass, Array<GameObject> array) {
+
+		// TODO: 23.02.23 dummy refactor
+		if (root == null) {
+			return;
+		}
+
 		if (root.hasComponent(componentClass)) {
 			array.add(root);
 		}
@@ -366,6 +372,11 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 				Vector2 hitCords = getWorldFromLocal(x, y);
 
 				if (button == 1 && !event.isCancelled() && !event.isStopped()) {
+
+					// TODO: 23.02.23 dummy refactor
+					if (currentContainer == null) {
+						return true;
+					}
 					final Vector2 vec = new Vector2(Gdx.input.getX(), Gdx.input.getY());
 					screenToLocalCoordinates(vec);
 					localToStageCoordinates(vec);
@@ -759,10 +770,22 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 	}
 
 	public void copySelected () {
+
+		// TODO: 23.02.23 dummy refactor
+		if (currentContainer == null) {
+			return;
+		}
+
 		SceneUtils.copy(gameAsset, selection);
 	}
 
 	public void pasteFromClipboard () {
+
+		// TODO: 23.02.23 dummy refactor
+		if (currentContainer == null) {
+			return;
+		}
+
 		SceneUtils.paste(gameAsset);
 	}
 
@@ -950,6 +973,12 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 	}
 
 	public void selectAll () {
+
+		// TODO: 23.02.23 dummy refactor
+		if (currentContainer == null) {
+			return;
+		}
+
 		selection.clear();
 		Array<GameObject> gameObjects = currentContainer.getGameObjects();
 		if (gameObjects != null) {

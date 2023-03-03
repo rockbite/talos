@@ -39,7 +39,6 @@ import com.talosvfx.talos.editor.wrappers.ModuleWrapper;
 import com.talosvfx.talos.runtime.vfx.ParticleEffectDescriptor;
 import com.talosvfx.talos.runtime.vfx.ParticleEffectInstance;
 import com.talosvfx.talos.runtime.vfx.ParticleEmitterDescriptor;
-import com.talosvfx.talos.runtime.vfx.assets.AssetProvider;
 import lombok.Getter;
 
 import java.util.Comparator;
@@ -124,28 +123,6 @@ public class ParticleNodeEditorApp extends AppManager.BaseApp<VFXProjectData> im
 	public void loadProject (VFXProjectData projectData) {
 		particleEffectDescriptor = new ParticleEffectDescriptor();
 		particleEffect = new ParticleEffectInstance(particleEffectDescriptor);
-
-		particleEffectDescriptor.setAssetProvider(new AssetProvider() {
-			@Override
-			public <T> GameAsset<T> findGameAsset(String assetName, Class<T> clazz) {
-				if (Sprite.class.isAssignableFrom(clazz)) {
-					GameAsset<T> gameAsset = AssetRepository.getInstance().getAssetForIdentifier(assetName, GameAssetType.SPRITE);
-					if(gameAsset.getResource() == null) {
-						gameAsset = AssetRepository.getInstance().getAssetForIdentifier("white", GameAssetType.SPRITE);
-					}
-					return gameAsset;
-				}
-
-				throw new GdxRuntimeException("Couldn't find asset " + assetName + " for type " + clazz);
-			}
-
-			@Override
-			public <T> T findAsset(String assetName, Class<T> clazz) {
-				GameAsset<?> gameAsset = findGameAsset(assetName, clazz);
-				return (T) new Sprite(((Texture) gameAsset.getResource()));
-			}
-		});
-
 
 		editorState = projectData.getEditorState();
 
@@ -263,6 +240,11 @@ public class ParticleNodeEditorApp extends AppManager.BaseApp<VFXProjectData> im
 
 
 		super.updateForGameAsset(gameAsset);
+
+		// TODO: 23.02.23 dummy refactor
+		if (AppManager.dummyAsset == (GameAsset) gameAsset) {
+			return;
+		}
 
 		loadProject(gameAsset.getResource());
 

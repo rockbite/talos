@@ -14,7 +14,6 @@ import com.talosvfx.talos.runtime.vfx.modules.MeshGeneratorModule;
 import com.talosvfx.talos.runtime.vfx.modules.ParticlePointDataGeneratorModule;
 import com.talosvfx.talos.runtime.vfx.modules.SpriteMaterialModule;
 import com.talosvfx.talos.runtime.vfx.render.p3d.Simple3DBatch;
-import com.talosvfx.talos.runtime.vfx.values.DrawableValue;
 import lombok.Getter;
 
 public class Particle3DRenderer implements ParticleRenderer {
@@ -93,8 +92,7 @@ public class Particle3DRenderer implements ParticleRenderer {
 	@Override
 	public void render (float[] verts, MaterialModule materialModule) {
 		if (materialModule instanceof SpriteMaterialModule) {
-			DrawableValue drawableValue = ((SpriteMaterialModule)materialModule).getDrawableValue();
-			TextureRegion textureRegion = drawableValue.getDrawable().getTextureRegion();
+			TextureRegion textureRegion = ((SpriteMaterialModule)materialModule).getTextureRegion();
 
 			batch.render(verts, textureRegion.getTexture());
 		}
@@ -103,8 +101,7 @@ public class Particle3DRenderer implements ParticleRenderer {
 	@Override
 	public void render (float[] verts, int vertCount, short[] tris, int triCount, MaterialModule materialModule) {
 		if (materialModule instanceof SpriteMaterialModule) {
-			DrawableValue drawableValue = ((SpriteMaterialModule)materialModule).getDrawableValue();
-			TextureRegion textureRegion = drawableValue.getDrawable().getTextureRegion();
+			TextureRegion textureRegion = ((SpriteMaterialModule)materialModule).getTextureRegion();
 
 			batch.render(verts, vertCount, tris, triCount, textureRegion.getTexture());
 		}

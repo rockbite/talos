@@ -7,6 +7,10 @@ import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.*;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.nodes.*;
+import com.talosvfx.talos.editor.addons.scene.events.PropertyHolderSelected;
+import com.talosvfx.talos.editor.addons.scene.logic.IPropertyHolder;
+import com.talosvfx.talos.editor.addons.scene.logic.PropertyWrapperProviders;
+import com.talosvfx.talos.editor.widgets.propertyWidgets.IPropertyProvider;
 import com.talosvfx.talos.runtime.routine.RoutineInstance;
 import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.editor.addons.scene.events.RoutineUpdated;
@@ -80,6 +84,15 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
         }
     }
 
+    @Override
+    protected void onBaseStageSelected () {
+        if (gameAsset == null) {
+            return;
+        }
+
+        Notifications.fireEvent(Notifications.obtainEvent(PropertyHolderSelected.class).setTarget(PropertyWrapperProviders.getOrCreateHolder(this.gameAsset.getResource())));
+    }
+
     private void setInstanceListeners() {
         data.getRoutineInstance().setListener(new RoutineInstance.RoutineListenerAdapter() {
             @Override
@@ -149,6 +162,31 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
 
           */
             // do this with any async
+        }
+    }
+
+    @Override
+    public void onNodeSelectionChange () {
+        ObjectSet<NodeWidget> selectedNodes = nodeBoard.getSelectedNodes();
+        if (selectedNodes.size == 0) {
+
+        } else {
+
+            Array<IPropertyProvider> providers = new Array<>();
+            for (NodeWidget selectedNode : selectedNodes) {
+                providers.add(selectedNode);
+            }
+            Notifications.fireEvent(Notifications.obtainEvent(PropertyHolderSelected.class).setTarget(new IPropertyHolder() {
+                @Override
+                public Iterable<IPropertyProvider> getPropertyProviders () {
+                    return providers;
+                }
+
+                @Override
+                public String getName () {
+                    return "Node Properties";
+                }
+            }));
         }
     }
 

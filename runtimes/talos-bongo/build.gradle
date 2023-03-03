@@ -1,6 +1,7 @@
 plugins {
     id 'java-library'
     id 'maven-publish'
+    id 'signing'
     alias(libs.plugins.lombok)
 }
 
@@ -17,6 +18,11 @@ task packageSources(type: Jar, dependsOn: [classes, jar]) {
 
 artifacts {
     api(jar, packageSources)
+}
+
+java {
+    withJavadocJar()
+    withSourcesJar()
 }
 
 configurations {
@@ -36,6 +42,11 @@ publishing {
             url = getSnapshotRepositoryUrl()
             credentials(org.gradle.api.credentials.PasswordCredentials)
         }
+        maven {
+            name = "release"
+            url = getReleaseRepositoryUrl()
+            credentials(org.gradle.api.credentials.PasswordCredentials)
+        }
     }
     publications {
         mavenJava(MavenPublication) {
@@ -44,6 +55,39 @@ publishing {
             groupId project.group
             artifactId project.name
             version project.version
+            pom {
+                name = "Talos Bongo runtime"
+                description = "Bongo runtime for TalosVFX"
+                url = "https://talosvfx.com"
+                licenses {
+                    license {
+                        name = 'The Apache License, Version 2.0'
+                        url = 'https://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+                developers {
+                    developer {
+                        id = 'tomski'
+                        name = 'Tom Wojciechowski'
+                        email = 'tom@asidik.com'
+                    }
+                    developer {
+                        id = 'azakhary'
+                        name = 'Avetis Zakharyan'
+                        email = 'azakhary@rockbitegames.com'
+                    }
+                }
+                scm {
+                    connection = 'scm:git:git://github.com/rockbite/talos.git'
+                    developerConnection = 'scm:git:ssh://github.com/rockbite/talos.git'
+                    url = 'github.com/rockbite/talos/'
+                }
+            }
         }
     }
+}
+
+signing {
+    required { project.isReleaseBuild() }
+    sign publishing.publications.mavenJava
 }

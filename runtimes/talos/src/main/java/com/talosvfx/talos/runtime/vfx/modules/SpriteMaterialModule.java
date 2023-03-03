@@ -18,86 +18,118 @@ package com.talosvfx.talos.runtime.vfx.modules;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
+import com.talosvfx.talos.runtime.RuntimeContext;
+import com.talosvfx.talos.runtime.assets.BaseAssetRepository;
 import com.talosvfx.talos.runtime.assets.GameAsset;
+import com.talosvfx.talos.runtime.assets.GameAssetType;
+import com.talosvfx.talos.runtime.assets.GameResourceOwner;
 import com.talosvfx.talos.runtime.vfx.ParticleEmitterDescriptor;
-import com.talosvfx.talos.runtime.vfx.assets.AssetProvider;
-import com.talosvfx.talos.runtime.vfx.render.drawables.TextureRegionDrawable;
-import com.talosvfx.talos.runtime.vfx.values.DrawableValue;
 import com.talosvfx.talos.runtime.vfx.values.ModuleValue;
 
-public class SpriteMaterialModule extends MaterialModule implements GameAsset.GameAssetUpdateListener {
 
-	private DrawableValue userDrawable;
+public class SpriteMaterialModule extends MaterialModule implements GameResourceOwner<Texture>, GameAsset.GameAssetUpdateListener {
 
-	public String assetIdentifier = "white";
 
+	private transient TextureRegion region;
+
+	public GameAsset<Texture> asset;
+
+	/**
+	 * To be removed, here for backwards compatibility
+	 */
+	@Deprecated
+	private String assetIdentifier = "white";
 	private ModuleValue<SpriteMaterialModule> moduleOutput;
 
-	private GameAsset<Texture> gameAsset;
-
 	@Override
-	protected void defineSlots() {
+	protected void defineSlots () {
 		moduleOutput = new ModuleValue<>();
 		moduleOutput.setModule(this);
 
-		userDrawable = new DrawableValue();
-		userDrawable.setEmpty(true);
-
 		createOutputSlot(MATERIAL_MODULE, moduleOutput);
-	}
-
-	public DrawableValue getDrawableValue () {
-		return userDrawable;
 	}
 
 	@Override
 	public void processCustomValues () {
 	}
 
-	public void setAsset (String identifier) {
-		this.assetIdentifier = identifier;
-		final AssetProvider assetProvider = graph.getEffectDescriptor().getAssetProvider();
-		GameAsset<Texture> asset = assetProvider.findGameAsset(assetIdentifier, Sprite.class);
-		asset.listeners.add(this);
-		this.gameAsset = asset;
-		userDrawable.setDrawable(new TextureRegionDrawable(new Sprite(gameAsset.getResource())));
-	}
-
-	@Override
-	public void setModuleGraph(ParticleEmitterDescriptor graph) {
-		super.setModuleGraph(graph);
-		setAsset(assetIdentifier);
-	}
-
 	@Override
 	public void write (Json json) {
 		super.write(json);
-		json.writeValue("asset", assetIdentifier);
+
+		GameResourceOwner.writeGameAsset(json, this);
 	}
 
 	@Override
 	public void read (Json json, JsonValue jsonData) {
 		super.read(json, jsonData);
+
+		//deprecated
 		assetIdentifier = jsonData.getString("asset", "white");
 
+		GameAsset<Texture> defaultValue = RuntimeContext.getInstance().AssetRepository.getAssetForIdentifier(assetIdentifier, GameAssetType.SPRITE);
 
+		GameAsset<Texture> asset = GameResourceOwner.readAsset(json, jsonData);
+		if (asset != null) {
+			if (asset.isBroken()) {
+				asset = defaultValue;
+			}
+			setGameAsset(asset);
+		} else {
+			setGameAsset(defaultValue);
+		}
 	}
 
+	public void setToDefault () {
+		GameAsset<Texture> defaultValue = RuntimeContext.getInstance().AssetRepository.getAssetForIdentifier("white", GameAssetType.SPRITE);
+		setGameAsset(defaultValue);
+	}
 
 	@Override
-	public void onUpdate() {
-		if (gameAsset != null && !gameAsset.isBroken()) {
-			userDrawable.getDrawable().getTextureRegion().setTexture(gameAsset.getResource());
+	public void onUpdate () {
+		if (asset != null && !asset.isBroken()) {
+			region = new TextureRegion(asset.getResource());
 		}
 	}
 
 	@Override
-	public void remove() {
+	public void remove () {
 		super.remove();
-		if(gameAsset!=null){
-			gameAsset.listeners.removeValue(this, true);
+		if (asset != null) {
+			asset.listeners.removeValue(this, true);
 		}
 	}
+
+	@Override
+	public GameAssetType getGameAssetType () {
+		return GameAssetType.SPRITE;
+	}
+
+	@Override
+	public GameAsset<Texture> getGameResource () {
+		return asset;
+	}
+
+	@Override
+	public void setGameAsset (GameAsset<Texture> gameAsset) {
+		if (this.asset != null) {
+			//Remove from old game asset, it might be the same, but it may also have changed
+			this.asset.listeners.removeValue(this, true);
+		}
+
+		this.asset = gameAsset;
+		asset.listeners.add(this);
+
+		if (asset != null && !asset.isBroken()) {
+			region = new TextureRegion(asset.getResource());
+		}
+	}
+
+	public TextureRegion getTextureRegion () {
+		return region;
+	}
+
 }

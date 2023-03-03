@@ -3,15 +3,18 @@ package com.talosvfx.talos.editor.project2;
 import com.kotcrab.vis.ui.widget.color.ColorPicker;
 import com.kotcrab.vis.ui.widget.color.ColorPickerListener;
 import com.talosvfx.talos.editor.dialogs.PreferencesWindow;
+import com.talosvfx.talos.editor.dialogs.AboutTalosDialog;
 
 public class UIController {
 
     private ColorPicker colorPicker;
     private PreferencesWindow preferencesWindow;
+    private AboutTalosDialog aboutTalosDialog;
 
     public UIController() {
         initColorPicker();
         initPreferenceWindow();
+        initAboutTalosDialog();
     }
 
     private void initColorPicker() {
@@ -27,6 +30,10 @@ public class UIController {
         preferencesWindow = new PreferencesWindow();
     }
 
+    private void initAboutTalosDialog() {
+        aboutTalosDialog = new AboutTalosDialog();
+    }
+
     public void showColorPicker(ColorPickerListener listener) {
         colorPicker.setListener(listener);
         SharedResources.stage.addActor(colorPicker.fadeIn());
@@ -34,5 +41,9 @@ public class UIController {
 
     public void showPreferencesWindow () {
         SharedResources.windowUtils.openWindow(preferencesWindow);
+    }
+
+    public void showAboutTalosDialog() {
+        SharedResources.windowUtils.openWindow(aboutTalosDialog);
     }
 }
