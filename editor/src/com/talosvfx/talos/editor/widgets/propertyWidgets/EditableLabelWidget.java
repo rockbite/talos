@@ -32,7 +32,7 @@ public class EditableLabelWidget extends PropertyWidget<String> {
             public void keyboardFocusChanged (FocusEvent event, Actor actor, boolean focused) {
                 super.keyboardFocusChanged(event, actor, focused);
                 if (!focused) {
-                    propertyValue.finishTextEdit();
+                    propertyValue.finishTextEdit(true);
                 }
             }
         });
