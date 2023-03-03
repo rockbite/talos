@@ -83,6 +83,7 @@ public class SceneHierarchyApp extends AppManager.BaseApp<Scene> implements Game
 
 	@Override
 	public void onUpdate () {
+		getGridAppReference().updateTabName(getAppName());
 		hierarchyWidget.loadEntityContainer(gameAsset);
 	}
 

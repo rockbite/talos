@@ -1712,11 +1712,6 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 
 				dataMaps.putFileHandleRawAsset(newHandle, rawAsset);
 
-				AssetPathChanged assetPathChanged = Notifications.obtainEvent(AssetPathChanged.class);
-				assetPathChanged.oldRelativePath = relative(oldHandle);
-				assetPathChanged.newRelativePath = relative(newHandle);
-				Notifications.fireEvent(assetPathChanged);
-
 				for (GameAsset gameAssetReference : rawAsset.gameAssetReferences) {
 					gameAssetReference.setUpdated();
 				}
@@ -1727,6 +1722,11 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 
 					gameAsset.setUpdated();
 				}
+
+				AssetPathChanged assetPathChanged = Notifications.obtainEvent(AssetPathChanged.class);
+				assetPathChanged.oldHandle = oldHandle;
+				assetPathChanged.newHandle = newHandle;
+				Notifications.fireEvent(assetPathChanged);
 			}
 			updateChildReferences(child);
 
@@ -1864,12 +1864,6 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 						}
 					}
 
-
-					AssetPathChanged assetPathChanged = Notifications.obtainEvent(AssetPathChanged.class);
-					assetPathChanged.oldRelativePath = relative(file);
-					assetPathChanged.newRelativePath = relative(destination);
-					Notifications.fireEvent(assetPathChanged);
-
 					if (isRootGameResource(rawAsset)) {
 						UUID gameAssetUniqueIdentifierFromRawAsset = getGameAssetUniqueIdentifierFromRawAsset(rawAsset);
 						GameAssetType typeFromExtension = null;
@@ -1905,6 +1899,11 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 					for (GameAsset gameAssetReference : rawAsset.gameAssetReferences) {
 						gameAssetReference.setUpdated();
 					}
+
+					AssetPathChanged assetPathChanged = Notifications.obtainEvent(AssetPathChanged.class);
+					assetPathChanged.oldHandle = file;
+					assetPathChanged.newHandle = destination;
+					Notifications.fireEvent(assetPathChanged);
 
 				} else {
 					//Just move it

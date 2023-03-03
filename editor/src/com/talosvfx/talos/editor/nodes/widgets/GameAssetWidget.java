@@ -9,6 +9,10 @@ import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.XmlReader;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
+import com.talosvfx.talos.editor.addons.scene.events.AssetPathChanged;
+import com.talosvfx.talos.editor.notifications.EventHandler;
+import com.talosvfx.talos.editor.notifications.Notifications;
+import com.talosvfx.talos.editor.notifications.Observer;
 import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.runtime.assets.GameAssetType;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
@@ -19,7 +23,7 @@ import lombok.Getter;
 import java.util.UUID;
 import java.util.function.Supplier;
 
-public class GameAssetWidget<T> extends AbstractWidget<GameAsset<T>> {
+public class GameAssetWidget<T> extends AbstractWidget<GameAsset<T>> implements Observer {
 
     private final SelectBoxWidget typeSelector;
     private Cell<SelectBoxWidget> typeSelectorCell;
@@ -31,6 +35,7 @@ public class GameAssetWidget<T> extends AbstractWidget<GameAsset<T>> {
     private Table bottomContainer;
 
     public GameAssetWidget() {
+        Notifications.registerObserver(this);
 
         final Array<String> types = new Array<>();
         GameAssetType[] values = GameAssetType.values();
@@ -143,5 +148,13 @@ public class GameAssetWidget<T> extends AbstractWidget<GameAsset<T>> {
             json.writeValue("uuid", gameAsset.getRootRawAsset().metaData.uuid.toString());
         }
         json.writeObjectEnd();
+    }
+
+    @EventHandler
+    public void onAssetPathChangedEvent(AssetPathChanged assetPathChanged) {
+        GameAsset<?> assetForPath = AssetRepository.getInstance().getAssetForPath(assetPathChanged.newHandle, true);
+        if (assetForPath == gameAsset) {
+            widget.updateWidget(gameAsset);
+        }
     }
 }
