@@ -159,6 +159,9 @@ public class PropertyWrapperProviders {
 			} catch (ReflectionException e) {
 				throw new RuntimeException(e);
 			}
+		} else if (object instanceof IPropertyHolder) {
+			IPropertyHolder propertyHolder = (IPropertyHolder) object;
+			return propertyHolder;
 		} else {
 			logger.error("No such property provider for type: {}", clazz);
 			throw new GdxRuntimeException("Holder must be registered in PropertyWrapperProviders");
