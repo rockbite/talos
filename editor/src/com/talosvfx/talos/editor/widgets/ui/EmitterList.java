@@ -9,11 +9,11 @@ import com.talosvfx.talos.editor.serialization.EmitterData;
 import com.talosvfx.talos.editor.widgets.ui.timeline.BasicRow;
 import com.talosvfx.talos.editor.widgets.ui.timeline.TimelineListener;
 import com.talosvfx.talos.editor.widgets.ui.timeline.TimelineWidget;
+import com.talosvfx.talos.runtime.utils.Supplier;
 import com.talosvfx.talos.runtime.vfx.ParticleEffectDescriptor;
 import com.talosvfx.talos.runtime.vfx.ParticleEmitterDescriptor;
 
 import java.util.Comparator;
-import java.util.function.Supplier;
 
 public class EmitterList extends TimelineWidget<ParticleEmitterWrapper> {
 

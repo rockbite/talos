@@ -22,13 +22,13 @@ import com.talosvfx.talos.editor.ParticleEmitterWrapper;
 import com.talosvfx.talos.editor.data.ModuleWrapperGroup;
 import com.talosvfx.talos.editor.widgets.ui.ModuleBoardWidget;
 import com.talosvfx.talos.editor.wrappers.ModuleWrapper;
+import com.talosvfx.talos.runtime.utils.Supplier;
 import com.talosvfx.talos.runtime.vfx.ParticleEffectDescriptor;
 import com.talosvfx.talos.runtime.vfx.serialization.BaseVFXProjectData;
 import com.talosvfx.talos.runtime.vfx.serialization.ConnectionData;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.function.Supplier;
 
 public class VFXProjectData extends BaseVFXProjectData {
 
