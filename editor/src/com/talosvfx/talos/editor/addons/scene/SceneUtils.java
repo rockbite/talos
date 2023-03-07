@@ -158,6 +158,19 @@ public class SceneUtils {
 		return gameObject;
 	}
 
+	public static void removeComponent (GameObject gameObject, AComponent component) {
+		gameObject.removeComponent(component);
+		component.remove();
+
+		ComponentRemoved componentRemoved = Notifications.obtainEvent(ComponentRemoved.class);
+		componentRemoved.setComponent(component);
+		componentRemoved.setGameObject(gameObject);
+		componentRemoved.setContainer(gameObject.getGameObjectContainerRoot());
+		Notifications.fireEvent(componentRemoved);
+
+		markContainerChanged(gameObject.getGameObjectContainerRoot());
+	}
+
 	private static void initComponentsFromTemplate (GameObject gameObject, XmlReader.Element template) {
 		XmlReader.Element container = template.getChildByName("components");
 		Array<XmlReader.Element> componentsXMLArray = container.getChildrenByName("component");
