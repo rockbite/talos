@@ -72,9 +72,12 @@ public class PropertiesPanel extends Table {
                                         component.reset();
                                         updateValues();
                                     } else if(payload.equals("remove")) {
+                                        component.remove();
+
                                         GameObject gameObject = component.getGameObject();
-                                        if (gameObject != null) {
-                                            SceneUtils.removeComponent(gameObject, component);
+                                        if (gameObject != null && gameObject.getGameObjectContainerRoot() != null) {
+                                            gameObject.removeComponent(component);
+                                            SceneUtils.componentRemoved(gameObject.getGameObjectContainerRoot(), gameObject, component);
                                         }
 
                                         PropertiesPanel.this.remove();
