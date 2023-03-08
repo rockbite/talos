@@ -202,6 +202,13 @@ public class ProjectSplash extends Table {
 		SharedResources.mainMenu.hide();
 	}
 
+	@Override
+	public void act(float delta) {
+		super.act(delta);
+		Stage stage = getStage();
+		setPosition(stage.getWidth()/2f - getWidth()/2f, stage.getHeight()/2f - getHeight()/2f);
+	}
+
 	public void hide() {
 		remove();
 	}
