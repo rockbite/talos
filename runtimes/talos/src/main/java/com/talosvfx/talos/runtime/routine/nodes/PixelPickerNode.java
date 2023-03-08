@@ -23,8 +23,7 @@ public class PixelPickerNode extends RoutineNode {
             return Color.BLACK;
         }
         Texture texture = asset.getResource();
-
-        if (nodeDirty) {
+        if (nodeDirty || pixmap == null) {
             if(!texture.getTextureData().isPrepared()) {
                 texture.getTextureData().prepare();
             }
