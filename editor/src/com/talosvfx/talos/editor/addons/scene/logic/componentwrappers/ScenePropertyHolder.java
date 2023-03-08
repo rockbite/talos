@@ -4,9 +4,11 @@ import com.badlogic.gdx.utils.Array;
 import com.talosvfx.talos.editor.addons.scene.logic.PropertyWrapperProviders;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.IPropertyProvider;
 import com.talosvfx.talos.runtime.scene.Scene;
+import lombok.Getter;
 
 public class ScenePropertyHolder extends PropertyWrapperProviders.ObjectPropertyHolder<Scene> {
 
+	@Getter
 	private final Scene scene;
 	private final ScenePropertyProvider scenePropertyProvider;
 

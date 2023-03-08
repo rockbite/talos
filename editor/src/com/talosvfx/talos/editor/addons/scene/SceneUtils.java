@@ -374,6 +374,16 @@ public class SceneUtils {
 		markContainerChanged(currentHolder);
 	}
 
+	public static void componentRemoved (GameObjectContainer currentHolder, GameObject gameObject, AComponent component) {
+		ComponentRemoved componentRemoved = Notifications.obtainEvent(ComponentRemoved.class);
+		componentRemoved.setContainer(currentHolder);
+		componentRemoved.setGameObject(gameObject);
+		componentRemoved.setComponent(component);
+		Notifications.fireEvent(componentRemoved);
+
+		markContainerChanged(currentHolder);
+	}
+
 	public static void componentUpdated (GameObjectContainer gameObjectContainer, GameObject gameObject, AComponent component) {
 		componentUpdated(gameObjectContainer, gameObject, component, false);
 	}

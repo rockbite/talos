@@ -6,18 +6,15 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
-import com.talosvfx.talos.editor.addons.scene.events.ComponentRemoved;
-import com.talosvfx.talos.editor.addons.scene.logic.componentwrappers.AComponentProvider;
-import com.talosvfx.talos.editor.addons.scene.logic.componentwrappers.TransformComponentProvider;
-import com.talosvfx.talos.runtime.scene.GameObject;import com.talosvfx.talos.runtime.scene.GameObjectContainer;
+import com.talosvfx.talos.editor.addons.scene.SceneUtils;
+import com.talosvfx.talos.editor.addons.scene.logic.componentwrappers.*;
+import com.talosvfx.talos.runtime.scene.GameObject;
 import com.talosvfx.talos.editor.addons.scene.widgets.PropertyPanel;
-import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.IPropertyProvider;
 import com.talosvfx.talos.editor.widgets.ui.menu.BasicPopup;
 import com.talosvfx.talos.runtime.scene.components.AComponent;
-import com.talosvfx.talos.runtime.scene.components.TransformComponent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,17 +73,13 @@ public class PropertiesPanel extends Table {
                                         updateValues();
                                     } else if(payload.equals("remove")) {
                                         component.remove();
-                                        GameObject gameObject = component.getGameObject();
-                                        if (gameObject != null) {
 
-                                            if (parentPropertyPanel.getCurrentHolder() instanceof GameObjectContainer) {
-                                                ComponentRemoved componentRemoved = Notifications.obtainEvent(ComponentRemoved.class);
-                                                componentRemoved.setComponent(component);
-                                                componentRemoved.setGameObject(gameObject);
-                                                componentRemoved.setContainer((GameObjectContainer)parentPropertyPanel.getCurrentHolder());
-                                                Notifications.fireEvent(componentRemoved);
-                                            }
+                                        GameObject gameObject = component.getGameObject();
+                                        if (gameObject != null && gameObject.getGameObjectContainerRoot() != null) {
+                                            gameObject.removeComponent(component);
+                                            SceneUtils.componentRemoved(gameObject.getGameObjectContainerRoot(), gameObject, component);
                                         }
+
                                         PropertiesPanel.this.remove();
                                     }
                                 }
