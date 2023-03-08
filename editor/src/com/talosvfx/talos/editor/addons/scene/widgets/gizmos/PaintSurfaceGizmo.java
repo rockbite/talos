@@ -145,7 +145,7 @@ public class PaintSurfaceGizmo extends Gizmo implements Observer, GameAsset.Game
 
         if (paintToolsPane.getCurrentTool() == PaintToolsPane.Tool.ERASER) {
             Gdx.gl.glBlendEquationSeparate(GL20.GL_FUNC_ADD, GL20.GL_FUNC_REVERSE_SUBTRACT);
-            innerBatch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+            innerBatch.setBlendFunctionSeparate(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, GL20.GL_SRC_ALPHA, GL20.GL_ONE);
         } else {
             Gdx.gl.glBlendEquationSeparate(GL20.GL_FUNC_ADD, GL20.GL_FUNC_ADD);
             innerBatch.setBlendFunctionSeparate(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, GL20.GL_SRC_ALPHA, GL20.GL_ONE);
@@ -232,7 +232,6 @@ public class PaintSurfaceGizmo extends Gizmo implements Observer, GameAsset.Game
     }
 
     private FrameBuffer createFrameBuffer(boolean updateListeners) {
-        destroyBrushTexture();
         if (frameBuffer != null) {
             frameBuffer.dispose();
         }
