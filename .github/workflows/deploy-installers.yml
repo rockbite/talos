@@ -60,7 +60,7 @@ jobs:
         run: |
           cd editor-desktop-bootstrap
           bash ./package-win.sh
-          "C:\Program Files (x86)\Windows Kits\10\bin\x64\signtool.exe" sign /tr http://timestamp.digicert.com /sha1 69B0E38B4AE92DA8F0433A154D0ED12BD735BF91 /d "TalosVFX Installer" target/talos/TalosVFX-1.0.msi
+          "C:\Program Files (x86)\Windows Kits\10\bin\10.0.19041.0\x86\signtool.exe" sign /tr http://timestamp.digicert.com /sha1 69B0E38B4AE92DA8F0433A154D0ED12BD735BF91 /d "TalosVFX Installer" target/talos/TalosVFX-1.0.msi
 
       - name: Upload installer for windows
         if: runner.os == 'Windows'
