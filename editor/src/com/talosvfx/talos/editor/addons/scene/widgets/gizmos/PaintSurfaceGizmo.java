@@ -280,7 +280,7 @@ public class PaintSurfaceGizmo extends Gizmo implements Observer, GameAsset.Game
         }
     }
 
-    private void createBrushTexture () {
+     public void createBrushTexture () {
         int size = paintToolsPane.getSize();
         float opacity = paintToolsPane.getOpacity();
         float hardness = paintToolsPane.getHardness();
@@ -365,6 +365,7 @@ public class PaintSurfaceGizmo extends Gizmo implements Observer, GameAsset.Game
             viewport.panRequiresSpace(true);
             previousKeyboardFocus = SharedResources.stage.getKeyboardFocus();
             SharedResources.stage.setKeyboardFocus(this);
+            paintToolsPane.applyChannelFilterToColor();
         } else {
             paintToolsPane.remove();
             viewport.panRequiresSpace(false);

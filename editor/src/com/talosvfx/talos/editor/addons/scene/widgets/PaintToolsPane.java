@@ -132,7 +132,7 @@ public class PaintToolsPane extends Table implements Observer {
         });
     }
 
-    private void applyChannelFilterToColor() {
+    public void applyChannelFilterToColor() {
         PaintSurfaceComponent surface = paintSurfaceGizmo.getGameObject().getComponent(PaintSurfaceComponent.class);
         if (!surface.redChannel) {
             colorWidget.getValue().r = 0;
@@ -150,6 +150,7 @@ public class PaintToolsPane extends Table implements Observer {
             colorWidget.getValue().b = fullColor.b;
         }
         colorWidget.setColor(colorWidget.getValue()); // to update the view
+        paintSurfaceGizmo.createBrushTexture();
     }
 
     @EventHandler

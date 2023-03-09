@@ -79,6 +79,10 @@ public class PaintSurfaceComponent extends AComponent implements GameResourceOwn
         GameResourceOwner.writeGameAsset(json, this);
         json.writeValue("overlay", overlay);
         json.writeValue("size", size, Vector2.class);
+        json.writeValue("redChannel", redChannel);
+        json.writeValue("greenChannel", greenChannel);
+        json.writeValue("blueChannel", blueChannel);
+        json.writeValue("alphaChannel", alphaChannel);
     }
 
     public void saveOnFile () {
@@ -104,6 +108,10 @@ public class PaintSurfaceComponent extends AComponent implements GameResourceOwn
 
         overlay = jsonData.getFloat("overlay", 0.5f);
         size = json.readValue( "size", Vector2.class, jsonData);
+        redChannel = jsonData.getBoolean("redChannel", true);
+        greenChannel = jsonData.getBoolean("greenChannel", true);
+        blueChannel = jsonData.getBoolean("blueChannel", true);
+        alphaChannel = jsonData.getBoolean("alphaChannel", true);
     }
 
     private void loadTextureFromIdentifier (String gameResourceIdentifier) {
