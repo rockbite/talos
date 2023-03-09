@@ -786,7 +786,7 @@ public class ProjectExplorerWidget extends Table implements Observer {
 
     @EventHandler
     public void onDirectoryContentsChanged (DirectoryChangedEvent event) {
-        if(getCurrentFolder().path().equals(event.getDirectoryPath())) {
+        if(getCurrentFolder() != null && getCurrentFolder().path().equals(event.getDirectoryPath())) {
             reload();
         }
     }

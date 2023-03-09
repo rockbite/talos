@@ -413,12 +413,16 @@ public class SEPropertyPanel extends PropertyPanel {
 
                                     if (assetForPath != null) {
                                         RoutineRendererComponent routineRendererComponent = new RoutineRendererComponent();
+                                        // HACK, should handle this properly
+                                        Json json = new Json();
+                                        String s = json.toJson(routineRendererComponent);
+                                        routineRendererComponent = json.fromJson(routineRendererComponent.getClass(), s);
+                                        // HACK, should handle this properly
                                         routineRendererComponent.setGameAsset(assetForPath);
                                         gameObject.addComponent(routineRendererComponent);
+                                        SceneUtils.componentAdded(gameObject.getGameObjectContainerRoot(), gameObject, routineRendererComponent);
 
                                         Notifications.fireEvent(Notifications.obtainEvent(DirectoryChangedEvent.class).set(assetDir.path()));
-
-                                        showComponent(routineRendererComponent);
                                     }
 
                                     remove();
