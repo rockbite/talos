@@ -12,6 +12,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.kotcrab.vis.ui.util.ActorUtils;
 import com.kotcrab.vis.ui.widget.VisLabel;
 import com.kotcrab.vis.ui.widget.VisTextButton;
@@ -343,10 +345,14 @@ public class SEPropertyPanel extends PropertyPanel {
                         }
                         if (gameAsset.type == GameAssetType.ROUTINE) {
                             RoutineRendererComponent routineRendererComponent = new RoutineRendererComponent();
+                            // HACK, should handle this properly
+                            Json json = new Json();
+                            String s = json.toJson(routineRendererComponent);
+                            routineRendererComponent = json.fromJson(routineRendererComponent.getClass(), s);
+                            // HACK, should handle this properly
                             routineRendererComponent.setGameAsset(gameAsset);
                             gameObject.addComponent(routineRendererComponent);
-
-                            showComponent(routineRendererComponent);
+                            SceneUtils.componentAdded(gameObject.getGameObjectContainerRoot(), gameObject, routineRendererComponent);
 
                             remove();
                             return;
