@@ -2,6 +2,7 @@ package com.talosvfx.talos.editor.addons.scene.widgets.gizmos;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
@@ -17,6 +18,7 @@ import com.talosvfx.talos.editor.utils.CursorUtil;
 import com.talosvfx.talos.runtime.scene.GameObject;
 import com.talosvfx.talos.runtime.scene.components.SpriteRendererComponent;
 import com.talosvfx.talos.runtime.scene.components.TransformComponent;
+import net.mostlyoriginal.api.plugin.extendedcomponentmapper.M;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -298,9 +300,21 @@ public class EightPointGizmo extends Gizmo {
 	}
 
 	private void movePointByDelta (float x, float y, float deltaX, float deltaY, ControlPoint currentManipulatingPoint) {
-
 		TransformComponent transformComponent = gameObject.getComponent(TransformComponent.class);
 		currentManipulatingPoint.position.set(x, y).sub(controlPointOffset);
+
+		final boolean keepAspectRatio;
+		final SpriteRendererComponent spriteRendererComponent;
+		final Texture texture;
+		if (gameObject.hasComponent(SpriteRendererComponent.class)) {
+			spriteRendererComponent = gameObject.getComponent(SpriteRendererComponent.class);
+			texture = spriteRendererComponent.getGameResource().getResource();
+			keepAspectRatio = spriteRendererComponent.fixAspectRatio && (texture != null);
+		} else {
+			keepAspectRatio = false;
+			spriteRendererComponent = null;
+			texture = null;
+		}
 
 		//We move all other points apart from the opposite point which is always 4 away
 
@@ -352,8 +366,18 @@ public class EightPointGizmo extends Gizmo {
 					height *= -1;
 				}
 
+				if (keepAspectRatio) {
+					float aspect = (float) texture.getWidth() / texture.getHeight();
+					width = height * aspect;
+				}
+
 				controlPoints.get(TOP_RIGHT).position.set(stationaryPoint.position.x + width, stationaryPoint.position.y);
 				controlPoints.get(BOTTOM_LEFT).position.set(stationaryPoint.position.x, stationaryPoint.position.y - height);
+
+				if (keepAspectRatio) {
+					controlPoints.get(BOTTOM_RIGHT).position.set(stationaryPoint.position.x + width, stationaryPoint.position.y - height);
+				}
+
 				controlPoints.get(TOP_MIDDLE).position.set(stationaryPoint.position.x + width / 2f, stationaryPoint.position.y);
 				controlPoints.get(RIGHT_MIDDLE).position.set(stationaryPoint.position.x + width, stationaryPoint.position.y - height / 2f);
 				controlPoints.get(LEFT_MIDDLE).position.set(stationaryPoint.position.x, stationaryPoint.position.y - height / 2f);
@@ -374,8 +398,17 @@ public class EightPointGizmo extends Gizmo {
 					height *= -1;
 				}
 
+				if (keepAspectRatio) {
+					float inverseAspect = (float) texture.getHeight() / texture.getWidth();
+					height = width * inverseAspect;
+				}
+
 				controlPoints.get(TOP_RIGHT).position.set(stationaryPoint.position.x, stationaryPoint.position.y + height);
 				controlPoints.get(BOTTOM_LEFT).position.set(stationaryPoint.position.x - width, stationaryPoint.position.y);
+
+				if (keepAspectRatio) {
+					controlPoints.get(TOP_LEFT).position.set(stationaryPoint.position.x - width, stationaryPoint.position.y + height);
+				}
 
 				controlPoints.get(TOP_MIDDLE).position.set(stationaryPoint.position.x - width / 2f, stationaryPoint.position.y + height);
 				controlPoints.get(RIGHT_MIDDLE).position.set(stationaryPoint.position.x, stationaryPoint.position.y + height / 2f);
@@ -397,8 +430,17 @@ public class EightPointGizmo extends Gizmo {
 					height *= -1;
 				}
 
+				if (keepAspectRatio) {
+					float inverseAspect = (float) texture.getHeight() / texture.getWidth();
+					height = width * inverseAspect;
+				}
+
 				controlPoints.get(TOP_LEFT).position.set(stationaryPoint.position.x, stationaryPoint.position.y + height);
 				controlPoints.get(BOTTOM_RIGHT).position.set(stationaryPoint.position.x + width, stationaryPoint.position.y);
+
+				if (keepAspectRatio) {
+					controlPoints.get(TOP_RIGHT).position.set(stationaryPoint.position.x + width, stationaryPoint.position.y + height);
+				}
 
 				controlPoints.get(TOP_MIDDLE).position.set(stationaryPoint.position.x + width / 2f, stationaryPoint.position.y + height);
 				controlPoints.get(RIGHT_MIDDLE).position.set(stationaryPoint.position.x + width, stationaryPoint.position.y + height / 2f);
@@ -420,8 +462,17 @@ public class EightPointGizmo extends Gizmo {
 					height *= -1;
 				}
 
+				if (keepAspectRatio) {
+					float aspect = (float) texture.getWidth() / texture.getHeight();
+					width = height * aspect;
+				}
+
 				controlPoints.get(TOP_LEFT).position.set(stationaryPoint.position.x - width, stationaryPoint.position.y);
 				controlPoints.get(BOTTOM_RIGHT).position.set(stationaryPoint.position.x, stationaryPoint.position.y - height);
+
+				if (keepAspectRatio) {
+					controlPoints.get(BOTTOM_LEFT).position.set(stationaryPoint.position.x - width, stationaryPoint.position.y - height);
+				}
 
 				controlPoints.get(TOP_MIDDLE).position.set(stationaryPoint.position.x - width / 2f, stationaryPoint.position.y);
 				controlPoints.get(RIGHT_MIDDLE).position.set(stationaryPoint.position.x, stationaryPoint.position.y - height / 2f);
@@ -465,10 +516,24 @@ public class EightPointGizmo extends Gizmo {
 					height *= -1;
 				}
 
+				if (keepAspectRatio) {
+					float inverseAspect = (float) texture.getHeight() / texture.getWidth();
+					height = width * inverseAspect;
+				}
+
 				controlPoints.get(TOP_RIGHT).position.set(stationaryPoint.position.x + width, stationaryPoint.position.y + height / 2f);
 				controlPoints.get(BOTTOM_RIGHT).position.set(stationaryPoint.position.x + width, stationaryPoint.position.y - height / 2f);
+
 				controlPoints.get(TOP_MIDDLE).position.x = stationaryPoint.position.x + width / 2f;
 				controlPoints.get(BOTTOM_MIDDLE).position.x = stationaryPoint.position.x + width / 2f;
+
+				if (keepAspectRatio) {
+					controlPoints.get(TOP_LEFT).position.set(stationaryPoint.position.x, stationaryPoint.position.y + height / 2f);
+					controlPoints.get(BOTTOM_LEFT).position.set(stationaryPoint.position.x, stationaryPoint.position.y - height / 2f);
+
+					controlPoints.get(TOP_MIDDLE).position.y = stationaryPoint.position.y + height / 2f;
+					controlPoints.get(BOTTOM_MIDDLE).position.y = stationaryPoint.position.y - height / 2f;
+				}
 
 			}
 
@@ -489,10 +554,24 @@ public class EightPointGizmo extends Gizmo {
 					height *= -1;
 				}
 
+				if (keepAspectRatio) {
+					float inverseAspect = (float) texture.getHeight() / texture.getWidth();
+					height = width * inverseAspect;
+				}
+
 				controlPoints.get(TOP_LEFT).position.set(stationaryPoint.position.x - width, stationaryPoint.position.y + height / 2f);
 				controlPoints.get(BOTTOM_LEFT).position.set(stationaryPoint.position.x - width, stationaryPoint.position.y - height / 2f);
+
 				controlPoints.get(TOP_MIDDLE).position.x = stationaryPoint.position.x - width / 2f;
 				controlPoints.get(BOTTOM_MIDDLE).position.x = stationaryPoint.position.x - width / 2f;
+
+				if (keepAspectRatio) {
+					controlPoints.get(TOP_RIGHT).position.set(stationaryPoint.position.x, stationaryPoint.position.y + height / 2f);
+					controlPoints.get(BOTTOM_RIGHT).position.set(stationaryPoint.position.x, stationaryPoint.position.y - height / 2f);
+
+					controlPoints.get(TOP_MIDDLE).position.y = stationaryPoint.position.y + height / 2f;
+					controlPoints.get(BOTTOM_MIDDLE).position.y = stationaryPoint.position.y - height / 2f;
+				}
 			}
 
 			if (stationaryPoint.id == BOTTOM_MIDDLE) {
@@ -511,11 +590,24 @@ public class EightPointGizmo extends Gizmo {
 					height *= -1;
 				}
 
+				if (keepAspectRatio) {
+					float aspect = (float) texture.getWidth() / texture.getHeight();
+					width = height * aspect;
+				}
+
 				controlPoints.get(TOP_LEFT).position.set(stationaryPoint.position.x - width / 2f, stationaryPoint.position.y + height);
 				controlPoints.get(TOP_RIGHT).position.set(stationaryPoint.position.x + width / 2f, stationaryPoint.position.y + height);
 
 				controlPoints.get(LEFT_MIDDLE).position.y = stationaryPoint.position.y + height / 2f;
 				controlPoints.get(RIGHT_MIDDLE).position.y = stationaryPoint.position.y + height / 2f;
+
+				if (keepAspectRatio) {
+					controlPoints.get(BOTTOM_LEFT).position.set(stationaryPoint.position.x - width / 2f, stationaryPoint.position.y);
+					controlPoints.get(BOTTOM_RIGHT).position.set(stationaryPoint.position.x + width / 2f, stationaryPoint.position.y);
+
+					controlPoints.get(LEFT_MIDDLE).position.x = stationaryPoint.position.x - width / 2f;
+					controlPoints.get(RIGHT_MIDDLE).position.x = stationaryPoint.position.x + width / 2f;
+				}
 			}
 
 			if (stationaryPoint.id == TOP_MIDDLE) {
@@ -534,11 +626,24 @@ public class EightPointGizmo extends Gizmo {
 					height *= -1;
 				}
 
+				if (keepAspectRatio) {
+					float aspect = (float) texture.getWidth() / texture.getHeight();
+					width = height * aspect;
+				}
+
 				controlPoints.get(BOTTOM_LEFT).position.set(stationaryPoint.position.x - width / 2f, stationaryPoint.position.y - height);
 				controlPoints.get(BOTTOM_RIGHT).position.set(stationaryPoint.position.x + width / 2f, stationaryPoint.position.y - height);
 
 				controlPoints.get(LEFT_MIDDLE).position.y = stationaryPoint.position.y - height / 2f;
 				controlPoints.get(RIGHT_MIDDLE).position.y = stationaryPoint.position.y - height / 2f;
+
+				if (keepAspectRatio) {
+					controlPoints.get(TOP_LEFT).position.set(stationaryPoint.position.x - width / 2f, stationaryPoint.position.y);
+					controlPoints.get(TOP_RIGHT).position.set(stationaryPoint.position.x + width / 2f, stationaryPoint.position.y);
+
+					controlPoints.get(LEFT_MIDDLE).position.x = stationaryPoint.position.x - width / 2f;
+					controlPoints.get(RIGHT_MIDDLE).position.x = stationaryPoint.position.x + width / 2f;
+				}
 			}
 
 			//put them back into space
