@@ -5,6 +5,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.utils.Align;
 import com.talosvfx.talos.runtime.scene.GameObject;
 import com.talosvfx.talos.runtime.scene.GameObjectContainer;
 import com.talosvfx.talos.editor.notifications.Notifications;
@@ -28,6 +29,7 @@ public class CameraPane extends Actor implements Observer {
 
     public CameraPane () {
         title = new Label("", SharedResources.skin);
+        title.setAlignment(Align.center);
         bg = new Image(SharedResources.skin.getDrawable("window"));
 
         cameraPreview = new CameraPreview();
@@ -37,12 +39,11 @@ public class CameraPane extends Actor implements Observer {
 
     @Override
     public void draw (Batch batch, float parentAlpha) {
-
         bg.setPosition(getX(), getY());
         bg.setSize(getWidth(), getHeight());
         bg.draw(batch, parentAlpha);
 
-        title.setPosition(bg.getX()+15, bg.getY() + getHeight() - title.getHeight()-7);
+        title.setPosition(getX() + getWidth() / 2f - title.getWidth() / 2f, getY() + getHeight() - title.getHeight() - 5f);
         title.draw(batch, parentAlpha);
 
         cameraPreview.setPosition(getX() + 10, getY() + 19);
@@ -60,6 +61,7 @@ public class CameraPane extends Actor implements Observer {
 
         setSize(previewSize.x + 20, previewSize.y  + 49);
 
+        title.pack();
         title.setWidth(getWidth() - 40);
         title.setEllipsis(true);
 
