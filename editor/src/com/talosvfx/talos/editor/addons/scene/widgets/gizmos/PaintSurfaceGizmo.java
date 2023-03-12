@@ -11,14 +11,12 @@ import com.badlogic.gdx.graphics.glutils.PixmapTextureData;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
-import com.badlogic.gdx.utils.Pools;
 import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.talosvfx.talos.editor.addons.scene.events.ComponentUpdated;
 import com.talosvfx.talos.editor.addons.scene.events.PaintSurfaceResize;
 import com.talosvfx.talos.editor.addons.scene.widgets.PaintToolsPane;
 import com.talosvfx.talos.editor.notifications.EventHandler;
@@ -388,5 +386,13 @@ public class PaintSurfaceGizmo extends Gizmo implements Observer, GameAsset.Game
     @Override
     public void onUpdate() {
         createFrameBuffer(false);
+    }
+
+    @EventHandler
+    public void onComponentUpdated(ComponentUpdated event) {
+        // create new framebuffer if applicable
+        if (event.getComponent() instanceof PaintSurfaceComponent && gameObject == event.getParent()) {
+            createFrameBuffer(false);
+        }
     }
 }
