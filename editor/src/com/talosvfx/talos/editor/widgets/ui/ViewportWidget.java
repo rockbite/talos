@@ -231,6 +231,21 @@ public abstract class ViewportWidget extends Table {
 			}
 		});
 
+
+		VisLabel viewportWidthLabel = new VisLabel("ViewportWidth");
+		VisTextField viewportWidthField = new VisTextField(viewportViewSettings.getFov()+"");
+		viewportWidthField.setTextFieldFilter(new FloatRangeDigitFilter());
+		viewportWidthField.addListener(new ChangeListener() {
+			@Override
+			public void changed (ChangeEvent event, Actor actor) {
+				String text = viewportWidthField.getText();
+				if (text != null && !text.isEmpty()) {
+					viewportViewSettings.setWorldWidth(Float.parseFloat(text));
+				}
+			}
+		});
+
+
 		VisLabel fovLabel = new VisLabel("Fov");
 		VisTextField fovField = new VisTextField(viewportViewSettings.getFov()+"");
 		fovField.setTextFieldFilter(new FloatRangeDigitFilter());
@@ -295,6 +310,9 @@ public abstract class ViewportWidget extends Table {
 		cameraTable.add(cameraTypeLabel);
 		cameraTable.add(cameraTypeBox);
 
+		cameraTable.row();
+		cameraTable.add(viewportWidthLabel);
+		cameraTable.add(viewportWidthField);
 
 		cameraTable.row();
 		cameraTable.add(fovLabel);
