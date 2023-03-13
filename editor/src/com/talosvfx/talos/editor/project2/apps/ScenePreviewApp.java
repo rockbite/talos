@@ -14,13 +14,15 @@ import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.runtime.scene.Scene;
 import lombok.Getter;
 
-public class ScenePreviewApp extends AppManager.BaseApp<Scene> implements Observer, ContainerOfPrefs<ViewportPreferences> {
+public class ScenePreviewApp extends AppManager.BaseApp<Scene> implements GameAsset.GameAssetUpdateListener, Observer, ContainerOfPrefs<ViewportPreferences> {
 
     @Getter
     private final ScenePreviewStage workspaceWidget;
 
     public ScenePreviewApp() {
         this.singleton = true;
+
+        Notifications.registerObserver(this);
 
         workspaceWidget = new ScenePreviewStage();
         workspaceWidget.disableListeners();
@@ -64,12 +66,21 @@ public class ScenePreviewApp extends AppManager.BaseApp<Scene> implements Observ
 
     @Override
     public String getAppName() {
-        return "Preview (Scene)";
+        if (gameAsset != null) {
+            return "Preview - " + gameAsset.nameIdentifier;
+        } else {
+            return "Preview - ";
+        }
     }
 
     @Override
     public void onRemove() {
         Notifications.unregisterObserver(this);
+    }
+
+    @Override
+    public void onUpdate () {
+        getGridAppReference().updateTabName(getAppName());
     }
 
     public void reload() {
