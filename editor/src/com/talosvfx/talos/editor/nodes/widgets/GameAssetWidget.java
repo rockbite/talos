@@ -142,7 +142,7 @@ public class GameAssetWidget<T> extends AbstractWidget<GameAsset<T>> implements 
     @Override
     public void write(Json json, String name) {
         json.writeObjectStart(name);
-        if(gameAsset != null) {
+        if(gameAsset != null && !gameAsset.isBroken()) {
             json.writeValue("type", type);
             json.writeValue("id", gameAsset.nameIdentifier);
             json.writeValue("uuid", gameAsset.getRootRawAsset().metaData.uuid.toString());
