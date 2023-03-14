@@ -52,7 +52,7 @@ public class CameraPreview extends Actor {
     public void act (float delta) {
         super.act(delta);
         TransformComponent transform = cameraObject.getComponent(TransformComponent.class);
-        viewport.getCamera().position.set(transform.position.x, transform.position.y, 0);
+        viewport.getCamera().position.set(transform.worldPosition.x, transform.worldPosition.y, 0);
         ((OrthographicCamera)viewport.getCamera()).zoom = component.zoom;
         OrthographicCamera camera = (OrthographicCamera) viewport.getCamera();
         float currRotation = getCameraAngle(camera);
