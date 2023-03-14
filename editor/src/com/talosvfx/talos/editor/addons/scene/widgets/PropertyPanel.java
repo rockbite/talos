@@ -158,7 +158,11 @@ public class PropertyPanel extends Table implements Observer {
 
     @EventHandler
     public void onComponentAdded (ComponentAdded componentAdded) {
-        if (this.currentPropertyHolder == componentAdded.getParent()) {
+        if (componentAdded.getParent() == null || this.currentPropertyHolder == null) {
+            return;
+        }
+        IPropertyHolder gameObjectHolder = PropertyWrapperProviders.getOrCreateHolder(componentAdded.getParent());
+        if (this.currentPropertyHolder == gameObjectHolder) {
             showPanel(this.currentPropertyHolder, this.currentPropertyHolder.getPropertyProviders());
         }
     }
