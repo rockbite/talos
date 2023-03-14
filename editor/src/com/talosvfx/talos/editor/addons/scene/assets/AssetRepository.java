@@ -6,7 +6,6 @@ import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.PixmapTextureData;
@@ -49,6 +48,8 @@ import com.talosvfx.talos.runtime.assets.meta.ScriptMetadata;
 import com.talosvfx.talos.runtime.assets.meta.SpineMetadata;
 import com.talosvfx.talos.runtime.assets.meta.SpriteMetadata;
 import com.talosvfx.talos.runtime.maps.TilePaletteData;
+import com.talosvfx.talos.runtime.scene.GameObjectContainer;
+import com.talosvfx.talos.runtime.scene.components.AComponent;
 import com.talosvfx.talos.runtime.utils.NamingUtils;
 import com.talosvfx.talos.editor.utils.Toasts;
 import com.talosvfx.talos.runtime.assets.GameAsset;
@@ -660,6 +661,7 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 			assetExportStructure.identifier = gameAsset.nameIdentifier;
 			assetExportStructure.uuid = gameAsset.getRootRawAsset().metaData.uuid.toString();
 			assetExportStructure.type = gameAsset.type;
+			assetExportStructure.dependentGameAssets.addAll(dependentGameAssetsToUUIDArray(gameAsset));
 
 
 			boolean primaryFile = true;
@@ -704,6 +706,36 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 
 			gameAssetExportStructure.gameAssets.add(assetExportStructure);
 
+		}
+	}
+
+	private ObjectSet<String> dependentGameAssetsToUUIDArray (GameAsset<?> gameAsset) {
+		ObjectSet<String> uuids = new ObjectSet<>();
+		for (GameAsset<?> dependentGameAsset : gameAsset.dependentGameAssets) {
+			uuids.add(dependentGameAsset.getRootRawAsset().metaData.uuid.toString());
+		}
+
+		//Are we something that does shit dynamically? Like Scene/Prefab?
+
+		if (gameAsset.type == GameAssetType.PREFAB || gameAsset.type == GameAssetType.SCENE) {
+			GameAsset<GameObjectContainer> castedGameAsset = (GameAsset<GameObjectContainer>)gameAsset;
+			GameObjectContainer container = castedGameAsset.getResource();
+			GameObject selfObject = container.getSelfObject();
+			collectDependentGameResources(selfObject, uuids);
+		}
+
+
+		return uuids;
+	}
+
+	private void collectDependentGameResources (GameObject selfObject, ObjectSet<String> uuids) {
+		if (selfObject.hasComponentType(GameResourceOwner.class)) {
+			GameResourceOwner gameResourceOwner = selfObject.getComponentAssignableFrom(GameResourceOwner.class);
+			uuids.add(gameResourceOwner.getGameResource().getRootRawAsset().metaData.uuid.toString());
+		}
+		Array<GameObject> gameObjects = selfObject.getGameObjects();
+		for (int i = 0; i < gameObjects.size; i++) {
+			collectDependentGameResources(gameObjects.get(i), uuids);
 		}
 	}
 

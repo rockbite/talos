@@ -4,7 +4,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.GdxRuntimeException;
@@ -65,11 +64,11 @@ public class RuntimeAssetRepository extends BaseAssetRepository {
 		loadType(GameAssetType.LAYOUT_DATA, sorted, baseDir);
 	}
 
-	private interface GameAssetLoader<T> {
+	public interface GameAssetLoader<T> {
 		GameAsset<T> load (GameAssetExportStructure exportStructure, FileHandle baseFolder);
 	}
 
-	private GameAssetLoader<?> getLoader (GameAssetType type) {
+	public GameAssetLoader<?> getLoader (GameAssetType type) {
 		switch (type) {
 		case SPRITE:
 			return this::spriteLoader;
@@ -235,6 +234,10 @@ public class RuntimeAssetRepository extends BaseAssetRepository {
 			GameAsset<?> asset = loader.load(gameAssetExportStructure, baseFolder);
 			registerAsset(asset, gameAssetExportStructure.identifier, gameAssetExportStructure.uuid);
 		}
+	}
+
+	public void registerAsset (GameAsset<?> asset, String uuid) {
+		registerAsset(asset, asset.nameIdentifier, uuid);
 	}
 
 	private void registerAsset (GameAsset<?> asset, String identifier, String uuid) {

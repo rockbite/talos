@@ -288,7 +288,7 @@ public class GameObject implements GameObjectContainer, Json.Serializable {
         return list;
     }
 
-    public <T extends AComponent> T getComponentAssignableFrom (Class<? extends T> clazz) {
+    public <T> T getComponentAssignableFrom (Class<? extends T> clazz) {
         for(Class clazzToCheck: componentClasses.keys()) {
             if(clazz.isAssignableFrom(clazzToCheck)) {
                 return (T) componentClasses.get(clazzToCheck);
