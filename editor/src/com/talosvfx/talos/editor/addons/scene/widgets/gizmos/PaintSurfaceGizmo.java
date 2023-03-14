@@ -69,6 +69,7 @@ public class PaintSurfaceGizmo extends Gizmo implements Observer, GameAsset.Game
             public boolean keyUp(InputEvent event, int keycode) {
                 if (keycode == Input.Keys.LEFT_BRACKET || keycode == Input.Keys.RIGHT_BRACKET) {
                     paintToolsPane.bracketUp(keycode);
+                    destroyBrushTexture();
                     return true;
                 }
 
