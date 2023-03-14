@@ -83,6 +83,9 @@ public class PaintSurfaceComponent extends AComponent implements GameResourceOwn
 
     public void saveOnFile () {
         GameAsset<Texture> gameResource = getGameResource();
+        if (gameResource.isBroken()) {
+            return;
+        }
         FileHandle handle = gameResource.getRootRawAsset().handle;
 
         TextureData textureData = gameResource.getResource().getTextureData();
