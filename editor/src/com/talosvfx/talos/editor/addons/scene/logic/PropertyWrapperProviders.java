@@ -28,19 +28,7 @@ import com.talosvfx.talos.runtime.assets.meta.TlsMetadata;
 import com.talosvfx.talos.runtime.scene.GameObject;
 import com.talosvfx.talos.runtime.scene.Prefab;
 import com.talosvfx.talos.runtime.scene.Scene;
-import com.talosvfx.talos.runtime.scene.components.AComponent;
-import com.talosvfx.talos.runtime.scene.components.CameraComponent;
-import com.talosvfx.talos.runtime.scene.components.CurveComponent;
-import com.talosvfx.talos.runtime.scene.components.MapComponent;
-import com.talosvfx.talos.runtime.scene.components.PaintSurfaceComponent;
-import com.talosvfx.talos.runtime.scene.components.ParticleComponent;
-import com.talosvfx.talos.runtime.scene.components.RendererComponent;
-import com.talosvfx.talos.runtime.scene.components.RoutineRendererComponent;
-import com.talosvfx.talos.runtime.scene.components.ScriptComponent;
-import com.talosvfx.talos.runtime.scene.components.SpineRendererComponent;
-import com.talosvfx.talos.runtime.scene.components.SpriteRendererComponent;
-import com.talosvfx.talos.runtime.scene.components.TileDataComponent;
-import com.talosvfx.talos.runtime.scene.components.TransformComponent;
+import com.talosvfx.talos.runtime.scene.components.*;
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ClassInfo;
 import io.github.classgraph.ClassInfoList;
@@ -106,6 +94,7 @@ public class PropertyWrapperProviders {
 		propertyProvidersForClass.put(SpriteRendererComponent.class, SpriteRendererComponentProvider.class);
 		propertyProvidersForClass.put(TileDataComponent.class, TileDataComponentProvider.class);
 		propertyProvidersForClass.put(TransformComponent.class, TransformComponentProvider.class);
+		propertyProvidersForClass.put(DataComponent.class, DataComponentProvider.class);
 
 
 		//Routine Nodes

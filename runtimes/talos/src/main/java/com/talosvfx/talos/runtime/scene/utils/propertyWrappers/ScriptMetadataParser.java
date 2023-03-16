@@ -16,69 +16,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ScriptMetadataParser {
-
-
-    private static class ScriptPropertyWrappers {
-        private final ObjectMap<Class, Class<? extends PropertyWrapper<?>>> registeredTypes = new ObjectMap<>();
-
-        private ObjectMap<String, String> primitiveReplacementMap = new ObjectMap<>();
-
-        ScriptPropertyWrappers () {
-            primitiveReplacementMap.put("float", Float.class.getName());
-            primitiveReplacementMap.put("int", Integer.class.getName());
-            primitiveReplacementMap.put("boolean", Boolean.class.getName());
-            primitiveReplacementMap.put("GameObject", GameObject.class.getName());
-            primitiveReplacementMap.put("String", String.class.getName());
-            primitiveReplacementMap.put("vec2", Vector2.class.getName());
-        }
-
-        <T> void registerPropertyWrapper (Class<T> clazz, Class<? extends PropertyWrapper<T>> wrapperClazz) {
-            this.registeredTypes.put(clazz, wrapperClazz);
-        }
-
-        String parseName (String className) {
-            if (primitiveReplacementMap.containsKey(className)) {
-                className = primitiveReplacementMap.get(className);
-            }
-            return className;
-        }
-
-        boolean supportsProperty (String property) {
-            property = parseName(property);
-            try {
-                Class classForName = ClassReflection.forName(property);
-                return registeredTypes.containsKey(classForName);
-            } catch (ReflectionException e) {
-                e.printStackTrace();
-                return false;
-            }
-
-        }
-
-        @SuppressWarnings("unchecked")
-        <T> PropertyWrapper<T> createPropertyWrapperForClazz (Class<T> clazz) {
-            Class<PropertyWrapper<T>> aClass = (Class<PropertyWrapper<T>>)registeredTypes.get(clazz);
-            try {
-                return ClassReflection.newInstance(aClass);
-            } catch (ReflectionException e) {
-                throw new RuntimeException(e);
-            }
-        }
-
-        public <T> PropertyWrapper<T> createPropertyWrapperForClazzName (String parameterClassName) {
-            String clazzName = parseName(parameterClassName);
-            Class aClass = null;
-            try {
-                aClass = ClassReflection.forName(clazzName);
-            } catch (ReflectionException e) {
-                throw new RuntimeException(e);
-            }
-            return createPropertyWrapperForClazz(aClass);
-        }
-    }
-
-    private ScriptPropertyWrappers scriptPropertyWrappers = new ScriptPropertyWrappers();
-
+    private PropertyWrappers scriptPropertyWrappers = new PropertyWrappers();
 
     BufferedReader reader;
 

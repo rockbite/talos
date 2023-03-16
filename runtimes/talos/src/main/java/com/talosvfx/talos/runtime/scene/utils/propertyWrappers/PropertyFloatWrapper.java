@@ -6,6 +6,10 @@ import com.badlogic.gdx.utils.JsonValue;
 
 public class PropertyFloatWrapper extends PropertyNumberWrapper<Float> {
 
+    public PropertyFloatWrapper () {
+        defaultValue = 0.0f;
+    }
+
     @Override
     public void collectAttributes (Array<String> attributes) {
         super.collectAttributes(attributes);

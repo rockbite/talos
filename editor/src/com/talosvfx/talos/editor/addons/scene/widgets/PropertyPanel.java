@@ -17,6 +17,7 @@ import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.Observer;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.IPropertyProvider;
+import com.talosvfx.talos.runtime.scene.components.DataComponent;
 import com.talosvfx.talos.runtime.scene.components.RoutineRendererComponent;
 import com.talosvfx.talos.runtime.scene.components.ScriptComponent;
 import lombok.Getter;
@@ -170,6 +171,10 @@ public class PropertyPanel extends Table implements Observer {
     public void onComponentUpdate (ComponentUpdated componentUpdated) {
         if (!ignoringEvents) {
             propertyProviderUpdated(PropertyWrapperProviders.getOrCreateProvider(componentUpdated.getComponent()));
+        }
+        IPropertyHolder gameObjectHolder = PropertyWrapperProviders.getOrCreateHolder(componentUpdated.getParent());
+        if (componentUpdated.getComponent() instanceof DataComponent && this.currentPropertyHolder == gameObjectHolder) {
+            showPanel(this.currentPropertyHolder, this.currentPropertyHolder.getPropertyProviders());
         }
     }
     @EventHandler

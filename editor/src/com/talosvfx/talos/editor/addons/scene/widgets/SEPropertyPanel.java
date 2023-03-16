@@ -39,6 +39,7 @@ import com.talosvfx.talos.editor.widgets.ui.SearchFilteredTree;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 import com.talosvfx.talos.editor.widgets.ui.common.SquareButton;
 import com.talosvfx.talos.runtime.scene.components.AComponent;
+import com.talosvfx.talos.runtime.scene.components.DataComponent;
 import com.talosvfx.talos.runtime.scene.components.RoutineRendererComponent;
 import com.talosvfx.talos.runtime.scene.components.ScriptComponent;
 import org.slf4j.Logger;
@@ -245,6 +246,10 @@ public class SEPropertyPanel extends PropertyPanel {
             collectAssets(GameAssetType.SCRIPT, rootHandle, scripts);
             collectAssets(GameAssetType.ROUTINE, rootHandle, customRenderers);
 
+            Label dataComponentLabel = new Label("New Data Component", getSkin());
+            FilteredTree.Node<Object> newDataComponent = new FilteredTree.Node<>("newdatacomponent", dataComponentLabel);
+            tree.add(newDataComponent);
+
             setToTree();
 
             add(container).width(300).minHeight(300).row();
@@ -429,6 +434,14 @@ public class SEPropertyPanel extends PropertyPanel {
                                 }
                             });
 
+                            return;
+                        }
+
+                        if (name.equals("newdatacomponent")) {
+                            DataComponent dataComponent = new DataComponent();
+                            gameObject.addComponent(dataComponent);
+                            SceneUtils.componentAdded(gameObject.getGameObjectContainerRoot(), gameObject, dataComponent);
+                            remove();
                             return;
                         }
                     }
