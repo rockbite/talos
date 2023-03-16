@@ -21,7 +21,7 @@ public class DataComponentProvider extends AComponentProvider<DataComponent> {
 
 		for (PropertyWrapper<?> property : component.getProperties()) {
 			PropertyWidget generate = WidgetFactory.generateForPropertyWrapper(property);
-			generate.setParent(this);
+			generate.setParent(component);
 			properties.add(generate);
 		}
 
