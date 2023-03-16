@@ -4,6 +4,11 @@ import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 
 public class PropertyBooleanWrapper extends PropertyWrapper<Boolean> {
+
+    public PropertyBooleanWrapper () {
+        defaultValue = false;
+    }
+
     @Override
     public Boolean parseValueFromString (String value) {
         return Boolean.valueOf(value);

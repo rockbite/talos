@@ -4,6 +4,11 @@ import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 
 public class PropertyStringWrapper extends PropertyWrapper<String> {
+
+    public PropertyStringWrapper () {
+        defaultValue = "";
+    }
+
     @Override
     public String parseValueFromString (String value) {
         return value;
