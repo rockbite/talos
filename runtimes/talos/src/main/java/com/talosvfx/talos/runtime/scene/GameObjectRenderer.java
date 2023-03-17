@@ -4,7 +4,9 @@ import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.PolygonBatch;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.talosvfx.talos.runtime.scene.components.MapComponent;
 import com.talosvfx.talos.runtime.scene.components.ParticleComponent;
 import com.talosvfx.talos.runtime.scene.components.RendererComponent;
@@ -15,6 +17,7 @@ import com.talosvfx.talos.runtime.scene.components.TransformComponent;
 import com.talosvfx.talos.runtime.scene.render.ComponentRenderer;
 import com.talosvfx.talos.runtime.scene.render.MapComponentRenderer;
 import com.talosvfx.talos.runtime.scene.render.RenderState;
+import com.talosvfx.talos.runtime.scene.render.RenderStrategy;
 import com.talosvfx.talos.runtime.scene.render.RoutineComponentRenderer;
 import com.talosvfx.talos.runtime.scene.render.SimpleParticleComponentRenderer;
 import com.talosvfx.talos.runtime.scene.render.SkeletonComponentRenderer;
@@ -34,7 +37,9 @@ public class GameObjectRenderer {
 	private ComponentRenderer<SpineRendererComponent> spineRenderer;
 
 	public final Comparator<GameObject> layerAndDrawOrderComparator;
-	private Comparator<GameObject> activeSorter;
+	public final Comparator<GameObject> yDownDrawOrderComparator;
+
+	public final Comparator<GameObject> parentSorter;
 
 	private Camera camera;
 
@@ -51,20 +56,77 @@ public class GameObjectRenderer {
 		layerAndDrawOrderComparator = new Comparator<GameObject>() {
 			@Override
 			public int compare (GameObject o1, GameObject o2) {
+				float aSort = GameObjectRenderer.getDrawOrderSafe(o1);
+				float bSort = GameObjectRenderer.getDrawOrderSafe(o2);
+				return Float.compare(aSort, bSort);
+			}
+		};
+
+		yDownDrawOrderComparator = new Comparator<GameObject>() {
+			@Override
+			public int compare (GameObject o1, GameObject o2) {
+				float aSort = GameObjectRenderer.getBottomY(o1);
+				float bSort = GameObjectRenderer.getBottomY(o2);
+				return -Float.compare(aSort, bSort);
+			}
+		};
+
+		parentSorter = new Comparator<GameObject>() {
+			@Override
+			public int compare (GameObject o1, GameObject o2) {
 				SceneLayer o1Layer = GameObjectRenderer.getLayerSafe(o1);
 				SceneLayer o2Layer = GameObjectRenderer.getLayerSafe(o2);
 
 				if (o1Layer.equals(o2Layer)) {
-					float aSort = GameObjectRenderer.getDrawOrderSafe(o1);
-					float bSort = GameObjectRenderer.getDrawOrderSafe(o2);
-					return Float.compare(aSort, bSort);
+
+					RenderStrategy renderStrategy = o1Layer.getRenderStrategy();
+
+
+					Comparator<GameObject> sorter = getSorter(renderStrategy);
+
+					return sorter.compare(o1, o2);
 				} else {
 					return Integer.compare(o1Layer.getIndex(), o2Layer.getIndex());
 				}
 			}
 		};
 
-		activeSorter = layerAndDrawOrderComparator;
+	}
+	private Comparator<GameObject> getSorter (RenderStrategy renderMode) {
+		switch (renderMode) {
+		case SCENE:
+			return layerAndDrawOrderComparator;
+		case YDOWN:
+			return yDownDrawOrderComparator;
+		}
+
+		throw new GdxRuntimeException("No sorter found for render mode: " + renderMode);
+	}
+	private static float getBottomY (GameObject gameObject) {
+		if (gameObject.hasComponentType(RendererComponent.class)) {
+			RendererComponent componentAssignableFrom = gameObject.getComponentAssignableFrom(RendererComponent.class);
+			TransformComponent transformComponent = gameObject.getComponent(TransformComponent.class);
+
+			float y = transformComponent.worldPosition.y;
+
+			if (componentAssignableFrom instanceof SpriteRendererComponent) {
+				Vector2 size = ((SpriteRendererComponent)componentAssignableFrom).size;
+				Vector2 worldScale = transformComponent.worldScale;
+
+				float totalHeight = size.y * worldScale.y;
+				y -= totalHeight/2f;
+			}
+
+			return y;
+
+		} else {
+			if (gameObject.hasComponent(TransformComponent.class)) {
+				TransformComponent component = gameObject.getComponent(TransformComponent.class);
+				return component.worldPosition.y;
+			}
+		}
+
+		return 0;
 	}
 
 	private static SceneLayer getLayerSafe(GameObject gameObject) {
@@ -82,9 +144,7 @@ public class GameObjectRenderer {
 		}
 		return -55;
 	}
-	public void setActiveSorter (Comparator<GameObject> customSorter) {
-		this.activeSorter = customSorter;
-	}
+
 
 	protected ComponentRenderer<MapComponent> createMapRenderer () {
 		return new MapComponentRenderer(this);
@@ -107,7 +167,7 @@ public class GameObjectRenderer {
 	}
 
 	private void sort (Array<GameObject> list) {
-		list.sort(activeSorter);
+		list.sort(parentSorter);
 	}
 
 	public void update (GameObject gameObject, float delta) {

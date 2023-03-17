@@ -4,6 +4,7 @@ import com.badlogic.gdx.utils.Array;
 import com.talosvfx.talos.editor.addons.scene.SceneUtils;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.project2.TalosProjectData;
+import com.talosvfx.talos.editor.widgets.propertyWidgets.SelectBoxWidget;
 import com.talosvfx.talos.editor.widgets.ui.FilteredTree;
 import com.talosvfx.talos.runtime.scene.SceneData;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.DynamicItemListWidget;
@@ -13,12 +14,15 @@ import com.talosvfx.talos.editor.widgets.propertyWidgets.LabelWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
 import com.talosvfx.talos.runtime.scene.Scene;
 import com.talosvfx.talos.runtime.scene.SceneLayer;
+import com.talosvfx.talos.runtime.scene.render.RenderStrategy;
 
 import java.util.function.Supplier;
 
 public class ScenePropertyProvider implements IPropertyProvider {
 
 	private final Scene scene;
+	private SelectBoxWidget renderStategy;
+	private String selectedLayer;
 
 	public ScenePropertyProvider (Scene scene) {
 		this.scene = scene;
@@ -101,6 +105,8 @@ public class ScenePropertyProvider implements IPropertyProvider {
 			public void onUpdate() {
 				int preferredLayerIndex = SharedResources.currentProject.getSceneData().getPreferredSceneLayer().getIndex();
 				itemListWidget.list.addNodeToSelectionByIndex(preferredLayerIndex);
+
+				setSelectedLayer(itemListWidget.list.getSelection().first().getObject().id);
 			}
 
 			@Override
@@ -123,10 +129,55 @@ public class ScenePropertyProvider implements IPropertyProvider {
 
 		itemListWidget.setDraggableInLayerOnly(true);
 
+
 		properties.add(labelWidget);
 		properties.add(itemListWidget);
 
+		itemListWidget.list.addItemListener(new FilteredTree.ItemListener<ItemData>() {
+			@Override
+			public void selected (FilteredTree.Node<ItemData> node) {
+				super.selected(node);
+				setSelectedLayer(node.getObject().id);
+			}
+		});
+
+		renderStategy = new SelectBoxWidget("Layer render mode", new Supplier<String>() {
+			@Override
+			public String get () {
+				SceneLayer selectedLayer = getSelectedLayer();
+				return selectedLayer.getRenderStrategy().name();
+			}
+		}, new PropertyWidget.ValueChanged<String>() {
+			@Override
+			public void report (String value) {
+				SceneLayer selectedLayer = getSelectedLayer();
+				RenderStrategy startToSet = RenderStrategy.valueOf(value);
+				selectedLayer.setRenderStrategy(startToSet);
+			}
+		}, new Supplier<Array<String>>() {
+			@Override
+			public Array<String> get () {
+				Array<String> options = new Array<>();
+				for (RenderStrategy value : RenderStrategy.values()) {
+					options.add(value.name());
+				}
+				return options;
+			}
+		});
+
+		properties.add(renderStategy);
+
+
 		return properties;
+	}
+	private SceneLayer getSelectedLayer () {
+		SceneData sceneData = SharedResources.currentProject.getSceneData();
+		return sceneData.getSceneLayerByName(selectedLayer);
+	}
+
+	private void setSelectedLayer (String layerID) {
+		selectedLayer = layerID;
+		renderStategy.updateValue();
 	}
 
 	@Override

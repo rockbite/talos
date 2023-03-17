@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.runtime.assets.GameAsset;
@@ -18,6 +19,7 @@ import com.talosvfx.talos.runtime.assets.GameAssetType;
 import com.talosvfx.talos.runtime.assets.GameResourceOwner;
 import com.talosvfx.talos.editor.addons.scene.events.ComponentUpdated;
 import com.talosvfx.talos.runtime.scene.GameObject;
+import com.talosvfx.talos.runtime.scene.GameObjectContainer;
 import com.talosvfx.talos.runtime.scene.GameObjectRenderer;
 import com.talosvfx.talos.runtime.maps.GridPosition;
 import com.talosvfx.talos.runtime.maps.StaticTile;
@@ -26,6 +28,7 @@ import com.talosvfx.talos.editor.addons.scene.utils.PolyBatchWithEncodingOverrid
 import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.Observer;
+import com.talosvfx.talos.runtime.scene.Scene;
 import com.talosvfx.talos.runtime.scene.SceneLayer;
 import com.talosvfx.talos.runtime.scene.components.ParticleComponent;
 import com.talosvfx.talos.runtime.scene.components.RendererComponent;
@@ -34,9 +37,12 @@ import com.talosvfx.talos.runtime.scene.components.SpriteRendererComponent;
 import com.talosvfx.talos.runtime.scene.components.TileDataComponent;
 import com.talosvfx.talos.runtime.scene.components.TransformComponent;
 import com.talosvfx.talos.runtime.scene.render.RenderState;
+import com.talosvfx.talos.runtime.scene.render.RenderStrategy;
 import com.talosvfx.talos.runtime.scene.utils.TransformSettings;
 import com.talosvfx.talos.runtime.vfx.ParticleEffectDescriptor;
 import com.talosvfx.talos.runtime.vfx.ParticleEffectInstance;
+
+import java.util.Comparator;
 
 public class MainRenderer implements Observer {
 
@@ -124,6 +130,13 @@ public class MainRenderer implements Observer {
 
 
     Array<GameObject> temp = new Array<>();
+
+    public void render (PolygonBatch batch, RenderState state, GameObjectContainer container) {
+        render(batch, state, container.getSelfObject());
+    }
+
+
+
     public void render (PolygonBatch batch, RenderState state, GameObject root) {
         temp.clear();
         temp.add(root);

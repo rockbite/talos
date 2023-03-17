@@ -16,6 +16,7 @@ import com.talosvfx.talos.runtime.assets.GameAssetType;
 import com.talosvfx.talos.editor.addons.scene.events.*;
 import com.talosvfx.talos.editor.addons.scene.events.scene.DeSelectGameObjectExternallyEvent;
 import com.talosvfx.talos.editor.addons.scene.events.scene.SelectGameObjectExternallyEvent;
+import com.talosvfx.talos.runtime.assets.meta.SpriteMetadata;
 import com.talosvfx.talos.runtime.maps.TalosLayer;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.events.DirectoryChangedEvent;
@@ -64,6 +65,11 @@ public class SceneUtils {
 	public static GameObject createSpriteObject (GameObjectContainer gameObjectContainer, GameAsset<Texture> spriteAsset, Vector2 sceneCords, GameObject parent) {
 		GameObject spriteObject = createObjectByTypeName(gameObjectContainer, "sprite", sceneCords, parent, spriteAsset.nameIdentifier);
 		SpriteRendererComponent component = spriteObject.getComponent(SpriteRendererComponent.class);
+
+        Texture texture = spriteAsset.getResource();
+		SpriteMetadata metaData = (SpriteMetadata)spriteAsset.getRootRawAsset().metaData;
+        component.size.x = texture.getWidth() / metaData.pixelsPerUnit;
+        component.size.y = texture.getHeight() / metaData.pixelsPerUnit;
 
 		if (!fromDirectoryView) {
 			component.orderingInLayer = getLatestFreeOrderingIndex(gameObjectContainer, component.sortingLayer);
@@ -407,7 +413,7 @@ public class SceneUtils {
 		Notifications.fireEvent(Notifications.obtainEvent(LayerListUpdated.class));
 	}
 
-	private static void markContainerChanged (GameObjectContainer currentHolder) {
+	public static void markContainerChanged (GameObjectContainer currentHolder) {
 		if (currentHolder instanceof Scene) {
 			GameAsset<Scene> sceneGameAsset = AssetRepository.getInstance().getAssetForResource((Scene)currentHolder);
 			if (sceneGameAsset != null) {

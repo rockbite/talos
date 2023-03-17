@@ -258,6 +258,9 @@ public class PreferencesWindow extends AWindowDialog implements Observer {
     @EventHandler
     public void onFinishInitializingEvent(FinishInitializingEvent event) {
         for(APrefWidget widget: widgetArray) {
+            if (widget.isProject() || widget.isGlobalProject()) {
+                continue;
+            }
             widget.read();
         }
     }

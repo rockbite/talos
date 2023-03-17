@@ -120,7 +120,7 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 
 	@Override
 	public NinePatch obtainNinePatch (GameAsset<Texture> gameAsset) {
-		if (patchCache.containsKey(gameAsset)) { //something better, maybe hash on pixel size + texture for this
+		if (patchCache.containsKey(gameAsset) && false) { //something better, maybe hash on pixel size + texture for this
 			return patchCache.get(gameAsset);
 		} else {
 			final SpriteMetadata metadata = (SpriteMetadata) gameAsset.getRootRawAsset().metaData;

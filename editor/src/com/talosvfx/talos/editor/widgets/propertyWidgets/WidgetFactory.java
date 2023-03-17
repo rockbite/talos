@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
+import com.talosvfx.talos.editor.utils.ReflectionUtilities;
 import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.runtime.assets.GameAssetType;
 import com.talosvfx.talos.editor.addons.scene.widgets.property.PropertyPanelAssetSelectionWidget;
@@ -101,15 +102,13 @@ public class WidgetFactory {
     }
     public static PropertyWidget generate(Object parent, String fieldName, String title) {
         try {
-            Field field;
-            try {
-                field = parent.getClass().getField(fieldName);
-            } catch (Exception e) {
-                field = parent.getClass().getDeclaredField(fieldName);
-            }
+
+            Field field = ReflectionUtilities.getFieldWithName(fieldName, parent.getClass(), null);
             return generate(parent, field, title);
         } catch (NoSuchFieldException e) {
             e.printStackTrace();
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
         }
         return null;
     }

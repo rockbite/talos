@@ -119,7 +119,7 @@ public class CameraPreview extends Actor {
         mainRenderer.skipUpdates = true;
         mainRenderer.setCamera(viewport.getCamera());
         mainRenderer.update(rootGO);
-        mainRenderer.render(polygonSpriteBatch, new RenderState(), rootGO);
+        mainRenderer.render(polygonSpriteBatch, new RenderState(), gameObjectContainer);
 
     }
 

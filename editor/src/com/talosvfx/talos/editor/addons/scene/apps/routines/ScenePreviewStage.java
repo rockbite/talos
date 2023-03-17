@@ -117,7 +117,7 @@ public class ScenePreviewStage extends ViewportWidget implements Observer {
 
 		renderer.setLayers(SharedResources.currentProject.getSceneData().getRenderLayers());
 		renderer.update(currentScene.getSelfObject());
-		renderer.render(batch, new RenderState(), currentScene.getSelfObject());
+		renderer.render(batch, new RenderState(), currentScene);
 	}
 
 	@Override

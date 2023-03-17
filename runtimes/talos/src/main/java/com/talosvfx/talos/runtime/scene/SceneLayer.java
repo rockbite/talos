@@ -1,8 +1,7 @@
 package com.talosvfx.talos.runtime.scene;
 
 
-import com.badlogic.gdx.utils.Json;
-import com.badlogic.gdx.utils.JsonValue;
+import com.talosvfx.talos.runtime.scene.render.RenderStrategy;
 import lombok.Data;
 
 @Data
@@ -12,6 +11,8 @@ public class SceneLayer {
 
     private String name;
     private int index;
+
+    private RenderStrategy renderStrategy = RenderStrategy.SCENE;
 
     public SceneLayer(String name, int index) {
         this.name = name;

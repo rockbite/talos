@@ -37,7 +37,8 @@ public abstract class RendererComponent extends AComponent implements Json.Seria
 
     @Override
     public void read (Json json, JsonValue jsonData) {
-        sortingLayer = json.readValue("sortingSceneLayer", SceneLayer.class, jsonData);
+        SceneLayer sortingSceneLayer = json.readValue("sortingSceneLayer", SceneLayer.class, jsonData);
+        sortingLayer = RuntimeContext.getInstance().sceneData.getSceneLayerByName(sortingSceneLayer.getName()); //connect it
         orderingInLayer = jsonData.getInt("orderingInLayer", 0);
         visible = jsonData.getBoolean("visible", true);
         childrenVisible = jsonData.getBoolean("childrenVisible", true);

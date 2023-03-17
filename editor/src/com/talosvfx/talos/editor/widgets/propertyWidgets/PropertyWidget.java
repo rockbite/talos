@@ -20,6 +20,7 @@ import com.talosvfx.talos.runtime.assets.AMetadata;
 import com.talosvfx.talos.editor.addons.scene.widgets.PropertyPanel;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.project2.SharedResources;
+import com.talosvfx.talos.runtime.scene.Scene;
 import com.talosvfx.talos.runtime.scene.components.AComponent;
 import com.talosvfx.talos.editor.widgets.ui.common.zoomWidgets.LabelWithZoom;
 import lombok.Getter;
@@ -170,6 +171,10 @@ public abstract class PropertyWidget<T> extends Table {
 		} else if (parent instanceof AMetadata) {
 			if (!isFastChange) {
 				AssetRepository.getInstance().saveMetaData((AMetadata)parent, true);
+			}
+		} else if (parent instanceof GameObjectContainer) {
+			if (!isFastChange) {
+				SceneUtils.markContainerChanged((GameObjectContainer)parent);
 			}
 		}
 
