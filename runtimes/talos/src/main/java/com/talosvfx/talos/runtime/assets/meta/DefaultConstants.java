@@ -7,7 +7,7 @@ public class DefaultConstants {
 	public static Supplier<Float> defaultPixelPerUnitProvider = new Supplier<Float>() {
 		@Override
 		public Float get () {
-			return defaultPixelPerUnitProvider.get();
+			return 100F;
 		}
 	};
 
