@@ -20,18 +20,6 @@ public class ScriptMetadataParser {
 
     BufferedReader reader;
 
-    public ScriptMetadataParser () {
-        registerSupportedClasses();
-    }
-
-    private void registerSupportedClasses () {
-        scriptPropertyWrappers.registerPropertyWrapper(Float.class, PropertyFloatWrapper.class);
-        scriptPropertyWrappers.registerPropertyWrapper(Boolean.class, PropertyBooleanWrapper.class);
-        scriptPropertyWrappers.registerPropertyWrapper(Integer.class, PropertyIntegerWrapper.class);
-        scriptPropertyWrappers.registerPropertyWrapper(String.class, PropertyStringWrapper.class);
-        scriptPropertyWrappers.registerPropertyWrapper(GameObject.class, PropertyGameObjectWrapper.class);
-    }
-
     public void processHandle(FileHandle handle, ScriptMetadata metadata) {
         try {
             reader = new BufferedReader(new FileReader(handle.file()));

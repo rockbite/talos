@@ -5,6 +5,9 @@ import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 
 public class PropertyIntegerWrapper extends PropertyNumberWrapper<Integer> {
+    public PropertyIntegerWrapper () {
+        defaultValue = 0;
+    }
 
     @Override
     public void collectAttributes (Array<String> attributes) {

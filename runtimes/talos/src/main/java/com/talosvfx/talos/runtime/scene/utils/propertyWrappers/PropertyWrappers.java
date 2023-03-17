@@ -1,6 +1,7 @@
 package com.talosvfx.talos.runtime.scene.utils.propertyWrappers;
 
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
@@ -18,6 +19,17 @@ class PropertyWrappers {
         primitiveReplacementMap.put("GameObject", GameObject.class.getName());
         primitiveReplacementMap.put("String", String.class.getName());
         primitiveReplacementMap.put("vec2", Vector2.class.getName());
+
+        registerSupportedClasses();
+    }
+
+    private void registerSupportedClasses () {
+        registerPropertyWrapper(Float.class, PropertyFloatWrapper.class);
+        registerPropertyWrapper(Boolean.class, PropertyBooleanWrapper.class);
+        registerPropertyWrapper(Integer.class, PropertyIntegerWrapper.class);
+        registerPropertyWrapper(String.class, PropertyStringWrapper.class);
+        registerPropertyWrapper(GameObject.class, PropertyGameObjectWrapper.class);
+        registerPropertyWrapper(Vector2.class, PropertyVec2Wrapper.class);
     }
 
     <T> void registerPropertyWrapper (Class<T> clazz, Class<? extends PropertyWrapper<T>> wrapperClazz) {
@@ -62,5 +74,9 @@ class PropertyWrappers {
             throw new RuntimeException(e);
         }
         return createPropertyWrapperForClazz(aClass);
+    }
+
+    public Array<String> getPrimitiveTypeNames () {
+        return primitiveReplacementMap.keys().toArray();
     }
 }

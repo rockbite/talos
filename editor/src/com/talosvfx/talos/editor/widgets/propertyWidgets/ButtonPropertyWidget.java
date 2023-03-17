@@ -9,6 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.ui.common.zoomWidgets.LabelWithZoom;
 import com.talosvfx.talos.editor.widgets.ui.common.SquareButton;
+import lombok.Setter;
 
 import java.util.function.Supplier;
 
@@ -17,7 +18,7 @@ public class ButtonPropertyWidget<T> extends PropertyWidget<T> {
     private T payload;
     private Label buttonLabel;
     private SquareButton button;
-    private ButtonListener btnListener;
+    protected ButtonListener btnListener;
 
     public interface ButtonListener<T> {
         void clicked(ButtonPropertyWidget<T> widget);
@@ -34,6 +35,10 @@ public class ButtonPropertyWidget<T> extends PropertyWidget<T> {
         clone.buttonLabel.setText(buttonLabel.getText());
 
         return clone;
+    }
+
+    public ButtonPropertyWidget(String text) {
+        this(null, text, null);
     }
 
     public ButtonPropertyWidget(String text, ButtonListener btnListener) {

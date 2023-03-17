@@ -1,6 +1,6 @@
 package com.talosvfx.talos.runtime.scene.utils.propertyWrappers;
 
-import com.talosvfx.talos.runtime.scene.GameObject;
+import com.badlogic.gdx.utils.Array;
 import com.talosvfx.talos.runtime.scene.components.DataComponent;
 
 public class DataPropertiesUtil {
@@ -8,18 +8,17 @@ public class DataPropertiesUtil {
 
     private static PropertyWrappers dataPropertyWrappers = new PropertyWrappers();
 
-    static {
-        dataPropertyWrappers.registerPropertyWrapper(Float.class, PropertyFloatWrapper.class);
-        dataPropertyWrappers.registerPropertyWrapper(Boolean.class, PropertyBooleanWrapper.class);
-        dataPropertyWrappers.registerPropertyWrapper(Integer.class, PropertyIntegerWrapper.class);
-        dataPropertyWrappers.registerPropertyWrapper(String.class, PropertyStringWrapper.class);
-        dataPropertyWrappers.registerPropertyWrapper(GameObject.class, PropertyGameObjectWrapper.class);
+    public static Array<String> getListOfPrimitives () {
+        Array<String> primitiveTypeNames = dataPropertyWrappers.getPrimitiveTypeNames();
+        // TODO: 16.03.23 need to add support for GameObjects
+        primitiveTypeNames.removeValue("GameObject", false);
+        return primitiveTypeNames;
     }
 
-    public static void addWrapper (DataComponent component, String parameterClassName, String parameterName) {
+    public static PropertyWrapper makeWrapper (String parameterClassName, String parameterName) {
         PropertyWrapper<?> propertyWrapper = dataPropertyWrappers.createPropertyWrapperForClazzName(parameterClassName);
         propertyWrapper.setDefault();
         propertyWrapper.propertyName = parameterName;
-        component.getProperties().add(propertyWrapper);
+        return propertyWrapper;
     }
 }
