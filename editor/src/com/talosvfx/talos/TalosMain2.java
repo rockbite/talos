@@ -27,7 +27,9 @@ import com.talosvfx.talos.editor.socket.SocketServer;
 import com.talosvfx.talos.editor.utils.CursorUtil;
 import com.talosvfx.talos.editor.widgets.ui.menu.MainMenu;
 import com.talosvfx.talos.runtime.RuntimeContext;
+import com.talosvfx.talos.runtime.assets.meta.DefaultConstants;
 import com.talosvfx.talos.runtime.utils.ConfigData;
+import com.talosvfx.talos.runtime.utils.Supplier;
 import lombok.Getter;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
@@ -58,6 +60,13 @@ public class TalosMain2 extends ApplicationAdapter {
 		SharedResources.globalDragAndDrop = new GlobalDragAndDrop();
 		SharedResources.globalSaveStateSystem = new GlobalSaveStateSystem();
 		SharedResources.commandsSystem = this.commandsSystem;
+
+		DefaultConstants.defaultPixelPerUnitProvider = new Supplier<Float>() {
+			@Override
+			public Float get () {
+				return Float.parseFloat(SharedResources.currentProject.getDefaultPixelPerMeter());
+			}
+		};
 
 		RuntimeContext instance = RuntimeContext.getInstance();
 		instance.AssetRepository = AssetRepository.getInstance();

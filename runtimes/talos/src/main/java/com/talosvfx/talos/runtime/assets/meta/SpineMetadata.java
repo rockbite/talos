@@ -7,7 +7,7 @@ import com.talosvfx.talos.runtime.assets.AMetadata;
 
 public class SpineMetadata extends AMetadata {
 
-    public float pixelsPerUnit = DefaultConstants.PIXELS_PER_UNIT;
+    public float pixelsPerUnit = DefaultConstants.defaultPixelPerUnitProvider.get();
 
     public String atlasPath;
 
@@ -19,7 +19,7 @@ public class SpineMetadata extends AMetadata {
     @Override
     public void read (Json json, JsonValue jsonData) {
         super.read(json, jsonData);
-        pixelsPerUnit = jsonData.getFloat("pixelsPerUnit", pixelsPerUnit);
+        pixelsPerUnit = jsonData.getFloat("pixelsPerUnit", DefaultConstants.defaultPixelPerUnitProvider.get());
     }
 
     @Override

@@ -268,6 +268,9 @@ public class PreferencesWindow extends AWindowDialog implements Observer {
             if(widget.isProject()) {
                 widget.readLocal();
             }
+            if (widget.isGlobalProject()) {
+                widget.readGlobalProject();
+            }
         }
     }
  }
