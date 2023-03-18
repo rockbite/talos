@@ -1,10 +1,18 @@
 package com.talosvfx.talos.editor.addons.scene.logic.componentwrappers;
 
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
+import com.talosvfx.talos.editor.addons.scene.SceneUtils;
 import com.talosvfx.talos.editor.addons.scene.widgets.property.PropertyPanelFieldWidget;
+import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.ButtonPropertyWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.WidgetFactory;
+import com.talosvfx.talos.editor.widgets.ui.common.SquareButton;
 import com.talosvfx.talos.runtime.scene.components.DataComponent;
 import com.talosvfx.talos.runtime.scene.utils.propertyWrappers.PropertyWrapper;
 
@@ -21,6 +29,18 @@ public class DataComponentProvider extends AComponentProvider<DataComponent> {
         for (PropertyWrapper<?> property : component.getProperties()) {
             PropertyWidget generate = WidgetFactory.generateForPropertyWrapper(property);
             generate.setParent(component);
+            generate.defaults().pad(5);
+            SquareButton deleteProperty = new SquareButton(SharedResources.skin, new Label("-", SharedResources.skin), "Delete property");
+            deleteProperty.addListener(new ClickListener() {
+                @Override
+                public void clicked (InputEvent event, float x, float y) {
+                   component.getProperties().removeValue(property, true);
+
+                    SceneUtils.componentUpdated(component.getGameObject().getGameObjectContainerRoot(), component.getGameObject(), component, false);
+                }
+            });
+            generate.add(deleteProperty);
+
             properties.add(generate);
         }
 
