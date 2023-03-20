@@ -19,10 +19,13 @@ import com.kotcrab.vis.ui.widget.VisLabel;
 import com.kotcrab.vis.ui.widget.VisTextButton;
 import com.kotcrab.vis.ui.widget.VisTextField;
 import com.kotcrab.vis.ui.widget.VisWindow;
+import com.talosvfx.talos.TalosMain2;
 import com.talosvfx.talos.editor.addons.scene.SceneUtils;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.logic.PropertyWrapperProviders;
 import com.talosvfx.talos.editor.addons.scene.logic.componentwrappers.GameObjectPropertyHolder;
+import com.talosvfx.talos.editor.utils.Toasts;
+import com.talosvfx.talos.runtime.RuntimeContext;
 import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.runtime.assets.GameAssetType;
 import com.talosvfx.talos.runtime.scene.GameObject;
@@ -38,10 +41,13 @@ import com.talosvfx.talos.editor.widgets.ui.FilteredTree;
 import com.talosvfx.talos.editor.widgets.ui.SearchFilteredTree;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 import com.talosvfx.talos.editor.widgets.ui.common.SquareButton;
+import com.talosvfx.talos.runtime.scene.SceneLayer;
 import com.talosvfx.talos.runtime.scene.components.AComponent;
 import com.talosvfx.talos.runtime.scene.components.DataComponent;
+import com.talosvfx.talos.runtime.scene.components.RendererComponent;
 import com.talosvfx.talos.runtime.scene.components.RoutineRendererComponent;
 import com.talosvfx.talos.runtime.scene.components.ScriptComponent;
+import com.talosvfx.talos.runtime.scene.components.SpriteRendererComponent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -250,6 +256,12 @@ public class SEPropertyPanel extends PropertyPanel {
             FilteredTree.Node<Object> newDataComponent = new FilteredTree.Node<>("newdatacomponent", dataComponentLabel);
             tree.add(newDataComponent);
 
+            Label spriteComponent = new Label("Sprite Renderer Component", getSkin());
+            FilteredTree.Node<Object> spriteComponentNode = new FilteredTree.Node<>("newspritecomponent", spriteComponent);
+            tree.add(spriteComponentNode);
+
+
+
             setToTree();
 
             add(container).width(300).minHeight(300).row();
@@ -443,6 +455,21 @@ public class SEPropertyPanel extends PropertyPanel {
                             SceneUtils.componentAdded(gameObject.getGameObjectContainerRoot(), gameObject, dataComponent);
                             remove();
                             return;
+                        }
+
+                        if (name.equals("newspritecomponent")) {
+                            if (gameObject.hasComponentType(RendererComponent.class)) {
+                                Toasts.getInstance().showErrorToast("Already has a renderer component");
+                            } else {
+                                SpriteRendererComponent spriteRendererComponent = new SpriteRendererComponent();
+
+                                SceneLayer preferredSceneLayer = RuntimeContext.getInstance().sceneData.getPreferredSceneLayer();
+                                spriteRendererComponent.sortingLayer = preferredSceneLayer;
+
+                                gameObject.addComponent(spriteRendererComponent);
+                                SceneUtils.componentAdded(gameObject.getGameObjectContainerRoot(), gameObject, spriteRendererComponent);
+                                remove();
+                            }
                         }
                     }
                     remove();

@@ -379,6 +379,26 @@ public class GameObject implements GameObjectContainer, Json.Serializable {
         return topParent;
     }
 
+    public GameObject getChildByName (String name, boolean recursive) {
+        for (int i = 0; i < children.size; i++) {
+            GameObject child = children.get(i);
+            if (child.name.equals(name)) {
+                return child;
+            }
+
+            if (recursive) {
+                if (child.getGameObjects() != null) {
+                    GameObject childByName = child.getChildByName(name, recursive);
+                    if (childByName != null) {
+                        return childByName;
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
     public GameObject getChildByUUID (String uuid) {
         for (int i = 0; i < children.size; i++) {
             GameObject child = children.get(i);
