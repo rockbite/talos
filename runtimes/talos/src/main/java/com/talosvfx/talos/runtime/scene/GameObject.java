@@ -145,11 +145,10 @@ public class GameObject implements GameObjectContainer, Json.Serializable {
     @Override
     public void removeObject (GameObject gameObject) {
         String name = gameObject.getName();
-        if(childrenMap.containsKey(name)) {
-            GameObject objectToRemove = childrenMap.get(name);
+        if (childrenMap.containsKey(name)) {
             childrenMap.remove(name);
-            children.removeValue(objectToRemove, true);
         }
+        children.removeValue(gameObject, true);
     }
 
     @Override
