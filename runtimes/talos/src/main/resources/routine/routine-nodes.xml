@@ -38,6 +38,10 @@
         <module name = "RotateBy" title = "Rotate By" keywords = "movement" class = "AsyncRoutineNodeWidget">
             <value port="input" name="startSignal" type="signal">start</value>
             <dynamicValue port="input" name="angle" type="float" min="-360" max="360">angle: </dynamicValue>
+            <group>
+                <dynamicValue port="input" name="pivotX" type="float" min="0" max="1" progress="true" default="0.5">Pivot X: </dynamicValue>
+                <dynamicValue port="input" name="pivotY" type="float" min="0" max="1" progress="true" default="0.5">Pivot Y: </dynamicValue>
+            </group>
             <checkbox name="yoyo" default = "false">Yoyo</checkbox>
             <dynamicValue port="input" name="duration" type="float" default="1">Duration</dynamicValue>
             <container name="timeline"></container>
@@ -81,6 +85,10 @@
             <group>
                 <dynamicValue port="input" name="scaleX" type="float" min="-1000" max="1000">Scale X: </dynamicValue>
                 <dynamicValue port="input" name="scaleY" type="float" min="-1000" max="1000">Scale Y: </dynamicValue>
+            </group>
+            <group>
+                <dynamicValue port="input" name="pivotX" type="float" min="0" max="1" progress="true" default="0.5">Pivot X: </dynamicValue>
+                <dynamicValue port="input" name="pivotY" type="float" min="0" max="1" progress="true" default="0.5">Pivot Y: </dynamicValue>
             </group>
             <checkbox name="yoyo" default = "false">Yoyo</checkbox>
             <dynamicValue port="input" name="duration" type="float" default="1">Duration</dynamicValue>

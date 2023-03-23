@@ -33,6 +33,10 @@ public class RotateBy extends AsyncRoutineNode<GameObject, RotateBy.State> {
 
         state.offset = a;
 
+        float pivotX = fetchFloatValue("pivotX");
+        float pivotY = fetchFloatValue("pivotY");
+        component.pivot.set(pivotX, pivotY);
+
         return true;
     }
 

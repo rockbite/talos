@@ -74,7 +74,7 @@ public class GOSelectionWidget extends AbstractWidget<String> {
         GOsNameLabel.setEllipsis(true);
         GOsNameLabel.setAlignment(Align.right);
         GOsLabelDefaultModeTable.add(typeLabel).padLeft(12);
-        GOsLabelDefaultModeTable.add(GOsNameLabel).growX().padLeft(10).padRight(12);
+        GOsLabelDefaultModeTable.add(GOsNameLabel).width(100).padLeft(10).padRight(12);
 
         GOsNameTextField = new TextField("", skin, "no-bg");
         GOsLabelEditingModeTable.add(GOsNameTextField);
