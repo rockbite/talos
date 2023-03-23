@@ -193,11 +193,13 @@ public class SpriteComponentRenderer extends ComponentRenderer<SpriteRendererCom
 					float pivotY = transformComponent.pivot.y;
 
 					batch.draw(textureRegion,
-						transformComponent.worldPosition.x - pivotX, transformComponent.worldPosition.y - pivotY,
-						pivotX, pivotY,
-						1f, 1f,
-						width * transformComponent.worldScale.x, height * transformComponent.worldScale.y,
-						transformComponent.worldRotation);
+							transformComponent.worldPosition.x - width/2f, transformComponent.worldPosition.y - height/2f,
+							pivotX * width, pivotY * height,
+							width,
+							height,
+							transformComponent.worldScale.x, transformComponent.worldScale.y,
+							transformComponent.worldRotation
+					);
 				}
 
 				batch.setColor(Color.WHITE);
