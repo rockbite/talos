@@ -21,6 +21,10 @@ public class RuntimeRoutineData implements BaseRoutineData, Json.Serializable {
 
 	private transient boolean canWrite;
 
+	private JsonValue jsonNodes;
+	private JsonValue jsonConnections;
+	private JsonValue jsonGroups;
+
 	@Override
 	public void write (Json json) {
 
@@ -28,6 +32,10 @@ public class RuntimeRoutineData implements BaseRoutineData, Json.Serializable {
 
 	@Override
 	public void read (Json json, JsonValue root) {
+		jsonNodes = root.get("list");
+		jsonConnections = root.get("connections");
+		jsonGroups = root.get("groups");
+
 		propertyWrappers.clear();
 		JsonValue propertiesJson = root.get("propertyWrappers");
 		if (propertiesJson != null) {
@@ -84,12 +92,12 @@ public class RuntimeRoutineData implements BaseRoutineData, Json.Serializable {
 
 	@Override
 	public JsonValue getJsonNodes () {
-		return null;
+		return jsonNodes;
 	}
 
 	@Override
 	public JsonValue getJsonConnections () {
-		return null;
+		return jsonConnections;
 	}
 
 	public RoutineInstance createInstance (boolean external) {
