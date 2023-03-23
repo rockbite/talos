@@ -145,11 +145,10 @@ public class GameObject implements GameObjectContainer, Json.Serializable {
     @Override
     public void removeObject (GameObject gameObject) {
         String name = gameObject.getName();
-        if(childrenMap.containsKey(name)) {
-            GameObject objectToRemove = childrenMap.get(name);
+        if (childrenMap.containsKey(name)) {
             childrenMap.remove(name);
-            children.removeValue(objectToRemove, true);
         }
+        children.removeValue(gameObject, true);
     }
 
     @Override
@@ -377,6 +376,26 @@ public class GameObject implements GameObjectContainer, Json.Serializable {
             topParent = topParent.getParent();
         }
         return topParent;
+    }
+
+    public GameObject getChildByName (String name, boolean recursive) {
+        for (int i = 0; i < children.size; i++) {
+            GameObject child = children.get(i);
+            if (child.name.equals(name)) {
+                return child;
+            }
+
+            if (recursive) {
+                if (child.getGameObjects() != null) {
+                    GameObject childByName = child.getChildByName(name, recursive);
+                    if (childByName != null) {
+                        return childByName;
+                    }
+                }
+            }
+        }
+
+        return null;
     }
 
     public GameObject getChildByUUID (String uuid) {
