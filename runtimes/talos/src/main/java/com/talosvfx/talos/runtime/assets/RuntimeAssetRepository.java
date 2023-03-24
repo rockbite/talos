@@ -11,6 +11,7 @@ import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.esotericsoftware.spine.SkeletonBinary;
 import com.esotericsoftware.spine.SkeletonData;
+import com.talosvfx.talos.runtime.RuntimeContext;
 import com.talosvfx.talos.runtime.assets.meta.AtlasMetadata;
 import com.talosvfx.talos.runtime.assets.meta.EmptyMetadata;
 import com.talosvfx.talos.runtime.assets.meta.PrefabMetadata;
@@ -21,6 +22,7 @@ import com.talosvfx.talos.runtime.routine.serialization.BaseRoutineData;
 import com.talosvfx.talos.runtime.routine.serialization.RuntimeRoutineData;
 import com.talosvfx.talos.runtime.scene.Prefab;
 import com.talosvfx.talos.runtime.scene.Scene;
+import com.talosvfx.talos.runtime.scene.SceneData;
 import com.talosvfx.talos.runtime.vfx.ParticleEffectDescriptor;
 import com.talosvfx.talos.runtime.vfx.serialization.BaseVFXProjectData;
 import com.talosvfx.talos.runtime.vfx.serialization.ExportData;
@@ -37,6 +39,7 @@ public class RuntimeAssetRepository extends BaseAssetRepository {
 	}
 
 	public void loadBundle (GameAssetsExportStructure gameAssetFile, FileHandle baseDir) {
+		RuntimeContext.getInstance().setSceneData(gameAssetFile.sceneData);
 
 		ObjectMap<GameAssetType, Array<GameAssetExportStructure>> sorted = new ObjectMap<>();
 		for (GameAssetExportStructure gameAsset : gameAssetFile.gameAssets) {
