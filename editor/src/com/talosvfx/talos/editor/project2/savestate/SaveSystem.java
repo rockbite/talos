@@ -59,6 +59,13 @@ public class SaveSystem implements Observer {
 		Notifications.quickFire(ExportRequest.class);
 	}
 
+	@CommandEventHandler(commandType = Commands.CommandType.EXPORT_OPTIMIZED)
+	public void onExportOptimized (CommandEvent event) {
+		ExportRequest exportRequest = Notifications.obtainEvent(ExportRequest.class);
+		exportRequest.setOptimized(true);
+		Notifications.fireEvent(exportRequest);
+	}
+
 	@EventHandler
 	public void onExport (ExportRequest event) {
 		TalosProjectData currentProject = SharedResources.currentProject;

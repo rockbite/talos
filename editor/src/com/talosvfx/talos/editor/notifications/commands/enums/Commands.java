@@ -22,6 +22,7 @@ public class Commands {
     SAVE("save_command", "Save", "", "GENERAL"),
 
     EXPORT("export_command", "Export", "", "GENERAL"),
+    EXPORT_OPTIMIZED("export_command_optimized", "Export Optimized", "Slower export that optimizes performance", "GENERAL"),
 
     OPEN("open_command", "Open", "", "GENERAL"),
 

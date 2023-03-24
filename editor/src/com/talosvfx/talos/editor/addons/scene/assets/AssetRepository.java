@@ -28,6 +28,7 @@ import com.talosvfx.talos.editor.addons.scene.events.*;
 import com.talosvfx.talos.editor.addons.scene.events.meta.MetaDataReloadedEvent;
 import com.talosvfx.talos.editor.addons.scene.events.explorer.DirectoryMovedEvent;
 import com.talosvfx.talos.editor.notifications.events.ProjectUnloadEvent;
+import com.talosvfx.talos.runtime.RuntimeContext;
 import com.talosvfx.talos.runtime.assets.AMetadata;
 import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
 import com.talosvfx.talos.editor.data.RoutineStageData;
@@ -546,6 +547,8 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 
 		ObjectSet<GameAsset<?>> gameAssetsToExport = new ObjectSet<>();
 		GameAssetsExportStructure gameAssetExportStructure = new GameAssetsExportStructure();
+
+		gameAssetExportStructure.sceneData = RuntimeContext.getInstance().sceneData;
 
 		if (settings.getExportPathHandle().child("assetExport.json").exists()) {
 			Toasts.getInstance().showInfoToast("Cleaning export directory");
