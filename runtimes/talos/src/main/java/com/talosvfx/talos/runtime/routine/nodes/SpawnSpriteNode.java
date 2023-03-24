@@ -40,8 +40,14 @@ public class SpawnSpriteNode extends RoutineNode {
             spriteRendererComponent.setGameAsset(asset);
             spriteRendererComponent.orderingInLayer = fetchIntValue("layerOrder");
 
-            SceneLayer preferredSceneLayer = RuntimeContext.getInstance().sceneData.getPreferredSceneLayer();
-            spriteRendererComponent.sortingLayer = preferredSceneLayer;
+            String layerName = fetchStringValue("layerName");
+            SceneLayer layer = RuntimeContext.getInstance().sceneData.getSceneLayerByName(layerName);
+            if (layer != null) {
+                spriteRendererComponent.sortingLayer = layer;
+            } else {
+                SceneLayer preferredSceneLayer = RuntimeContext.getInstance().sceneData.getPreferredSceneLayer();
+                spriteRendererComponent.sortingLayer = preferredSceneLayer;
+            }
 
             target.addGameObject(go);
 

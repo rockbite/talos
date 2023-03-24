@@ -3,9 +3,11 @@ package com.talosvfx.talos.runtime.routine.nodes;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.esotericsoftware.spine.SkeletonData;
+import com.talosvfx.talos.runtime.RuntimeContext;
 import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.runtime.routine.RoutineNode;
 import com.talosvfx.talos.runtime.scene.GameObject;
+import com.talosvfx.talos.runtime.scene.SceneLayer;
 import com.talosvfx.talos.runtime.scene.components.SpineRendererComponent;
 import com.talosvfx.talos.runtime.scene.components.TransformComponent;
 import com.talosvfx.talos.runtime.utils.NamingUtils;
@@ -39,10 +41,14 @@ public class SpawnSpineNode extends RoutineNode {
             spineRendererComponent.setGameAsset(asset);
             spineRendererComponent.orderingInLayer = fetchIntValue("layerOrder");
 
-            logger.error("REDO THIS");
-//            SceneData sceneData = SharedResources.currentProject.getSceneData();
-//            Array<SceneLayer> renderLayers = sceneData.getRenderLayers();
-//            spineRendererComponent.sortingLayer = renderLayers.get(1); // todo: this is temporary
+            String layerName = fetchStringValue("layerName");
+            SceneLayer layer = RuntimeContext.getInstance().sceneData.getSceneLayerByName(layerName);
+            if (layer != null) {
+                spineRendererComponent.sortingLayer = layer;
+            } else {
+                SceneLayer preferredSceneLayer = RuntimeContext.getInstance().sceneData.getPreferredSceneLayer();
+                spineRendererComponent.sortingLayer = preferredSceneLayer;
+            }
 
             target.addGameObject(go);
 

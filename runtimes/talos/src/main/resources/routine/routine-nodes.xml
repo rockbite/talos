@@ -184,6 +184,7 @@
                 <option value = "sliced">Sliced</option>
                 <option value = "tiled">Tiled</option>
             </select>
+            <inputText port="input" name="layerName" type="string">Layer</inputText>
             <dynamicValue port="input" name="layerOrder" type="int" min="0" max="500" step="1">Layer order</dynamicValue>
             <value port="output" name="onComplete" type="signal">onComplete</value>
         </module>
@@ -192,6 +193,7 @@
             <inputText name="name" type="string">name</inputText>
             <asset port="input" name="spine" type="SKELETON">spine</asset>
             <color port="input" name="color" type="color">Color: </color>
+            <inputText port="input" name="layerName" type="string">Layer</inputText>
             <dynamicValue port="input" name="layerOrder" type="int" min="0" max="500" step="1">Layer order</dynamicValue>
             <value port="output" name="onComplete" type="signal">onComplete</value>
         </module>
