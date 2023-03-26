@@ -110,23 +110,24 @@ public class RuntimeAssetRepository extends BaseAssetRepository {
 	private <T> GameAsset<T> spriteLoader (GameAssetExportStructure exportStructure, FileHandle baseFolder) {
 		GameAsset<AtlasRegion> gameAsset = new GameAsset<>(exportStructure.identifier, exportStructure.type);
 
+		String first = exportStructure.relativePathsOfRawFiles.first();
+		FileHandle child = baseFolder.child(exportStructure.type.name()).child(first);
+
 		//Check our game assets, maybe we are referncing an atlas
 		ObjectSet<String> dependentGameAssets = exportStructure.dependentGameAssets;
 		if (dependentGameAssets.size > 0) {
-			String first = dependentGameAssets.first();
-			GameAsset<TextureAtlas> assetForUniqueIdentifier = getAssetForUniqueIdentifier(UUID.fromString(first), GameAssetType.ATLAS);
+			String textureAtlasUUID = dependentGameAssets.first();
+			GameAsset<TextureAtlas> assetForUniqueIdentifier = getAssetForUniqueIdentifier(UUID.fromString(textureAtlasUUID), GameAssetType.ATLAS);
 			if (assetForUniqueIdentifier != null) {
 
 				TextureAtlas resource = assetForUniqueIdentifier.getResource();
 				gameAsset.setResourcePayload(resource.findRegion(exportStructure.identifier));
 				gameAsset.dependentGameAssets.add(assetForUniqueIdentifier);
+				gameAsset.dependentRawAssets.add(fakeMeta(child, SpriteMetadata.class));
 
 				return (GameAsset<T>)gameAsset;
 			}
 		}
-
-		String first = exportStructure.relativePathsOfRawFiles.first();
-		FileHandle child = baseFolder.child(exportStructure.type.name()).child(first);
 
 		gameAsset.setResourcePayload(new AtlasRegion(new TextureRegion(new Texture(child))));
 		gameAsset.dependentRawAssets.add(fakeMeta(child, SpriteMetadata.class));
@@ -155,8 +156,8 @@ public class RuntimeAssetRepository extends BaseAssetRepository {
 
 		TextureAtlas skeleAtlas = null;
 		if (exportStructure.dependentGameAssets.size > 0) {
-			String first = exportStructure.dependentGameAssets.first();
-			GameAsset<TextureAtlas> assetForUniqueIdentifier = getAssetForUniqueIdentifier(UUID.fromString(first), GameAssetType.ATLAS);
+			String atlasUUID = exportStructure.dependentGameAssets.first();
+			GameAsset<TextureAtlas> assetForUniqueIdentifier = getAssetForUniqueIdentifier(UUID.fromString(atlasUUID), GameAssetType.ATLAS);
 			if (assetForUniqueIdentifier != null) {
 				TextureAtlas resource = assetForUniqueIdentifier.getResource();
 				skeleAtlas = resource;
