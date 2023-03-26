@@ -672,8 +672,8 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 				if (!converted) {
 					if (dependentRawAsset.shouldExport) {
 						dependentRawAsset.handle.copyTo(dirToCopyInto);
-						assetExportStructure.relativePathsOfRawFiles.add(relativeFromRootDir + dependentRawAsset.handle.name());
 					}
+					assetExportStructure.relativePathsOfRawFiles.add(relativeFromRootDir + dependentRawAsset.handle.name());
 				}
 
 				if (!copyMetaIfExists(dependentRawAsset.handle, dirToCopyInto)) {
