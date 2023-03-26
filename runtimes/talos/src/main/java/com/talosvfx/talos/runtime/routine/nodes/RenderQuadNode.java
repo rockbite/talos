@@ -2,6 +2,8 @@ package com.talosvfx.talos.runtime.routine.nodes;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 import com.badlogic.gdx.utils.Pools;
 import com.talosvfx.talos.runtime.assets.AMetadata;
 import com.talosvfx.talos.runtime.assets.GameAsset;
@@ -27,7 +29,7 @@ public class RenderQuadNode extends RoutineNode {
         drawableQuad.z = z;
         drawableQuad.size.set(width, height);
 
-        GameAsset<Texture> asset = (GameAsset<Texture>) fetchAssetValue("sprite");
+        GameAsset<AtlasRegion> asset = (GameAsset<AtlasRegion>) fetchAssetValue("sprite");
 
         if (asset == null || asset.getRootRawAsset() == null) {
             return;
@@ -43,7 +45,7 @@ public class RenderQuadNode extends RoutineNode {
             }
         }
 
-        Texture resource = asset.getResource();
+        AtlasRegion resource = asset.getResource();
         if (resource == null) {
             return;
         }

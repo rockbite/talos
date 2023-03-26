@@ -1,6 +1,8 @@
 package com.talosvfx.talos.editor.addons.scene.logic.componentwrappers;
 
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Array;
@@ -25,14 +27,14 @@ public final class SpriteRendererComponentProvider extends RendererComponentProv
 	public Array<PropertyWidget> getListOfProperties () {
 		Array<PropertyWidget> properties = new Array<>();
 
-		PropertyPanelAssetSelectionWidget<Texture> textureWidget = new PropertyPanelAssetSelectionWidget<>("Texture", GameAssetType.SPRITE, new Supplier<GameAsset<Texture>>() {
+		PropertyPanelAssetSelectionWidget<AtlasRegion> textureWidget = new PropertyPanelAssetSelectionWidget<>("Texture", GameAssetType.SPRITE, new Supplier<GameAsset<AtlasRegion>>() {
 			@Override
-			public GameAsset<Texture> get () {
+			public GameAsset<AtlasRegion> get () {
 				return component.getGameResource();
 			}
-		}, new PropertyWidget.ValueChanged<GameAsset<Texture>>() {
+		}, new PropertyWidget.ValueChanged<GameAsset<AtlasRegion>>() {
 			@Override
-			public void report (GameAsset<Texture> value) {
+			public void report (GameAsset<AtlasRegion> value) {
 				component.setGameAsset(value);
 			}
 		});
@@ -64,10 +66,10 @@ public final class SpriteRendererComponentProvider extends RendererComponentProv
 				if (!component.fixAspectRatio)
 					return;
 
-				final Texture texture = component.getGameResource().getResource();
+				final AtlasRegion texture = component.getGameResource().getResource();
 
 				if (texture != null) {
-					final float aspect = texture.getHeight() * 1f / texture.getWidth();
+					final float aspect = texture.getRegionHeight() * 1f / texture.getRegionWidth();
 					component.size.y = component.size.x * aspect;
 				}
 
@@ -87,10 +89,10 @@ public final class SpriteRendererComponentProvider extends RendererComponentProv
 					final Vector2PropertyWidget vector2PropertyWidget = ((Vector2PropertyWidget)sizeWidget);
 					final ValueWidget xValue = vector2PropertyWidget.xValue;
 					final ValueWidget yValue = vector2PropertyWidget.yValue;
-					final Texture texture = component.getGameResource().getResource();
+					final AtlasRegion texture = component.getGameResource().getResource();
 
 					if (texture != null) {
-						final float aspect = texture.getHeight() * 1f / texture.getWidth();
+						final float aspect = texture.getRegionHeight() * 1f / texture.getRegionWidth();
 
 						if (event.getTarget() == xValue) {
 							component.size.y = component.size.x * aspect;

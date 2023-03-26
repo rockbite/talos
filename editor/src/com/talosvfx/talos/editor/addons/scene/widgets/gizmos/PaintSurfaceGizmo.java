@@ -6,6 +6,9 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.PixmapTextureData;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -85,7 +88,7 @@ public class PaintSurfaceGizmo extends Gizmo implements Observer, GameAsset.Game
 
         PaintSurfaceComponent surface = gameObject.getComponent(PaintSurfaceComponent.class);
 
-        Texture resource = surface.getGameResource().getResource();
+        Texture resource = surface.getGameResource().getResource().getTexture();
         if (resource != null && !surface.getGameResource().isBroken()) {
             Vector2 size = surface.size;
 
@@ -129,7 +132,7 @@ public class PaintSurfaceGizmo extends Gizmo implements Observer, GameAsset.Game
         final PaintSurfaceComponent surface = gameObject.getComponent(PaintSurfaceComponent.class);
         final TransformComponent transformComponent = gameObject.getComponent(TransformComponent.class);
         final Vector2 surfaceSize = surface.size;
-        final Texture resource = surface.getGameResource().getResource();
+        final Texture resource = surface.getGameResource().getResource().getTexture();
 
         // get mouse unit cords
         mouseCordsOnScene.set(viewport.getMouseCordsOnScene());
@@ -168,11 +171,11 @@ public class PaintSurfaceGizmo extends Gizmo implements Observer, GameAsset.Game
 
     private void updateAssetFromPixmap (Pixmap pixmap, boolean updateListeners) {
         final PaintSurfaceComponent surface = gameObject.getComponent(PaintSurfaceComponent.class);
-        final GameAsset<Texture> gameAsset = surface.gameAsset;
+        final GameAsset<AtlasRegion> gameAsset = surface.gameAsset;
 
         if (gameAsset.isBroken()) return;
 
-        final Texture resource = gameAsset.getResource();
+        final Texture resource = gameAsset.getResource().getTexture();
         final int width = resource.getWidth();
         final int height = resource.getHeight();
 
@@ -191,7 +194,7 @@ public class PaintSurfaceGizmo extends Gizmo implements Observer, GameAsset.Game
         final Texture texture = new Texture(newPixmap);
         texture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
 
-        surface.gameAsset.setResourcePayload(texture);
+        surface.gameAsset.setResourcePayload(new AtlasRegion(new TextureRegion(texture)));
 
         if (updateListeners) {
             surface.gameAsset.listeners.removeValue(this, true);
@@ -236,12 +239,12 @@ public class PaintSurfaceGizmo extends Gizmo implements Observer, GameAsset.Game
         }
 
         PaintSurfaceComponent surface = gameObject.getComponent(PaintSurfaceComponent.class);
-        GameAsset<Texture> gameResource = surface.getGameResource();
+        GameAsset<AtlasRegion> gameResource = surface.getGameResource();
         if (gameResource.isBroken()) {
             // no texture is assigned to the surface,skip
             return null;
         }
-        Texture resource = gameResource.getResource();
+        Texture resource = gameResource.getResource().getTexture();
         resource.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
 
         final int widthInPixels = resource.getWidth();
@@ -335,7 +338,7 @@ public class PaintSurfaceGizmo extends Gizmo implements Observer, GameAsset.Game
 
     private void drawBrushPoint(float x, float y, int sizePixels, float hardness) {
         PaintSurfaceComponent surface = gameObject.getComponent(PaintSurfaceComponent.class);
-        Texture resource = surface.getGameResource().getResource();
+        Texture resource = surface.getGameResource().getResource().getTexture();
         float xMul = surface.size.x / resource.getWidth();
         float yMul = surface.size.y / resource.getHeight();
 

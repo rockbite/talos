@@ -1,6 +1,8 @@
 package com.talosvfx.talos.editor.addons.scene.logic.metawrappers;
 
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Array;
@@ -46,7 +48,7 @@ public class SpriteMetaDataProvider extends AMetaDataProvider<SpriteMetadata> {
 			@Override
 			public void clicked (ButtonPropertyWidget<String> widget) {
 				logger.info("todo open sprite editor request");
-				GameAsset<Texture> assetForPath = (GameAsset<Texture>)AssetRepository.getInstance().getAssetForPath(meta.link.handle, false);
+				GameAsset<AtlasRegion> assetForPath = (GameAsset<AtlasRegion>)AssetRepository.getInstance().getAssetForPath(meta.link.handle, false);
 				SharedResources.appManager.openApp(assetForPath, SpriteEditorApp.class);
 			}
 		});

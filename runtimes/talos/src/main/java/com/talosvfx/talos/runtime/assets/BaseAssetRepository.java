@@ -6,6 +6,7 @@ import com.badlogic.gdx.assets.loaders.FileHandleResolver;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import lombok.Getter;
 
 import java.util.UUID;
@@ -31,7 +32,7 @@ public abstract class BaseAssetRepository {
 
 	public abstract <U> GameAsset<U> getAssetForUniqueIdentifier (UUID uuid, GameAssetType type);
 
-	public abstract NinePatch obtainNinePatch (GameAsset<Texture> gameAsset);
+	public abstract NinePatch obtainNinePatch (GameAsset<TextureAtlas.AtlasRegion> gameAsset);
 
 
 }

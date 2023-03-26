@@ -4,6 +4,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.*;
@@ -62,14 +64,14 @@ public class SceneUtils {
 		return emptyObject;
 	}
 
-	public static GameObject createSpriteObject (GameObjectContainer gameObjectContainer, GameAsset<Texture> spriteAsset, Vector2 sceneCords, GameObject parent) {
+	public static GameObject createSpriteObject (GameObjectContainer gameObjectContainer, GameAsset<AtlasRegion> spriteAsset, Vector2 sceneCords, GameObject parent) {
 		GameObject spriteObject = createObjectByTypeName(gameObjectContainer, "sprite", sceneCords, parent, spriteAsset.nameIdentifier);
 		SpriteRendererComponent component = spriteObject.getComponent(SpriteRendererComponent.class);
 
-        Texture texture = spriteAsset.getResource();
+        AtlasRegion texture = spriteAsset.getResource();
 		SpriteMetadata metaData = (SpriteMetadata)spriteAsset.getRootRawAsset().metaData;
-        component.size.x = texture.getWidth() / metaData.pixelsPerUnit;
-        component.size.y = texture.getHeight() / metaData.pixelsPerUnit;
+        component.size.x = texture.getRegionWidth() / metaData.pixelsPerUnit;
+        component.size.y = texture.getRegionHeight() / metaData.pixelsPerUnit;
 
 		if (!fromDirectoryView) {
 			component.orderingInLayer = getLatestFreeOrderingIndex(gameObjectContainer, component.sortingLayer);

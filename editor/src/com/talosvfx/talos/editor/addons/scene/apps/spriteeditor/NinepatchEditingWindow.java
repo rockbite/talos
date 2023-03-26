@@ -2,6 +2,8 @@ package com.talosvfx.talos.editor.addons.scene.apps.spriteeditor;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
@@ -307,11 +309,11 @@ public class NinepatchEditingWindow extends SpriteEditorWindow {
     }
 
     @Override
-    public void updateForGameAsset (GameAsset<Texture> gameAsset) {
+    public void updateForGameAsset (GameAsset<AtlasRegion> gameAsset) {
         super.updateForGameAsset(gameAsset);
 
         final SpriteMetadata metadata = (SpriteMetadata) gameAsset.getRootRawAsset().metaData;
-        this.texture = gameAsset.getResource();
+        this.texture = gameAsset.getResource().getTexture();
 
         // clamp metadata values in case they are invalid
         metadata.borderData[0] = MathUtils.clamp(metadata.borderData[0], 0, texture.getWidth());
