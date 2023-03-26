@@ -673,7 +673,13 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 					}
 				}
 
-				copyMetaIfExists(dependentRawAsset.handle, dirToCopyInto);
+				if (!copyMetaIfExists(dependentRawAsset.handle, dirToCopyInto)) {
+					if (primaryFile) {
+						FileHandle metadataHandleFor = AssetImporter.getMetadataHandleFor(gameAsset.getRootRawAsset().handle);
+						dirToCopyInto.child(metadataHandleFor.name()).writeString(json.prettyPrint(gameAsset.getRootRawAsset().metaData), false);
+
+					}
+				}
 
 				primaryFile = false;
 			}
@@ -712,11 +718,13 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 		}
 	}
 
-	private void copyMetaIfExists (FileHandle handle, FileHandle dirToCopyInto) {
+	private boolean copyMetaIfExists (FileHandle handle, FileHandle dirToCopyInto) {
 		FileHandle meta = handle.parent().child(handle.name() + ".meta");
 		if (meta.exists()) {
 			meta.copyTo(dirToCopyInto);
+			return true;
 		}
+		return false;
 	}
 
 	private String getRelativePathFromRoot (FileHandle projectDir, FileHandle pathInsideProjectDir) {
