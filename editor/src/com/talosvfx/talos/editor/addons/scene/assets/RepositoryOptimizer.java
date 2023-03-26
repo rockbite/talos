@@ -102,24 +102,6 @@ public class RepositoryOptimizer {
 
 						}
 
-						//We need to find others that reference this asssset and update it to the generated bucket
-						for (GameAsset<AtlasRegion> texturesToPack : bucket.texturesToPack) {
-							//Update all other references
-							for (GameAsset<?> gameAsset : gameAssetsToExport) {
-								Array.ArrayIterator<GameAsset<?>> iterator = gameAsset.dependentGameAssets.iterator();
-								boolean found = false;
-								while (iterator.hasNext()) {
-									GameAsset<?> next = iterator.next();
-									if (next.getRootRawAsset().metaData.uuid.equals(texturesToPack.getRootRawAsset().metaData.uuid)) {
-										iterator.remove();
-										found = true;
-									}
-								}
-								if (found) {
-									gameAsset.dependentGameAssets.add(bucket.generatedTextureAtlas);
-								}
-							}
-						}
 						for (GameAsset<TextureAtlas> textureAtlasGameAsset : bucket.atlasesToUnpack) {
 							//Update all other references
 							for (GameAsset<?> gameAsset : gameAssetsToExport) {
