@@ -1145,8 +1145,11 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		if (suggestedName.equals(gameObject.getName()))
 			return;
 
-		String finalName = NamingUtils.getNewName(suggestedName, currentContainer.getAllGONames());
-
+		GameObjectContainer container = currentContainer;
+		if(gameObject.getParent() != null) {
+			container = gameObject.getParent();
+		}
+		String finalName = NamingUtils.getNewName(suggestedName, container.getAllGONames());
 
 		String oldName = gameObject.getName();
 
