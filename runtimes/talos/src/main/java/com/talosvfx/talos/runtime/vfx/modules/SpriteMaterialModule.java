@@ -72,16 +72,15 @@ public class SpriteMaterialModule extends MaterialModule implements GameResource
 		//deprecated
 		assetIdentifier = jsonData.getString("asset", "white");
 
-		GameAsset<AtlasRegion> defaultValue = RuntimeContext.getInstance().AssetRepository.getAssetForIdentifier(assetIdentifier, GameAssetType.SPRITE);
-
 		GameAsset<AtlasRegion> asset = GameResourceOwner.readAsset(json, jsonData);
+
 		if (asset != null) {
 			if (asset.isBroken()) {
-				asset = defaultValue;
+				asset = RuntimeContext.getInstance().AssetRepository.getAssetForIdentifier(assetIdentifier, GameAssetType.SPRITE);
 			}
 			setGameAsset(asset);
 		} else {
-			setGameAsset(defaultValue);
+			setGameAsset(RuntimeContext.getInstance().AssetRepository.getAssetForIdentifier(assetIdentifier, GameAssetType.SPRITE));
 		}
 	}
 
