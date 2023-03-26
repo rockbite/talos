@@ -36,6 +36,7 @@ dependencyResolutionManagement {
 
             library("libgdx", "com.badlogicgames.gdx", "gdx").versionRef("libgdx")
             library("libgdx-tools", "com.badlogicgames.gdx", "gdx-tools").versionRef("libgdx")
+            library("libgdx-awt", "com.badlogicgames.gdx", "gdx-lwjgl3-glfw-awt-macos").versionRef("libgdx")
             library("libgdx-freetype", "com.badlogicgames.gdx", "gdx-freetype").versionRef("libgdx")
             library("libgdx-freetype-platform", "com.badlogicgames.gdx", "gdx-freetype-platform").versionRef("libgdx")
 
