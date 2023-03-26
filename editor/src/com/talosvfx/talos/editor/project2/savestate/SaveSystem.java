@@ -79,7 +79,7 @@ public class SaveSystem implements Observer {
 		} else {
 			BaseAssetRepository.AssetRepositoryCatalogueExportOptions settings = new BaseAssetRepository.AssetRepositoryCatalogueExportOptions();
 			settings.loadFromPrefs(projectPrefs);
-			AssetRepository.getInstance().exportToFile(settings);
+			AssetRepository.getInstance().exportToFile(settings, event.isOptimized());
 		}
 
 		if(!exportScript.isEmpty()) {

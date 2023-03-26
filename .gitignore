@@ -97,3 +97,5 @@ editor/assets/talos-version.properties
 /editor-desktop-bootstrap/dist/
 /editor-desktop-bootstrap/target/
 editor-desktop-bootstrap/out/**
+
+Exports/**

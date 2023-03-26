@@ -30,6 +30,8 @@ public class GameAsset<T> {
 	@Getter@Setter
 	private boolean dummy;
 
+
+
 	public interface GameAssetUpdateListener {
 		void onUpdate ();
 	}
@@ -68,6 +70,20 @@ public class GameAsset<T> {
 		return dependentRawAssets.first();
 	}
 
+	public GameAsset<T> copy () {
+		GameAsset<T> copy = new GameAsset<>(nameIdentifier, type);
+
+		for (RawAsset dependentRawAsset : dependentRawAssets) {
+			copy.dependentRawAssets.add(dependentRawAsset.copy());
+		}
+
+		copy.dependentGameAssets.addAll(dependentGameAssets);
+		copy.resourcePayload = resourcePayload;
+		copy.broken = broken;
+		copy.dummy = dummy;
+		copy.nonFound = nonFound;
+		return copy;
+	}
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;

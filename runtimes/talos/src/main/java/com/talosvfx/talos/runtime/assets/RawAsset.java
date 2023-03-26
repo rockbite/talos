@@ -13,10 +13,18 @@ public class RawAsset {
 
 	public Array<GameAsset> gameAssetReferences = new Array<>();
 
+	public boolean shouldExport = true;
+
 	public RawAsset (FileHandle file) {
 		this.handle = file;
 	}
-
+	public RawAsset copy () {
+		RawAsset rawAsset = new RawAsset(handle);
+		rawAsset.metaData = metaData;
+		rawAsset.shouldExport = shouldExport;
+		rawAsset.gameAssetReferences.addAll(gameAssetReferences);
+		return rawAsset;
+	}
 	@Override
 	public String toString () {
 		if (metaData == null) {
@@ -28,4 +36,6 @@ public class RawAsset {
 		}
 		return handle.path() + " " + aClass.getSimpleName();
 	}
+
+
 }
