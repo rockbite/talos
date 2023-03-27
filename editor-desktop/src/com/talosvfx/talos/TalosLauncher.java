@@ -66,6 +66,17 @@ public class TalosLauncher implements ILauncher {
 		config.setBackBufferConfig(1,1,1,1,8,8, 0);
 		config.setWindowIcon("icon/talos-64x64.png");
 
+
+		boolean gl3 = false;
+
+		if (gl3) {
+			config.setOpenGLEmulation(Lwjgl3ApplicationConfiguration.GLEmulation.GL30, 3, 2);
+
+			ShaderProgram.prependVertexCode = "#version 330 core\n";
+			ShaderProgram.prependFragmentCode = "#version 330 core\n";
+		}
+
+
 		DateFormat simple =  new SimpleDateFormat("dd MMM yy HH:mm Z");
 		String buildDate = simple.format(TALOS_BUILD.getBuildDate());
 		String misc = "Branch: [" + TALOS_BUILD.getBranch() + "] Commit: [" + TALOS_BUILD.getCommit() + "] Date: ["+ buildDate +"]";
@@ -82,14 +93,6 @@ public class TalosLauncher implements ILauncher {
 			}
 		};
 
-		boolean gl3 = false;
-
-		if (gl3) {
-			config.setOpenGLEmulation(Lwjgl3ApplicationConfiguration.GLEmulation.GL30, 3, 2);
-
-			ShaderProgram.prependVertexCode = "#version 330 core\n";
-			ShaderProgram.prependFragmentCode = "#version 330 core\n";
-		}
 
 
 
