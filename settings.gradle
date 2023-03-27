@@ -8,6 +8,7 @@ include 'plugins'
 include 'runtimes:talos'
 include 'runtimes:talos-libgdx'
 include 'runtimes:talos-bongo'
+include 'tools'
 
 
 dependencyResolutionManagement {

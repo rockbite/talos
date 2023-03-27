@@ -17,6 +17,7 @@ import com.talosvfx.talos.runtime.assets.GameAssetType;
 import com.talosvfx.talos.runtime.assets.GameAssetsExportStructure;
 import com.talosvfx.talos.runtime.assets.RawAsset;
 import com.talosvfx.talos.runtime.assets.meta.AtlasMetadata;
+import com.talosvfx.talos.tools.ExportOptimizer;
 
 import java.awt.*;
 import java.util.UUID;
@@ -135,6 +136,7 @@ public class RepositoryOptimizer {
 		return new Supplier<TextureBucket>() {
 			@Override
 			public TextureBucket get () {
+				ExportOptimizer.ExportPayload exportPayload = new ExportOptimizer.ExportPayload();
 
 				FileHandle exportParent = Gdx.files.local("Exports");
 				exportParent.mkdirs();
@@ -162,6 +164,10 @@ public class RepositoryOptimizer {
 					String imagePathAbsoluteDir = textureAtlasGameAsset.getRootRawAsset().handle.parent().file().getAbsolutePath();
 					TextureUnpacker.main(new String[]{absolutePath, imagePathAbsoluteDir, raws.file().getAbsolutePath()});
 
+					ExportOptimizer.UnpackPayload unpackPayload = new ExportOptimizer.UnpackPayload();
+					unpackPayload.set(absolutePath, imagePathAbsoluteDir, raws.file().getAbsolutePath());
+					exportPayload.getUnpackPayloads().add(unpackPayload);
+
 				}
 
 				for (GameAsset<AtlasRegion> textureGameAsset : bucket.texturesToPack) {
@@ -179,6 +185,10 @@ public class RepositoryOptimizer {
 				settings.maxHeight = 2048;
 				settings.filterMag = bucket.magFilter;
 				settings.filterMin = bucket.minFilter;
+
+				ExportOptimizer.PackPayload packPayload = new ExportOptimizer.PackPayload();
+				packPayload.set(settings, raws.file().getAbsolutePath(), result.file().getAbsolutePath(), bucket.identifier);
+				exportPayload.setPackPayload(packPayload);
 
 				TexturePacker.process(settings, raws.file().getAbsolutePath(), result.file().getAbsolutePath(), bucket.identifier);
 
