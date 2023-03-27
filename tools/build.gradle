@@ -6,11 +6,11 @@ plugins {
 }
 
 dependencies {
-    api libs.libgdx
-    api libs.libgdx.tools
-    api libs.slf4j.api
-    api libs.logback.core
-    api libs.logback.classic
+    implementation libs.libgdx
+    implementation libs.libgdx.tools
+    implementation libs.slf4j.api
+    implementation libs.logback.core
+    implementation libs.logback.classic
 }
 
 task packageSources(type: Jar, dependsOn: [classes, jar]) {
