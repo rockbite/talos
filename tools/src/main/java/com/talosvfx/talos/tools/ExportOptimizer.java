@@ -57,6 +57,7 @@ public class ExportOptimizer {
 
 		for (UnpackPayload unpackPayload : exportPayload.getUnpackPayloads()) {
 			logger.info("Trying to unpack {}", unpackPayload.targetAtlasPath);
+
 			TextureUnpacker.main(new String[]{unpackPayload.targetAtlasPath, unpackPayload.imageDir, unpackPayload.outDir});
 			logger.info("Pack finished {}", unpackPayload.targetAtlasPath);
 		}
