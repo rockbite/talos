@@ -53,8 +53,12 @@ public class ExportOptimizer {
 	}
 
 	public static void unpackAndPack (ExportPayload exportPayload) {
+
+
 		for (UnpackPayload unpackPayload : exportPayload.getUnpackPayloads()) {
+			logger.info("Trying to unpack {}", unpackPayload.targetAtlasPath);
 			TextureUnpacker.main(new String[]{unpackPayload.targetAtlasPath, unpackPayload.imageDir, unpackPayload.outDir});
+			logger.info("Pack finished {}", unpackPayload.targetAtlasPath);
 		}
 
 		PackPayload packPayload = exportPayload.packPayload;
@@ -64,6 +68,7 @@ public class ExportOptimizer {
 	public static void main (String[] args) {
 		if (args.length == 1) {
 			Json json = new Json();
+			logger.info("Packing config {}", args[0]);
 			ExportPayload exportPayload = json.fromJson(ExportPayload.class, args[0]);
 			try {
 				unpackAndPack(exportPayload);

@@ -79,7 +79,7 @@ public class RepositoryOptimizer {
 
 		Net.HttpRequest httpRequest = new Net.HttpRequest();
 		httpRequest.setMethod(Net.HttpMethods.GET);
-		httpRequest.setUrl("https://oss.sonatype.org/content/repositories/snapshots/com/talosvfx/tools/2.0.0-SNAPSHOT/tools-2.0.0-20230327.113914-1.jar");
+		httpRequest.setUrl("https://oss.sonatype.org/content/repositories/snapshots/com/talosvfx/tools/2.0.0-SNAPSHOT/tools-2.0.0-20230327.121357-2.jar");
 		Gdx.net.sendHttpRequest(httpRequest, new Net.HttpResponseListener() {
 			@Override
 			public void handleHttpResponse (Net.HttpResponse httpResponse) {
@@ -347,7 +347,6 @@ public class RepositoryOptimizer {
 		try {
 			String absolutePathToJar = jarLocation.file().getAbsolutePath();
 
-			//java -cp JarExample2.jar com.baeldung.jarArguments.JarExample "arg 1" arg2@
 			Process process = Runtime.getRuntime().exec("java -cp " + absolutePathToJar + " " + ExportOptimizer.class.getName() + " " + payload);
 
 
