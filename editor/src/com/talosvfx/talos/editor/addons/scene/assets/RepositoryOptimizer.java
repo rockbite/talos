@@ -21,7 +21,7 @@ import com.talosvfx.talos.runtime.assets.GameAssetType;
 import com.talosvfx.talos.runtime.assets.GameAssetsExportStructure;
 import com.talosvfx.talos.runtime.assets.RawAsset;
 import com.talosvfx.talos.runtime.assets.meta.AtlasMetadata;
-import com.talosvfx.talos.tools.ExportOptimizer;
+import lombok.Data;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -33,6 +33,47 @@ import java.util.concurrent.ExecutionException;
 import java.util.function.Supplier;
 
 public class RepositoryOptimizer {
+
+	@Data
+	public static class UnpackPayload {
+
+		private String targetAtlasPath;
+		private String imageDir;
+		private String outDir;
+
+		public UnpackPayload () {}
+
+		public void set (String targetAtlas, String imageDir, String outDir) {
+			this.targetAtlasPath = targetAtlas;
+			this.imageDir = imageDir;
+			this.outDir = outDir;
+		}
+	}
+
+	@Data
+	public static class PackPayload {
+
+		private TexturePacker.Settings settings;
+		private String input;
+		private String output;
+		private String packFileName;
+
+		public PackPayload () {}
+
+		public void set (TexturePacker.Settings settings, String input, String output, String packFileName) {
+			this.settings = settings;
+			this.input = input;
+			this.output = output;
+			this.packFileName = packFileName;
+		}
+	}
+
+	@Data
+	public static class ExportPayload {
+		private Array<UnpackPayload> unpackPayloads = new Array<>();
+		private PackPayload packPayload;
+	}
+
 
 	public static void startProcess (ObjectSet<GameAsset<?>> gameAssetsToExport, GameAssetsExportStructure gameAssetExportStructure, Runnable runnable) {
 		checkAndDownload(gameAssetsToExport, gameAssetExportStructure, runnable);
@@ -259,7 +300,7 @@ public class RepositoryOptimizer {
 		return new Supplier<TextureBucket>() {
 			@Override
 			public TextureBucket get () {
-				ExportOptimizer.ExportPayload exportPayload = new ExportOptimizer.ExportPayload();
+				ExportPayload exportPayload = new ExportPayload();
 
 				FileHandle exportParent = Gdx.files.local("Exports");
 				exportParent.mkdirs();
@@ -287,7 +328,7 @@ public class RepositoryOptimizer {
 					String absolutePath = textureAtlasGameAsset.getRootRawAsset().handle.file().getAbsolutePath();
 					String imagePathAbsoluteDir = textureAtlasGameAsset.getRootRawAsset().handle.parent().file().getAbsolutePath();
 
-					ExportOptimizer.UnpackPayload unpackPayload = new ExportOptimizer.UnpackPayload();
+					UnpackPayload unpackPayload = new UnpackPayload();
 					unpackPayload.set(absolutePath, imagePathAbsoluteDir, raws.file().getAbsolutePath());
 					exportPayload.getUnpackPayloads().add(unpackPayload);
 
@@ -305,7 +346,7 @@ public class RepositoryOptimizer {
 				settings.filterMag = bucket.magFilter;
 				settings.filterMin = bucket.minFilter;
 
-				ExportOptimizer.PackPayload packPayload = new ExportOptimizer.PackPayload();
+				PackPayload packPayload = new PackPayload();
 				packPayload.set(settings, raws.file().getAbsolutePath(), result.file().getAbsolutePath(), bucket.identifier);
 				exportPayload.setPackPayload(packPayload);
 
@@ -337,7 +378,7 @@ public class RepositoryOptimizer {
 		};
 	}
 
-	private static CompletableFuture<Void> invokeExternalTool (ExportOptimizer.ExportPayload exportPayload) {
+	private static CompletableFuture<Void> invokeExternalTool (ExportPayload exportPayload) {
 		FileHandle jarLocation = getJarLocation();
 
 		Json json = new Json();
@@ -348,7 +389,7 @@ public class RepositoryOptimizer {
 		try {
 			String absolutePathToJar = jarLocation.file().getAbsolutePath();
 
-			String args = "java -cp " + absolutePathToJar + " " + ExportOptimizer.class.getName() + " " + payload;
+			String args = "java -cp " + absolutePathToJar + " " + "com.talosvfx.talos.tools.ExportOptimizer" + " " + payload;
 			Process process = Runtime.getRuntime().exec(args);
 
 

@@ -37,8 +37,6 @@ dependencies {
     api libs.bongo.engine
     api project(":runtimes:talos-bongo")
 
-    implementation project(":tools")
-
     api libs.visui
 
     api libs.libgdx.freetype
