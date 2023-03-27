@@ -80,7 +80,7 @@ public class RepositoryOptimizer {
 
 		Net.HttpRequest httpRequest = new Net.HttpRequest();
 		httpRequest.setMethod(Net.HttpMethods.GET);
-		httpRequest.setUrl("https://oss.sonatype.org/content/repositories/snapshots/com/talosvfx/tools/2.0.0-SNAPSHOT/tools-2.0.0-20230327.134753-3.jar");
+		httpRequest.setUrl("https://oss.sonatype.org/content/repositories/snapshots/com/talosvfx/tools/2.0.0-SNAPSHOT/tools-2.0.0-20230327.140856-4.jar");
 		Gdx.net.sendHttpRequest(httpRequest, new Net.HttpResponseListener() {
 			@Override
 			public void handleHttpResponse (Net.HttpResponse httpResponse) {
@@ -377,6 +377,7 @@ public class RepositoryOptimizer {
 			if (i != 0) {
 				throw new GdxRuntimeException("Exception in packing");
 			}
+			objectCompletableFuture.complete(null);
 
 		} catch (IOException e) {
 			throw new RuntimeException(e);
