@@ -43,6 +43,7 @@ public class SpriteMetaDataProvider extends AMetaDataProvider<SpriteMetadata> {
 		propertyWidgets.add(pixelToWorldPropertyWidget);
 		propertyWidgets.add(WidgetFactory.generate(meta, "minFilter", "MinFilter"));
 		propertyWidgets.add(WidgetFactory.generate(meta, "magFilter", "MagFilter"));
+		propertyWidgets.add(WidgetFactory.generate(meta, "dontPack", "Dont pack"));
 
 		ButtonPropertyWidget<String> spriteEditor = new ButtonPropertyWidget<String>("Sprite Editor", new ButtonPropertyWidget.ButtonListener<String>() {
 			@Override

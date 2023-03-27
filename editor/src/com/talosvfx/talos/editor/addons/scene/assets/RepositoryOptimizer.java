@@ -21,6 +21,7 @@ import com.talosvfx.talos.runtime.assets.GameAssetType;
 import com.talosvfx.talos.runtime.assets.GameAssetsExportStructure;
 import com.talosvfx.talos.runtime.assets.RawAsset;
 import com.talosvfx.talos.runtime.assets.meta.AtlasMetadata;
+import com.talosvfx.talos.runtime.assets.meta.SpriteMetadata;
 import lombok.Data;
 
 import java.io.IOException;
@@ -203,6 +204,10 @@ public class RepositoryOptimizer {
 
 		GameAsset<TextureAtlas> generatedTextureAtlas;
 
+		TexturePacker.Settings packSettings;
+
+		boolean single;
+
 	}
 
 	public static void process (ObjectSet<GameAsset<?>> gameAssetsToExport, GameAssetsExportStructure gameAssetExportStructure, Runnable runnable) {
@@ -227,7 +232,7 @@ public class RepositoryOptimizer {
 		}
 		for (GameAsset<AtlasRegion> sprite : sprites) {
 			AtlasRegion resource = sprite.getResource();
-			TextureBucket bucket = findOrCreateBucket(resource.getTexture(), buckets);
+			TextureBucket bucket = findOrCreateBucket(resource.getTexture(), buckets, (SpriteMetadata)sprite.getRootRawAsset().metaData);
 			bucket.texturesToPack.add(sprite);
 		}
 
@@ -334,20 +339,10 @@ public class RepositoryOptimizer {
 
 				}
 
-				TexturePacker.Settings settings = new TexturePacker.Settings();
-				settings.edgePadding = true;
-				settings.duplicatePadding = true;
-				settings.paddingX = 2;
-				settings.paddingY = 2;
-				settings.stripWhitespaceX = true;
-				settings.stripWhitespaceY = true;
-				settings.maxWidth = 2048;
-				settings.maxHeight = 2048;
-				settings.filterMag = bucket.magFilter;
-				settings.filterMin = bucket.minFilter;
+
 
 				PackPayload packPayload = new PackPayload();
-				packPayload.set(settings, raws.file().getAbsolutePath(), result.file().getAbsolutePath(), bucket.identifier);
+				packPayload.set(bucket.packSettings, raws.file().getAbsolutePath(), result.file().getAbsolutePath(), bucket.identifier);
 				exportPayload.setPackPayload(packPayload);
 
 				CompletableFuture<Void> completableFuture = invokeExternalTool(exportPayload);
@@ -429,8 +424,20 @@ public class RepositoryOptimizer {
 
 	;
 
-	private static TextureBucket findOrCreateBucket (Texture resource, ObjectSet<TextureBucket> buckets) {
+	private static TextureBucket findOrCreateBucket (Texture resource, ObjectSet<TextureBucket> buckets, SpriteMetadata metadata) {
+		if (metadata.dontPack) {
+			TextureBucket textureBucket = new TextureBucket();
+			textureBucket.minFilter = resource.getMinFilter();
+			textureBucket.magFilter = resource.getMagFilter();
+			textureBucket.identifier = "talos-pack-" + buckets.size;
+			textureBucket.packSettings = getSingleTexturePackSettings(textureBucket);
+			textureBucket.single = true;
+			buckets.add(textureBucket);
+			return textureBucket;
+		}
 		for (TextureBucket bucket : buckets) {
+			if (bucket.single) continue;
+
 			Texture.TextureFilter minFilter = bucket.minFilter;
 			Texture.TextureFilter magFilter = bucket.magFilter;
 
@@ -445,9 +452,41 @@ public class RepositoryOptimizer {
 		textureBucket.minFilter = resource.getMinFilter();
 		textureBucket.magFilter = resource.getMagFilter();
 		textureBucket.identifier = "talos-pack-" + buckets.size;
+		textureBucket.packSettings = getDefaultPackSettings(textureBucket);
 		buckets.add(textureBucket);
 
 		return textureBucket;
+	}
+
+	private static TexturePacker.Settings getSingleTexturePackSettings (TextureBucket bucket) {
+		TexturePacker.Settings settings = new TexturePacker.Settings();
+		settings.edgePadding = false;
+		settings.duplicatePadding = false;
+		settings.paddingX = 0;
+		settings.paddingY = 0;
+		settings.stripWhitespaceX = false;
+		settings.stripWhitespaceY = false;
+		settings.maxWidth = 2048;
+		settings.maxHeight = 2048;
+		settings.filterMag = bucket.magFilter;
+		settings.filterMin = bucket.minFilter;
+		settings.pot = false;
+		return settings;
+	}
+
+	private static TexturePacker.Settings getDefaultPackSettings (TextureBucket bucket) {
+		TexturePacker.Settings settings = new TexturePacker.Settings();
+		settings.edgePadding = true;
+		settings.duplicatePadding = true;
+		settings.paddingX = 2;
+		settings.paddingY = 2;
+		settings.stripWhitespaceX = true;
+		settings.stripWhitespaceY = true;
+		settings.maxWidth = 2048;
+		settings.maxHeight = 2048;
+		settings.filterMag = bucket.magFilter;
+		settings.filterMin = bucket.minFilter;
+		return settings;
 	}
 
 	private static TextureBucket findOrCreateBucket (TextureAtlas resource, ObjectSet<TextureBucket> buckets) {
@@ -466,6 +505,7 @@ public class RepositoryOptimizer {
 		textureBucket.minFilter = resource.getTextures().first().getMinFilter();
 		textureBucket.magFilter = resource.getTextures().first().getMagFilter();
 		textureBucket.identifier = "talos-pack-" + buckets.size;
+		textureBucket.packSettings = getDefaultPackSettings(textureBucket);
 		buckets.add(textureBucket);
 
 		return textureBucket;

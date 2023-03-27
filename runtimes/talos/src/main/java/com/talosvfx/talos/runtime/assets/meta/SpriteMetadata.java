@@ -19,6 +19,7 @@ public class SpriteMetadata extends AMetadata {
     public Texture.TextureFilter minFilter = Texture.TextureFilter.Nearest;
     public Texture.TextureFilter magFilter = Texture.TextureFilter.Nearest;
 
+    public boolean dontPack = false;
     public SpriteMetadata() {
         super();
     }
@@ -30,6 +31,7 @@ public class SpriteMetadata extends AMetadata {
         json.writeValue("pixelsPerUnit", pixelsPerUnit);
         json.writeValue("minFilter", minFilter);
         json.writeValue("minFilter", magFilter);
+        json.writeValue("dontPack", dontPack);
     }
 
     @Override
@@ -42,6 +44,7 @@ public class SpriteMetadata extends AMetadata {
         pixelsPerUnit = jsonData.getFloat("pixelsPerUnit", DefaultConstants.defaultPixelPerUnitProvider.get());
         minFilter = json.readValue("minFilter", Texture.TextureFilter.class, Texture.TextureFilter.Nearest, jsonData);
         magFilter = json.readValue("magFilter", Texture.TextureFilter.class, Texture.TextureFilter.Nearest, jsonData);
+        dontPack = jsonData.getBoolean("dontPack", false);
     }
 
     public boolean isSlice () {
