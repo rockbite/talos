@@ -3,6 +3,7 @@ package com.talosvfx.talos.tools;
 import com.badlogic.gdx.tools.texturepacker.TexturePacker;
 import com.badlogic.gdx.tools.texturepacker.TextureUnpacker;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Base64Coder;
 import com.badlogic.gdx.utils.Json;
 import lombok.Data;
 import org.slf4j.Logger;
@@ -69,8 +70,10 @@ public class ExportOptimizer {
 	public static void main (String[] args) {
 		if (args.length == 1) {
 			Json json = new Json();
+
+			System.out.println("args: " + args[0]);
 			logger.info("Packing config {}", args[0]);
-			ExportPayload exportPayload = json.fromJson(ExportPayload.class, args[0]);
+			ExportPayload exportPayload = json.fromJson(ExportPayload.class, Base64Coder.decodeString(args[0]));
 			try {
 				unpackAndPack(exportPayload);
 			} catch (Exception e) {

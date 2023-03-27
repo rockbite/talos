@@ -10,6 +10,7 @@ import com.badlogic.gdx.net.HttpStatus;
 import com.badlogic.gdx.tools.texturepacker.TexturePacker;
 import com.badlogic.gdx.tools.texturepacker.TextureUnpacker;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Base64Coder;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.ObjectSet;
@@ -79,7 +80,7 @@ public class RepositoryOptimizer {
 
 		Net.HttpRequest httpRequest = new Net.HttpRequest();
 		httpRequest.setMethod(Net.HttpMethods.GET);
-		httpRequest.setUrl("https://oss.sonatype.org/content/repositories/snapshots/com/talosvfx/tools/2.0.0-SNAPSHOT/tools-2.0.0-20230327.121357-2.jar");
+		httpRequest.setUrl("https://oss.sonatype.org/content/repositories/snapshots/com/talosvfx/tools/2.0.0-SNAPSHOT/tools-2.0.0-20230327.134753-3.jar");
 		Gdx.net.sendHttpRequest(httpRequest, new Net.HttpResponseListener() {
 			@Override
 			public void handleHttpResponse (Net.HttpResponse httpResponse) {
@@ -340,14 +341,15 @@ public class RepositoryOptimizer {
 		FileHandle jarLocation = getJarLocation();
 
 		Json json = new Json();
-		String payload = json.toJson(exportPayload);
+		String payload = Base64Coder.encodeString(json.toJson(exportPayload));
 
 		CompletableFuture<Void> objectCompletableFuture = new CompletableFuture<>();
 
 		try {
 			String absolutePathToJar = jarLocation.file().getAbsolutePath();
 
-			Process process = Runtime.getRuntime().exec("java -cp " + absolutePathToJar + " " + ExportOptimizer.class.getName() + " " + payload);
+			String args = "java -cp " + absolutePathToJar + " " + ExportOptimizer.class.getName() + " " + payload;
+			Process process = Runtime.getRuntime().exec(args);
 
 
 			InputStream inputStream = process.getInputStream();

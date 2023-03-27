@@ -9,7 +9,8 @@ dependencies {
     api libs.libgdx
     api libs.libgdx.tools
     api libs.slf4j.api
-
+    api libs.logback.core
+    api libs.logback.classic
 }
 
 task packageSources(type: Jar, dependsOn: [classes, jar]) {
