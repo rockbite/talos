@@ -37,7 +37,7 @@ dependencies {
     api libs.bongo.engine
     api project(":runtimes:talos-bongo")
 
-    compileOnly project(":tools")
+    implementation project(":tools")
 
     api libs.visui
 

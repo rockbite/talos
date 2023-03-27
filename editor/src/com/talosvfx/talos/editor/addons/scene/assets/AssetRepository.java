@@ -615,7 +615,7 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 		Thread thread = new Thread(new Runnable() {
 			@Override
 			public void run () {
-				RepositoryOptimizer.process(gameAssetsToExport, gameAssetExportStructure, runnable);
+				RepositoryOptimizer.startProcess(gameAssetsToExport, gameAssetExportStructure, runnable);
 			}
 		});
 		thread.start();

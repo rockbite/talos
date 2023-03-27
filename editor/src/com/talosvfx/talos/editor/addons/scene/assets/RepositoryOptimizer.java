@@ -1,17 +1,20 @@
 package com.talosvfx.talos.editor.addons.scene.assets;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Net;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
-import com.badlogic.gdx.graphics.glutils.FileTextureData;
-import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.net.HttpStatus;
 import com.badlogic.gdx.tools.texturepacker.TexturePacker;
 import com.badlogic.gdx.tools.texturepacker.TextureUnpacker;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.GdxRuntimeException;
+import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.ObjectSet;
 import com.talosvfx.talos.editor.project2.SharedResources;
+import com.talosvfx.talos.editor.utils.Toasts;
 import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.runtime.assets.GameAssetType;
 import com.talosvfx.talos.runtime.assets.GameAssetsExportStructure;
@@ -19,12 +22,132 @@ import com.talosvfx.talos.runtime.assets.RawAsset;
 import com.talosvfx.talos.runtime.assets.meta.AtlasMetadata;
 import com.talosvfx.talos.tools.ExportOptimizer;
 
-import java.awt.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.function.Supplier;
 
 public class RepositoryOptimizer {
+
+	public static void startProcess (ObjectSet<GameAsset<?>> gameAssetsToExport, GameAssetsExportStructure gameAssetExportStructure, Runnable runnable) {
+		checkAndDownload(gameAssetsToExport, gameAssetExportStructure, runnable);
+	}
+
+	private static void checkAndDownload (ObjectSet<GameAsset<?>> gameAssetsToExport, GameAssetsExportStructure gameAssetExportStructure, Runnable runnable) {
+		if (hasToolsBinary()) {
+			process(gameAssetsToExport, gameAssetExportStructure, runnable);
+		} else {
+
+			CompletableFuture<Void> download = download();
+			download.whenComplete((unused, throwable) -> {
+				if (throwable == null) {
+					Gdx.app.postRunnable(new Runnable() {
+						@Override
+						public void run () {
+							Toasts.getInstance().showInfoToast("Downloading external tools complete");
+						}
+					});
+					process(gameAssetsToExport, gameAssetExportStructure, runnable);
+				} else {
+					throw new GdxRuntimeException("Failure to download and process");
+				}
+			});
+
+			try {
+				download.get();
+			} catch (InterruptedException e) {
+				throw new RuntimeException(e);
+			} catch (ExecutionException e) {
+				throw new RuntimeException(e);
+			}
+		}
+	}
+
+	private static CompletableFuture<Void> download () {
+		Gdx.app.postRunnable(new Runnable() {
+			@Override
+			public void run () {
+				Toasts.getInstance().showInfoToast("Downloading external tools");
+			}
+		});
+
+		CompletableFuture<Void> downloadFuture = new CompletableFuture<>();
+
+		Net.HttpRequest httpRequest = new Net.HttpRequest();
+		httpRequest.setMethod(Net.HttpMethods.GET);
+		httpRequest.setUrl("https://oss.sonatype.org/content/repositories/snapshots/com/talosvfx/tools/2.0.0-SNAPSHOT/tools-2.0.0-20230327.113914-1.jar");
+		Gdx.net.sendHttpRequest(httpRequest, new Net.HttpResponseListener() {
+			@Override
+			public void handleHttpResponse (Net.HttpResponse httpResponse) {
+				HttpStatus status = httpResponse.getStatus();
+
+				if (status.getStatusCode() == 200) {
+					long length = Long.parseLong(httpResponse.getHeader("Content-Length"));
+
+					// We're going to download the file to external storage, create the streams
+					InputStream is = httpResponse.getResultAsStream();
+					OutputStream os = getJarLocation().write(false);
+
+					byte[] bytes = new byte[1024];
+					int count = -1;
+					long read = 0;
+					try {
+						// Keep reading bytes and storing them until there are no more.
+						while ((count = is.read(bytes, 0, bytes.length)) != -1) {
+							os.write(bytes, 0, count);
+							read += count;
+
+							// Update the UI with the download progress
+							final int progress = ((int)(((double)read / (double)length) * 100));
+
+							System.out.println("Download progress " + progress + "%");
+
+							// Since we are downloading on a background thread, post a runnable to touch ui
+
+						}
+
+						downloadFuture.complete(null);
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+
+			@Override
+			public void failed (Throwable t) {
+				Gdx.app.postRunnable(new Runnable() {
+					@Override
+					public void run () {
+						Toasts.getInstance().showErrorToast("Error downloading tools, " + t.getLocalizedMessage());
+					}
+				});
+			}
+
+			@Override
+			public void cancelled () {
+				Gdx.app.postRunnable(new Runnable() {
+					@Override
+					public void run () {
+						Toasts.getInstance().showErrorToast("Tools download cancelled");
+					}
+				});
+			}
+		});
+
+		return downloadFuture;
+	}
+
+	private static FileHandle getJarLocation () {
+		return Gdx.files.local("Exports/binaries/tools-jar.jar");
+	}
+
+	private static boolean hasToolsBinary () {
+		return getJarLocation().exists();
+	}
 
 	private static class TextureBucket {
 
@@ -32,7 +155,6 @@ public class RepositoryOptimizer {
 
 		Texture.TextureFilter magFilter;
 		Texture.TextureFilter minFilter;
-
 
 		ObjectSet<GameAsset<TextureAtlas>> atlasesToUnpack = new ObjectSet<>();
 		ObjectSet<GameAsset<AtlasRegion>> texturesToPack = new ObjectSet<>();
@@ -42,8 +164,8 @@ public class RepositoryOptimizer {
 	}
 
 	public static void process (ObjectSet<GameAsset<?>> gameAssetsToExport, GameAssetsExportStructure gameAssetExportStructure, Runnable runnable) {
-		ObjectSet<TextureBucket> buckets = new ObjectSet<>();
 
+		ObjectSet<TextureBucket> buckets = new ObjectSet<>();
 
 		ObjectSet<GameAsset<TextureAtlas>> atlases = new ObjectSet<>();
 		ObjectSet<GameAsset<AtlasRegion>> sprites = new ObjectSet<>();
@@ -151,27 +273,23 @@ public class RepositoryOptimizer {
 				}
 				bucketDir.mkdirs();
 
-
 				FileHandle raws = bucketDir.child("raws");
 				FileHandle result = bucketDir.child("packed");
 				raws.mkdirs();
 				result.mkdirs();
 
+				for (GameAsset<AtlasRegion> textureGameAsset : bucket.texturesToPack) {
+					textureGameAsset.getRootRawAsset().handle.copyTo(raws);
+				}
 
 				for (GameAsset<TextureAtlas> textureAtlasGameAsset : bucket.atlasesToUnpack) {
-
 					String absolutePath = textureAtlasGameAsset.getRootRawAsset().handle.file().getAbsolutePath();
 					String imagePathAbsoluteDir = textureAtlasGameAsset.getRootRawAsset().handle.parent().file().getAbsolutePath();
-					TextureUnpacker.main(new String[]{absolutePath, imagePathAbsoluteDir, raws.file().getAbsolutePath()});
 
 					ExportOptimizer.UnpackPayload unpackPayload = new ExportOptimizer.UnpackPayload();
 					unpackPayload.set(absolutePath, imagePathAbsoluteDir, raws.file().getAbsolutePath());
 					exportPayload.getUnpackPayloads().add(unpackPayload);
 
-				}
-
-				for (GameAsset<AtlasRegion> textureGameAsset : bucket.texturesToPack) {
-					textureGameAsset.getRootRawAsset().handle.copyTo(raws);
 				}
 
 				TexturePacker.Settings settings = new TexturePacker.Settings();
@@ -190,7 +308,14 @@ public class RepositoryOptimizer {
 				packPayload.set(settings, raws.file().getAbsolutePath(), result.file().getAbsolutePath(), bucket.identifier);
 				exportPayload.setPackPayload(packPayload);
 
-				TexturePacker.process(settings, raws.file().getAbsolutePath(), result.file().getAbsolutePath(), bucket.identifier);
+				CompletableFuture<Void> completableFuture = invokeExternalTool(exportPayload);
+				try {
+					completableFuture.get();
+				} catch (InterruptedException e) {
+					throw new RuntimeException(e);
+				} catch (ExecutionException e) {
+					throw new RuntimeException(e);
+				}
 
 				GameAsset<TextureAtlas> atlasGameAsset = new GameAsset<>(bucket.identifier, GameAssetType.ATLAS);
 				atlasGameAsset.dependentRawAssets.add(new RawAsset(result.child(bucket.identifier + ".atlas")));
@@ -202,17 +327,64 @@ public class RepositoryOptimizer {
 					}
 				}
 
-
 				atlasGameAsset.getRootRawAsset().metaData = new AtlasMetadata();
 				atlasGameAsset.getRootRawAsset().metaData.uuid = UUID.randomUUID();
 				bucket.generatedTextureAtlas = atlasGameAsset;
 
-
-
 				return bucket;
 			}
 		};
-	};
+	}
+
+	private static CompletableFuture<Void> invokeExternalTool (ExportOptimizer.ExportPayload exportPayload) {
+		FileHandle jarLocation = getJarLocation();
+
+		Json json = new Json();
+		String payload = json.toJson(exportPayload);
+
+		CompletableFuture<Void> objectCompletableFuture = new CompletableFuture<>();
+
+		try {
+			String absolutePathToJar = jarLocation.file().getAbsolutePath();
+
+			//java -cp JarExample2.jar com.baeldung.jarArguments.JarExample "arg 1" arg2@
+			Process process = Runtime.getRuntime().exec("java -cp " + absolutePathToJar + " " + ExportOptimizer.class.getName() + " " + payload);
+
+
+			InputStream inputStream = process.getInputStream();
+			InputStreamReader isr = new InputStreamReader(inputStream);
+			InputStream errorStream = process.getErrorStream();
+			InputStreamReader esr = new InputStreamReader(errorStream);
+
+			int n1;
+			char[] c1 = new char[1024];
+			StringBuffer stableOutput = new StringBuffer();
+			while ((n1 = isr.read(c1)) > 0) {
+				stableOutput.append(c1, 0, n1);
+			}
+			System.out.println("Output: " + stableOutput.toString());
+
+			int n2;
+			char[] c2 = new char[1024];
+			StringBuffer stableError = new StringBuffer();
+			while ((n2 = esr.read(c2)) > 0) {
+				stableError.append(c2, 0, n2);
+			}
+			System.out.println("Error: " + stableError.toString());
+
+			int i = process.exitValue();
+			if (i != 0) {
+				throw new GdxRuntimeException("Exception in packing");
+			}
+
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+
+		return objectCompletableFuture;
+	}
+
+	;
 
 	private static TextureBucket findOrCreateBucket (Texture resource, ObjectSet<TextureBucket> buckets) {
 		for (TextureBucket bucket : buckets) {
