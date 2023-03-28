@@ -197,10 +197,4 @@ public class EventNodeWidget extends RoutineNodeWidget {
             }
         }
     }
-
-    @Override
-    public void animateSignal(String portName) {
-        super.animateSignal(portName);
-        Toasts.getInstance().showErrorToast("FIREEEE");
-    }
 }

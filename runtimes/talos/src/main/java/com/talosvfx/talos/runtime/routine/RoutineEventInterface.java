@@ -4,5 +4,5 @@ import com.badlogic.gdx.utils.Array;
 import com.talosvfx.talos.runtime.scene.utils.propertyWrappers.PropertyWrapper;
 
 public interface RoutineEventInterface {
-    void onEventFromRoutines (String eventName, Array<PropertyWrapper<?>> propertires);
+    void onEventFromRoutines (String eventName, Array<PropertyWrapper<?>> properties);
 }

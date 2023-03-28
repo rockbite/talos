@@ -38,8 +38,8 @@ public class AssetPipelineTest extends ApplicationAdapter {
 
 		instance.routineEventInterface = new RoutineEventInterface() {
 			@Override
-			public void onEventFromRoutines (String eventName, Array<PropertyWrapper<?>> propertires) {
-				System.out.println("Event: " +eventName + " " + propertires);
+			public void onEventFromRoutines (String eventName, Array<PropertyWrapper<?>> properties) {
+				System.out.println("Event: " +eventName + " " + properties);
 			}
 		};
 

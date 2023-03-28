@@ -7,7 +7,7 @@ public class RoutineDefaultEventInterface implements RoutineEventInterface {
 
 
 	@Override
-	public void onEventFromRoutines (String eventName, Array<PropertyWrapper<?>> propertires) {
+	public void onEventFromRoutines (String eventName, Array<PropertyWrapper<?>> properties) {
 
 	}
 }
