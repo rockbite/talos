@@ -121,13 +121,13 @@ public class Simple3DBatch {
 
         lastTexture = texture;
 
-        int incomingVertCount = verts.length/vertexSize;
+        int incomingVertCount = vertCount/vertexSize;
 
         if (vertsInBuffer + incomingVertCount > maxVertsInMesh) {
             flush();
         }
 
-        System.arraycopy(verts, 0, vertexBuffer, vertsInBuffer * vertexSize, verts.length);
+        System.arraycopy(verts, 0, vertexBuffer, vertsInBuffer * vertexSize, vertCount);
         vertsInBuffer += incomingVertCount;
 
 
