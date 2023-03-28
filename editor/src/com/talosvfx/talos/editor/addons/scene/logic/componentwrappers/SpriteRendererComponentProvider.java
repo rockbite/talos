@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Array;
+import com.talosvfx.talos.editor.addons.scene.SceneUtils;
 import com.talosvfx.talos.editor.addons.scene.widgets.property.PropertyPanelAssetSelectionWidget;
 import com.talosvfx.talos.editor.nodes.widgets.ValueWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
@@ -13,6 +14,7 @@ import com.talosvfx.talos.editor.widgets.propertyWidgets.Vector2PropertyWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.WidgetFactory;
 import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.runtime.assets.GameAssetType;
+import com.talosvfx.talos.runtime.scene.GameObject;
 import com.talosvfx.talos.runtime.scene.components.SpriteRendererComponent;
 
 import java.util.function.Supplier;
@@ -36,6 +38,8 @@ public final class SpriteRendererComponentProvider extends RendererComponentProv
 			@Override
 			public void report (GameAsset<AtlasRegion> value) {
 				component.setGameAsset(value);
+				GameObject gameObject = getComponent().getGameObject();
+				SceneUtils.componentUpdated(gameObject.getGameObjectContainerRoot(), gameObject, getComponent(), false);
 			}
 		});
 
