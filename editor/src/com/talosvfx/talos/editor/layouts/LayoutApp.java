@@ -38,4 +38,8 @@ public interface LayoutApp {
 	void setLayoutContent(LayoutContent layoutContent);
 	LayoutContent getLayoutContent();
 	void actInBackground(float delta);
+
+	boolean hasPreferredWidth();
+
+	boolean hasPreferredHeight();
 }
