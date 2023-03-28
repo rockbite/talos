@@ -1,18 +1,20 @@
 package com.talosvfx.talos.editor.addons.scene.utils.importers;
 
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.runtime.assets.meta.SpriteMetadata;
 import com.talosvfx.talos.runtime.scene.GameObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SpriteImporter extends AbstractImporter<Texture> {
+public class SpriteImporter extends AbstractImporter<AtlasRegion> {
 
     private static final Logger logger = LoggerFactory.getLogger(SpriteImporter.class);
 
     @Override
-    public GameObject makeInstance (GameAsset<Texture> asset, GameObject parent) {
+    public GameObject makeInstance (GameAsset<AtlasRegion> asset, GameObject parent) {
 
         SpriteMetadata metaData = (SpriteMetadata)asset.getRootRawAsset().metaData;
 

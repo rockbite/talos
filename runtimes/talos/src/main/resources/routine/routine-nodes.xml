@@ -15,6 +15,11 @@
             <checkbox name="payloadOverride" default = "false">Override Payload</checkbox>
             <value port="output" name="onComplete" type="signal">onComplete</value>
         </module>
+        <module name = "GOSelectorNode" title = "Game Object Selector" keywords = "" class = "RoutineNodeWidget">
+            <value port="input" name="input" type="signal">in</value>
+            <inputText name="target" default="">Target</inputText>
+            <value port="output" name="outSignal" type="signal">out</value>
+        </module>
         <module name = "CompleteRoutineNode" title = "Complete Routine" keywords = "tween, system" class = "RoutineNodeWidget">
             <value port="input" name="startSignal" type="signal">execute</value>
         </module>
@@ -38,6 +43,10 @@
         <module name = "RotateBy" title = "Rotate By" keywords = "movement" class = "AsyncRoutineNodeWidget">
             <value port="input" name="startSignal" type="signal">start</value>
             <dynamicValue port="input" name="angle" type="float" min="-360" max="360">angle: </dynamicValue>
+            <group>
+                <dynamicValue port="input" name="pivotX" type="float" min="0" max="1" progress="true" default="0.5">Pivot X: </dynamicValue>
+                <dynamicValue port="input" name="pivotY" type="float" min="0" max="1" progress="true" default="0.5">Pivot Y: </dynamicValue>
+            </group>
             <checkbox name="yoyo" default = "false">Yoyo</checkbox>
             <dynamicValue port="input" name="duration" type="float" default="1">Duration</dynamicValue>
             <container name="timeline"></container>
@@ -81,6 +90,10 @@
             <group>
                 <dynamicValue port="input" name="scaleX" type="float" min="-1000" max="1000">Scale X: </dynamicValue>
                 <dynamicValue port="input" name="scaleY" type="float" min="-1000" max="1000">Scale Y: </dynamicValue>
+            </group>
+            <group>
+                <dynamicValue port="input" name="pivotX" type="float" min="0" max="1" progress="true" default="0.5">Pivot X: </dynamicValue>
+                <dynamicValue port="input" name="pivotY" type="float" min="0" max="1" progress="true" default="0.5">Pivot Y: </dynamicValue>
             </group>
             <checkbox name="yoyo" default = "false">Yoyo</checkbox>
             <dynamicValue port="input" name="duration" type="float" default="1">Duration</dynamicValue>
@@ -177,6 +190,7 @@
                 <option value = "sliced">Sliced</option>
                 <option value = "tiled">Tiled</option>
             </select>
+            <inputText port="input" name="layerName" type="string">Layer</inputText>
             <dynamicValue port="input" name="layerOrder" type="int" min="0" max="500" step="1">Layer order</dynamicValue>
             <value port="output" name="onComplete" type="signal">onComplete</value>
         </module>
@@ -185,6 +199,7 @@
             <inputText name="name" type="string">name</inputText>
             <asset port="input" name="spine" type="SKELETON">spine</asset>
             <color port="input" name="color" type="color">Color: </color>
+            <inputText port="input" name="layerName" type="string">Layer</inputText>
             <dynamicValue port="input" name="layerOrder" type="int" min="0" max="500" step="1">Layer order</dynamicValue>
             <value port="output" name="onComplete" type="signal">onComplete</value>
         </module>
@@ -441,6 +456,10 @@
             <value port="input" name="input" type="signal">in</value>
             <checkbox name="isVisible" default = "true">isVisible</checkbox>
             <value port="output" name="outSignal" type="signal">out</value>
-        </module>
+        </module><module name = "GOSelectorNode" title = "Game Object Selector" keywords = "" class = "RoutineNodeWidget">
+        <value port="input" name="input" type="signal">in</value>
+        <inputText name="target" default="">Target</inputText>
+        <value port="output" name="outSignal" type="signal">out</value>
+    </module>
     </category>
 </modules>

@@ -30,6 +30,12 @@
                 CTRL E
             </combination>
         </command>
+        <command name = "Export Optimized" uniqueName = "export_command_optimized" description = "">
+            <context>GLOBAL</context>>
+            <combination type = "keyboard" repeat = "false">
+                CTRL SHIFT E
+            </combination>
+        </command>
         <command name = "Open" uniqueName = "open_command" description = "">
             <context>FOCUSED</context>>
             <combination type = "keyboard" repeat = "false">

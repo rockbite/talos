@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.talosvfx.talos.runtime.RuntimeContext;
@@ -32,16 +33,17 @@ public class SpriteComponentRenderer extends ComponentRenderer<SpriteRendererCom
 		TransformComponent transformComponent = gameObject.getComponent(TransformComponent.class);
 
 		SpriteRendererComponent spriteRenderer = gameObject.getComponent(SpriteRendererComponent.class);
-		GameAsset<Texture> gameResource = spriteRenderer.getGameResource();
+		GameAsset<TextureAtlas.AtlasRegion> gameResource = spriteRenderer.getGameResource();
 		RawAsset rootRawAsset = gameResource.getRootRawAsset();
 		AMetadata metaData = rootRawAsset.metaData;
 		if (metaData instanceof SpriteMetadata) {
 			//It should be
 			SpriteMetadata metadata = (SpriteMetadata)metaData;
 
-			Texture resource = spriteRenderer.getGameResource().getResource();
-			if (resource.getMagFilter() != metadata.magFilter || resource.getMinFilter() != metadata.minFilter) {
-				resource.setFilter(metadata.minFilter, metadata.magFilter);
+			TextureAtlas.AtlasRegion resource = spriteRenderer.getGameResource().getResource();
+			Texture texture = resource.getTexture();
+			if (texture.getMagFilter() != metadata.magFilter || texture.getMinFilter() != metadata.minFilter) {
+				texture.setFilter(metadata.minFilter, metadata.magFilter);
 			}
 			textureRegion.setRegion(resource);
 			if(textureRegion != null) {
@@ -193,11 +195,13 @@ public class SpriteComponentRenderer extends ComponentRenderer<SpriteRendererCom
 					float pivotY = transformComponent.pivot.y;
 
 					batch.draw(textureRegion,
-						transformComponent.worldPosition.x - pivotX, transformComponent.worldPosition.y - pivotY,
-						pivotX, pivotY,
-						1f, 1f,
-						width * transformComponent.worldScale.x, height * transformComponent.worldScale.y,
-						transformComponent.worldRotation);
+							transformComponent.worldPosition.x - width/2f, transformComponent.worldPosition.y - height/2f,
+							pivotX * width, pivotY * height,
+							width,
+							height,
+							transformComponent.worldScale.x, transformComponent.worldScale.y,
+							transformComponent.worldRotation
+					);
 				}
 
 				batch.setColor(Color.WHITE);

@@ -35,6 +35,8 @@ public class EmitterModuleWrapper extends ModuleWrapper<EmitterModule> {
     TextField durationField;
     TextField emissionField;
 
+    TextField maxField;
+
     @Override
     protected float reportPrefWidth() {
         return 180;
@@ -46,6 +48,7 @@ public class EmitterModuleWrapper extends ModuleWrapper<EmitterModule> {
         delayField = addInputSlotWithTextField("delay: ", EmitterModule.DELAY, 60, true);
         durationField = addInputSlotWithTextField("duration: ", EmitterModule.DURATION, 60, true);
         emissionField = addInputSlotWithTextField("emission: ", EmitterModule.RATE, 60, true);
+        maxField = addInputSlotWithTextField("max particles: ", EmitterModule.MAX, 60, true);
 
         delayField.addListener(new ChangeListener() {
             @Override
@@ -65,6 +68,13 @@ public class EmitterModuleWrapper extends ModuleWrapper<EmitterModule> {
             @Override
             public void changed (ChangeEvent event, Actor actor) {
                 module.defaultRate = floatFromText(emissionField);
+            }
+        });
+
+        maxField.addListener(new ChangeListener() {
+            @Override
+            public void changed (ChangeEvent event, Actor actor) {
+                module.defaultMaxParticles = (int)floatFromText(maxField);
             }
         });
 
@@ -95,6 +105,7 @@ public class EmitterModuleWrapper extends ModuleWrapper<EmitterModule> {
         delayField.setText(module.defaultDelay + "");
         durationField.setText(module.defaultDuration + "");
         emissionField.setText(module.defaultRate + "");
+        maxField.setText(module.defaultMaxParticles + "");
     }
 
     @Override
@@ -103,6 +114,7 @@ public class EmitterModuleWrapper extends ModuleWrapper<EmitterModule> {
         delayField.setText(module.defaultDelay + "");
         durationField.setText(module.defaultDuration + "");
         emissionField.setText(module.defaultRate + "");
+        maxField.setText(module.defaultMaxParticles + "");
     }
 
 }

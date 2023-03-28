@@ -18,6 +18,8 @@ package com.talosvfx.talos.runtime.vfx.modules;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
@@ -30,12 +32,12 @@ import com.talosvfx.talos.runtime.vfx.ParticleEmitterDescriptor;
 import com.talosvfx.talos.runtime.vfx.values.ModuleValue;
 
 
-public class SpriteMaterialModule extends MaterialModule implements GameResourceOwner<Texture>, GameAsset.GameAssetUpdateListener {
+public class SpriteMaterialModule extends MaterialModule implements GameResourceOwner<AtlasRegion>, GameAsset.GameAssetUpdateListener {
 
 
 	private transient TextureRegion region;
 
-	public GameAsset<Texture> asset;
+	public GameAsset<AtlasRegion> asset;
 
 	/**
 	 * To be removed, here for backwards compatibility
@@ -70,21 +72,20 @@ public class SpriteMaterialModule extends MaterialModule implements GameResource
 		//deprecated
 		assetIdentifier = jsonData.getString("asset", "white");
 
-		GameAsset<Texture> defaultValue = RuntimeContext.getInstance().AssetRepository.getAssetForIdentifier(assetIdentifier, GameAssetType.SPRITE);
+		GameAsset<AtlasRegion> asset = GameResourceOwner.readAsset(json, jsonData);
 
-		GameAsset<Texture> asset = GameResourceOwner.readAsset(json, jsonData);
 		if (asset != null) {
 			if (asset.isBroken()) {
-				asset = defaultValue;
+				asset = RuntimeContext.getInstance().AssetRepository.getAssetForIdentifier(assetIdentifier, GameAssetType.SPRITE);
 			}
 			setGameAsset(asset);
 		} else {
-			setGameAsset(defaultValue);
+			setGameAsset(RuntimeContext.getInstance().AssetRepository.getAssetForIdentifier(assetIdentifier, GameAssetType.SPRITE));
 		}
 	}
 
 	public void setToDefault () {
-		GameAsset<Texture> defaultValue = RuntimeContext.getInstance().AssetRepository.getAssetForIdentifier("white", GameAssetType.SPRITE);
+		GameAsset<AtlasRegion> defaultValue = RuntimeContext.getInstance().AssetRepository.getAssetForIdentifier("white", GameAssetType.SPRITE);
 		setGameAsset(defaultValue);
 	}
 
@@ -109,12 +110,12 @@ public class SpriteMaterialModule extends MaterialModule implements GameResource
 	}
 
 	@Override
-	public GameAsset<Texture> getGameResource () {
+	public GameAsset<AtlasRegion> getGameResource () {
 		return asset;
 	}
 
 	@Override
-	public void setGameAsset (GameAsset<Texture> gameAsset) {
+	public void setGameAsset (GameAsset<AtlasRegion> gameAsset) {
 		if (this.asset != null) {
 			//Remove from old game asset, it might be the same, but it may also have changed
 			this.asset.listeners.removeValue(this, true);

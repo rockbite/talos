@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.ShortArray;
 import com.talosvfx.talos.runtime.vfx.Particle;
 import com.talosvfx.talos.runtime.vfx.ParticlePointData;
@@ -37,9 +38,12 @@ public class StripMeshGeneratorModule extends MeshGeneratorModule {
 	private int quadVertexSize2D = 2 + 1 + 2;
 	private int quadVertCount = 4;
 
-	private float[] verts = new float[quadVertCount * quadVertexSize2D];
+	private float[] verts = new float[10000];
 
 	private boolean render3D;
+	private Vector3 left = new Vector3();
+	private Vector3 temp = new Vector3();
+	private Vector3 forward = new Vector3();
 
 	@Override
 	protected void defineSlots () {
@@ -73,18 +77,15 @@ public class StripMeshGeneratorModule extends MeshGeneratorModule {
 	private Vector3 fromOffset = new Vector3();
 	private Vector3 toOffset = new Vector3();
 
-	Vector2 targetVector = new Vector2();
-	Vector2 leftBase = new Vector2();
-	Vector2 leftTarget = new Vector2();
-	Vector2 rightBase = new Vector2();
-	Vector2 rightTarget = new Vector2();
+	private Pool<Vertex> vertexPool = new Pool<Vertex>() {
+		@Override
+		protected Vertex newObject () {
+			return new Vertex();
+		}
+	};
 
 	void constructMesh () {
-		if (this.render3D) {
-			verts = new float[quadVertCount * quadVertexSize3D];
-		} else {
-			verts = new float[quadVertCount * quadVertexSize2D];
-		}
+
 	}
 
 	@Override
@@ -110,27 +111,24 @@ public class StripMeshGeneratorModule extends MeshGeneratorModule {
 		}
 	}
 
+	Array<Vertex> vertices = new Array<>();
+	ShortArray tris = new ShortArray();
+
 	@Override
 	public void render (ParticleRenderer particleRenderer, MaterialModule materialModule, Array<ParticlePointGroup> groupData) {
-
-		Array<Vertex> vertices = new Array<>();
-		ShortArray tris = new ShortArray();
 
 		for (int i = 0; i < groupData.size; i++) {
 			ParticlePointGroup particlePointGroup = groupData.get(i);
 
 			Array<ParticlePointData> pointData = particlePointGroup.pointDataArray;
 
+
 			if (pointData.size < 2)
-				return; //Nothing to render
+				continue; //Nothing to render
 
 			int vertIndex = 0;
 			int triIndex = 0;
 
-			Vector3 forward = new Vector3();
-			Vector3 temp = new Vector3();
-
-			Vector3 left = new Vector3();
 			for (int j = 0; j < pointData.size; j++) {
 				float progression = j / (float)(pointData.size - 1);
 
@@ -192,8 +190,8 @@ public class StripMeshGeneratorModule extends MeshGeneratorModule {
 				//2d hack,
 				left.set(-forward.y, forward.x, forward.z);
 
-				Vertex vertexL = new Vertex();
-				Vertex vertexR = new Vertex();
+				Vertex vertexL = vertexPool.obtain();
+				Vertex vertexR = vertexPool.obtain();
 
 				vertexL.set(particlePointData, temp.set(left).scl(width * 0.5f), U, leftBaseV, fromColourBits);
 				vertexR.set(particlePointData, temp.set(left).scl(width * 0.5f).scl(-1), U, rightBaseV, fromColourBits);
@@ -223,9 +221,6 @@ public class StripMeshGeneratorModule extends MeshGeneratorModule {
 				triIndex += 6;
 			}
 
-			int perVertex = render3D ? 6 : 5;
-
-			float[] verts = new float[tris.size * perVertex];
 
 			int idx = 0;
 			for (int tri = 0; tri < tris.size; tri++) {
@@ -245,6 +240,7 @@ public class StripMeshGeneratorModule extends MeshGeneratorModule {
 
 			final int triSize = tris.size;
 
+			vertexPool.freeAll(vertices);
 			vertices.clear();
 			tris.clear();
 
@@ -254,7 +250,7 @@ public class StripMeshGeneratorModule extends MeshGeneratorModule {
 				tris.add(triI);
 			}
 
-			particleRenderer.render(verts, verts.length, tris.items, tris.size, materialModule);
+			particleRenderer.render(verts, idx, tris.items, tris.size, materialModule);
 
 			tris.clear();
 

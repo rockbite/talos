@@ -1,6 +1,8 @@
 package com.talosvfx.talos.editor.addons.scene.apps.spriteeditor;
 
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
@@ -55,7 +57,7 @@ public class SpriteEditor extends Table {
         contentCell.setActor(editorMenu.getWindow(currentTab));
     }
 
-    public void updateForGameAsset (GameAsset<Texture> gameAsset) {
+    public void updateForGameAsset (GameAsset<AtlasRegion> gameAsset) {
         for (SpriteEditorWindow spriteEditorWindow : editorMenu.getTabWindowMap().values()) {
             spriteEditorWindow.updateForGameAsset(gameAsset);
         }

@@ -16,6 +16,7 @@
 
 package com.talosvfx.talos.runtime.vfx.modules;
 
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.talosvfx.talos.runtime.vfx.ParticleEmitterInstance;
@@ -30,21 +31,27 @@ public class EmitterModule extends AbstractModule {
     public static final int RATE = 2;
     public static final int CONFIG = 3;
 
+    public static final int MAX = 4;
 
     NumericalValue delay;
     NumericalValue duration;
     NumericalValue rate;
+
+    NumericalValue max;
     EmConfigValue config;
 
     public float defaultDelay = 0;
     public float defaultDuration = 2f;
     public float defaultRate = 50f;
 
+    public int defaultMaxParticles = -1;
+
     @Override
     protected void defineSlots() {
         delay = createInputSlot(DELAY);
         duration = createInputSlot(DURATION);
         rate = createInputSlot(RATE);
+        max = createInputSlot(MAX);
 
         config = createInputSlot(CONFIG, new EmConfigValue());
     }
@@ -78,6 +85,14 @@ public class EmitterModule extends AbstractModule {
         if(rate.isEmpty()) return defaultRate; // defaults
 
         return rate.getFloat();
+    }
+
+    public int getMaxParticles () {
+        fetchInputSlotValue(MAX);
+
+        if (max.isEmpty()) return defaultMaxParticles;
+
+        return MathUtils.round(max.getFloat());
     }
 
     public boolean isContinuous() {
@@ -132,6 +147,7 @@ public class EmitterModule extends AbstractModule {
         json.writeValue("delay", defaultDelay);
         json.writeValue("duration", defaultDuration);
         json.writeValue("rate", defaultRate);
+        json.writeValue("maxParticles", defaultMaxParticles);
     }
 
     @Override
@@ -140,6 +156,7 @@ public class EmitterModule extends AbstractModule {
         defaultDelay = jsonData.getFloat("delay", 0);
         defaultDuration = jsonData.getFloat("duration", 2);
         defaultRate = jsonData.getFloat("rate", 50);
+        defaultMaxParticles = jsonData.getInt("maxParticles", defaultMaxParticles);
     }
 
     public boolean isImmortal() {

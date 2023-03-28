@@ -4,6 +4,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Polygon;
@@ -305,7 +307,7 @@ public class EightPointGizmo extends Gizmo {
 
 		final boolean keepAspectRatio;
 		final SpriteRendererComponent spriteRendererComponent;
-		final Texture texture;
+		final AtlasRegion texture;
 		if (gameObject.hasComponent(SpriteRendererComponent.class)) {
 			spriteRendererComponent = gameObject.getComponent(SpriteRendererComponent.class);
 			texture = spriteRendererComponent.getGameResource().getResource();
@@ -367,7 +369,7 @@ public class EightPointGizmo extends Gizmo {
 				}
 
 				if (keepAspectRatio) {
-					float aspect = (float) texture.getWidth() / texture.getHeight();
+					float aspect = (float) texture.getRegionWidth() / texture.getRegionHeight();
 					width = height * aspect;
 				}
 
@@ -399,7 +401,7 @@ public class EightPointGizmo extends Gizmo {
 				}
 
 				if (keepAspectRatio) {
-					float inverseAspect = (float) texture.getHeight() / texture.getWidth();
+					float inverseAspect = (float) texture.getRegionHeight() / texture.getRegionWidth();
 					height = width * inverseAspect;
 				}
 
@@ -431,7 +433,7 @@ public class EightPointGizmo extends Gizmo {
 				}
 
 				if (keepAspectRatio) {
-					float inverseAspect = (float) texture.getHeight() / texture.getWidth();
+					float inverseAspect = (float) texture.getRegionHeight() / texture.getRegionWidth();
 					height = width * inverseAspect;
 				}
 
@@ -463,7 +465,7 @@ public class EightPointGizmo extends Gizmo {
 				}
 
 				if (keepAspectRatio) {
-					float aspect = (float) texture.getWidth() / texture.getHeight();
+					float aspect = (float) texture.getRegionWidth() / texture.getRegionHeight();
 					width = height * aspect;
 				}
 
@@ -517,7 +519,7 @@ public class EightPointGizmo extends Gizmo {
 				}
 
 				if (keepAspectRatio) {
-					float inverseAspect = (float) texture.getHeight() / texture.getWidth();
+					float inverseAspect = (float) texture.getRegionHeight() / texture.getRegionWidth();
 					height = width * inverseAspect;
 				}
 
@@ -555,7 +557,7 @@ public class EightPointGizmo extends Gizmo {
 				}
 
 				if (keepAspectRatio) {
-					float inverseAspect = (float) texture.getHeight() / texture.getWidth();
+					float inverseAspect = (float) texture.getRegionHeight() / texture.getRegionWidth();
 					height = width * inverseAspect;
 				}
 
@@ -591,7 +593,7 @@ public class EightPointGizmo extends Gizmo {
 				}
 
 				if (keepAspectRatio) {
-					float aspect = (float) texture.getWidth() / texture.getHeight();
+					float aspect = (float) texture.getRegionWidth() / texture.getRegionHeight();
 					width = height * aspect;
 				}
 
@@ -627,7 +629,7 @@ public class EightPointGizmo extends Gizmo {
 				}
 
 				if (keepAspectRatio) {
-					float aspect = (float) texture.getWidth() / texture.getHeight();
+					float aspect = (float) texture.getRegionWidth() / texture.getRegionHeight();
 					width = height * aspect;
 				}
 

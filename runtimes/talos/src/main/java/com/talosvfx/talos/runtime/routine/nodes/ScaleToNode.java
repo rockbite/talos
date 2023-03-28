@@ -30,6 +30,10 @@ public class ScaleToNode extends AsyncRoutineNode<GameObject, ScaleToNode.ScaleS
         float scaleX = fetchFloatValue("scaleX");
         float scaleY = fetchFloatValue("scaleY");
 
+        float pivotX = fetchFloatValue("pivotX");
+        float pivotY = fetchFloatValue("pivotY");
+        component.pivot.set(pivotX, pivotY);
+
         state.targetScale.set(scaleX, scaleY);
 
         return true;

@@ -1,6 +1,8 @@
 package com.talosvfx.talos.editor.addons.scene.apps.spriteeditor;
 
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.editor.layouts.DummyLayoutApp;
@@ -9,14 +11,14 @@ import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.project2.apps.SingletonApp;
 
 @SingletonApp
-public class SpriteEditorApp extends AppManager.BaseApp<Texture> {
+public class SpriteEditorApp extends AppManager.BaseApp<AtlasRegion> {
     private final SpriteEditor spriteEditor;
 
     public SpriteEditorApp () {
         this.singleton = true;
 
         spriteEditor = new SpriteEditor();
-        DummyLayoutApp<Texture> spriteEditorApp = new DummyLayoutApp<Texture>(SharedResources.skin, this, getAppName()) {
+        DummyLayoutApp<AtlasRegion> spriteEditorApp = new DummyLayoutApp<AtlasRegion>(SharedResources.skin, this, getAppName()) {
             @Override
             public void onInputProcessorAdded() {
                 super.onInputProcessorAdded();
@@ -38,7 +40,7 @@ public class SpriteEditorApp extends AppManager.BaseApp<Texture> {
     }
 
     @Override
-    public void updateForGameAsset (GameAsset<Texture> gameAsset) {
+    public void updateForGameAsset (GameAsset<AtlasRegion> gameAsset) {
         super.updateForGameAsset(gameAsset);
 
         // TODO: 23.02.23 dummy refactor

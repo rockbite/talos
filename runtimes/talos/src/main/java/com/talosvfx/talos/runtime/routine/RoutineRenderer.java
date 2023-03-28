@@ -132,7 +132,7 @@ public class RoutineRenderer {
                     drawSliced(batch, drawableQuad);
                 } else {
                     boolean aspect = drawableQuad.aspect;
-                    float scl = (float) drawableQuad.gameAsset.getResource().getWidth() / drawableQuad.gameAsset.getResource().getHeight();
+                    float scl = (float) drawableQuad.gameAsset.getResource().getRegionWidth() / drawableQuad.gameAsset.getResource().getRegionHeight();
                     float width = drawableQuad.size.x;
                     float height = drawableQuad.size.y;
                     if (aspect) {

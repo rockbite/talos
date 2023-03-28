@@ -11,7 +11,10 @@ import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g3d.utils.RenderContext;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.Array;
 import com.rockbite.bongo.engine.components.singletons.Cameras;
 import com.rockbite.bongo.engine.gltf.scene.shader.DefaultSceneShaderProvider;
 import com.rockbite.bongo.engine.gltf.scene.shader.SceneShaderProvider;
@@ -21,6 +24,8 @@ import com.rockbite.bongo.engine.render.ShaderSourceProvider;
 import com.rockbite.bongo.engine.systems.RenderPassSystem;
 import com.talosvfx.talos.runtime.vfx.IEmitter;
 import com.talosvfx.talos.runtime.vfx.ParticleEffectInstance;
+import com.talosvfx.talos.runtime.vfx.ParticlePointData;
+import com.talosvfx.talos.runtime.vfx.ParticlePointGroup;
 import com.talosvfx.talos.runtime.vfx.ScopePayload;
 import com.talosvfx.talos.runtime.components.Particle;
 import com.talosvfx.talos.runtime.vfx.modules.DrawableModule;
@@ -168,6 +173,21 @@ public class ParticleRenderPassSystem extends RenderPassSystem implements Partic
 			particleEmitter.getScope().setCurrentRequestMode(ScopePayload.SUB_PARTICLE_ALPHA);
 
 			meshGenerator.render(this, drawableModule.getMaterialModule(), particlePointDataGeneratorModule.pointData);
+
+
+
+//			ShapeRenderer shapeRenderer = new ShapeRenderer();
+//			shapeRenderer.setProjectionMatrix(cameras.getGameCamera().combined);
+//			shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+//			Array<ParticlePointGroup> pointData = particlePointDataGeneratorModule.pointData;
+//			for (ParticlePointGroup group : pointData) {
+//				shapeRenderer.setColor(1f, 0, 0, 1f);
+//				for (ParticlePointData particlePointData : group.pointDataArray) {
+//					shapeRenderer.circle(particlePointData.x, particlePointData.y, 0.25f, 20);
+//				}
+//			}
+//			shapeRenderer.end();
+
 
 			particleEmitter.getScope().setCurrentRequestMode(cachedMode);
 			particleEmitter.getScope().setCurrentRequesterID(cachedRequesterID);

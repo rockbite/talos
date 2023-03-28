@@ -5,12 +5,16 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.utils.ObjectSet;
 import com.esotericsoftware.spine.SkeletonBinary;
 import com.esotericsoftware.spine.SkeletonData;
+import com.talosvfx.talos.runtime.RuntimeContext;
 import com.talosvfx.talos.runtime.assets.meta.AtlasMetadata;
 import com.talosvfx.talos.runtime.assets.meta.EmptyMetadata;
 import com.talosvfx.talos.runtime.assets.meta.PrefabMetadata;
@@ -21,6 +25,7 @@ import com.talosvfx.talos.runtime.routine.serialization.BaseRoutineData;
 import com.talosvfx.talos.runtime.routine.serialization.RuntimeRoutineData;
 import com.talosvfx.talos.runtime.scene.Prefab;
 import com.talosvfx.talos.runtime.scene.Scene;
+import com.talosvfx.talos.runtime.scene.SceneData;
 import com.talosvfx.talos.runtime.vfx.ParticleEffectDescriptor;
 import com.talosvfx.talos.runtime.vfx.serialization.BaseVFXProjectData;
 import com.talosvfx.talos.runtime.vfx.serialization.ExportData;
@@ -31,12 +36,13 @@ public class RuntimeAssetRepository extends BaseAssetRepository {
 	protected ObjectMap<GameAssetType, ObjectMap<String, GameAsset<?>>> identifierToGameAssetMap = new ObjectMap<>();
 	protected ObjectMap<UUID, GameAsset<?>> uuidGameAssetObjectMap = new ObjectMap<>();
 
-	protected ObjectMap<GameAsset<Texture>, NinePatch> patchCache = new ObjectMap<>();
+	protected ObjectMap<GameAsset<AtlasRegion>, NinePatch> patchCache = new ObjectMap<>();
 
 	public RuntimeAssetRepository () {
 	}
 
 	public void loadBundle (GameAssetsExportStructure gameAssetFile, FileHandle baseDir) {
+		RuntimeContext.getInstance().setSceneData(gameAssetFile.sceneData);
 
 		ObjectMap<GameAssetType, Array<GameAssetExportStructure>> sorted = new ObjectMap<>();
 		for (GameAssetExportStructure gameAsset : gameAssetFile.gameAssets) {
@@ -46,9 +52,9 @@ public class RuntimeAssetRepository extends BaseAssetRepository {
 			sorted.get(gameAsset.type).add(gameAsset);
 		}
 
+		loadType(GameAssetType.ATLAS, sorted, baseDir);
 		loadType(GameAssetType.SPRITE, sorted, baseDir);
 		loadType(GameAssetType.SCRIPT, sorted, baseDir);
-		loadType(GameAssetType.ATLAS, sorted, baseDir);
 		loadType(GameAssetType.SOUND, sorted, baseDir);
 
 		loadType(GameAssetType.SKELETON, sorted, baseDir);
@@ -102,12 +108,28 @@ public class RuntimeAssetRepository extends BaseAssetRepository {
 
 
 	private <T> GameAsset<T> spriteLoader (GameAssetExportStructure exportStructure, FileHandle baseFolder) {
-		GameAsset<Texture> gameAsset = new GameAsset<>(exportStructure.identifier, exportStructure.type);
+		GameAsset<AtlasRegion> gameAsset = new GameAsset<>(exportStructure.identifier, exportStructure.type);
 
 		String first = exportStructure.relativePathsOfRawFiles.first();
 		FileHandle child = baseFolder.child(exportStructure.type.name()).child(first);
 
-		gameAsset.setResourcePayload(new Texture(child));
+		//Check our game assets, maybe we are referncing an atlas
+		ObjectSet<String> dependentGameAssets = exportStructure.dependentGameAssets;
+		if (dependentGameAssets.size > 0) {
+			String textureAtlasUUID = dependentGameAssets.first();
+			GameAsset<TextureAtlas> assetForUniqueIdentifier = getAssetForUniqueIdentifier(UUID.fromString(textureAtlasUUID), GameAssetType.ATLAS);
+			if (assetForUniqueIdentifier != null) {
+
+				TextureAtlas resource = assetForUniqueIdentifier.getResource();
+				gameAsset.setResourcePayload(resource.findRegion(exportStructure.identifier));
+				gameAsset.dependentGameAssets.add(assetForUniqueIdentifier);
+				gameAsset.dependentRawAssets.add(fakeMeta(child, SpriteMetadata.class));
+
+				return (GameAsset<T>)gameAsset;
+			}
+		}
+
+		gameAsset.setResourcePayload(new AtlasRegion(new TextureRegion(new Texture(child))));
 		gameAsset.dependentRawAssets.add(fakeMeta(child, SpriteMetadata.class));
 		return (GameAsset<T>)gameAsset;
 	}
@@ -131,10 +153,25 @@ public class RuntimeAssetRepository extends BaseAssetRepository {
 		FileHandle skeleFile = baseFolder.child(exportStructure.type.name()).child(exportStructure.relativePathsOfRawFiles.first());
 
 		//Gotta try load the atlas
-		String skeleName = skeleFile.nameWithoutExtension();
-		FileHandle atlasFile = skeleFile.parent().child(skeleName + ".atlas");
-		TextureAtlas.TextureAtlasData skeleAtlasData = new TextureAtlas.TextureAtlasData(atlasFile, atlasFile.parent(), false);
-		TextureAtlas skeleAtlas = new TextureAtlas(skeleAtlasData);
+
+		TextureAtlas skeleAtlas = null;
+		if (exportStructure.dependentGameAssets.size > 0) {
+			String atlasUUID = exportStructure.dependentGameAssets.first();
+			GameAsset<TextureAtlas> assetForUniqueIdentifier = getAssetForUniqueIdentifier(UUID.fromString(atlasUUID), GameAssetType.ATLAS);
+			if (assetForUniqueIdentifier != null) {
+				TextureAtlas resource = assetForUniqueIdentifier.getResource();
+				skeleAtlas = resource;
+				gameAsset.dependentGameAssets.add(assetForUniqueIdentifier);
+			}
+		}
+
+		if (skeleAtlas == null) {
+			String skeleName = skeleFile.nameWithoutExtension();
+			FileHandle atlasFile = skeleFile.parent().child(skeleName + ".atlas");
+			TextureAtlas.TextureAtlasData skeleAtlasData = new TextureAtlas.TextureAtlasData(atlasFile, atlasFile.parent(), false);
+			skeleAtlas = new TextureAtlas(skeleAtlasData);
+		}
+
 
 		SkeletonBinary skeletonBinary = new SkeletonBinary(skeleAtlas);
 		SpineMetadata metaData = getMeta(skeleFile, SpineMetadata.class);
@@ -273,7 +310,7 @@ public class RuntimeAssetRepository extends BaseAssetRepository {
 	}
 
 	@Override
-	public NinePatch obtainNinePatch (GameAsset<Texture> gameAsset) {
+	public NinePatch obtainNinePatch (GameAsset<AtlasRegion> gameAsset) {
 		if (patchCache.containsKey(gameAsset)) { //something better, maybe hash on pixel size + texture for this
 			return patchCache.get(gameAsset);
 		} else {

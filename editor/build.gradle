@@ -41,6 +41,8 @@ dependencies {
 
     api libs.libgdx.freetype
 
+    implementation libs.libgdx.tools
+
 
     implementation libs.string.similarity
 
