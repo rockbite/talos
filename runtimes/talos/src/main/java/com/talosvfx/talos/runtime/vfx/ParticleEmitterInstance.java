@@ -52,6 +52,8 @@ public class ParticleEmitterInstance implements IEmitter {
 
 	float rate; // emission rate
 
+	int maxParticles;
+
 	// inner vars
 	public float alpha;
 	public float particlesToEmmit;
@@ -99,17 +101,19 @@ public class ParticleEmitterInstance implements IEmitter {
 
 	public void update (float delta) {
 		final DrawableModule drawableModule = getDrawableModule();
-		if (drawableModule == null) return;
+		if (drawableModule == null)
+			return;
 
 		emitterModule = emitterGraph.getEmitterModule();
 		if (emitterModule == null)
 			return;
 
-		if(!initialized) {
+		if (!initialized) {
 			init();
 		}
 
-		if(paused) return;
+		if (paused)
+			return;
 
 		//update variables to their real values
 		emitterModule.updateScopeData(this);
@@ -122,15 +126,17 @@ public class ParticleEmitterInstance implements IEmitter {
 		duration = emitterModule.getDuration();
 		isContinuous = emitterModule.isContinuous();
 		rate = emitterModule.getRate();
+		maxParticles = emitterModule.getMaxParticles();
 		isAttached = emitterModule.isAttached();
 		isAdditive = emitterModule.isAdditive();
 		isBlendAdd = emitterModule.isBlendAdd();
 		isImmortal = emitterModule.isImmortal();
 
-		if(delayTimer > 0) {
+		if (delayTimer > 0) {
 			delayTimer -= delta;
-			if(delayTimer < 0) delayTimer = 0;
-			if(delayTimer > 0) {
+			if (delayTimer < 0)
+				delayTimer = 0;
+			if (delayTimer > 0) {
 
 				updateParticles(delta); // process existing particles at least
 
@@ -139,10 +145,10 @@ public class ParticleEmitterInstance implements IEmitter {
 			}
 		}
 
-		float normDelta = delta/duration;
+		float normDelta = delta / duration;
 
 		float deltaLeftover = 0;
-		if(alpha + normDelta > 1f) {
+		if (alpha + normDelta > 1f) {
 			deltaLeftover = (1f - alpha) * duration;
 			alpha = 1f;
 		} else {
@@ -154,23 +160,25 @@ public class ParticleEmitterInstance implements IEmitter {
 		emitterModule.updateScopeData(this);
 
 		//
-		if (alpha < 1f || (alpha == 1f && deltaLeftover > 0)) { // emission only here
-			// let's emmit
-			particlesToEmmit += rate * deltaLeftover;
+		if (maxParticles == -1 || activeParticles.size < maxParticles) {
+			if (alpha < 1f || (alpha == 1f && deltaLeftover > 0)) { // emission only here
+				// let's emmit
+				particlesToEmmit += rate * deltaLeftover;
 
-			if(isImmortal) {
-				particlesToEmmit = Math.max(0, Math.round(rate * duration) - activeParticles.size);
-			}
-
-			int count = (int)particlesToEmmit;
-			for (int i = 0; i < count; i++) {
-				Particle particle = particlePool.obtain();
-				if (emitterGraph.getParticleModule() != null) {
-					particle.init(this);
-					activeParticles.add(particle);
+				if (isImmortal) {
+					particlesToEmmit = Math.max(0, Math.round(rate * duration) - activeParticles.size);
 				}
+
+				int count = (int)particlesToEmmit;
+				for (int i = 0; i < count; i++) {
+					Particle particle = particlePool.obtain();
+					if (emitterGraph.getParticleModule() != null) {
+						particle.init(this);
+						activeParticles.add(particle);
+					}
+				}
+				particlesToEmmit -= count;
 			}
-			particlesToEmmit -= count;
 		}
 
 		// process existing particles.

@@ -2,6 +2,7 @@ package com.talosvfx.talos.runtime.vfx.modules;
 
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.Pool;
@@ -49,7 +50,33 @@ public class HistoryParticlePointDataGeneratorModule extends ParticlePointDataGe
 	}
 
 	private Vector3 tempVec3 = new Vector3();
-	private Array<Vector3> locationPoints = new Array<>();
+
+	private IntMap<Array<Vector3>> locationMap = new IntMap<>();
+
+	private Pool<Vector3> vectorPool = new Pool<Vector3>() {
+		@Override
+		protected Vector3 newObject () {
+			return new Vector3();
+		}
+	};
+
+	private Pool<Array<Vector3>> arrayPool = new Pool<Array<Vector3>>() {
+		@Override
+		protected Array<Vector3> newObject () {
+			return new Array<>();
+		}
+	};
+
+	public void onParticleKilled (Particle particle) {
+		if (locationMap.containsKey(particle.requesterID)) {
+			Array<Vector3> remove = locationMap.remove(particle.requesterID);
+			vectorPool.freeAll(remove);
+			arrayPool.free(remove);
+			remove.clear();
+		} else {
+			System.out.println("Not found history");
+		}
+	}
 
 	@Override
 	protected void createPoints (Particle particle, Pool<ParticlePointData> particlePointDataPool, ParticlePointGroup group) {
@@ -57,6 +84,11 @@ public class HistoryParticlePointDataGeneratorModule extends ParticlePointDataGe
 		int cachedRequestMode = getScope().getRequestMode();
 		int cachedRequesterID = getScope().getRequesterID();
 
+		if (!locationMap.containsKey(cachedRequesterID)) {
+			locationMap.put(cachedRequesterID, arrayPool.obtain());
+		}
+
+		Array<Vector3> locationPoints = locationMap.get(cachedRequesterID);
 
 		int numPoints = (int)maxPoints.get(0);
 		if (numPoints > 0) {
@@ -80,7 +112,7 @@ public class HistoryParticlePointDataGeneratorModule extends ParticlePointDataGe
 				if (shouldPop) {
 					locationPoints.removeIndex(0);
 				}
-				locationPoints.add(new Vector3(particle.position));
+				locationPoints.add(vectorPool.obtain().set(particle.position));
 			}
 
 		}

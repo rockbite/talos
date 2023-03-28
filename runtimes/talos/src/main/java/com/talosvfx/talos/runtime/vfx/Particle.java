@@ -22,6 +22,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Pool;
 import com.talosvfx.talos.runtime.vfx.modules.DrawableModule;
+import com.talosvfx.talos.runtime.vfx.modules.HistoryParticlePointDataGeneratorModule;
 import com.talosvfx.talos.runtime.vfx.modules.ParticleModule;
 import com.talosvfx.talos.runtime.vfx.modules.ParticlePointDataGeneratorModule;
 
@@ -286,5 +287,9 @@ public class Particle implements Pool.Poolable {
         ParticleModule particleModule = emitterReference.getParticleModule();
         if(particleModule == null) return;
         particleModule.updateScopeData(this);
+        ParticlePointDataGeneratorModule pointDataGenerator = emitterReference.getDrawableModule().getPointDataGenerator();
+        if (pointDataGenerator instanceof HistoryParticlePointDataGeneratorModule) {
+            ((HistoryParticlePointDataGeneratorModule)pointDataGenerator).onParticleKilled(this);
+        }
     }
 }

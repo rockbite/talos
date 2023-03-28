@@ -121,8 +121,9 @@ public class StripMeshGeneratorModule extends MeshGeneratorModule {
 
 			Array<ParticlePointData> pointData = particlePointGroup.pointDataArray;
 
+
 			if (pointData.size < 2)
-				return; //Nothing to render
+				continue; //Nothing to render
 
 			int vertIndex = 0;
 			int triIndex = 0;
