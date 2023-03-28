@@ -164,6 +164,7 @@
         </module>
         <module name = "SpawnSpriteNode" title = "Spawn Sprite" keywords = "" class = "RoutineNodeWidget">
             <value port="input" name="startSignal" type="signal">start</value>
+            <inputText name="name" type="string">name</inputText>
             <asset port="input" name="sprite" type="SPRITE">sprite</asset>
             <group>
                 <dynamicValue port="input" name="width" type="float" min="-1000" max="1000">Width: </dynamicValue>

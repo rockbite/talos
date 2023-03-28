@@ -22,12 +22,12 @@ import com.talosvfx.talos.runtime.scene.utils.propertyWrappers.PropertyWrapper;
 import lombok.Getter;
 import lombok.Setter;
 
-public class CustomVarWidget extends Table {
+public class CustomVarWidget<T> extends AbstractWidget<T> {
 
     private final Table editing;
     private final Table main;
     @Getter
-    private PropertyWrapper propertyWrapper;
+    private PropertyWrapper<T> propertyWrapper;
 
     private Label fieldNameLabel;
     private TextField fieldNameTextField;
@@ -47,10 +47,10 @@ public class CustomVarWidget extends Table {
     private Table fieldContainer;
     private Cell<Table> contentCell;
 
-    private ATypeWidget innerWidget;
+    private ATypeWidget<T> innerWidget;
     private Label typeLabel;
 
-    public CustomVarWidget(PropertyWrapper<?> propertyWrapper, ATypeWidget innerWidget) {
+    public CustomVarWidget(PropertyWrapper<T> propertyWrapper, ATypeWidget<T> innerWidget) {
         this.propertyWrapper = propertyWrapper;
 
         editing = new Table();
@@ -212,9 +212,9 @@ public class CustomVarWidget extends Table {
             }
         };
 
-        add(top).growX();
-        row();
-        contentCell = add(bottom).growX();
+        content.add(top).growX();
+        content.row();
+        contentCell = content.add(bottom).growX();
     }
 
     private void collapse() {
@@ -316,12 +316,14 @@ public class CustomVarWidget extends Table {
     }
 
     public void setFieldName(String text) {
+        String oldName = propertyWrapper.propertyName;
+
         fieldNameLabel.setText(text);
         fieldNameTextField.setText(text);
 
         propertyWrapper.propertyName = text;
 
-        fireNameChangedEvent(false);
+        fireNameChangedEvent(oldName, text, false);
     }
 
     protected void fireValueChangedEvent(boolean isFastChange) {
@@ -338,9 +340,11 @@ public class CustomVarWidget extends Table {
         }
     }
 
-    protected void fireNameChangedEvent(boolean isFastChange) {
+    protected void fireNameChangedEvent(String oldName, String newName, boolean isFastChange) {
         CustomVarWidgetChangeListener.CustomVarChangeEvent nameChangedEvent = Pools.obtain(CustomVarWidgetChangeListener.CustomVarChangeEvent.class);
         nameChangedEvent.setType(CustomVarWidgetChangeListener.Type.nameChanged);
+        nameChangedEvent.setOldName(oldName);
+        nameChangedEvent.setNewName(newName);
         nameChangedEvent.setFastChange(isFastChange);
 
         try {
@@ -370,8 +374,24 @@ public class CustomVarWidget extends Table {
         innerWidget.applyValueToWrapper(propertyWrapper);
     }
 
-    public boolean isCollapsed () {
-        return arrowButton.isCollapsed();
+    @Override
+    public void loadFromXML(XmlReader.Element element) {
+
+    }
+
+    @Override
+    public T getValue() {
+        return propertyWrapper.getValue();
+    }
+
+    @Override
+    public void read(Json json, JsonValue jsonValue) {
+
+    }
+
+    @Override
+    public void write(Json json, String name) {
+
     }
 
     public abstract static class CustomVarWidgetChangeListener implements EventListener {
@@ -390,7 +410,10 @@ public class CustomVarWidget extends Table {
 
             switch (customVarChangeEvent.getType()) {
                 case nameChanged:
-                    nameChanged(customVarChangeEvent, event.getTarget(), customVarChangeEvent.isFastChange);
+                    String oldName = customVarChangeEvent.oldName;
+                    String newName = customVarChangeEvent.newName;
+                    boolean isFastChange = customVarChangeEvent.isFastChange;
+                    nameChanged(customVarChangeEvent, event.getTarget(), oldName, newName, isFastChange);
                     break;
                 case valueChanged:
                     valueChanged(customVarChangeEvent, event.getTarget(), customVarChangeEvent.isFastChange);
@@ -406,7 +429,7 @@ public class CustomVarWidget extends Table {
         }
 
 
-        public abstract void nameChanged(CustomVarChangeEvent event, Actor actor, boolean isFastChange);
+        public abstract void nameChanged(CustomVarChangeEvent event, Actor actor, String oldName, String newName, boolean isFastChange);
 
         public abstract void valueChanged(CustomVarChangeEvent event, Actor actor, boolean isFastChange);
 
@@ -417,12 +440,16 @@ public class CustomVarWidget extends Table {
         }
 
         public static class CustomVarChangeEvent extends Event {
-            @Getter
-            @Setter
+            @Getter@Setter
             private Type type;
-            @Getter
-            @Setter
+            @Getter@Setter
             private boolean isFastChange;
+
+            @Getter@Setter
+            private String oldName;
+
+            @Getter@Setter
+            private String newName;
         }
     }
 }

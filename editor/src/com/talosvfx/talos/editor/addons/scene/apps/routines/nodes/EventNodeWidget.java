@@ -10,13 +10,19 @@ import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.ui.types.ATypeWidget;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.ui.types.PropertyTypeWidgetMapper;
+import com.talosvfx.talos.editor.nodes.NodeBoard;
+import com.talosvfx.talos.editor.nodes.NodeWidget;
 import com.talosvfx.talos.editor.nodes.widgets.CustomVarWidget;
 import com.talosvfx.talos.editor.project2.SharedResources;
+import com.talosvfx.talos.editor.utils.Toasts;
 import com.talosvfx.talos.editor.widgets.ui.common.ImageButton;
 import com.talosvfx.talos.editor.widgets.ui.menu.BasicPopup;
+import com.talosvfx.talos.runtime.routine.RoutineNode;
 import com.talosvfx.talos.runtime.routine.misc.PropertyTypeWrapperMapper;
 import com.talosvfx.talos.runtime.scene.utils.propertyWrappers.PropertyType;
 import com.talosvfx.talos.runtime.scene.utils.propertyWrappers.PropertyWrapper;
+
+import java.util.Locale;
 
 public class EventNodeWidget extends RoutineNodeWidget {
     private Array<PropertyWrapper<?>> propertyWrappers = new Array<>();
@@ -145,6 +151,10 @@ public class EventNodeWidget extends RoutineNodeWidget {
                 PropertyType type = propertyWrapper.getType();
                 ATypeWidget innerWidget = ClassReflection.newInstance(PropertyTypeWidgetMapper.getWidgetForPropertyTYpe(type));
                 CustomVarWidget widget = new CustomVarWidget(propertyWrapper, innerWidget);
+                widgetMap.put(propertyWrapper.propertyName, widget);
+                typeMap.put(propertyWrapper.propertyName, type.toString().toLowerCase(Locale.ROOT));
+                defaultsMap.put(propertyWrapper.propertyName, "");
+                addConnection(widget, propertyWrapper.propertyName, true);
                 widget.setFieldName(propertyWrapper.propertyName);
                 fieldTable.add(widget).padTop(2).growX();
                 fieldTable.row();
@@ -153,7 +163,13 @@ public class EventNodeWidget extends RoutineNodeWidget {
                 widget.addListener(new CustomVarWidget.CustomVarWidgetChangeListener() {
 
                     @Override
-                    public void nameChanged(CustomVarChangeEvent event, Actor actor, boolean isFastChange) {
+                    public void nameChanged(CustomVarChangeEvent event, Actor actor, String oldName, String newName, boolean isFastChange) {
+                        if (newName.equals(oldName)) {
+                            return;
+                        }
+                        NodeBoard.NodeConnection connection = nodeBoard.findConnection(EventNodeWidget.this, true, oldName);
+                        nodeBoard.removeConnection(connection, false);
+                        nodeBoard.addConnectionCurve(connection.fromNode, connection.toNode, connection.fromId, newName);
                         reportNodeDataModified(isFastChange);
                     }
 
@@ -182,5 +198,9 @@ public class EventNodeWidget extends RoutineNodeWidget {
         }
     }
 
-
+    @Override
+    public void animateSignal(String portName) {
+        super.animateSignal(portName);
+        Toasts.getInstance().showErrorToast("FIREEEE");
+    }
 }
