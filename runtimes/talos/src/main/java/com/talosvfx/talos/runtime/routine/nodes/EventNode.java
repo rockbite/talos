@@ -5,6 +5,7 @@ import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
+import com.talosvfx.talos.runtime.RuntimeContext;
 import com.talosvfx.talos.runtime.routine.RoutineInstance;
 import com.talosvfx.talos.runtime.routine.RoutineNode;
 import com.talosvfx.talos.runtime.scene.utils.propertyWrappers.PropertyType;
@@ -26,7 +27,7 @@ public class EventNode extends RoutineNode {
             }
         }
 
-        routineInstanceRef.eventNodesEventManager.post(eventName, new Array<>(propertyWrappers));
+        RuntimeContext.getInstance().routineEventInterface.onEventFromRoutines(eventName, new Array<>(propertyWrappers));
     }
 
     @Override

@@ -65,7 +65,6 @@ public class RoutineInstance {
     private GameObject cameraGO;
     private boolean paused = false;
 
-    public RoutineEventNodeManager eventNodesEventManager;
 
     public void reset() {
         clearMemory();
@@ -153,27 +152,8 @@ public class RoutineInstance {
         void onComplete();
     }
 
-    private Array<RoutineEventNodeListener> routineEventNodeListeners;
-
     public RoutineInstance() {
         Pools.get(DrawableQuad.class, 100);
-
-        routineEventNodeListeners = new Array<>();
-        eventNodesEventManager = new RoutineEventNodeManager() {
-            @Override
-            public void post(String eventName, Array<PropertyWrapper<?>> properties) {
-                for (RoutineEventNodeListener routineEventNodeListener : routineEventNodeListeners) {
-                    routineEventNodeListener.receive(eventName, properties);
-                }
-            }
-
-            @Override
-            public void addListener(RoutineEventNodeListener listener) {
-                if (listener != null) {
-                    routineEventNodeListeners.add(listener);
-                }
-            }
-        };
     }
 
 
