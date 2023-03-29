@@ -9,7 +9,9 @@ import java.lang.String;
  */
 public class Commands {
   public enum CommandGroup {
-    GENERAL
+    GENERAL,
+
+    TRANSFORM
   }
 
   public enum CommandType {
@@ -22,7 +24,8 @@ public class Commands {
     SAVE("save_command", "Save", "", "GENERAL"),
 
     EXPORT("export_command", "Export", "", "GENERAL"),
-    EXPORT_OPTIMIZED("export_command_optimized", "Export Optimized", "Slower export that optimizes performance", "GENERAL"),
+
+    EXPORT_OPTIMIZED("export_command_optimized", "Export Optimized", "", "GENERAL"),
 
     OPEN("open_command", "Open", "", "GENERAL"),
 
@@ -40,7 +43,23 @@ public class Commands {
 
     UNGROUP("ungroup_command", "Ungroup", "", "GENERAL"),
 
-    ESCAPE("escape_command", "Escape", "", "GENERAL");
+    ESCAPE("escape_command", "Escape", "", "GENERAL"),
+
+    MOVE_LEFT_1PX("moveLeft", "Move left 1px", "", "TRANSFORM"),
+
+    MOVE_LEFT_10PX("moveJumpyLeft", "Move left 10px", "", "TRANSFORM"),
+
+    MOVE_RIGHT_1X("moveRight", "Move right 1x", "", "TRANSFORM"),
+
+    MOVE_RIGHT_10PX("moveJumpyRight", "Move right 10px", "", "TRANSFORM"),
+
+    MOVE_UP_1PX("moveUp", "Move Up 1px", "", "TRANSFORM"),
+
+    MOVE_UP_10PX("moveJumpyUp", "Move Up 10px", "", "TRANSFORM"),
+
+    MOVE_DOWN_1PX("moveDown", "Move Down 1px", "", "TRANSFORM"),
+
+    MOVE_DOWN_10PX("moveJumpyDown", "Move Down 10px", "", "TRANSFORM");
 
     public final String uniqueName;
 
