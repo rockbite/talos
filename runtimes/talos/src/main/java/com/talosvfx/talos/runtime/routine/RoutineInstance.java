@@ -65,6 +65,7 @@ public class RoutineInstance {
     private GameObject cameraGO;
     private boolean paused = false;
 
+
     public void reset() {
         clearMemory();
         globalMap.clear();

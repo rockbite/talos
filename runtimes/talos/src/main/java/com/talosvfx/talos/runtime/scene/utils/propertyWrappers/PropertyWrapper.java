@@ -16,6 +16,8 @@ public abstract class PropertyWrapper<T> implements Cloneable, Json.Serializable
 
     public boolean isValueOverridden = false;
 
+    public boolean isCollapsed = true;
+
     public void collectAttributes (Array<String> attributes) {
         for (int i = 0; i < attributes.size; i+=2) {
             String type = attributes.get(i);
@@ -58,6 +60,7 @@ public abstract class PropertyWrapper<T> implements Cloneable, Json.Serializable
        propertyName = jsonData.getString("propertyName");
        index = jsonData.getInt("index");
        isValueOverridden = jsonData.getBoolean("isValueOverridden", false);
+       isCollapsed = jsonData.getBoolean("isCollapsed", true);
     }
 
     @Override
@@ -65,6 +68,7 @@ public abstract class PropertyWrapper<T> implements Cloneable, Json.Serializable
         json.writeValue("propertyName", propertyName);
         json.writeValue("index", index);
         json.writeValue("isValueOverridden", isValueOverridden);
+        json.writeValue("isCollapsed", isCollapsed);
     }
 
     public abstract T parseValueFromString (String value);

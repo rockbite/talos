@@ -154,6 +154,11 @@
             <dynamicValue name="interval" type="float" default="1" step="0.0001">interval</dynamicValue>
             <value port="output" name="onComplete" type="signal">onComplete</value>
         </module>
+        <module name = "EventNode" title = "Event Node" keywords = "tween, system" class = "EventNodeWidget">
+            <value port="input" name="startSignal" type="signal">execute</value>
+            <inputText name="eventName" type="string">Event Name</inputText>
+            <container name="customParams"></container>
+        </module>
     </category>
     <category name="entities" title="Entities">
         <module name = "RemoveEntityNode" title = "Remove Entity" keywords = "" class = "RoutineNodeWidget">
@@ -172,6 +177,7 @@
         </module>
         <module name = "SpawnSpriteNode" title = "Spawn Sprite" keywords = "" class = "RoutineNodeWidget">
             <value port="input" name="startSignal" type="signal">start</value>
+            <inputText name="name" type="string">name</inputText>
             <asset port="input" name="sprite" type="SPRITE">sprite</asset>
             <group>
                 <dynamicValue port="input" name="width" type="float" min="-1000" max="1000">Width: </dynamicValue>

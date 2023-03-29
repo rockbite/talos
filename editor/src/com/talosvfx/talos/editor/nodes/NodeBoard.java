@@ -466,6 +466,10 @@ public class NodeBoard<T extends DynamicNodeStageData> extends WidgetGroup imple
 		return connection;
 	}
 
+	public void updateConnectionCurve() {
+
+	}
+
 	public void connectNodeIfCan (NodeWidget currentNode, String currentSlot, boolean currentIsInput) {
 		Object[] result = new Object[2];
 		NodeWidget target = null;
@@ -549,7 +553,6 @@ public class NodeBoard<T extends DynamicNodeStageData> extends WidgetGroup imple
 	/**
 	 * Selection
 	 */
-
 	public void selectNode (NodeWidget node) {
 		clearSelection();
 		nodeStage.onNodeSelectionChange();

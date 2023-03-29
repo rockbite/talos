@@ -9,6 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.kotcrab.vis.ui.VisUI;
 import com.rockbite.bongo.engine.render.PolygonSpriteBatchMultiTextureMULTIBIND;
@@ -25,9 +26,12 @@ import com.talosvfx.talos.editor.project2.savestate.GlobalSaveStateSystem;
 import com.talosvfx.talos.editor.project2.savestate.SaveSystem;
 import com.talosvfx.talos.editor.socket.SocketServer;
 import com.talosvfx.talos.editor.utils.CursorUtil;
+import com.talosvfx.talos.editor.utils.Toasts;
 import com.talosvfx.talos.editor.widgets.ui.menu.MainMenu;
 import com.talosvfx.talos.runtime.RuntimeContext;
 import com.talosvfx.talos.runtime.assets.meta.DefaultConstants;
+import com.talosvfx.talos.runtime.routine.RoutineEventInterface;
+import com.talosvfx.talos.runtime.scene.utils.propertyWrappers.PropertyWrapper;
 import com.talosvfx.talos.runtime.utils.ConfigData;
 import com.talosvfx.talos.runtime.utils.Supplier;
 import lombok.Getter;
@@ -114,6 +118,13 @@ public class TalosMain2 extends ApplicationAdapter {
 		Notifications.quickFire(FinishInitializingEvent.class);
 
 		openProjectExplorer();
+
+		RuntimeContext.getInstance().routineEventInterface = new RoutineEventInterface() {
+            @Override
+            public void onEventFromRoutines(String eventName, Array<PropertyWrapper<?>> properties) {
+                Toasts.getInstance().showInfoToast(eventName + " event fired!");
+            }
+        };
 	}
 
 	private void openProjectExplorer () {
