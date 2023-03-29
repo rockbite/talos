@@ -39,6 +39,11 @@ public class PropertiesPanelApp extends AppManager.BaseApp<Object> implements Ob
 			public void onInputProcessorRemoved () {
 				super.onInputProcessorRemoved();
 			}
+
+			@Override
+			public boolean hasPreferredWidth () {
+				return true;
+			}
 		};
 
 		this.gridAppReference = propertyPanelApp;

@@ -47,7 +47,7 @@ public class LayoutColumn extends LayoutItem {
 
 			rows.insert(idxRelative, newLayoutContent);
 			if (resize) {
-				takeThirtyPercent(newLayoutContent, idxRelative, !up ? idxRelative + 1 : idxRelative - 1);
+				handleSize(newLayoutContent, idxRelative, !up ? idxRelative + 1 : idxRelative - 1);
 			}
 
 		} else {
@@ -60,7 +60,7 @@ public class LayoutColumn extends LayoutItem {
 					}
 				} else {
 					if (resize) {
-						takeThirtyPercent(newLayoutContent, 0, 1);
+						handleSize(newLayoutContent, 0, 1);
 					}
 				}
 
@@ -73,7 +73,7 @@ public class LayoutColumn extends LayoutItem {
 					}
 				} else {
 					if (resize) {
-						takeThirtyPercent(newLayoutContent, 1, 0);
+						handleSize(newLayoutContent, 1, 0);
 					}
 				}
 			}
@@ -168,20 +168,37 @@ public class LayoutColumn extends LayoutItem {
 		super.draggedResizeWidget(layoutResizeWidget, event, x, y, pointer);
 	}
 
-	private void takeThirtyPercent (LayoutItem newLayoutContent, int thisItemIdx, int otherItemIdx) {
+	private void handleSize (LayoutItem newLayoutContent, int thisItemIdx, int otherItemIdx) {
 		if (otherItemIdx < 0 || otherItemIdx >= rows.size) {
-			//Just give it full width
-			rows.get(thisItemIdx).setRelativeHeight(1f);
+			//Just give it full height
+			rows.get(thisItemIdx).setRelativeWidth(1f);
+		} else if (newLayoutContent instanceof LayoutContent) {
+			LayoutContent layoutContent = (LayoutContent) newLayoutContent;
+			if (layoutContent.getActiveApp().hasPreferredHeight()) {
+				float preferredHeight = layoutContent.getContentTable().getPrefHeight();
+				LayoutItem otherItem = rows.get(otherItemIdx);
+				if (preferredHeight < totalPixelHeightToDistribute) {
+					float currentRelativePercent = preferredHeight / totalPixelHeightToDistribute;
+					newLayoutContent.setRelativeHeight(currentRelativePercent);
+					otherItem.setRelativeHeight(otherItem.getRelativeHeight() - currentRelativePercent);
+				} else {
+					takeThirtyPercent(newLayoutContent, otherItemIdx);
+				}
+			} else {
+				takeThirtyPercent(newLayoutContent, otherItemIdx);
+			}
 		} else {
-			LayoutItem layoutItem = rows.get(otherItemIdx);
-			float totalRelativeHeight = layoutItem.getRelativeHeight();
-			float totalRelativeSub = totalRelativeHeight * 0.3f;
-
-
-			newLayoutContent.setRelativeHeight(totalRelativeSub);
-			layoutItem.setRelativeHeight(totalRelativeHeight - totalRelativeSub);
+			takeThirtyPercent(newLayoutContent, otherItemIdx);
 		}
+	}
 
+	private void takeThirtyPercent (LayoutItem newLayoutContent, int otherItemIdx) {
+		LayoutItem layoutItem = rows.get(otherItemIdx);
+		float totalRelativeHeight = layoutItem.getRelativeHeight();
+		float totalRelativeSub = totalRelativeHeight * 0.3f;
+
+		newLayoutContent.setRelativeHeight(totalRelativeSub);
+		layoutItem.setRelativeHeight(totalRelativeHeight - totalRelativeSub);
 	}
 
 

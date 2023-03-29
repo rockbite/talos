@@ -24,6 +24,8 @@ public class LayoutContent extends LayoutItem {
 	private LayoutApp activeApp;
 	private boolean layoutFocused;
 
+
+
 	public LayoutContent (Skin skin, LayoutGrid layoutGrid, LayoutApp app) {
 		this(skin, layoutGrid);
 		addContent(app);
@@ -129,6 +131,10 @@ public class LayoutContent extends LayoutItem {
 	public void addContent (LayoutApp layoutApp) {
 		addContent(layoutApp, false);
 
+	}
+
+	public Table getContentTable() {
+		return contentTable;
 	}
 
 	public void setLayoutFocused (boolean layoutFocused) {
@@ -274,5 +280,9 @@ public class LayoutContent extends LayoutItem {
 
 		swapToApp(firstActive);
 
+	}
+
+	public LayoutApp getActiveApp() {
+		return activeApp;
 	}
 }
