@@ -59,13 +59,6 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
         super(skin);
         this.routineEditorApp = routineEditorApp;
         Notifications.registerObserver(this);
-
-        RuntimeContext.getInstance().routineEventInterface = new RoutineEventInterface() {
-            @Override
-            public void onEventFromRoutines(String eventName, Array<PropertyWrapper<?>> properties) {
-                Toasts.getInstance().showInfoToast(eventName + "event fired!");
-            }
-        };
     }
 
     @Override
