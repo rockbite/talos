@@ -98,49 +98,49 @@
         </command>
     </commandGroup>
     <commandGroup package="Transform">
-        <command name="Move left 1px" uniqueName="moveLeft" description="">
+        <command name="Left" uniqueName="moveLeft" description="">
             <context>FOCUSED</context>
             <combination type="keyboard" repeat="true">
                 LEFT
             </combination>
         </command>
-        <command name="Move left 10px" uniqueName="moveJumpyLeft" description="">
+        <command name="Jumpy Left" uniqueName="moveJumpyLeft" description="">
             <context>FOCUSED</context>
             <combination type="keyboard" repeat="true">
                 SHIFT LEFT
             </combination>
         </command>
-        <command name="Move right 1x" uniqueName="moveRight" description="">
+        <command name="Right" uniqueName="moveRight" description="">
             <context>FOCUSED</context>
             <combination type="keyboard" repeat="true">
                 RIGHT
             </combination>
         </command>
-        <command name="Move right 10px" uniqueName="moveJumpyRight" description="">
+        <command name="Jumpy right" uniqueName="moveJumpyRight" description="">
             <context>FOCUSED</context>
             <combination type="keyboard" repeat="true">
                 SHIFT RIGHT
             </combination>
         </command>
-        <command name="Move Up 1px" uniqueName="moveUp" description="">
+        <command name="Up" uniqueName="moveUp" description="">
             <context>FOCUSED</context>
             <combination type="keyboard" repeat="true">
                 UP
             </combination>
         </command>
-        <command name="Move Up 10px" uniqueName="moveJumpyUp" description="">
+        <command name="Jumpy up" uniqueName="moveJumpyUp" description="">
             <context>FOCUSED</context>
             <combination type="keyboard" repeat="true">
                 SHIFT UP
             </combination>
         </command>
-        <command name="Move Down 1px" uniqueName="moveDown" description="">
+        <command name="Down" uniqueName="moveDown" description="">
             <context>FOCUSED</context>
             <combination type="keyboard" repeat="true">
                 DOWN
             </combination>
         </command>
-        <command name="Move Down 10px" uniqueName="moveJumpyDown" description="">
+        <command name="Jumpy Down" uniqueName="moveJumpyDown" description="">
             <context>FOCUSED</context>
             <combination type="keyboard" repeat="true">
                 SHIFT DOWN

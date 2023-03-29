@@ -45,21 +45,21 @@ public class Commands {
 
     ESCAPE("escape_command", "Escape", "", "GENERAL"),
 
-    MOVE_LEFT_1PX("moveLeft", "Move left 1px", "", "TRANSFORM"),
+    LEFT("moveLeft", "Left", "", "TRANSFORM"),
 
-    MOVE_LEFT_10PX("moveJumpyLeft", "Move left 10px", "", "TRANSFORM"),
+    JUMPY_LEFT("moveJumpyLeft", "Jumpy Left", "", "TRANSFORM"),
 
-    MOVE_RIGHT_1X("moveRight", "Move right 1x", "", "TRANSFORM"),
+    RIGHT("moveRight", "Right", "", "TRANSFORM"),
 
-    MOVE_RIGHT_10PX("moveJumpyRight", "Move right 10px", "", "TRANSFORM"),
+    JUMPY_RIGHT("moveJumpyRight", "Jumpy right", "", "TRANSFORM"),
 
-    MOVE_UP_1PX("moveUp", "Move Up 1px", "", "TRANSFORM"),
+    UP("moveUp", "Up", "", "TRANSFORM"),
 
-    MOVE_UP_10PX("moveJumpyUp", "Move Up 10px", "", "TRANSFORM"),
+    JUMPY_UP("moveJumpyUp", "Jumpy up", "", "TRANSFORM"),
 
-    MOVE_DOWN_1PX("moveDown", "Move Down 1px", "", "TRANSFORM"),
+    DOWN("moveDown", "Down", "", "TRANSFORM"),
 
-    MOVE_DOWN_10PX("moveJumpyDown", "Move Down 10px", "", "TRANSFORM");
+    JUMPY_DOWN("moveJumpyDown", "Jumpy Down", "", "TRANSFORM");
 
     public final String uniqueName;
 
