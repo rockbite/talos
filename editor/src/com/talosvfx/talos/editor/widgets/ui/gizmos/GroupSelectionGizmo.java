@@ -13,11 +13,13 @@ import com.talosvfx.talos.editor.widgets.ui.ViewportWidget;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 import com.talosvfx.talos.runtime.scene.components.SpriteRendererComponent;
 import com.talosvfx.talos.runtime.scene.components.TransformComponent;
+import lombok.Getter;
 
 import java.util.Comparator;
 
 public class GroupSelectionGizmo extends Gizmo {
 
+	@Getter
 	private final ViewportWidget viewportWidget;
 
 	private BoundingBox selectionBounds = new BoundingBox();

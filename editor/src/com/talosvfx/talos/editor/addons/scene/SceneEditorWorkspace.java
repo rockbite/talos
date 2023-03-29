@@ -96,6 +96,8 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 	private SavableContainer currentContainer;
 	private GameAsset<Scene> gameAsset;
 
+	private AligningToolsPane aligningToolsPane;
+
 	private MainRenderer renderer;
 	private final MainRenderer uiSceneRenderer;
 
@@ -201,6 +203,8 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		mapEditorState = new MapEditorState();
 
 		Notifications.registerObserver(this);
+
+		aligningToolsPane = new AligningToolsPane(groupSelectionGizmo.getViewportWidget().selection);
 
 
 		GizmoRegister.init(RuntimeContext.getInstance().configData.getGameObjectConfigurationXMLRoot());
@@ -1127,6 +1131,9 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 					tempList.add(PropertyWrapperProviders.getOrCreateHolder(gameObject));
 				}
 				selectPropertyHolder(PropertyWrapperProviders.getOrCreateHolder(new MultiPropertyHolder<>(tempList)));
+				if(aligningToolsPane.getParent() == null) {
+					groupSelectionGizmo.getViewportWidget().addActor(aligningToolsPane);
+				}
 			}
 		}
 
@@ -1439,6 +1446,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 			}
 		}
 		clearSelection();
+		aligningToolsPane.remove();
 		GameObjectSelectionChanged<GameObjectContainer> gameObjectSelectionChanged = Notifications.obtainEvent(GameObjectSelectionChanged.class);
 		gameObjectSelectionChanged.set(getEventContext(), selection);
 		Notifications.fireEvent(gameObjectSelectionChanged);
