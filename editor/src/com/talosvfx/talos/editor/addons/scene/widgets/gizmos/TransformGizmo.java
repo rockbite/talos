@@ -1,5 +1,7 @@
 package com.talosvfx.talos.editor.addons.scene.widgets.gizmos;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -27,6 +29,9 @@ public class TransformGizmo extends Gizmo {
 
     private final Vector2 centerPoint = new Vector2();
     private final float pointHitError = 25;
+
+    private boolean hasDeterminedDirection = false;
+    private boolean isHorizontal = false;
 
     @Override
     public void draw (Batch batch, float parentAlpha) {
@@ -138,6 +143,7 @@ public class TransformGizmo extends Gizmo {
         prevTouch.set(x, y);
         deltaXCache = x;
         deltaYCache = y;
+        hasDeterminedDirection = false;
 
         grabbedFromCenter = isPointHit(centerPoint, x, y);
     }
@@ -167,6 +173,25 @@ public class TransformGizmo extends Gizmo {
         // NOTE: when fast dragged the mouse position can move faster than the transformation, hence we discard checks if the gizmo was already dragged
         if (!grabbedFromCenter && gameObject.isEditorTransformLocked())
             return;
+
+        if (Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
+            if (!hasDeterminedDirection) {
+                tmp.set(x, y).sub(prevTouch);
+                float x1 = tmp.x;
+                float y1 = tmp.y;
+
+                isHorizontal = Math.abs(x1) > Math.abs(y1);
+                hasDeterminedDirection = true;
+            }
+
+            if (isHorizontal) {
+                y = prevTouch.y;
+            } else {
+                x = prevTouch.x;
+            }
+        } else {
+            hasDeterminedDirection = false;
+        }
 
         tmp.set(x, y).sub(prevTouch);
         // render position
