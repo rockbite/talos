@@ -1187,13 +1187,13 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 			return true;
 		}
 
+		if(entityUnderMouse != null && entityUnderMouse.isEditorTransformLocked()) {
+			return true;
+		}
+
 		//if(gizmo != null && !(gizmo instanceof GroupSelectionGizmo) && gizmo.getGameObject().isEditorTransformLocked()) {
 		if(gizmo != null) {
 			return false;
-		}
-
-		if(entityUnderMouse != null && entityUnderMouse.isEditorTransformLocked()) {
-			return true;
 		}
 
 		return false;
