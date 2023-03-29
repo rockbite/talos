@@ -549,15 +549,10 @@ public class NodeBoard<T extends DynamicNodeStageData> extends WidgetGroup imple
 
 		Notifications.fireEvent(Notifications.obtainEvent(NodeConnectionCreatedEvent.class).set(getNodeStage(), connection));
 	}
-//
-//	public void updateConnection (NodeWidget from, NodeWidget to, String slotFrom, String slotTo) {
-//
-//	}
 
 	/**
 	 * Selection
 	 */
-
 	public void selectNode (NodeWidget node) {
 		clearSelection();
 		nodeStage.onNodeSelectionChange();
