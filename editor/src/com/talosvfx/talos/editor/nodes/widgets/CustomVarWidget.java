@@ -347,13 +347,8 @@ public class CustomVarWidget<T> extends AbstractWidget<T> {
         nameChangedEvent.setNewName(newName);
         nameChangedEvent.setFastChange(isFastChange);
 
-        try {
-            fire(nameChangedEvent);
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            Pools.free(nameChangedEvent);
-        }
+        fire(nameChangedEvent);
+        Pools.free(nameChangedEvent);
     }
 
     protected void fireCollapse() {
@@ -361,13 +356,8 @@ public class CustomVarWidget<T> extends AbstractWidget<T> {
         nameChangedEvent.setType(CustomVarWidgetChangeListener.Type.collapse);
         nameChangedEvent.setFastChange(false);
 
-        try {
-            fire(nameChangedEvent);
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            Pools.free(nameChangedEvent);
-        }
+        fire(nameChangedEvent);
+        Pools.free(nameChangedEvent);
     }
 
     private void applyValueToWrapper() {
