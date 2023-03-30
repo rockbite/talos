@@ -1,99 +1,149 @@
 <actions>
-    <commandGroup package = "General">
-        <command name = "Copy" uniqueName = "copy_command" description = "">
-            <context>FOCUSED</context>>
-            <combination type = "keyboard" repeat = "false">
+    <commandGroup package="General">
+        <command name="Copy" uniqueName="copy_command" description="">
+            <context>FOCUSED</context>
+            <combination type="keyboard" repeat="false">
                 CTRL C
             </combination>
         </command>
-        <command name = "Cut" uniqueName = "cut_command" description = "">
-            <context>FOCUSED</context>>
-            <combination type = "keyboard" repeat = "false">
+        <command name="Cut" uniqueName="cut_command" description="">
+            <context>FOCUSED</context>
+            <combination type="keyboard" repeat="false">
                 CTRL X
             </combination>
         </command>
-        <command name = "Paste" uniqueName = "paste_command" description = "">
-            <context>FOCUSED</context>>
-            <combination type = "keyboard" repeat = "false">
+        <command name="Paste" uniqueName="paste_command" description="">
+            <context>FOCUSED</context>
+            <combination type="keyboard" repeat="false">
                 CTRL V
             </combination>
         </command>
-        <command name = "Save" uniqueName = "save_command" description = "">
-            <context>GLOBAL</context>>
-            <combination type = "keyboard" repeat = "false">
+        <command name="Save" uniqueName="save_command" description="">
+            <context>GLOBAL</context>
+            <combination type="keyboard" repeat="false">
                 CTRL S
             </combination>
         </command>
-        <command name = "Export" uniqueName = "export_command" description = "">
-            <context>GLOBAL</context>>
-            <combination type = "keyboard" repeat = "false">
+        <command name="Export" uniqueName="export_command" description="">
+            <context>GLOBAL</context>
+            <combination type="keyboard" repeat="false">
                 CTRL E
             </combination>
         </command>
-        <command name = "Export Optimized" uniqueName = "export_command_optimized" description = "">
-            <context>GLOBAL</context>>
-            <combination type = "keyboard" repeat = "false">
+        <command name="Export Optimized" uniqueName="export_command_optimized" description="">
+            <context>GLOBAL</context>
+            <combination type="keyboard" repeat="false">
                 CTRL SHIFT E
             </combination>
         </command>
-        <command name = "Open" uniqueName = "open_command" description = "">
-            <context>FOCUSED</context>>
-            <combination type = "keyboard" repeat = "false">
+        <command name="Open" uniqueName="open_command" description="">
+            <context>FOCUSED</context>
+            <combination type="keyboard" repeat="false">
                 CTRL O
             </combination>
         </command>
-        <command name = "Undo" uniqueName = "undo_command" description = "">
-            <context>GLOBAL</context>>
-            <combination type = "keyboard" repeat = "true">
+        <command name="Undo" uniqueName="undo_command" description="">
+            <context>GLOBAL</context>
+            <combination type="keyboard" repeat="true">
                 CTRL Z
             </combination>
         </command>
-        <command name = "Redo" uniqueName = "redo_command" description = "">
-            <context>GLOBAL</context>>
-            <combination type = "keyboard" repeat = "true">
+        <command name="Redo" uniqueName="redo_command" description="">
+            <context>GLOBAL</context>
+            <combination type="keyboard" repeat="true">
                 CTRL SHIFT Z
             </combination>
         </command>
-        <command name = "Select All" uniqueName = "select_all_command" description = "">
-            <context>FOCUSED</context>>
-            <combination type = "keyboard" repeat = "false">
+        <command name="Select All" uniqueName="select_all_command" description="">
+            <context>FOCUSED</context>
+            <combination type="keyboard" repeat="false">
                 CTRL A
             </combination>
         </command>
-        <command name = "Delete" uniqueName = "delete_command" description = "">
-            <context>FOCUSED</context>>
-            <combination type = "keyboard" repeat = "false">
+        <command name="Delete" uniqueName="delete_command" description="">
+            <context>FOCUSED</context>
+            <combination type="keyboard" repeat="false">
                 DEL
             </combination>
-            <combination type = "keyboard" repeat = "false">
+            <combination type="keyboard" repeat="false">
                 FORWARD_DEL
             </combination>
         </command>
-        <command name = "Rename" uniqueName = "rename_command" description = "">
-            <context>FOCUSED</context>>
-            <combination type = "keyboard" repeat = "false">
+        <command name="Rename" uniqueName="rename_command" description="">
+            <context>FOCUSED</context>
+            <combination type="keyboard" repeat="false">
                 F2
             </combination>
         </command>
-        <command name = "Group" uniqueName = "group_command" description = "">
-            <context>FOCUSED</context>>
-            <combination type = "keyboard" repeat = "false">
+        <command name="Group" uniqueName="group_command" description="">
+            <context>FOCUSED</context>
+            <combination type="keyboard" repeat="false">
                 CTRL G
             </combination>
         </command>
-        <command name = "Ungroup" uniqueName = "ungroup_command" description = "">
-            <context>FOCUSED</context>>
-            <combination type = "keyboard" repeat = "false">
+        <command name="Ungroup" uniqueName="ungroup_command" description="">
+            <context>FOCUSED</context>
+            <combination type="keyboard" repeat="false">
                 CTRL U
             </combination>
         </command>
-        <command name = "Escape" uniqueName = "escape_command" description = "">
-            <context>FOCUSED</context>>
-            <combination type = "keyboard" repeat = "false">
+        <command name="Escape" uniqueName="escape_command" description="">
+            <context>FOCUSED</context>
+            <combination type="keyboard" repeat="false">
                 ESCAPE
             </combination>
-            <combination type = "keyboard" repeat = "false">
+            <combination type="keyboard" repeat="false">
                 BACK
+            </combination>
+        </command>
+    </commandGroup>
+    <commandGroup package="Transform">
+        <command name="Left" uniqueName="move_left_command" description="">
+            <context>FOCUSED</context>
+            <combination type="keyboard" repeat="true">
+                LEFT
+            </combination>
+        </command>
+        <command name="Jumpy Left" uniqueName="move_jumpy_left_command" description="">
+            <context>FOCUSED</context>
+            <combination type="keyboard" repeat="true">
+                SHIFT LEFT
+            </combination>
+        </command>
+        <command name="Right" uniqueName="move_right_command" description="">
+            <context>FOCUSED</context>
+            <combination type="keyboard" repeat="true">
+                RIGHT
+            </combination>
+        </command>
+        <command name="Jumpy right" uniqueName="move_jumpy_right_command" description="">
+            <context>FOCUSED</context>
+            <combination type="keyboard" repeat="true">
+                SHIFT RIGHT
+            </combination>
+        </command>
+        <command name="Up" uniqueName="move_up_command" description="">
+            <context>FOCUSED</context>
+            <combination type="keyboard" repeat="true">
+                UP
+            </combination>
+        </command>
+        <command name="Jumpy up" uniqueName="move_jumpy_up_command" description="">
+            <context>FOCUSED</context>
+            <combination type="keyboard" repeat="true">
+                SHIFT UP
+            </combination>
+        </command>
+        <command name="Down" uniqueName="move_down_command" description="">
+            <context>FOCUSED</context>
+            <combination type="keyboard" repeat="true">
+                DOWN
+            </combination>
+        </command>
+        <command name="Jumpy Down" uniqueName="move_jumpy_down_command" description="">
+            <context>FOCUSED</context>
+            <combination type="keyboard" repeat="true">
+                SHIFT DOWN
             </combination>
         </command>
     </commandGroup>

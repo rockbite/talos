@@ -9,7 +9,9 @@ import java.lang.String;
  */
 public class Commands {
   public enum CommandGroup {
-    GENERAL
+    GENERAL,
+
+    TRANSFORM
   }
 
   public enum CommandType {
@@ -22,7 +24,8 @@ public class Commands {
     SAVE("save_command", "Save", "", "GENERAL"),
 
     EXPORT("export_command", "Export", "", "GENERAL"),
-    EXPORT_OPTIMIZED("export_command_optimized", "Export Optimized", "Slower export that optimizes performance", "GENERAL"),
+
+    EXPORT_OPTIMIZED("export_command_optimized", "Export Optimized", "", "GENERAL"),
 
     OPEN("open_command", "Open", "", "GENERAL"),
 
@@ -40,7 +43,23 @@ public class Commands {
 
     UNGROUP("ungroup_command", "Ungroup", "", "GENERAL"),
 
-    ESCAPE("escape_command", "Escape", "", "GENERAL");
+    ESCAPE("escape_command", "Escape", "", "GENERAL"),
+
+    LEFT("move_left_command", "Left", "", "TRANSFORM"),
+
+    JUMPY_LEFT("move_jumpy_left_command", "Jumpy Left", "", "TRANSFORM"),
+
+    RIGHT("move_right_command", "Right", "", "TRANSFORM"),
+
+    JUMPY_RIGHT("move_jumpy_right_command", "Jumpy right", "", "TRANSFORM"),
+
+    UP("move_up_command", "Up", "", "TRANSFORM"),
+
+    JUMPY_UP("move_jumpy_up_command", "Jumpy up", "", "TRANSFORM"),
+
+    DOWN("move_down_command", "Down", "", "TRANSFORM"),
+
+    JUMPY_DOWN("move_jumpy_down_command", "Jumpy Down", "", "TRANSFORM");
 
     public final String uniqueName;
 

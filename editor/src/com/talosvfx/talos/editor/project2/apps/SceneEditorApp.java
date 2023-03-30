@@ -2,13 +2,11 @@ package com.talosvfx.talos.editor.project2.apps;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
-import com.talosvfx.talos.editor.addons.scene.events.commands.GONameChangeCommand;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.Observer;
 import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.editor.layouts.DummyLayoutApp;
 import com.talosvfx.talos.editor.notifications.CommandEventHandler;
-import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.commands.enums.Commands;
 import com.talosvfx.talos.editor.notifications.events.commands.CommandContextEvent;
 import com.talosvfx.talos.editor.project2.AppManager;
@@ -133,6 +131,46 @@ public class SceneEditorApp extends AppManager.BaseApp<Scene> implements GameAss
 	@CommandEventHandler(commandType = Commands.CommandType.ESCAPE)
 	public void onEscapeCommand (CommandContextEvent commandContextEvent) {
 		workspaceWidget.escapePressed();
+	}
+
+	@CommandEventHandler(commandType = Commands.CommandType.LEFT)
+	public void onLeftCommand (CommandContextEvent commandContextEvent) {
+		workspaceWidget.moveSelectedObjectsByPixels(-1, 0);
+	}
+
+	@CommandEventHandler(commandType = Commands.CommandType.JUMPY_LEFT)
+	public void onJumpyLeftCommand (CommandContextEvent commandContextEvent) {
+		workspaceWidget.moveSelectedObjectsByPixels(-10, 0);
+	}
+
+	@CommandEventHandler(commandType = Commands.CommandType.RIGHT)
+	public void onRightCommand (CommandContextEvent commandContextEvent) {
+		workspaceWidget.moveSelectedObjectsByPixels(1, 0);
+	}
+
+	@CommandEventHandler(commandType = Commands.CommandType.JUMPY_RIGHT)
+	public void onJumpyRightCommand (CommandContextEvent commandContextEvent) {
+		workspaceWidget.moveSelectedObjectsByPixels(10, 0);
+	}
+
+	@CommandEventHandler(commandType = Commands.CommandType.DOWN)
+	public void onDownCommand (CommandContextEvent commandContextEvent) {
+		workspaceWidget.moveSelectedObjectsByPixels(0, -1);
+	}
+
+	@CommandEventHandler(commandType = Commands.CommandType.JUMPY_DOWN)
+	public void onJumpyDownCommand (CommandContextEvent commandContextEvent) {
+		workspaceWidget.moveSelectedObjectsByPixels(0, -10);
+	}
+
+	@CommandEventHandler(commandType = Commands.CommandType.UP)
+	public void onUpCommand (CommandContextEvent commandContextEvent) {
+		workspaceWidget.moveSelectedObjectsByPixels(0, 1);
+	}
+
+	@CommandEventHandler(commandType = Commands.CommandType.JUMPY_UP)
+	public void onJumpyUpCommand (CommandContextEvent commandContextEvent) {
+		workspaceWidget.moveSelectedObjectsByPixels(0, 10);
 	}
 
 	@Override

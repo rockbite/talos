@@ -388,6 +388,7 @@ public class RepositoryOptimizer {
 			Process process = Runtime.getRuntime().exec(args);
 
 
+
 			InputStream inputStream = process.getInputStream();
 			InputStreamReader isr = new InputStreamReader(inputStream);
 			InputStream errorStream = process.getErrorStream();
@@ -409,13 +410,16 @@ public class RepositoryOptimizer {
 			}
 			System.out.println("Error: " + stableError.toString());
 
-			int i = process.exitValue();
+			int i = process.waitFor();
+
 			if (i != 0) {
 				throw new GdxRuntimeException("Exception in packing");
 			}
 			objectCompletableFuture.complete(null);
 
 		} catch (IOException e) {
+			throw new RuntimeException(e);
+		} catch (InterruptedException e) {
 			throw new RuntimeException(e);
 		}
 
