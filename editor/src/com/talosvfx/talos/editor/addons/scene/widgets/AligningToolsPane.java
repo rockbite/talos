@@ -7,15 +7,19 @@ import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.OrderedSet;
+import com.talosvfx.talos.editor.addons.scene.SceneUtils;
 import com.talosvfx.talos.editor.addons.scene.utils.AligningUtils;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 import com.talosvfx.talos.runtime.scene.GameObject;
+import com.talosvfx.talos.runtime.scene.components.TransformComponent;
 
 
 public class AligningToolsPane extends Table {
+    private OrderedSet<GameObject> selection;
 
     public AligningToolsPane(OrderedSet<GameObject> selection) {
+        this.selection = selection;
         pad(10);
         setBackground(SharedResources.skin.newDrawable("white", ColorLibrary.BackgroundColor.MID_GRAY.getColor()));
 
@@ -68,6 +72,7 @@ public class AligningToolsPane extends Table {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 AligningUtils.alignVerticalCenter(selection.orderedItems());
+                onUpdate();
             }
         });
 
@@ -75,6 +80,7 @@ public class AligningToolsPane extends Table {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 AligningUtils.alignVerticalLeft(selection.orderedItems());
+                onUpdate();
             }
         });
 
@@ -82,6 +88,7 @@ public class AligningToolsPane extends Table {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 AligningUtils.alignVerticalRight(selection.orderedItems());
+                onUpdate();
             }
         });
 
@@ -89,6 +96,7 @@ public class AligningToolsPane extends Table {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 AligningUtils.alignHorizontalCenter(selection.orderedItems());
+                onUpdate();
             }
         });
 
@@ -96,6 +104,7 @@ public class AligningToolsPane extends Table {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 AligningUtils.alignHorizontalTop(selection.orderedItems());
+                onUpdate();
             }
         });
 
@@ -103,6 +112,7 @@ public class AligningToolsPane extends Table {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 AligningUtils.alignHorizontalBottom(selection.orderedItems());
+                onUpdate();
             }
         });
 
@@ -111,6 +121,7 @@ public class AligningToolsPane extends Table {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 AligningUtils.distributeItemsVerticalCenter(selection.orderedItems());
+                onUpdate();
             }
         });
 
@@ -118,6 +129,7 @@ public class AligningToolsPane extends Table {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 AligningUtils.distributeItemsHorizontalCenter(selection.orderedItems());
+                onUpdate();
             }
         });
 
@@ -152,6 +164,9 @@ public class AligningToolsPane extends Table {
         });*/
     }
 
+    private void onUpdate(){
+        SceneUtils.componentBatchUpdated(selection.orderedItems().get(0).getGameObjectContainerRoot(), selection.orderedItems(), TransformComponent.class, false);
+    }
 
     @Override
     public void act(float delta) {

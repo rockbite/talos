@@ -941,6 +941,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 	}
 
 
+	private Array<GameObject> tempArray = new Array<>();
 	public void openSavableContainer (SavableContainer mainScene) {
 		if (mainScene == null)
 			return;
@@ -956,7 +957,16 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
 		createAndInitGizmos(mainScene, mainScene.getSelfObject(), this, shouldRegisterRoot);
 
+		tempArray.clear();
+		for (GameObject gameObject : selection) {
+			GameObject childByName = mainScene.getSelfObject().getChildByName(gameObject.getName(), true);
+			if (childByName != null) {
+				tempArray.add(childByName);
+			}
+		}
+
 		clearSelection();
+		selection.addAll(tempArray);
 
 		selectPropertyHolder(PropertyWrapperProviders.getOrCreateHolder(mainScene));
 

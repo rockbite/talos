@@ -10,10 +10,12 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.Pools;
+import com.talosvfx.talos.editor.addons.scene.SceneUtils;
 import com.talosvfx.talos.runtime.scene.GameObject;
 import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.Gizmo;
 import com.talosvfx.talos.editor.widgets.ui.ViewportWidget;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
+import com.talosvfx.talos.runtime.scene.GameObjectContainer;
 import com.talosvfx.talos.runtime.scene.components.SpriteRendererComponent;
 import com.talosvfx.talos.runtime.scene.components.TransformComponent;
 import lombok.Getter;
@@ -130,8 +132,9 @@ public class GroupSelectionGizmo extends Gizmo {
 	}
 
 	@Override
-	public void touchUp (float x, float y) {
-
+	public void touchUp(float x, float y) {
+		GameObjectContainer container = viewportWidget.selection.first().getGameObjectContainerRoot();
+		SceneUtils.componentBatchUpdated(container, viewportWidget.selection.orderedItems(), TransformComponent.class, false);
 	}
 
 	private void calculateSelectionBounds () {

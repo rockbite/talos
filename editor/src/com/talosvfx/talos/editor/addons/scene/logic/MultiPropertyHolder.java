@@ -122,8 +122,19 @@ public class MultiPropertyHolder<T extends IPropertyHolder> implements IProperty
                     }
                 });
 
+                wrapper.setParent(this);
                 widgets.add(wrapper);
             }
+        }
+
+        public Class<?> getWidgetClass(PropertyWidget propertyWidget) {
+            int index = widgets.indexOf(propertyWidget, true);
+            return map.get(index).first().getParentObject().getClass();
+        }
+
+        public Array<PropertyWidget> getPropertyWidgetsFor(PropertyWidget propertyWidget) {
+            int index = widgets.indexOf(propertyWidget, true);
+            return map.get(index);
         }
 
         public void addProvider(IPropertyProvider provider) {
