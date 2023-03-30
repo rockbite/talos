@@ -1188,18 +1188,26 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		}
 
 		Vector3 touchToLocal = getTouchToWorld(Gdx.input.getX(), Gdx.input.getY());
-		Gizmo gizmo = hitGizmo(touchToLocal.x, touchToLocal.y);
+		if (!selection.isEmpty()) {
+			for (GameObject gameObject : selection) {
+				Gizmo gizmo = hitGizmoGameObject(touchToLocal.x, touchToLocal.y, gameObject);
+				if (gizmo != null) {
+					return false;
+				}
 
+			}
+		}
+
+		Gizmo gizmo = hitGizmo(touchToLocal.x, touchToLocal.y);
 		if (gizmo == null && entityUnderMouse == null) {
 			return true;
 		}
 
-		if(entityUnderMouse != null && entityUnderMouse.isEditorTransformLocked()) {
+		if (entityUnderMouse != null && entityUnderMouse.isEditorTransformLocked()) {
 			return true;
 		}
 
-		//if(gizmo != null && !(gizmo instanceof GroupSelectionGizmo) && gizmo.getGameObject().isEditorTransformLocked()) {
-		if(gizmo != null) {
+		if (gizmo != null && !gizmo.getGameObject().isEditorTransformLocked()) {
 			return false;
 		}
 
