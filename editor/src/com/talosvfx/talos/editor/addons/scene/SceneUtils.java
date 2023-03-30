@@ -397,16 +397,40 @@ public class SceneUtils {
 	}
 
 	public static void componentUpdated (GameObjectContainer gameObjectContainer, GameObject gameObject, AComponent component, boolean isRapid) {
+		fireComponentUpdateEvent(gameObjectContainer, gameObject, component,isRapid);
+
+		if (!isRapid) {
+			markContainerChanged(gameObjectContainer);
+		}
+	}
+
+	public static void componentBatchUpdated (GameObjectContainer gameObjectContainer, Array<GameObject> gameObjects, Class<? extends AComponent> componentType, boolean isRapid) {
+		for (GameObject gameObject : gameObjects) {
+			AComponent component = gameObject.getComponent(componentType);
+			fireComponentUpdateEvent(gameObjectContainer, gameObject, component,isRapid);
+		}
+
+		if (!isRapid) {
+			markContainerChanged(gameObjectContainer);
+		}
+	}
+
+	public static void fireComponentUpdateEvent(GameObjectContainer gameObjectContainer, GameObject gameObject, AComponent component, boolean isRapid){
 		ComponentUpdated componentUpdated = Notifications.obtainEvent(ComponentUpdated.class);
 		componentUpdated.setComponent(component);
 		componentUpdated.setParent(gameObject);
 		componentUpdated.setRapid(isRapid);
 		componentUpdated.setContainer(gameObjectContainer);
 		Notifications.fireEvent(componentUpdated);
+	}
 
-		if (!isRapid) {
-			markContainerChanged(gameObjectContainer);
-		}
+	public static void fireComponentUpdateEvent(AComponent component, boolean isRapid){
+		ComponentUpdated componentUpdated = Notifications.obtainEvent(ComponentUpdated.class);
+		componentUpdated.setComponent(component);
+		componentUpdated.setParent(component.getGameObject());
+		componentUpdated.setRapid(isRapid);
+		componentUpdated.setContainer(component.getGameObject().getGameObjectContainerRoot());
+		Notifications.fireEvent(componentUpdated);
 	}
 
 	public static void layersUpdated () {

@@ -6,11 +6,13 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.Value;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.talosvfx.talos.editor.addons.scene.SceneUtils;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.events.PropertyHolderEdited;
+import com.talosvfx.talos.editor.addons.scene.logic.MultiPropertyHolder;
 import com.talosvfx.talos.editor.addons.scene.logic.componentwrappers.GameObjectPropertyHolder;
 import com.talosvfx.talos.editor.addons.scene.logic.componentwrappers.GameObjectPropertyProvider;
 import com.talosvfx.talos.runtime.scene.GameObject;
@@ -175,6 +177,22 @@ public abstract class PropertyWidget<T> extends Table {
 		} else if (parent instanceof GameObjectContainer) {
 			if (!isFastChange) {
 				SceneUtils.markContainerChanged((GameObjectContainer)parent);
+			}
+		} else if (parent instanceof MultiPropertyHolder.MultiPropertyProvider) {
+			MultiPropertyHolder.MultiPropertyProvider multiPropertyProvider = (MultiPropertyHolder.MultiPropertyProvider) parent;
+			Class<?> type = multiPropertyProvider.getWidgetClass(this);
+
+			if (AComponent.class.isAssignableFrom(type)) {
+				Array<PropertyWidget> propertyWidgets = multiPropertyProvider.getPropertyWidgetsFor(this);
+				for (PropertyWidget propertyWidget : propertyWidgets) {
+					AComponent component = ((AComponent) propertyWidget.getParentObject());
+					SceneUtils.fireComponentUpdateEvent(component, isFastChange);
+				}
+				GameObjectContainer container = ((AComponent) propertyWidgets.first().getParentObject()).getGameObject().getGameObjectContainerRoot();
+
+				if (!isFastChange) {
+					SceneUtils.markContainerChanged(container);
+				}
 			}
 		}
 
