@@ -3,11 +3,7 @@ package com.talosvfx.talos.runtime.routine;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.Json;
-import com.badlogic.gdx.utils.JsonValue;
-import com.badlogic.gdx.utils.ObjectMap;
-import com.badlogic.gdx.utils.XmlReader;
+import com.badlogic.gdx.utils.*;
 import com.talosvfx.talos.runtime.RuntimeContext;
 import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.runtime.assets.GameAssetType;
@@ -15,7 +11,7 @@ import lombok.Getter;
 
 import java.util.UUID;
 
-public abstract class RoutineNode {
+public abstract class RoutineNode implements Pool.Poolable {
 
     protected RoutineInstance routineInstanceRef;
 
@@ -463,6 +459,7 @@ public abstract class RoutineNode {
         }
     }
 
+    @Override
     public void reset() {
 
     }

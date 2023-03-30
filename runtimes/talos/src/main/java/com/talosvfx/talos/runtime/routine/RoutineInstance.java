@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
 
-public class RoutineInstance {
+public class RoutineInstance implements Pool.Poolable {
 
     private static final Logger logger = LoggerFactory.getLogger(RoutineInstance.class);
 
@@ -66,6 +66,8 @@ public class RoutineInstance {
     private boolean paused = false;
 
 
+
+    @Override
     public void reset() {
         clearMemory();
         globalMap.clear();
