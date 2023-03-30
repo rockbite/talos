@@ -45,6 +45,7 @@ public class SpriteComponentRenderer extends ComponentRenderer<SpriteRendererCom
 			}
 			textureRegion.setRegion(resource);
 			if(textureRegion != null) {
+				textureRegion.flip(rendererComponent.flipX, rendererComponent.flipY);
 				batch.setColor(spriteRenderer.finalColor);
 
 				final float width = spriteRenderer.size.x;
@@ -129,6 +130,7 @@ public class SpriteComponentRenderer extends ComponentRenderer<SpriteRendererCom
 						float uScale = uWidth * remainderX/tileWidth;
 						float cachedU2 = textureRegion.getU2();
 						textureRegion.setU2(textureRegion.getU() + uScale);
+						textureRegion.flip(rendererComponent.flipX, rendererComponent.flipY);
 						batch.draw(textureRegion, vector2.x - halfTileWidth, vector2.y - halfTileHeight, halfTileWidth, halfTileHeight, remainderX, tileHeight, 1.002f, 1.002f, transformComponent.worldRotation);
 						textureRegion.setU2(cachedU2);
 					}
