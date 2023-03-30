@@ -3,7 +3,7 @@
   "children": [
     {
       "type": "COLUMN",
-      "relativeWidth": 0.85300004,
+      "relativeWidth": 0.73,
       "children": [
         {
           "type": "CONTENT",
@@ -62,7 +62,7 @@
     },
     {
       "type": "CONTENT",
-      "relativeWidth": 0.147,
+      "relativeWidth": 0.27,
       "children": [
         {
           "type": "APP",

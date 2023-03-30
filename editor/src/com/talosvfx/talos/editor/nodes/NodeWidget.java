@@ -566,6 +566,13 @@ public abstract class NodeWidget extends EmptyWindow implements Json.Serializabl
         reportNodeDataModified(false);
     }
 
+    protected void reportNodeDataModified(boolean renamedField, boolean isFastChange) {
+        NodeDataModifiedEvent nodeDataModifiedEvent = Notifications.obtainEvent(NodeDataModifiedEvent.class).set(nodeBoard.getNodeStage(), NodeWidget.this);
+        nodeDataModifiedEvent.isFastChange = isFastChange;
+        nodeDataModifiedEvent.renamedField = renamedField;
+        Notifications.fireEvent(nodeDataModifiedEvent);
+    }
+
     protected void reportNodeDataModified(boolean isFastChange) {
         NodeDataModifiedEvent nodeDataModifiedEvent = Notifications.obtainEvent(NodeDataModifiedEvent.class).set(nodeBoard.getNodeStage(), NodeWidget.this);
         nodeDataModifiedEvent.isFastChange = isFastChange;

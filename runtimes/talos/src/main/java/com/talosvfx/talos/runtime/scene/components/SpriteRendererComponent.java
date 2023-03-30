@@ -1,5 +1,7 @@
 package com.talosvfx.talos.runtime.scene.components;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
@@ -29,7 +31,7 @@ public class SpriteRendererComponent extends RendererComponent implements GameRe
     public boolean shouldInheritParentColor = true;
     public boolean flipX;
     public boolean flipY;
-    public boolean fixAspectRatio = true;
+    private boolean fixAspectRatio = true;
     public RenderMode renderMode = RenderMode.simple;
 
     @ValueProperty(prefix = {"W", "H"})
@@ -211,5 +213,17 @@ public class SpriteRendererComponent extends RendererComponent implements GameRe
     @Override
     public boolean shouldInheritParentColor() {
         return shouldInheritParentColor;
+    }
+
+    public boolean shouldFixAspectRatio(boolean getRawValue) {
+        if (getRawValue) {
+            return fixAspectRatio;
+        } else {
+            if (Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
+                return !fixAspectRatio;
+            } else {
+                return fixAspectRatio;
+            }
+        }
     }
 }

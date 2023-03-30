@@ -160,13 +160,14 @@ public class CustomFloatWidget extends ATypeWidget<Float> {
         PropertyFloatWrapper floatWrapper = (PropertyFloatWrapper) propertyWrapper;
         if (floatWrapper.isRanged) {
             rangeWidget.setValue("RANGE");
-            valueWidget.setValue(floatWrapper.defaultValue);
+            valueWidget.setValue(floatWrapper.value);
             stepWidget.setValue(floatWrapper.step);
             minWidget.setValue(floatWrapper.minValue);
             maxWidget.setValue(floatWrapper.maxValue);
             expand();
         } else {
             rangeWidget.setValue("NORMAL");
+            valueWidget.setValue(floatWrapper.value);
         }
     }
 
@@ -180,6 +181,6 @@ public class CustomFloatWidget extends ATypeWidget<Float> {
             floatPropertyWrapper.maxValue = maxWidget.getValue();
             floatPropertyWrapper.step = stepWidget.getValue();
         }
-        floatPropertyWrapper.defaultValue = valueWidget.getValue();
+        floatPropertyWrapper.value = valueWidget.getValue();
     }
 }

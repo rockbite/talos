@@ -67,7 +67,7 @@ public final class SpriteRendererComponentProvider extends RendererComponentProv
 		fixAspectRatioWidget.addListener(new ChangeListener() {
 			@Override
 			public void changed (ChangeEvent event, Actor actor) {
-				if (!component.fixAspectRatio)
+				if (!component.shouldFixAspectRatio(true))
 					return;
 
 				final AtlasRegion texture = component.getGameResource().getResource();
@@ -86,7 +86,7 @@ public final class SpriteRendererComponentProvider extends RendererComponentProv
 		sizeWidget.addListener(new ChangeListener() {
 			@Override
 			public void changed (ChangeEvent event, Actor actor) {
-				if (!component.fixAspectRatio)
+				if (!component.shouldFixAspectRatio(true))
 					return;
 
 				if (event.getTarget() instanceof ValueWidget) {

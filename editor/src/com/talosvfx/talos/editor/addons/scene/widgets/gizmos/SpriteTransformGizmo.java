@@ -114,7 +114,7 @@ public class SpriteTransformGizmo extends SmartTransformGizmo {
 
 
         // if aspect ratio is fixed set height by width
-        if (spriteRendererComponent.fixAspectRatio) {
+        if (spriteRendererComponent.shouldFixAspectRatio(false)) {
             AtlasRegion texture = spriteRendererComponent.getGameResource().getResource();
 
             if (texture != null) {
