@@ -1,6 +1,8 @@
 package com.talosvfx.talos.runtime;
 
 import com.talosvfx.talos.runtime.assets.BaseAssetRepository;
+import com.talosvfx.talos.runtime.routine.RoutineDefaultEventInterface;
+import com.talosvfx.talos.runtime.routine.RoutineEventInterface;
 import com.talosvfx.talos.runtime.scene.SceneData;
 import com.talosvfx.talos.runtime.utils.ConfigData;
 import lombok.Getter;
@@ -25,5 +27,8 @@ public class RuntimeContext {
 
 	@Getter@Setter
 	public SceneData sceneData;
+
+	@Getter@Setter
+	public RoutineEventInterface routineEventInterface = new RoutineDefaultEventInterface();
 
 }

@@ -41,7 +41,7 @@ public class LayoutRow extends LayoutItem {
 
 			columns.insert(idxRelative, newLayoutContent);
 			if (resize) {
-				takeThirtyPercent(newLayoutContent, idxRelative, left ? idxRelative + 1 : idxRelative - 1);
+				handleSize(newLayoutContent, idxRelative, left ? idxRelative + 1 : idxRelative - 1);
 			}
 
 		} else {
@@ -56,7 +56,7 @@ public class LayoutRow extends LayoutItem {
 					}
 				} else {
 					if (resize) {
-						takeThirtyPercent(newLayoutContent, 0, 1);
+						handleSize(newLayoutContent, 0, 1);
 					}
 				}
 
@@ -69,7 +69,7 @@ public class LayoutRow extends LayoutItem {
 					}
 				} else {
 					if (resize) {
-						takeThirtyPercent(newLayoutContent, 1, 0);
+						handleSize(newLayoutContent, 1, 0);
 					}
 				}
 			}
@@ -85,20 +85,37 @@ public class LayoutRow extends LayoutItem {
 		}
 	}
 
-	private void takeThirtyPercent (LayoutItem newLayoutContent, int thisItemIdx, int otherItemIdx) {
+	private void handleSize (LayoutItem newLayoutContent, int thisItemIdx, int otherItemIdx) {
 		if (otherItemIdx < 0 || otherItemIdx >= columns.size) {
 			//Just give it full width
 			columns.get(thisItemIdx).setRelativeWidth(1f);
+		} else if (newLayoutContent instanceof LayoutContent) {
+			LayoutContent layoutContent = (LayoutContent) newLayoutContent;
+			if (layoutContent.getActiveApp().hasPreferredWidth()) {
+				float preferredWidth = layoutContent.getContentTable().getPrefWidth();
+				LayoutItem otherItem = columns.get(otherItemIdx);
+				if (preferredWidth < totalPixelWidthToDistribute) {
+					float currentRelativePercent = preferredWidth / totalPixelWidthToDistribute;
+					newLayoutContent.setRelativeWidth(currentRelativePercent);
+					otherItem.setRelativeWidth(otherItem.getRelativeWidth() - currentRelativePercent);
+				} else {
+					takeThirtyPercent(newLayoutContent, otherItemIdx);
+				}
+			} else {
+				takeThirtyPercent(newLayoutContent, otherItemIdx);
+			}
 		} else {
-			LayoutItem layoutItem = columns.get(otherItemIdx);
-			float totalRelativeWidth = layoutItem.getRelativeWidth();
-			float totalRelativeSub = totalRelativeWidth * 0.3f;
-
-
-			newLayoutContent.setRelativeWidth(totalRelativeSub);
-			layoutItem.setRelativeWidth(totalRelativeWidth - totalRelativeSub);
+			takeThirtyPercent(newLayoutContent, otherItemIdx);
 		}
+	}
 
+	private void takeThirtyPercent (LayoutItem newLayoutContent, int otherItemIdx) {
+		LayoutItem layoutItem = columns.get(otherItemIdx);
+		float totalRelativeWidth = layoutItem.getRelativeWidth();
+		float totalRelativeSub = totalRelativeWidth * 0.3f;
+
+		newLayoutContent.setRelativeWidth(totalRelativeSub);
+		layoutItem.setRelativeWidth(totalRelativeWidth - totalRelativeSub);
 	}
 
 	@Override

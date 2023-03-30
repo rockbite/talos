@@ -1,5 +1,7 @@
 package com.talosvfx.talos.editor.widgets.ui.gizmos;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
@@ -7,23 +9,31 @@ import com.badlogic.gdx.math.collision.BoundingBox;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.utils.Pools;
 import com.talosvfx.talos.runtime.scene.GameObject;
 import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.Gizmo;
 import com.talosvfx.talos.editor.widgets.ui.ViewportWidget;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 import com.talosvfx.talos.runtime.scene.components.SpriteRendererComponent;
 import com.talosvfx.talos.runtime.scene.components.TransformComponent;
+import lombok.Getter;
 
 import java.util.Comparator;
 
 public class GroupSelectionGizmo extends Gizmo {
 
+	@Getter
 	private final ViewportWidget viewportWidget;
 
 	private BoundingBox selectionBounds = new BoundingBox();
 
 	private ObjectMap<GameObject, Vector2> worldSpaceStartingOffsets = new ObjectMap<>();
 	private Comparator<GameObject> parentHierarchySorter;
+
+	private boolean hasDeterminedDirection = false;
+	private boolean isHorizontalMove = false;
+
+	private Vector2 prevPoint = new Vector2();
 
 	public GroupSelectionGizmo (ViewportWidget widget) {
 		this.viewportWidget = widget;
@@ -63,6 +73,7 @@ public class GroupSelectionGizmo extends Gizmo {
 		super.touchDown(x, y, button);
 
 		worldSpaceStartingOffsets.clear();
+		hasDeterminedDirection = false;
 
 		//Sort the selection by parent hierarchy becuase its impportant to do parents first
 
@@ -78,21 +89,44 @@ public class GroupSelectionGizmo extends Gizmo {
 			}
 		}
 
+		prevPoint.set(x, y);
 	}
 
 	@Override
 	public void touchDragged (float x, float y) {
 		super.touchDragged(x, y);
+		Vector2 tmp = Pools.obtain(Vector2.class);
+
+		if (Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
+			if (!hasDeterminedDirection) {
+				tmp.set(x, y).sub(prevPoint);
+				float x1 = tmp.x;
+				float y1 = tmp.y;
+
+				isHorizontalMove = Math.abs(x1) > Math.abs(y1);
+				hasDeterminedDirection = true;
+			}
+
+			if (isHorizontalMove) {
+				y = prevPoint.y;
+			} else {
+				x = prevPoint.x;
+			}
+		} else {
+			hasDeterminedDirection = false;
+		}
 
 		for (GameObject object : viewportWidget.selection) {
 			if (object.hasComponent(TransformComponent.class)) {
 				Vector2 worldSpaceOffset = worldSpaceStartingOffsets.get(object);
-
 				Vector2 newWorldSpace = new Vector2(x, y).sub(worldSpaceOffset);
 
 				GameObject.setPositionFromWorldPosition(object, newWorldSpace);
 			}
 		}
+
+		prevPoint.set(x, y);
+		Pools.free(tmp);
 	}
 
 	@Override

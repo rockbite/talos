@@ -303,4 +303,14 @@ public class DummyLayoutApp<T> implements LayoutApp {
     public void actInBackground(float delta) {
         // do nothing by default
     }
+
+    @Override
+    public boolean hasPreferredHeight () {
+        return false;
+    }
+
+    @Override
+    public boolean hasPreferredWidth () {
+        return false;
+    }
 }

@@ -311,7 +311,7 @@ public class EightPointGizmo extends Gizmo {
 		if (gameObject.hasComponent(SpriteRendererComponent.class)) {
 			spriteRendererComponent = gameObject.getComponent(SpriteRendererComponent.class);
 			texture = spriteRendererComponent.getGameResource().getResource();
-			keepAspectRatio = spriteRendererComponent.fixAspectRatio && (texture != null);
+			keepAspectRatio = spriteRendererComponent.shouldFixAspectRatio(false) && (texture != null);
 		} else {
 			keepAspectRatio = false;
 			spriteRendererComponent = null;

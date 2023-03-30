@@ -51,6 +51,6 @@ public class CustomVector2Widget extends ATypeWidget<Vector2> {
     @Override
     public void applyValueToWrapper(PropertyWrapper<Vector2> propertyWrapper) {
         vec.set(xWidget.getValue(), yWidget.getValue());
-        propertyWrapper.defaultValue.set(vec);
+        propertyWrapper.value.set(vec);
     }
 }

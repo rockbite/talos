@@ -55,6 +55,7 @@ public class SpriteEditor extends Table {
         currentTab = tab;
         currentTab.spriteEditorTab.setChecked(true);
         contentCell.setActor(editorMenu.getWindow(currentTab));
+        setScrollFocus();
     }
 
     public void updateForGameAsset (GameAsset<AtlasRegion> gameAsset) {
