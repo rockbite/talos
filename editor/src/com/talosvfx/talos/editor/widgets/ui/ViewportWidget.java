@@ -21,7 +21,6 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.PolygonBatch;
@@ -50,6 +49,7 @@ import com.kotcrab.vis.ui.widget.VisLabel;
 import com.kotcrab.vis.ui.widget.VisSelectBox;
 import com.kotcrab.vis.ui.widget.VisTable;
 import com.kotcrab.vis.ui.widget.VisTextField;
+import com.talosvfx.talos.editor.addons.scene.SceneUtils;
 import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.EightPointGizmo;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.render.Render;
@@ -61,7 +61,6 @@ import com.talosvfx.talos.runtime.maps.TalosLayer;
 import com.talosvfx.talos.editor.addons.scene.utils.EntitySelectionBuffer;
 import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.Gizmo;
 import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.GizmoRegister;
-import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.SpriteTransformGizmo;
 import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.TransformGizmo;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.utils.CursorUtil;
@@ -1387,5 +1386,17 @@ public abstract class ViewportWidget extends Table {
 		current = MathUtils.clamp(current, 0, 1); // won't happen, but just in case lol
 		float scale = Interpolation.slowFast.apply(0.0025f,1, current);
 		return scale;
+	}
+
+	public void moveSelectedObjectsByPixels (float x, float y) {
+		for (GameObject gameObject : selection) {
+			if (gameObject.hasComponent(TransformComponent.class)) {
+				TransformComponent component = gameObject.getComponent(TransformComponent.class);
+				float worldSizeX = Math.signum(x) * pixelToWorld(x);
+				float worldSizeY = Math.signum(y) * pixelToWorld(y);
+				component.position.add(worldSizeX, worldSizeY);
+				SceneUtils.componentUpdated(gameObject.getGameObjectContainerRoot(), gameObject, component);
+			}
+		}
 	}
 }

@@ -25,6 +25,10 @@ public class CommandParser {
         customKeyNames.put("FORWARD_DEL", Input.Keys.FORWARD_DEL);
         customKeyNames.put("ESCAPE", Input.Keys.ESCAPE);
         customKeyNames.put("BACK", Input.Keys.BACK);
+        customKeyNames.put("LEFT", Input.Keys.LEFT);
+        customKeyNames.put("RIGHT", Input.Keys.RIGHT);
+        customKeyNames.put("UP", Input.Keys.UP);
+        customKeyNames.put("DOWN", Input.Keys.DOWN);
     }
 
     public void parseCommands(FileHandle file) {
