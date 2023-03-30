@@ -98,49 +98,49 @@
         </command>
     </commandGroup>
     <commandGroup package="Transform">
-        <command name="Left" uniqueName="moveLeft" description="">
+        <command name="Left" uniqueName="move_left_command" description="">
             <context>FOCUSED</context>
             <combination type="keyboard" repeat="true">
                 LEFT
             </combination>
         </command>
-        <command name="Jumpy Left" uniqueName="moveJumpyLeft" description="">
+        <command name="Jumpy Left" uniqueName="move_jumpy_left_command" description="">
             <context>FOCUSED</context>
             <combination type="keyboard" repeat="true">
                 SHIFT LEFT
             </combination>
         </command>
-        <command name="Right" uniqueName="moveRight" description="">
+        <command name="Right" uniqueName="move_right_command" description="">
             <context>FOCUSED</context>
             <combination type="keyboard" repeat="true">
                 RIGHT
             </combination>
         </command>
-        <command name="Jumpy right" uniqueName="moveJumpyRight" description="">
+        <command name="Jumpy right" uniqueName="move_jumpy_right_command" description="">
             <context>FOCUSED</context>
             <combination type="keyboard" repeat="true">
                 SHIFT RIGHT
             </combination>
         </command>
-        <command name="Up" uniqueName="moveUp" description="">
+        <command name="Up" uniqueName="move_up_command" description="">
             <context>FOCUSED</context>
             <combination type="keyboard" repeat="true">
                 UP
             </combination>
         </command>
-        <command name="Jumpy up" uniqueName="moveJumpyUp" description="">
+        <command name="Jumpy up" uniqueName="move_jumpy_up_command" description="">
             <context>FOCUSED</context>
             <combination type="keyboard" repeat="true">
                 SHIFT UP
             </combination>
         </command>
-        <command name="Down" uniqueName="moveDown" description="">
+        <command name="Down" uniqueName="move_down_command" description="">
             <context>FOCUSED</context>
             <combination type="keyboard" repeat="true">
                 DOWN
             </combination>
         </command>
-        <command name="Jumpy Down" uniqueName="moveJumpyDown" description="">
+        <command name="Jumpy Down" uniqueName="move_jumpy_down_command" description="">
             <context>FOCUSED</context>
             <combination type="keyboard" repeat="true">
                 SHIFT DOWN
