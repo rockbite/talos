@@ -1395,8 +1395,8 @@ public abstract class ViewportWidget extends Table {
 				float worldSizeX = Math.signum(x) * pixelToWorld(x);
 				float worldSizeY = Math.signum(y) * pixelToWorld(y);
 				component.position.add(worldSizeX, worldSizeY);
-				SceneUtils.componentUpdated(gameObject.getGameObjectContainerRoot(), gameObject, component);
 			}
 		}
+		SceneUtils.componentBatchUpdated(selection.orderedItems().get(0).getGameObjectContainerRoot(), selection.orderedItems(), TransformComponent.class, false);
 	}
 }
