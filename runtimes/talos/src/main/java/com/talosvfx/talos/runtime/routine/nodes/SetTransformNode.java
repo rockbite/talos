@@ -17,9 +17,11 @@ public class SetTransformNode extends RoutineNode {
     public void receiveSignal(String portName) {
 
         GameObject go = (GameObject) routineInstanceRef.getSignalPayload();
-        if(go != null) {
+        if (go != null) {
             TransformComponent component = go.getComponent(TransformComponent.class);
-
+            if (component == null) {
+                return;
+            }
             diff.set(component.position);
 
             component.position.x = fetchFloatValue("x");
