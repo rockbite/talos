@@ -20,8 +20,6 @@ public class ScenePreviewApp extends AppManager.BaseApp<Scene> implements GameAs
     private final ScenePreviewStage workspaceWidget;
 
     public ScenePreviewApp() {
-        this.singleton = true;
-
         Notifications.registerObserver(this);
 
         workspaceWidget = new ScenePreviewStage();

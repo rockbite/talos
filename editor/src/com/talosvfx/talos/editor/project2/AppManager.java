@@ -151,7 +151,8 @@ public class AppManager extends InputAdapter implements Observer {
 		// todo: write this
 		Array<BaseApp> appInstances = getAppInstances();
 		for(BaseApp app: appInstances) {
-			if(!app.singleton) {
+			SingletonApp annotation = app.getClass().getAnnotation(SingletonApp.class);
+			if(annotation == null) {
 				continue;
 			}
 			if(app.getClass().equals(appClass)) {
@@ -199,8 +200,6 @@ public class AppManager extends InputAdapter implements Observer {
 	//Grid layout needs to be able to be setup with layout specific in mind
 
 	public abstract static class BaseApp<T> implements EventContextProvider<BaseApp<T>> {
-		protected boolean singleton;
-
 		@Getter
 		protected LayoutApp gridAppReference;
 

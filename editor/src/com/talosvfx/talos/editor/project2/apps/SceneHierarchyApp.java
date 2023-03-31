@@ -21,9 +21,6 @@ public class SceneHierarchyApp extends AppManager.BaseApp<Scene> implements Game
 	private final HierarchyWidget hierarchyWidget;
 
 	public SceneHierarchyApp () {
-		this.singleton = true;
-
-
 		hierarchyWidget = new HierarchyWidget();
 		DummyLayoutApp<Scene> hierarchyApp = new DummyLayoutApp<Scene>(SharedResources.skin, this, getAppName()) {
 			@Override

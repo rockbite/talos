@@ -66,7 +66,6 @@ public class ParticleNodeEditorApp extends AppManager.BaseApp<VFXProjectData> im
 	private VFXEditorState editorState;
 
 	public ParticleNodeEditorApp () {
-		this.singleton = false;
 		Notifications.registerObserver(this);
 
 		moduleBoardWidget = new ModuleBoardWidget(this);

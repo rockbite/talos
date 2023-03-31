@@ -29,8 +29,6 @@ public class SceneEditorApp extends AppManager.BaseApp<Scene> implements GameAss
 	private static final Logger logger = LoggerFactory.getLogger(SceneEditorApp.class);
 
 	public SceneEditorApp () {
-		this.singleton = true;
-
 		Notifications.registerObserver(this);
 		workspaceWidget = new SceneEditorWorkspace(this);
 		workspaceWidget.disableListeners();

@@ -228,4 +228,8 @@ public class GroupSelectionGizmo extends Gizmo {
 	public int getPriority () {
 		return -1;
 	}
+
+	public Array<GameObject> getGameObjects() {
+		return worldSpaceStartingOffsets.keys().toArray();
+	}
 }

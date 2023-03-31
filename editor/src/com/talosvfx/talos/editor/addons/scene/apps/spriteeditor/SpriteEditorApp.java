@@ -15,7 +15,6 @@ public class SpriteEditorApp extends AppManager.BaseApp<AtlasRegion> {
     private final SpriteEditor spriteEditor;
 
     public SpriteEditorApp () {
-        this.singleton = true;
 
         spriteEditor = new SpriteEditor();
         DummyLayoutApp<AtlasRegion> spriteEditorApp = new DummyLayoutApp<AtlasRegion>(SharedResources.skin, this, getAppName()) {

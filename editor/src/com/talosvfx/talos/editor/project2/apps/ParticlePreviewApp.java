@@ -23,7 +23,6 @@ public class ParticlePreviewApp extends AppManager.BaseApp<VFXProjectData> imple
 	private Preview3D preview3D;
 
 	public ParticlePreviewApp () {
-		this.singleton = false;
 
 		preview3D = new Preview3D();
 

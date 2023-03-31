@@ -20,8 +20,6 @@ public class ProjectExplorerApp extends AppManager.BaseApp<Object> implements Co
 	private final ProjectExplorerWidget projectExplorerWidget;
 
 	public ProjectExplorerApp () {
-		this.singleton = true;
-
 		super.updateForGameAsset(gameAsset);
 
 		projectExplorerWidget = new ProjectExplorerWidget();
