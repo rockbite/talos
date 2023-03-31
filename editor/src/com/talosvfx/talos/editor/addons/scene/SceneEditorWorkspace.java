@@ -30,6 +30,7 @@ import com.talosvfx.talos.editor.addons.scene.logic.IPropertyHolder;
 import com.talosvfx.talos.editor.addons.scene.logic.MultiPropertyHolder;
 import com.talosvfx.talos.editor.addons.scene.logic.PropertyWrapperProviders;
 import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.CurveGizmo;
+import com.talosvfx.talos.editor.widgets.ui.gizmos.GroupSelectionGizmo;
 import com.talosvfx.talos.runtime.RuntimeContext;
 import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.runtime.assets.GameAssetType;
@@ -1200,6 +1201,9 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		Vector3 touchToLocal = getTouchToWorld(Gdx.input.getX(), Gdx.input.getY());
 		if (!selection.isEmpty()) {
 			for (GameObject gameObject : selection) {
+				if (!gameObject.isEditorVisible()) {
+					continue;
+				}
 				Gizmo gizmo = hitGizmoGameObject(touchToLocal.x, touchToLocal.y, gameObject);
 				if (gizmo != null) {
 					return false;
@@ -1213,12 +1217,31 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 			return true;
 		}
 
+
 		if (entityUnderMouse != null && entityUnderMouse.isEditorTransformLocked()) {
 			return true;
 		}
 
-		if (gizmo != null && !gizmo.getGameObject().isEditorTransformLocked()) {
-			return false;
+		if (gizmo != null) {
+			// This is for the case when the object is not editor visible, and you drag from it
+			if (entityUnderMouse == null) {
+				if (gizmo instanceof GroupSelectionGizmo) {
+					GroupSelectionGizmo groupSelectionGizmo = (GroupSelectionGizmo) gizmo;
+					for (GameObject gameObject : groupSelectionGizmo.getGameObjects()) {
+						if (!gameObject.isEditorVisible() || gameObject.isEditorTransformLocked()) {
+							return true;
+						}
+					}
+				}
+			} else {
+				if (gizmo instanceof GroupSelectionGizmo) {
+
+				} else {
+					if (!gizmo.getGameObject().isEditorVisible() || gizmo.getGameObject().isEditorTransformLocked()) {
+						return true;
+					}
+				}
+			}
 		}
 
 		return false;

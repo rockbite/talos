@@ -22,8 +22,6 @@ public class EmitterTimelineApp extends AppManager.BaseApp<VFXProjectData> imple
     private EmitterList emitterList;
 
     public EmitterTimelineApp() {
-        singleton = true;
-
         Notifications.registerObserver(this);
 
         emitterList = new EmitterList(SharedResources.skin);

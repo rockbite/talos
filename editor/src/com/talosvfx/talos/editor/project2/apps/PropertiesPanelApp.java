@@ -20,8 +20,6 @@ public class PropertiesPanelApp extends AppManager.BaseApp<Object> implements Ob
 	private final SEPropertyPanel propertyPanel;
 
 	public PropertiesPanelApp () {
-		this.singleton = true;
-
 		propertyPanel = new SEPropertyPanel();
 		DummyLayoutApp<Object> propertyPanelApp = new DummyLayoutApp<Object>(SharedResources.skin, this, getAppName()) {
 			@Override

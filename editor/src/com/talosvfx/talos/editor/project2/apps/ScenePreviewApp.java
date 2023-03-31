@@ -14,14 +14,14 @@ import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.runtime.scene.Scene;
 import lombok.Getter;
 
+
+@SingletonApp
 public class ScenePreviewApp extends AppManager.BaseApp<Scene> implements GameAsset.GameAssetUpdateListener, Observer, ContainerOfPrefs<ViewportPreferences> {
 
     @Getter
     private final ScenePreviewStage workspaceWidget;
 
     public ScenePreviewApp() {
-        this.singleton = true;
-
         Notifications.registerObserver(this);
 
         workspaceWidget = new ScenePreviewStage();
