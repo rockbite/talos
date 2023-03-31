@@ -1313,10 +1313,6 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		return fullPath.replace(projectFullPath, "").substring(1);
 	}
 
-
-
-
-
 	public Array<SceneLayer> getLayerList () {
 		SceneData sceneData = SharedResources.currentProject.getSceneData();
 
@@ -1349,7 +1345,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 			}
 
 			if (!foundLayer) {
-				component.setSortingLayer(GameObjectRenderer.DEFAULT_SCENE_LAYER);
+				component.setSortingLayer(SharedResources.currentProject.getSceneData().getPreferredSceneLayer());
 			}
 		}
 	}

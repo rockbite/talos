@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.PolygonBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.GdxRuntimeException;
+import com.talosvfx.talos.runtime.RuntimeContext;
 import com.talosvfx.talos.runtime.scene.components.MapComponent;
 import com.talosvfx.talos.runtime.scene.components.ParticleComponent;
 import com.talosvfx.talos.runtime.scene.components.RendererComponent;
@@ -27,9 +28,6 @@ import lombok.Getter;
 import java.util.Comparator;
 
 public class GameObjectRenderer {
-
-	public static SceneLayer DEFAULT_SCENE_LAYER = new SceneLayer("Default", 0);
-
 	private ComponentRenderer<SpriteRendererComponent> spriteRenderer;
 	private ComponentRenderer<MapComponent> mapRenderer;
 	private ComponentRenderer<ParticleComponent<?>> particleRenderer;
@@ -134,7 +132,8 @@ public class GameObjectRenderer {
 			RendererComponent rendererComponent = gameObject.getComponentAssignableFrom(RendererComponent.class);
 			return rendererComponent.sortingLayer;
 		}
-		return DEFAULT_SCENE_LAYER;
+
+		return RuntimeContext.getInstance().sceneData.getPreferredSceneLayer();
 	}
 
 	public static float getDrawOrderSafe (GameObject gameObject) {
@@ -142,6 +141,7 @@ public class GameObjectRenderer {
 			RendererComponent rendererComponent = gameObject.getComponentAssignableFrom(RendererComponent.class);
 			return rendererComponent.orderingInLayer;
 		}
+
 		return -55;
 	}
 

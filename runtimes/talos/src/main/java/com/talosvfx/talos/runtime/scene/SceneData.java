@@ -5,7 +5,6 @@ import lombok.Data;
 
 @Data
 public class SceneData {
-
 	private Array<SceneLayer> renderLayers = new Array<>(new SceneLayer[]{
 			new SceneLayer("Default", 0),
 			new SceneLayer("UI", 1),
@@ -24,13 +23,21 @@ public class SceneData {
 		return null;
 	}
 
-	public void setPreferredSceneLayer(String sceneLayer){
+
+	public void setPreferredSceneLayer (String sceneLayer){
 		preferredSceneLayer = getSceneLayerByName(sceneLayer);
 	}
 
 	public SceneLayer getPreferredSceneLayer(){
-		if(preferredSceneLayer == null)
-			return getSceneLayerByName("Default");
+		if (preferredSceneLayer == null) {
+			SceneLayer defaultLayer = getSceneLayerByName("Default");
+			if (defaultLayer == null) {
+				return renderLayers.first();
+			} else {
+				return defaultLayer;
+			}
+		}
+
 		return preferredSceneLayer;
 	}
 }

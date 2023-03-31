@@ -4,11 +4,11 @@ package com.talosvfx.talos.runtime.scene;
 import com.talosvfx.talos.runtime.scene.render.RenderStrategy;
 import lombok.Data;
 
+import java.util.UUID;
+
 @Data
 public class SceneLayer {
-
-    public static SceneLayer DEFAULT_SCENE_LAYER = new SceneLayer("Default", 0);
-
+    private UUID uniqueID;
     private String name;
     private int index;
 
@@ -17,9 +17,16 @@ public class SceneLayer {
     public SceneLayer(String name, int index) {
         this.name = name;
         this.index = index;
+        this.uniqueID = UUID.randomUUID();
+    }
+
+    public SceneLayer(String name, int index, UUID uniqueID) {
+        this.name = name;
+        this.index = index;
+        this.uniqueID = uniqueID;
     }
 
     public SceneLayer() {
-
+        uniqueID = UUID.randomUUID();
     }
 }
