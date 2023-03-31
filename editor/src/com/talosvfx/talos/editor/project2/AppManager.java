@@ -407,12 +407,7 @@ public class AppManager extends InputAdapter implements Observer {
 		for (BaseApp<T> baseApp : appsToUpdate) {
 			if (baseApp.getGameAsset() != gameAsset) {
 				//Need to swap in the registry
-				if (baseApp.getGameAsset() != dummyAsset) {
-					logger.warn("Probably should never happen, be careful of this case");
-				} else {
-					swapInRegistry(baseApp, gameAsset);
-				}
-
+				swapInRegistry(baseApp, gameAsset);
 			}
 			baseApp.updateForGameAsset(gameAsset);
 		}
@@ -528,7 +523,21 @@ public class AppManager extends InputAdapter implements Observer {
 	}
 
 	private <T, U extends BaseApp<T>> Array<U> getAppsToUpdate (GameAsset<T> gameAsset) {
-		Array<U> appsToUpdate = new Array<>();
+		ObjectSet<U> appsToUpdate = new ObjectSet<>();
+
+		if (gameAsset != dummyAsset && gameAsset != singletonAsset) {
+			for (ObjectMap.Entry<GameAsset<?>, Array<? extends BaseApp<?>>> assetArrayEntry : baseAppsOpenForGameAsset) {
+				GameAsset<?> asset = assetArrayEntry.key;
+				if (asset.type.equals(gameAsset.type)) {
+					Array<U> appsArray = (Array<U>) assetArrayEntry.value;
+					for (U app : appsArray) {
+						if (app.getClass().getAnnotation(SingletonApp.class) != null) {
+							appsToUpdate.add(app);
+						}
+					}
+				}
+			}
+		}
 
 		if (baseAppsOpenForGameAsset.containsKey(gameAsset)) {
 			//Unsafe type
@@ -555,7 +564,7 @@ public class AppManager extends InputAdapter implements Observer {
 		}
 
 
-		return appsToUpdate;
+		return appsToUpdate.iterator().toArray();
 	}
 
 	private <T, U extends BaseApp<T>> U createBaseAppForGameAsset (GameAsset<T> gameAsset, Class<U> aClass) {
@@ -577,15 +586,6 @@ public class AppManager extends InputAdapter implements Observer {
 		Array<U> baseAppsToCreate = new Array<>();
 
 		for (Class<U> aClass : appsForGameAssetType) {
-			//Check if we have one open in openApps
-			boolean singleton = false;
-
-			if (aClass.isAnnotationPresent(SingletonApp.class)) {
-				singleton = true;
-			}
-
-			//todo do something with singleton
-
 			boolean shouldSkip = false;
 			for (int i = 0; i < openApps.size; i++) {
 				U baseApp = openApps.get(i);
