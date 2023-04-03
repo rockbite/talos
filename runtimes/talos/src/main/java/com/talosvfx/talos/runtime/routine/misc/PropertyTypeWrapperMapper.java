@@ -15,6 +15,7 @@ public class PropertyTypeWrapperMapper {
 		wrapperMap.put(PropertyType.ASSET, PropertyGameAssetWrapper.class);
 		wrapperMap.put(PropertyType.BOOLEAN, PropertyBooleanWrapper.class);
 		wrapperMap.put(PropertyType.STRING, PropertyStringWrapper.class);
+		wrapperMap.put(PropertyType.GAME_OBJECT, PropertyGameObjectWrapper.class);
 	}
 	public static Class<? extends PropertyWrapper> getWrapperForPropertyType (PropertyType propertyType) {
 		return wrapperMap.get(propertyType);

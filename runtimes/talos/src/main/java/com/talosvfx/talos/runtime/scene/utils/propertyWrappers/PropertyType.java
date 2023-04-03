@@ -8,7 +8,6 @@ public enum PropertyType {
     COLOR,
     ASSET,
     BOOLEAN,
-    STRING;
-    //GAME_OBJECT();
-
+    STRING,
+    GAME_OBJECT;
 }
