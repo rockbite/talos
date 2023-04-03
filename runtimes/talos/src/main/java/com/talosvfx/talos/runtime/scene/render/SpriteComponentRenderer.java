@@ -43,9 +43,13 @@ public class SpriteComponentRenderer extends ComponentRenderer<SpriteRendererCom
 			if (resource.getMagFilter() != metadata.magFilter || resource.getMinFilter() != metadata.minFilter) {
 				resource.setFilter(metadata.minFilter, metadata.magFilter);
 			}
-			textureRegion.setRegion(resource);
-			if(textureRegion != null) {
-				textureRegion.flip(rendererComponent.flipX, rendererComponent.flipY);
+
+			if (textureRegion.getTexture() == null || !textureRegion.getTexture().equals(resource)) {
+				textureRegion.setRegion(resource);
+			}
+
+			if (textureRegion != null) {
+				textureRegion.flip(textureRegion.isFlipX() != rendererComponent.flipX, textureRegion.isFlipY() != rendererComponent.flipY);
 				batch.setColor(spriteRenderer.finalColor);
 
 				final float width = spriteRenderer.size.x;
