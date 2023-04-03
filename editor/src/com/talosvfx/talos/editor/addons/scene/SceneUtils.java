@@ -27,6 +27,7 @@ import com.talosvfx.talos.editor.project2.TalosProjectData;
 import com.talosvfx.talos.editor.project2.apps.ProjectExplorerApp;
 import com.talosvfx.talos.editor.project2.apps.SceneEditorApp;
 import com.talosvfx.talos.editor.serialization.VFXProjectData;
+import com.talosvfx.talos.runtime.scene.components.*;
 import com.talosvfx.talos.runtime.utils.NamingUtils;
 import com.talosvfx.talos.editor.utils.Toasts;
 import com.talosvfx.talos.runtime.scene.GameObject;
@@ -34,12 +35,6 @@ import com.talosvfx.talos.runtime.scene.GameObjectContainer;
 import com.talosvfx.talos.runtime.scene.Prefab;
 import com.talosvfx.talos.runtime.scene.SavableContainer;
 import com.talosvfx.talos.runtime.scene.Scene;
-import com.talosvfx.talos.runtime.scene.components.AComponent;
-import com.talosvfx.talos.runtime.scene.components.MapComponent;
-import com.talosvfx.talos.runtime.scene.components.ParticleComponent;
-import com.talosvfx.talos.runtime.scene.components.SpineRendererComponent;
-import com.talosvfx.talos.runtime.scene.components.SpriteRendererComponent;
-import com.talosvfx.talos.runtime.scene.components.TransformComponent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -187,6 +182,11 @@ public class SceneUtils {
 					//Add a layer also
 					TalosLayer layer = new TalosLayer("NewLayer");
 					((MapComponent)component).getLayers().add(layer);
+				}
+				if (component instanceof CurveComponent) {
+					final SceneEditorApp currentApp = SharedResources.appManager.getSingletonAppInstance(SceneEditorApp.class);
+					final Supplier<Camera> currentCameraSupplier = currentApp.getWorkspaceWidget().getViewportViewSettings().getCurrentCameraSupplier();
+					((CurveComponent) component).scale(currentCameraSupplier.get().viewportWidth / 10);
 				}
 
 			} catch (Exception e) {
