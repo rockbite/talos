@@ -315,15 +315,21 @@ public class CustomVarWidget<T> extends AbstractWidget<T> {
         fieldContainer.setBackground(ColorLibrary.obtainBackground(getSkin(), ColorLibrary.SHAPE_SQUARE, color));
     }
 
-    public void setFieldName(String text) {
+    public void setFieldName(String newName) {
         String oldName = propertyWrapper.propertyName;
 
-        fieldNameLabel.setText(text);
-        fieldNameTextField.setText(text);
+        if (!fieldNameLabel.getText().equals(newName) || !fieldNameTextField.getText().equals(newName)) {
+            fieldNameLabel.setText(newName);
+            fieldNameTextField.setText(newName);
+        }
 
-        propertyWrapper.propertyName = text;
+        if (newName.equals(oldName)) {
+            // same newName
+            return;
+        }
+        propertyWrapper.propertyName = newName;
 
-        fireNameChangedEvent(oldName, text, false);
+        fireNameChangedEvent(oldName, newName, false);
     }
 
     protected void fireValueChangedEvent(boolean isFastChange) {

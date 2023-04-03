@@ -30,7 +30,6 @@ public class PropertyStringWrapper extends PropertyWrapper<String> {
 
     @Override
     public PropertyType getType() {
-        // TODO: 12/23/2022 IMPLEMENT TYPE
-        return null;
+        return PropertyType.STRING;
     }
 }
