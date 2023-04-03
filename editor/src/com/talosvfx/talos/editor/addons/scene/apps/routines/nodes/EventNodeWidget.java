@@ -53,6 +53,7 @@ public class EventNodeWidget extends RoutineNodeWidget {
                         .addItem("Boolean", PropertyType.BOOLEAN)
                         .addItem("Color", PropertyType.COLOR)
                         .addItem("Asset", PropertyType.ASSET)
+                        .addItem("String", PropertyType.STRING)
                         .onClick(type -> {
                             PropertyWrapper<?> newPropertyWrapper = createNewPropertyWrapper(type);
                             newPropertyWrapper.isCollapsed = false; // make open by default
@@ -162,12 +163,12 @@ public class EventNodeWidget extends RoutineNodeWidget {
 
                 @Override
                 public void nameChanged(CustomVarChangeEvent event, Actor actor, String oldName, String newName, boolean isFastChange) {
-                    if (newName.equals(oldName)) {
-                        return;
-                    }
                     NodeBoard.NodeConnection connection = nodeBoard.findConnection(EventNodeWidget.this, true, oldName);
-                    nodeBoard.removeConnection(connection, false);
-                    nodeBoard.addConnectionCurve(connection.fromNode, connection.toNode, connection.fromId, newName);
+                    if (connection != null) {
+                        // update wires
+                        nodeBoard.removeConnection(connection, false);
+                        nodeBoard.addConnectionCurve(connection.fromNode, connection.toNode, connection.fromId, newName);
+                    }
                     reportNodeDataModified(isFastChange);
                 }
 
