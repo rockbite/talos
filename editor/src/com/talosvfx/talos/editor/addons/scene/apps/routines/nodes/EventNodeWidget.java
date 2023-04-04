@@ -54,6 +54,7 @@ public class EventNodeWidget extends RoutineNodeWidget {
                         .addItem("Color", PropertyType.COLOR)
                         .addItem("Asset", PropertyType.ASSET)
                         .addItem("String", PropertyType.STRING)
+                        .addItem("GameObject", PropertyType.GAME_OBJECT)
                         .onClick(type -> {
                             PropertyWrapper<?> newPropertyWrapper = createNewPropertyWrapper(type);
                             newPropertyWrapper.isCollapsed = false; // make open by default
