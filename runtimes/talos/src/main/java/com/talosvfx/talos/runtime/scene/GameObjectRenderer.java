@@ -269,6 +269,10 @@ public class GameObjectRenderer {
 
 
 	public void renderObject (Batch batch, GameObject gameObject) {
+		if (gameObject.hasComponent(RoutineRendererComponent.class)) {
+			routineRenderer.render(batch, camera, gameObject, gameObject.getComponent(RoutineRendererComponent.class));
+		}
+
 		if (gameObject.hasComponent(SpriteRendererComponent.class)) {
 			spriteRenderer.render(batch, camera, gameObject, gameObject.getComponent(SpriteRendererComponent.class));
 		} else if (gameObject.hasComponent(ParticleComponent.class)) {
@@ -277,9 +281,8 @@ public class GameObjectRenderer {
 			spineRenderer.render(batch, camera, gameObject, gameObject.getComponent(SpineRendererComponent.class));
 		} else if (gameObject.hasComponent(MapComponent.class)) {
 			mapRenderer.render(batch, camera, gameObject, gameObject.getComponent(MapComponent.class));
-		} else if (gameObject.hasComponent(RoutineRendererComponent.class)) {
-			routineRenderer.render(batch, camera, gameObject, gameObject.getComponent(RoutineRendererComponent.class));
 		}
+
 	}
 	public void buildRenderStateAndRender (PolygonBatch batch, Camera camera, RenderState state, GameObject root) {
 		temp.clear();

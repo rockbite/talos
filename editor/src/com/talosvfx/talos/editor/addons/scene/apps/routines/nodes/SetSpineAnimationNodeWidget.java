@@ -32,12 +32,21 @@ public class SetSpineAnimationNodeWidget extends AbstractRoutineNodeWidget {
         Table container = getCustomContainer("animation_list");
         container.add(selectBox).growX().row();
 
+
         GameAssetWidget reference = (GameAssetWidget)getWidget("reference");
 
         reference.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 loadList(reference);
+            }
+        });
+
+        selectBox.addListener(new ChangeListener() {
+            @Override
+            public void changed (ChangeEvent event, Actor actor) {
+                reportNodeDataModified(false);
+//                inputs.get("animation").valueOverride = properties.getString("animation");
             }
         });
     }

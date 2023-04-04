@@ -8,6 +8,7 @@ import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.talosvfx.talos.runtime.RuntimeContext;
 import com.talosvfx.talos.runtime.routine.RoutineInstance;
 import com.talosvfx.talos.runtime.routine.RoutineNode;
+import com.talosvfx.talos.runtime.scene.GameObject;
 import com.talosvfx.talos.runtime.scene.utils.propertyWrappers.PropertyType;
 import com.talosvfx.talos.runtime.scene.utils.propertyWrappers.PropertyWrapper;
 
