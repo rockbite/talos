@@ -130,7 +130,7 @@ public class RoutineInstance implements Pool.Poolable, RoutineEventListener {
     }
 
     @Override
-    public void addListener(RoutineEventInterface routineEventInterface) {
+    public void addNodeEventListener(RoutineEventInterface routineEventInterface) {
         routineEventListeners.add(routineEventInterface);
     }
 

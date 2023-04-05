@@ -495,7 +495,7 @@ public class GameObject implements GameObjectContainer, RoutineEventListener, Js
     }
 
     @Override
-    public void addListener(RoutineEventInterface routineEventInterface) {
+    public void addNodeEventListener(RoutineEventInterface routineEventInterface) {
         routineEventListeners.add(routineEventInterface);
     }
 }

@@ -6,5 +6,5 @@ import com.talosvfx.talos.runtime.scene.utils.propertyWrappers.PropertyWrapper;
 public interface RoutineEventListener {
     void onEventFromRoutines(String eventName, Array<PropertyWrapper<?>> propertyWrappers);
 
-    void addListener(RoutineEventInterface routineEventInterface);
+    void addNodeEventListener(RoutineEventInterface routineEventInterface);
 }
