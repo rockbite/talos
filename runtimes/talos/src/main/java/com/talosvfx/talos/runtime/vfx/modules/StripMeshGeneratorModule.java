@@ -1,6 +1,7 @@
 package com.talosvfx.talos.runtime.vfx.modules;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
@@ -117,6 +118,26 @@ public class StripMeshGeneratorModule extends MeshGeneratorModule {
 	@Override
 	public void render (ParticleRenderer particleRenderer, MaterialModule materialModule, Array<ParticlePointGroup> groupData) {
 
+		float BASEU = 0;
+		float BASEU2 = 1f;
+		float BASEV = 0f;
+		float BASEV2 = 1f;
+
+		if (materialModule instanceof SpriteMaterialModule) {
+			TextureRegion textureRegion = ((SpriteMaterialModule)materialModule).getTextureRegion();
+			BASEU = textureRegion.getU();
+			BASEU2 = textureRegion.getU2();
+			BASEV = textureRegion.getV();
+			BASEV2 = textureRegion.getV2();
+		}
+
+		float UVWIDTH = BASEU2 - BASEU;
+		float VHEIGHT = BASEV2 - BASEV;
+
+		float HALFU = UVWIDTH/2f;
+		float HALFV = VHEIGHT/2f;
+
+
 		for (int i = 0; i < groupData.size; i++) {
 			ParticlePointGroup particlePointGroup = groupData.get(i);
 
@@ -161,10 +182,11 @@ public class StripMeshGeneratorModule extends MeshGeneratorModule {
 
 				//get uvs from material
 
-				float U = scaleU;
+				float U = BASEU + (UVWIDTH * scaleU * progression);
 
-				float leftBaseV = 0.5f + (0.5f * scaleV);
-				float rightBaseV = 0.5f - (0.5f * scaleV);
+				float MIDV = BASEV + VHEIGHT * 0.5f;
+				float leftBaseV = MIDV + (HALFV * scaleV);
+				float rightBaseV = MIDV - (HALFV * scaleV);
 
 				forward.setZero();
 				if (j < pointData.size - 1) {
