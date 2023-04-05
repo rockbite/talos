@@ -738,9 +738,11 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 	}
 
 	private void collectDependentGameResources (GameObject selfObject, ObjectSet<String> uuids) {
-		if (selfObject.hasComponentType(GameResourceOwner.class)) {
-			GameResourceOwner gameResourceOwner = selfObject.getComponentAssignableFrom(GameResourceOwner.class);
-			uuids.add(gameResourceOwner.getGameResource().getRootRawAsset().metaData.uuid.toString());
+		for (AComponent component : selfObject.getComponents()) {
+			if (component instanceof GameResourceOwner) {
+				GameResourceOwner gameResourceOwner = (GameResourceOwner) component;
+				uuids.add(gameResourceOwner.getGameResource().getRootRawAsset().metaData.uuid.toString());
+			}
 		}
 		Array<GameObject> gameObjects = selfObject.getGameObjects();
 		for (int i = 0; i < gameObjects.size; i++) {
