@@ -1181,6 +1181,8 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		event.newName = finalName;
 
 		Notifications.fireEvent(event);
+
+		SceneUtils.markContainerChanged(container);
 	}
 
 	@Override
