@@ -13,7 +13,6 @@ import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.XmlReader;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
-import com.talosvfx.talos.editor.addons.scene.logic.IPropertyHolder;
 import com.talosvfx.talos.editor.nodes.widgets.*;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.events.dynamicnodestage.NodeDataModifiedEvent;
@@ -591,6 +590,10 @@ public abstract class NodeWidget extends EmptyWindow implements Json.Serializabl
 
     public AbstractWidget getWidget(String key) {
         return widgetMap.get(key);
+    }
+
+    public ObjectMap<String, AbstractWidget> getWidgetMap () {
+        return widgetMap;
     }
 
     public ButtonWidget getButton(String key) {

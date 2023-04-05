@@ -28,6 +28,9 @@ import com.esotericsoftware.spine.SkeletonData;
 import com.talosvfx.talos.editor.addons.scene.events.*;
 import com.talosvfx.talos.editor.addons.scene.events.meta.MetaDataReloadedEvent;
 import com.talosvfx.talos.editor.addons.scene.events.explorer.DirectoryMovedEvent;
+import com.talosvfx.talos.editor.nodes.NodeWidget;
+import com.talosvfx.talos.editor.nodes.widgets.AbstractWidget;
+import com.talosvfx.talos.editor.nodes.widgets.GameAssetWidget;
 import com.talosvfx.talos.editor.notifications.events.ProjectUnloadEvent;
 import com.talosvfx.talos.editor.serialization.EmitterData;
 import com.talosvfx.talos.editor.wrappers.ModuleWrapper;
@@ -705,6 +708,22 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 			GameObjectContainer container = castedGameAsset.getResource();
 			GameObject selfObject = container.getSelfObject();
 			collectDependentGameResources(selfObject, uuids);
+		}
+
+		if (gameAsset.type == GameAssetType.ROUTINE) {
+			GameAsset<RoutineStageData> routineStageDataGameAsset = (GameAsset<RoutineStageData>)gameAsset;
+			Array<NodeWidget> nodes = routineStageDataGameAsset.getResource().getNodes();
+			for (NodeWidget node : nodes) {
+				ObjectMap<String, AbstractWidget> widgetMap = node.getWidgetMap();
+				for (ObjectMap.Entry<String, AbstractWidget> stringAbstractWidgetEntry : widgetMap) {
+					AbstractWidget widget = stringAbstractWidgetEntry.value;
+					if (widget instanceof GameAssetWidget) {
+						GameAssetWidget<?> gameAssetWidget = (GameAssetWidget<?>) widget;
+						GameAsset<?> value = gameAssetWidget.getValue();
+						uuids.add(value.getRootRawAsset().metaData.uuid.toString());
+					}
+				}
+			}
 		}
 
 		return uuids;
