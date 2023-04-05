@@ -75,7 +75,7 @@ public class SetSpineAnimationNode extends RoutineNode {
 
                 if (clearTrack) {
                     animationState.clearTrack(track);
-                    component.skeleton.setBonesToSetupPose();
+                    animationState.setEmptyAnimation(track, 0.1f);
                 } else {
 
                     if (add) {
