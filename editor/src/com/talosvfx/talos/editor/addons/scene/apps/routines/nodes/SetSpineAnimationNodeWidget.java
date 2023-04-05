@@ -73,6 +73,7 @@ public class SetSpineAnimationNodeWidget extends AbstractRoutineNodeWidget {
         GameAsset<SkeletonData> value = reference.getValue();
 
         if (value == null) return;
+        if (value.isBroken()) return;
 
         SkeletonData skeletonData = value.getResource();
         Array<Animation> animations = skeletonData.getAnimations();
