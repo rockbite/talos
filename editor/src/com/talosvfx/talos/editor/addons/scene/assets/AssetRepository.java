@@ -25,6 +25,8 @@ import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.esotericsoftware.spine.SkeletonBinary;
 import com.esotericsoftware.spine.SkeletonData;
+import com.talosvfx.talos.editor.addons.scene.apps.routines.RoutineEditorApp;
+import com.talosvfx.talos.editor.addons.scene.apps.routines.RoutineStage;
 import com.talosvfx.talos.editor.addons.scene.events.*;
 import com.talosvfx.talos.editor.addons.scene.events.meta.MetaDataReloadedEvent;
 import com.talosvfx.talos.editor.addons.scene.events.explorer.DirectoryMovedEvent;
@@ -713,6 +715,12 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 		if (gameAsset.type == GameAssetType.ROUTINE) {
 			GameAsset<RoutineStageData> routineStageDataGameAsset = (GameAsset<RoutineStageData>)gameAsset;
 			Array<NodeWidget> nodes = routineStageDataGameAsset.getResource().getNodes();
+			if (nodes.size == 0) {
+				RoutineEditorApp routineEditorApp = new RoutineEditorApp();
+				routineEditorApp.updateForGameAsset(routineStageDataGameAsset);
+
+				routineEditorApp.onRemove();
+			}
 			for (NodeWidget node : nodes) {
 				ObjectMap<String, AbstractWidget> widgetMap = node.getWidgetMap();
 				for (ObjectMap.Entry<String, AbstractWidget> stringAbstractWidgetEntry : widgetMap) {
