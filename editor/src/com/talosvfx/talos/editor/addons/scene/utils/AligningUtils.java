@@ -3,6 +3,7 @@ package com.talosvfx.talos.editor.addons.scene.utils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.talosvfx.talos.runtime.scene.GameObject;
+import com.talosvfx.talos.runtime.scene.components.SpriteRendererComponent;
 import com.talosvfx.talos.runtime.scene.components.TransformComponent;
 import lombok.Getter;
 
@@ -23,8 +24,19 @@ enum PositionAlign {
     }
 
 }
+
 public class AligningUtils {
     static Vector2 temp = new Vector2();
+
+    public static Vector2 getSize(GameObject gameObject) {
+        TransformComponent transformComponent = gameObject.getComponent(TransformComponent.class);
+        if (gameObject.hasComponent(SpriteRendererComponent.class)) {
+            SpriteRendererComponent spriteRendererComponent = gameObject.getComponent(SpriteRendererComponent.class);
+            return temp.set(spriteRendererComponent.getWidth() * transformComponent.scale.x,
+                    spriteRendererComponent.getHeight() * transformComponent.scale.y);
+        }
+        return temp.set(transformComponent.scale.x, transformComponent.scale.y);
+    }
 
     public static Vector2 calculateCenterPosition(Array<GameObject> selection) {
         float xSum = 0;
@@ -44,10 +56,10 @@ public class AligningUtils {
     public static float calculateLeftX(Array<GameObject> selection) {
         TransformComponent firstObjectComponent = selection.get(0).getComponent(TransformComponent.class);
         float leftX = firstObjectComponent.position.x
-                - firstObjectComponent.scale.x / 2;
+                - getSize(selection.get(0)).x / 2;
         for (GameObject gameObject : selection) {
             TransformComponent component = gameObject.getComponent(TransformComponent.class);
-            float x = component.position.x - component.scale.x / 2;
+            float x = component.position.x - getSize(gameObject).x / 2;
             if (x < leftX) {
                 leftX = x;
             }
@@ -58,10 +70,10 @@ public class AligningUtils {
     public static float calculateRightX(Array<GameObject> selection) {
         TransformComponent firstObjectComponent = selection.get(0).getComponent(TransformComponent.class);
         float leftX = firstObjectComponent.position.x
-                + firstObjectComponent.scale.x / 2;
+                + getSize(selection.get(0)).x / 2;
         for (GameObject gameObject : selection) {
             TransformComponent component = gameObject.getComponent(TransformComponent.class);
-            float x = component.position.x + component.scale.x / 2;
+            float x = component.position.x + getSize(gameObject).x / 2;
             if (x > leftX) {
                 leftX = x;
             }
@@ -72,10 +84,10 @@ public class AligningUtils {
     public static float calculateTopY(Array<GameObject> selection) {
         TransformComponent firstObjectComponent = selection.get(0).getComponent(TransformComponent.class);
         float topY = firstObjectComponent.position.y
-                + firstObjectComponent.scale.y / 2;
+                + getSize(selection.get(0)).y / 2;
         for (GameObject gameObject : selection) {
             TransformComponent component = gameObject.getComponent(TransformComponent.class);
-            float y = component.position.y + component.scale.y / 2;
+            float y = component.position.y + getSize(gameObject).y / 2;
             if (y > topY) {
                 topY = y;
             }
@@ -86,10 +98,10 @@ public class AligningUtils {
     public static float calculateBottomY(Array<GameObject> selection) {
         TransformComponent firstObjectComponent = selection.get(0).getComponent(TransformComponent.class);
         float bottomY = firstObjectComponent.position.y
-                - firstObjectComponent.scale.y / 2;
+                - getSize(selection.get(0)).y / 2;
         for (GameObject gameObject : selection) {
             TransformComponent component = gameObject.getComponent(TransformComponent.class);
-            float y = component.position.y - component.scale.y / 2;
+            float y = component.position.y - getSize(gameObject).y / 2;
             if (y < bottomY) {
                 bottomY = y;
             }
@@ -120,7 +132,7 @@ public class AligningUtils {
 
         for (int i = 0; i < gameObjects.size; i++) {
             TransformComponent component = gameObjects.get(i).getComponent(TransformComponent.class);
-            float y = topY + i * space + multiplayer * component.scale.y;
+            float y = topY + i * space + multiplayer * getSize(gameObjects.get(i)).y;
             component.position.set(component.position.x, y);
         }
     }
@@ -144,7 +156,7 @@ public class AligningUtils {
 
         for (int i = 0; i < gameObjects.size; i++) {
             TransformComponent component = gameObjects.get(i).getComponent(TransformComponent.class);
-            float x = leftX + i * space + multiplayer * component.scale.x;
+            float x = leftX + i * space + multiplayer * getSize(gameObjects.get(i)).x;
             component.position.set(x, component.position.y);
         }
     }
@@ -153,7 +165,7 @@ public class AligningUtils {
         float multiplayer = positionAlign.getMultiplayer();
         for (GameObject gameObject : gameObjects) {
             TransformComponent component = gameObject.getComponent(TransformComponent.class);
-            component.position.set(component.position.x, y + multiplayer * component.scale.y);
+            component.position.set(component.position.x, y + multiplayer * getSize(gameObject).y);
         }
     }
 
@@ -161,7 +173,7 @@ public class AligningUtils {
         float multiplayer = positionAlign.getMultiplayer();
         for (GameObject gameObject : gameObjects) {
             TransformComponent component = gameObject.getComponent(TransformComponent.class);
-            component.position.set(x + multiplayer * component.scale.x, component.position.y);
+            component.position.set(x + multiplayer * getSize(gameObject).x, component.position.y);
         }
     }
 

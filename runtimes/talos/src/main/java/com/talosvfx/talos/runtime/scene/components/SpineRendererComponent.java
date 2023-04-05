@@ -29,7 +29,7 @@ public class SpineRendererComponent extends RendererComponent implements Json.Se
     public AnimationState animationState;
 
     public Color color = new Color(Color.WHITE);
-    public transient Color finalColor = new Color();
+    public transient Color finalColor = new Color(Color.WHITE);
     public boolean shouldInheritParentColor = true;
 
     public transient String currAnimation;
@@ -92,7 +92,8 @@ public class SpineRendererComponent extends RendererComponent implements Json.Se
     private void createSkeletonFromGameAsset () {
         if (!gameAsset.isBroken()) {
             skeleton = new Skeleton(gameAsset.getResource());
-            animationState = new AnimationState(new AnimationStateData(skeleton.getData()));
+            AnimationStateData data = new AnimationStateData(skeleton.getData());
+            animationState = new AnimationState(data);
             skeleton.setScale(this.scale, this.scale);
 
             Array<Animation> animations = skeleton.getData().getAnimations();

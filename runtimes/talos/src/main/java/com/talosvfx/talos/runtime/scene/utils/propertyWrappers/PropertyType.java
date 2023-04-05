@@ -7,8 +7,7 @@ public enum PropertyType {
     VECTOR2,
     COLOR,
     ASSET,
-    BOOLEAN;
-    //STRING(),
-    //GAME_OBJECT();
-
+    BOOLEAN,
+    STRING,
+    GAME_OBJECT;
 }

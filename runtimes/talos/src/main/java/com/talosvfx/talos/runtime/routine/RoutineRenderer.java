@@ -100,6 +100,7 @@ public class RoutineRenderer {
             renderRoutineNode.size.set(routineRendererComponent.viewportSize);
             renderRoutineNode.viewportPosition.set(camera.position.x, camera.position.y);
             renderRoutineNode.viewportSize.set(cameraViewportRect.width, cameraViewportRect.height);
+            renderRoutineNode.gameObject = gameObject;
 
             if(routineRendererComponent.cacheCoolDown == 0) {
                 reset  = true;
@@ -121,7 +122,7 @@ public class RoutineRenderer {
                     routineInstance.getProperties().put(propertyWrapper.propertyName, propertyWrapper);
                 }
 
-                routineInstance.setContainer(findContainer(gameObject.parent));
+                routineInstance.setContainer((SavableContainer) gameObject.getGameObjectContainerRoot());
                 renderRoutineNode.receiveSignal("startSignal");
                 routineInstance.drawableQuads.sort(zComparator);
                 routineInstance.setDirty(false);
