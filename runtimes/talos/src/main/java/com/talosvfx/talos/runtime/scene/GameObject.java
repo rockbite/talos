@@ -10,10 +10,13 @@ import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.ObjectSet;
 import com.talosvfx.talos.runtime.assets.GameResourceOwner;
+import com.talosvfx.talos.runtime.routine.RoutineEventInterface;
+import com.talosvfx.talos.runtime.routine.RoutineEventListener;
 import com.talosvfx.talos.runtime.scene.components.AComponent;
 import com.talosvfx.talos.runtime.scene.components.RendererComponent;
 import com.talosvfx.talos.runtime.scene.components.TransformComponent;
 import com.talosvfx.talos.runtime.scene.utils.TransformSettings;
+import com.talosvfx.talos.runtime.scene.utils.propertyWrappers.PropertyWrapper;
 import lombok.Getter;
 
 import java.util.ArrayList;
@@ -21,7 +24,7 @@ import java.util.Collection;
 import java.util.UUID;
 import java.util.function.Supplier;
 
-public class GameObject implements GameObjectContainer, Json.Serializable {
+public class GameObject implements GameObjectContainer, RoutineEventListener, Json.Serializable {
 
     private String name = "gameObject";
     public UUID uuid;
@@ -48,8 +51,11 @@ public class GameObject implements GameObjectContainer, Json.Serializable {
     @Getter
     private transient TransformSettings transformSettings = new TransformSettings();
 
+    private Array<RoutineEventInterface> routineEventListeners;
+
     public GameObject () {
         uuid = UUID.randomUUID();
+        routineEventListeners = new Array<>();
     }
 
     @Override
@@ -479,5 +485,17 @@ public class GameObject implements GameObjectContainer, Json.Serializable {
             }
         }
         return null;
+    }
+
+    @Override
+    public void onEventFromRoutines(String eventName, Array<PropertyWrapper<?>> propertyWrappers) {
+        for (RoutineEventInterface routineEventListener : routineEventListeners) {
+            routineEventListener.onEventFromRoutines(eventName, propertyWrappers);
+        }
+    }
+
+    @Override
+    public void addNodeEventListener(RoutineEventInterface routineEventInterface) {
+        routineEventListeners.add(routineEventInterface);
     }
 }
