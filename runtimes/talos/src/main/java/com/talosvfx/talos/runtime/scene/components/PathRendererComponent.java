@@ -165,7 +165,9 @@ public class PathRendererComponent extends RendererComponent implements GameReso
         edgePoints.clear();
         vectorPool.freeAll(points);
         vectorPool.freeAll(edgePoints);
-        vectorPool.free(this.prev);
+        if (this.prev != null) {
+            vectorPool.free(this.prev);
+        }
         for (int i = 0; i < getNumSegments(); i++) {
             Vector2[] pointsInSegment = getPointsInSegment(i);
 
