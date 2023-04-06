@@ -7,21 +7,8 @@ import com.badlogic.gdx.graphics.g2d.PolygonBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.GdxRuntimeException;
-import com.talosvfx.talos.runtime.scene.components.MapComponent;
-import com.talosvfx.talos.runtime.scene.components.ParticleComponent;
-import com.talosvfx.talos.runtime.scene.components.RendererComponent;
-import com.talosvfx.talos.runtime.scene.components.RoutineRendererComponent;
-import com.talosvfx.talos.runtime.scene.components.SpineRendererComponent;
-import com.talosvfx.talos.runtime.scene.components.SpriteRendererComponent;
-import com.talosvfx.talos.runtime.scene.components.TransformComponent;
-import com.talosvfx.talos.runtime.scene.render.ComponentRenderer;
-import com.talosvfx.talos.runtime.scene.render.MapComponentRenderer;
-import com.talosvfx.talos.runtime.scene.render.RenderState;
-import com.talosvfx.talos.runtime.scene.render.RenderStrategy;
-import com.talosvfx.talos.runtime.scene.render.RoutineComponentRenderer;
-import com.talosvfx.talos.runtime.scene.render.SimpleParticleComponentRenderer;
-import com.talosvfx.talos.runtime.scene.render.SkeletonComponentRenderer;
-import com.talosvfx.talos.runtime.scene.render.SpriteComponentRenderer;
+import com.talosvfx.talos.runtime.scene.components.*;
+import com.talosvfx.talos.runtime.scene.render.*;
 import lombok.Getter;
 
 import java.util.Comparator;
@@ -35,6 +22,7 @@ public class GameObjectRenderer {
 	private ComponentRenderer<ParticleComponent<?>> particleRenderer;
 	private ComponentRenderer<RoutineRendererComponent<?>> routineRenderer;
 	private ComponentRenderer<SpineRendererComponent> spineRenderer;
+	private ComponentRenderer<PathRendererComponent> pathRenderer;
 
 	public final Comparator<GameObject> layerAndDrawOrderComparator;
 	public final Comparator<GameObject> yDownDrawOrderComparator;
@@ -52,6 +40,7 @@ public class GameObjectRenderer {
 		particleRenderer = createParticleRenderer();
 		routineRenderer = createRoutineRenderer();
 		spineRenderer = createSpineRenderer();
+		pathRenderer = createPathRenderer();
 
 		layerAndDrawOrderComparator = new Comparator<GameObject>() {
 			@Override
@@ -164,6 +153,10 @@ public class GameObjectRenderer {
 
 	protected ComponentRenderer<SpriteRendererComponent> createSpriteRenderer () {
 		return new SpriteComponentRenderer(this);
+	}
+
+	protected ComponentRenderer<PathRendererComponent> createPathRenderer () {
+		return new PathComponentRenderer(this);
 	}
 
 	private void sort (Array<GameObject> list) {
@@ -281,6 +274,8 @@ public class GameObjectRenderer {
 			spineRenderer.render(batch, camera, gameObject, gameObject.getComponent(SpineRendererComponent.class));
 		} else if (gameObject.hasComponent(MapComponent.class)) {
 			mapRenderer.render(batch, camera, gameObject, gameObject.getComponent(MapComponent.class));
+		} else if (gameObject.hasComponent(PathRendererComponent.class)) {
+			pathRenderer.render(batch, camera, gameObject, gameObject.getComponent(PathRendererComponent.class));
 		}
 
 	}
