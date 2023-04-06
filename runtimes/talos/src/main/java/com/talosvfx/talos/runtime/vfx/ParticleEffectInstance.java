@@ -204,6 +204,16 @@ public class ParticleEffectInstance {
 	}
 
 
+	public void reset () {
+		for (int i = 0; i < emitters.size; i++) {
+			emitters.get(i).reset();
+		}
+		paused = true;
+		totalTime = 0;
+	}
+
+
+
 
 	public Array<IEmitter> getEmitters () {
         return emitters;

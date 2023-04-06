@@ -302,6 +302,22 @@ public class ParticleEmitterInstance implements IEmitter {
 	}
 
 	@Override
+	public void reset () {
+		delayTimer = delay;
+		alpha = 0;
+		isComplete = false;
+		particlesToEmmit = 1f;
+		isStopped = true;
+		Array.ArrayIterator<Particle> iterator = activeParticles.iterator();
+		while (iterator.hasNext()) {
+			Particle next = iterator.next();
+			next.notifyKill();
+			particlePool.free(next);
+			iterator.remove();
+		}
+	}
+
+	@Override
 	public float getDelayRemaining () {
 		return delayTimer;
 	}
