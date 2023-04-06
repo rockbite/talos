@@ -12,6 +12,7 @@ import com.badlogic.gdx.math.collision.BoundingBox;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
+import com.badlogic.gdx.utils.Pool;
 import com.talosvfx.talos.runtime.RuntimeContext;
 import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.runtime.assets.GameAssetType;
@@ -52,6 +53,13 @@ public class PathRendererComponent extends RendererComponent implements GameReso
 
     Bezier<Vector2> bezier = new Bezier<>();
 
+    Pool<Vector2> vectorPool = new Pool<Vector2>() {
+        @Override
+        protected Vector2 newObject() {
+            return new Vector2();
+        }
+    };
+
     transient GameAsset.GameAssetUpdateListener gameAssetUpdateListener = new GameAsset.GameAssetUpdateListener() {
         @Override
         public void onUpdate() {
@@ -64,7 +72,7 @@ public class PathRendererComponent extends RendererComponent implements GameReso
 
     @Override
     public GameAssetType getGameAssetType() {
-        return null;
+        return GameAssetType.SPRITE;
     }
 
     @Override
@@ -73,7 +81,7 @@ public class PathRendererComponent extends RendererComponent implements GameReso
     }
 
     @Override
-    public void write (Json json) {
+    public void write(Json json) {
         GameResourceOwner.writeGameAsset(json, this);
 
         json.writeValue("shouldInheritParentColor", shouldInheritParentColor());
@@ -82,18 +90,18 @@ public class PathRendererComponent extends RendererComponent implements GameReso
         super.write(json);
     }
 
-    private void loadTextureFromIdentifier (String gameResourceIdentifier) {
+    private void loadTextureFromIdentifier(String gameResourceIdentifier) {
         GameAsset<TextureAtlas.AtlasRegion> assetForIdentifier = RuntimeContext.getInstance().AssetRepository.getAssetForIdentifier(gameResourceIdentifier, GameAssetType.SPRITE);
         setGameAsset(assetForIdentifier);
     }
 
-    private void loadTextureFromUniqueIdentifier (UUID gameResourceIdentifier) {
+    private void loadTextureFromUniqueIdentifier(UUID gameResourceIdentifier) {
         GameAsset<TextureAtlas.AtlasRegion> assetForUniqueIdentifier = RuntimeContext.getInstance().AssetRepository.getAssetForUniqueIdentifier(gameResourceIdentifier, GameAssetType.SPRITE);
         setGameAsset(assetForUniqueIdentifier);
     }
 
     @Override
-    public void read (Json json, JsonValue jsonData) {
+    public void read(Json json, JsonValue jsonData) {
         UUID gameResourceUUID = GameResourceOwner.readGameResourceUUIDFromComponent(jsonData);
         if (gameResourceUUID == null) {
             String gameResourceIdentifier = GameResourceOwner.readGameResourceFromComponent(jsonData);
@@ -164,10 +172,10 @@ public class PathRendererComponent extends RendererComponent implements GameReso
 
             for (float t = 0; t <= 1f; t += step) {
                 Vector2 curr = bezier.valueAt(tmp2, t);
-                points[index++] = curr.cpy();
+                points[index++] = vectorPool.obtain().set(curr);
             }
             Vector2 curr = bezier.valueAt(tmp2, 1f);
-            points[index++] = curr.cpy();
+            points[index++] = vectorPool.obtain().set(curr);
         }
 
         edgePoints = computeEdgePoints(points, thickness);
@@ -215,28 +223,30 @@ public class PathRendererComponent extends RendererComponent implements GameReso
         Vector2[] offsetPoints = new Vector2[curvePoints.length * 2];
 
         Vector2 firstTangent = getTangent(curvePoints[1], curvePoints[0]);
-        offsetPoints[0] = curvePoints[0].cpy().add(new Vector2(-firstTangent.y, firstTangent.x).nor().scl(offsetDistance));
-        offsetPoints[1] = curvePoints[0].cpy().add(new Vector2(-firstTangent.y, firstTangent.x).nor().scl(-offsetDistance));
+        Vector2 firstNormal = vectorPool.obtain().set(-firstTangent.y, firstTangent.x).nor();
+        offsetPoints[0] = vectorPool.obtain().set(curvePoints[0]).add(firstNormal.scl(offsetDistance));
+        offsetPoints[1] = vectorPool.obtain().set(curvePoints[0]).add(firstNormal.scl(-1));
 
         int length = curvePoints.length;
         Vector2 lastTangent = getTangent(curvePoints[length - 1], curvePoints[length - 2]);
-        offsetPoints[offsetPoints.length - 2] = curvePoints[length - 1].cpy().add(new Vector2(-lastTangent.y, lastTangent.x).nor().scl(offsetDistance));
-        offsetPoints[offsetPoints.length - 1] = curvePoints[length - 1].cpy().add(new Vector2(-lastTangent.y, lastTangent.x).nor().scl(-offsetDistance));
+        Vector2 lastNormal = vectorPool.obtain().set(-lastTangent.y, lastTangent.x).nor();
+        offsetPoints[offsetPoints.length - 2] = vectorPool.obtain().set(curvePoints[length - 1]).add(lastNormal.scl(offsetDistance));
+        offsetPoints[offsetPoints.length - 1] = vectorPool.obtain().set(curvePoints[length - 1]).add(lastNormal.scl(-1));
 
         int idx = 2;
         for (int i = 1; i < curvePoints.length - 1; i++) {
             Vector2 p = curvePoints[i];
             Vector2 t = getTangent(curvePoints[i + 1], curvePoints[i - 1]);
-            Vector2 n = new Vector2(-t.y, t.x).nor().scl(offsetDistance);
-            offsetPoints[idx++] = p.cpy().add(n);
-            offsetPoints[idx++] = p.cpy().add(new Vector2(-t.y, t.x).nor().scl(-offsetDistance));
+            Vector2 normal = vectorPool.obtain().set(-t.y, t.x).nor();
+            offsetPoints[idx++] = vectorPool.obtain().set(p).add(normal.scl(offsetDistance));
+            offsetPoints[idx++] = vectorPool.obtain().set(p).add(normal.scl(-1));
         }
         return offsetPoints;
     }
 
 
     Vector2 getTangent(Vector2 p1, Vector2 p2) {
-        Vector2 tangent = p2.cpy();
+        Vector2 tangent = vectorPool.obtain().set(p2);
         tangent.sub(p1);
         tangent.nor();
         return tangent;
@@ -331,5 +341,11 @@ public class PathRendererComponent extends RendererComponent implements GameReso
 
             polygonBatch.draw(gameAsset.getResource().getTexture(), vertices, 0, vertices.length, indices, 0, indices.length);
         }
+    }
+
+    @Override
+    public void remove() {
+        super.remove();
+        vectorPool.clear();
     }
 }
