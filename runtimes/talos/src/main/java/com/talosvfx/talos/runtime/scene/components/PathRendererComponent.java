@@ -41,11 +41,11 @@ public class PathRendererComponent extends RendererComponent implements GameReso
 
     private short[] indices;
     private float[] vertices;
-    private Vector2[] edgePoints;
+    private Array<Vector2> edgePoints = new Array<>();
 
-    private Vector2[] controlPoints;
+    private Array<Vector2> controlPoints = new Array<>();
 
-    private Vector2[] points;
+    private Array<Vector2> points = new Array<>();
 
     private Vector2 tmp = new Vector2();
     private Vector2 tmp2 = new Vector2();
@@ -160,9 +160,9 @@ public class PathRendererComponent extends RendererComponent implements GameReso
     }
 
     public void setPoints(Array<Vector2> controlPoints) {
-        this.controlPoints = controlPoints.toArray(Vector2.class);
-        points = new Vector2[21 * getNumSegments()];
-        int index = 0;
+        this.controlPoints = controlPoints;
+        points.clear();
+        edgePoints.clear();
         for (int i = 0; i < getNumSegments(); i++) {
             Vector2[] pointsInSegment = getPointsInSegment(i);
 
@@ -172,23 +172,28 @@ public class PathRendererComponent extends RendererComponent implements GameReso
 
             for (float t = 0; t <= 1f; t += step) {
                 Vector2 curr = bezier.valueAt(tmp2, t);
-                points[index++] = vectorPool.obtain().set(curr);
+                points.add(vectorPool.obtain().set(curr));
             }
             Vector2 curr = bezier.valueAt(tmp2, 1f);
-            points[index++] = vectorPool.obtain().set(curr);
+            points.add(vectorPool.obtain().set(curr));
         }
 
-        edgePoints = computeEdgePoints(points, thickness);
-
+        computeEdgePoints(points, thickness);
 
         int ATTRIBUTE_COUNT = 5;
-        vertices = new float[edgePoints.length * ATTRIBUTE_COUNT + (repeatCount) * 2 * ATTRIBUTE_COUNT];
+        int verticesLength = edgePoints.size * ATTRIBUTE_COUNT + (repeatCount) * 2 * ATTRIBUTE_COUNT;
+        if (vertices == null || verticesLength != vertices.length) {
+            vertices = new float[verticesLength];
+
+            int indicesLength = (vertices.length / ATTRIBUTE_COUNT - 2) * 3;
+            indices = new short[indicesLength];
+        }
 
         float length = 0;
-        Vector2 prev = new Vector2(points[0].x, points[0].y);
-        for (int i = 1; i < points.length; i++) {
-            length += points[i].dst(prev);
-            prev.set(points[i]);
+        Vector2 prev = vectorPool.obtain().set(points.get(0).x, points.get(0).y);
+        for (int i = 1; i < points.size; i++) {
+            length += points.get(i).dst(prev);
+            prev.set(points.get(i));
         }
 
         float pixelSize = repeatCount / length;
@@ -196,13 +201,10 @@ public class PathRendererComponent extends RendererComponent implements GameReso
         int idx = 0;
         this.prev = null;
         progress = 0;
-        for (int i = 0; i < points.length; i++) {
-            idx = setData(idx, edgePoints[i * 2].x, edgePoints[i * 2].y, edgePoints[i * 2 + 1].x, edgePoints[i * 2 + 1].y, points[i].x, points[i].y, pixelSize);
-
+        for (int i = 0; i < points.size; i++) {
+            idx = setData(idx, edgePoints.get(i * 2).x, edgePoints.get(i * 2).y, edgePoints.get(i * 2 + 1).x,
+                    edgePoints.get(i * 2 + 1).y, points.get(i).x, points.get(i).y, pixelSize);
         }
-
-        int indicesLength = (vertices.length / ATTRIBUTE_COUNT - 2) * 3;
-        indices = new short[indicesLength];
 
         int tri = 0;
         for (int i = 0; i < idx / ATTRIBUTE_COUNT - 2; i += 2) {
@@ -216,32 +218,28 @@ public class PathRendererComponent extends RendererComponent implements GameReso
     }
 
     public int getNumSegments() {
-        return controlPoints.length / 3;
+        return controlPoints.size / 3;
     }
 
-    Vector2[] computeEdgePoints(Vector2[] curvePoints, float offsetDistance) {
-        Vector2[] offsetPoints = new Vector2[curvePoints.length * 2];
-
-        Vector2 firstTangent = getTangent(curvePoints[1], curvePoints[0]);
+    void computeEdgePoints(Array<Vector2> curvePoints, float offsetDistance) {
+        Vector2 firstTangent = getTangent(curvePoints.get(1), curvePoints.get(0));
         Vector2 firstNormal = vectorPool.obtain().set(-firstTangent.y, firstTangent.x).nor();
-        offsetPoints[0] = vectorPool.obtain().set(curvePoints[0]).add(firstNormal.scl(offsetDistance));
-        offsetPoints[1] = vectorPool.obtain().set(curvePoints[0]).add(firstNormal.scl(-1));
+        edgePoints.add(vectorPool.obtain().set(curvePoints.get(0)).add(firstNormal.scl(offsetDistance)));
+        edgePoints.add(vectorPool.obtain().set(curvePoints.get(0)).add(firstNormal.scl(-1)));
 
-        int length = curvePoints.length;
-        Vector2 lastTangent = getTangent(curvePoints[length - 1], curvePoints[length - 2]);
-        Vector2 lastNormal = vectorPool.obtain().set(-lastTangent.y, lastTangent.x).nor();
-        offsetPoints[offsetPoints.length - 2] = vectorPool.obtain().set(curvePoints[length - 1]).add(lastNormal.scl(offsetDistance));
-        offsetPoints[offsetPoints.length - 1] = vectorPool.obtain().set(curvePoints[length - 1]).add(lastNormal.scl(-1));
-
-        int idx = 2;
-        for (int i = 1; i < curvePoints.length - 1; i++) {
-            Vector2 p = curvePoints[i];
-            Vector2 t = getTangent(curvePoints[i + 1], curvePoints[i - 1]);
+        for (int i = 1; i < curvePoints.size - 1; i++) {
+            Vector2 p = curvePoints.get(i);
+            Vector2 t = getTangent(curvePoints.get(i + 1), curvePoints.get(i - 1));
             Vector2 normal = vectorPool.obtain().set(-t.y, t.x).nor();
-            offsetPoints[idx++] = vectorPool.obtain().set(p).add(normal.scl(offsetDistance));
-            offsetPoints[idx++] = vectorPool.obtain().set(p).add(normal.scl(-1));
+            edgePoints.add(vectorPool.obtain().set(p).add(normal.scl(offsetDistance)));
+            edgePoints.add(vectorPool.obtain().set(p).add(normal.scl(-1)));
         }
-        return offsetPoints;
+
+        int length = curvePoints.size;
+        Vector2 lastTangent = getTangent(curvePoints.get(length - 1), curvePoints.get(length - 2));
+        Vector2 lastNormal = vectorPool.obtain().set(-lastTangent.y, lastTangent.x).nor();
+        edgePoints.add(vectorPool.obtain().set(curvePoints.get(length - 1)).add(lastNormal.scl(offsetDistance)));
+        edgePoints.add(vectorPool.obtain().set(curvePoints.get(length - 1)).add(lastNormal.scl(-1)));
     }
 
 
@@ -262,7 +260,7 @@ public class PathRendererComponent extends RendererComponent implements GameReso
         if (prev != null) {
             progress += prev.dst(centerX, centerY) * pixelSize;
         } else {
-            prev = new Vector2();
+            prev = vectorPool.obtain();
         }
 
         prev.set(centerX, centerY);
@@ -307,16 +305,16 @@ public class PathRendererComponent extends RendererComponent implements GameReso
     public Vector2[] getPointsInSegment(int index) {
         for (int i = 0; i < 4; i++) {
             if (i == 3) {
-                tmpArr[i].set(controlPoints[loopIndex(index * 3 + i)]);
+                tmpArr[i].set(controlPoints.get(loopIndex(index * 3 + i)));
             } else {
-                tmpArr[i].set(controlPoints[index * 3 + i]);
+                tmpArr[i].set(controlPoints.get(index * 3 + i));
             }
         }
         return tmpArr;
     }
 
     public int loopIndex(int index) {
-        return (index + controlPoints.length) % controlPoints.length;
+        return (index + controlPoints.size) % controlPoints.size;
     }
 
     @Override
