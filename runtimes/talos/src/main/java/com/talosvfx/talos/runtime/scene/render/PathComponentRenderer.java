@@ -30,6 +30,7 @@ public class PathComponentRenderer extends ComponentRenderer<PathRendererCompone
         TransformComponent transformComponent = gameObject.getComponent(TransformComponent.class);
         CurveComponent curveComponent = gameObject.getComponent(CurveComponent.class);
 
+        vectorPool.freeAll(points);
         points.clear();
         for (Vector2 point : curveComponent.points) {
             Vector2 finalPoint = vectorPool.obtain().set(point).add(transformComponent.worldPosition);

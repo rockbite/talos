@@ -163,6 +163,9 @@ public class PathRendererComponent extends RendererComponent implements GameReso
         this.controlPoints = controlPoints;
         points.clear();
         edgePoints.clear();
+        vectorPool.freeAll(points);
+        vectorPool.freeAll(edgePoints);
+        vectorPool.free(this.prev);
         for (int i = 0; i < getNumSegments(); i++) {
             Vector2[] pointsInSegment = getPointsInSegment(i);
 
@@ -195,6 +198,7 @@ public class PathRendererComponent extends RendererComponent implements GameReso
             length += points.get(i).dst(prev);
             prev.set(points.get(i));
         }
+        vectorPool.free(prev);
 
         float pixelSize = repeatCount / length;
 
@@ -226,6 +230,8 @@ public class PathRendererComponent extends RendererComponent implements GameReso
         Vector2 firstNormal = vectorPool.obtain().set(-firstTangent.y, firstTangent.x).nor();
         edgePoints.add(vectorPool.obtain().set(curvePoints.get(0)).add(firstNormal.scl(offsetDistance)));
         edgePoints.add(vectorPool.obtain().set(curvePoints.get(0)).add(firstNormal.scl(-1)));
+        vectorPool.free(firstNormal);
+        vectorPool.free(firstTangent);
 
         for (int i = 1; i < curvePoints.size - 1; i++) {
             Vector2 p = curvePoints.get(i);
@@ -233,6 +239,9 @@ public class PathRendererComponent extends RendererComponent implements GameReso
             Vector2 normal = vectorPool.obtain().set(-t.y, t.x).nor();
             edgePoints.add(vectorPool.obtain().set(p).add(normal.scl(offsetDistance)));
             edgePoints.add(vectorPool.obtain().set(p).add(normal.scl(-1)));
+
+            vectorPool.free(normal);
+            vectorPool.free(t);
         }
 
         int length = curvePoints.size;
@@ -240,6 +249,8 @@ public class PathRendererComponent extends RendererComponent implements GameReso
         Vector2 lastNormal = vectorPool.obtain().set(-lastTangent.y, lastTangent.x).nor();
         edgePoints.add(vectorPool.obtain().set(curvePoints.get(length - 1)).add(lastNormal.scl(offsetDistance)));
         edgePoints.add(vectorPool.obtain().set(curvePoints.get(length - 1)).add(lastNormal.scl(-1)));
+        vectorPool.free(lastNormal);
+        vectorPool.free(lastTangent);
     }
 
 
