@@ -229,6 +229,16 @@
             <value port="output" name="gameObject" type="gameobject">gameObject</value>
             <value port="output" name="onComplete" type="signal">onComplete</value>
         </module>
+        <module name="SpawnPrefabNode" title="Spawn Prefab" keywords="" class="RoutineNodeWidget">
+            <value port="input" name="startSignal" type="signal">start</value>
+            <inputText name="name" type="string">name</inputText>
+            <asset port="input" name="prefab" type="PREFAB">prefab</asset>
+            <inputText port="input" name="layerName" type="string">Layer</inputText>
+            <dynamicValue port="input" name="layerOrder" type="int" min="0" max="500" step="1">Layer order
+            </dynamicValue>
+            <value port="output" name="gameObject" type="gameobject">gameObject</value>
+            <value port="output" name="onComplete" type="signal">onComplete</value>
+        </module>
         <module name="SetSpineAnimationNode" title="Set Spine Animation" keywords=""
                 class="SetSpineAnimationNodeWidget">
             <value port="input" name="startSignal" type="signal">start</value>
