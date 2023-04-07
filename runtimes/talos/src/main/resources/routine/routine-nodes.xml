@@ -202,6 +202,7 @@
             <inputText port="input" name="layerName" type="string">Layer</inputText>
             <dynamicValue port="input" name="layerOrder" type="int" min="0" max="500" step="1">Layer order
             </dynamicValue>
+            <value port="output" name="gameObject" type="gameobject">gameObject</value>
             <value port="output" name="onComplete" type="signal">onComplete</value>
         </module>
         <module name="SpawnSpineNode" title="Spawn Spine" keywords="" class="RoutineNodeWidget">
@@ -212,6 +213,7 @@
             <inputText port="input" name="layerName" type="string">Layer</inputText>
             <dynamicValue port="input" name="layerOrder" type="int" min="0" max="500" step="1">Layer order
             </dynamicValue>
+            <value port="output" name="gameObject" type="gameobject">gameObject</value>
             <value port="output" name="onComplete" type="signal">onComplete</value>
         </module>
         <module name="SpawnParticleNode" title="Spawn Particle" keywords="" class="RoutineNodeWidget">
@@ -224,6 +226,7 @@
             </group>
             <dynamicValue port="input" name="layerOrder" type="int" min="0" max="500" step="1">Layer order
             </dynamicValue>
+            <value port="output" name="gameObject" type="gameobject">gameObject</value>
             <value port="output" name="onComplete" type="signal">onComplete</value>
         </module>
         <module name="SetSpineAnimationNode" title="Set Spine Animation" keywords=""
@@ -280,7 +283,7 @@
                 <value port="output" name="viewportSize" type="vec2">viewport size</value>
                 <value port="output" name="position" type="vec2">position</value>
                 <value port="output" name="size" type="vec2">size</value>
-                <value port="output" name="gameObject" type="gameObject">gameObject</value>
+                <value port="output" name="gameObject" type="gameobject">gameObject</value>
             </group>
         </module>
         <module name="RenderQuadNode" title="Render Quad" keywords="" class="RoutineNodeWidget">

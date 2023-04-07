@@ -44,6 +44,9 @@ public class SetSpineAnimationNode extends RoutineNode {
         int track = fetchIntValue("track");
         GameObject gameObject = fetchGameObjectValue("gameObject");
 
+        if (gameObject == null) {
+            gameObject = (GameObject) routineInstanceRef.getSignalPayload();
+        }
 
         if(animationName != null && !animationName.isEmpty() && gameObject != null) {
             SpineRendererComponent component = gameObject.getComponent(SpineRendererComponent.class);

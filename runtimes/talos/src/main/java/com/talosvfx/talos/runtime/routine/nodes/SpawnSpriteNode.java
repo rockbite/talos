@@ -2,12 +2,10 @@ package com.talosvfx.talos.runtime.routine.nodes;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.Array;
 import com.talosvfx.talos.runtime.RuntimeContext;
 import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.runtime.routine.RoutineNode;
 import com.talosvfx.talos.runtime.scene.GameObject;
-import com.talosvfx.talos.runtime.scene.SceneData;
 import com.talosvfx.talos.runtime.scene.SceneLayer;
 import com.talosvfx.talos.runtime.scene.components.SpriteRendererComponent;
 import com.talosvfx.talos.runtime.scene.components.TransformComponent;
@@ -20,6 +18,7 @@ public class SpawnSpriteNode extends RoutineNode {
     private static final Logger logger = LoggerFactory.getLogger(SpawnSpriteNode.class);
 
     private Vector2 tmp = new Vector2();
+    private GameObject goRef;
 
     @Override
     public void receiveSignal(String portName) {
@@ -30,15 +29,15 @@ public class SpawnSpriteNode extends RoutineNode {
 
         if(asset != null) {
             tmp.setZero();
-            GameObject go = new GameObject();
+            goRef = new GameObject();
             String nm = fetchStringValue("name");
             if(nm == null || nm.isEmpty()) nm = "dynamicGo";
             String name = NamingUtils.getNewName(nm, target.getAllGONames());
-            go.setName(name);
+            goRef.setName(name);
             TransformComponent transformComponent = new TransformComponent();
             SpriteRendererComponent spriteRendererComponent = new SpriteRendererComponent();
-            go.addComponent(transformComponent);
-            go.addComponent(spriteRendererComponent);
+            goRef.addComponent(transformComponent);
+            goRef.addComponent(spriteRendererComponent);
             spriteRendererComponent.setGameAsset(asset);
             spriteRendererComponent.orderingInLayer = fetchIntValue("layerOrder");
 
@@ -51,7 +50,7 @@ public class SpawnSpriteNode extends RoutineNode {
                 spriteRendererComponent.sortingLayer = preferredSceneLayer;
             }
 
-            target.addGameObject(go);
+            target.addGameObject(goRef);
 
             spriteRendererComponent.size.x = fetchFloatValue("width");
             spriteRendererComponent.size.y = fetchFloatValue("height");
@@ -64,8 +63,22 @@ public class SpawnSpriteNode extends RoutineNode {
             Color color = fetchColorValue("color");
             spriteRendererComponent.color.set(color);
 
-            routineInstanceRef.setSignalPayload(go);
+            routineInstanceRef.setSignalPayload(goRef);
             sendSignal("onComplete");
         }
+    }
+
+    @Override
+    public Object queryValue(String targetPortName) {
+        if (targetPortName.equals("gameObject")) {
+            return goRef;
+        }
+        return 0;
+    }
+
+    @Override
+    public void reset () {
+        super.reset();
+        goRef = null;
     }
 }
