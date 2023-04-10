@@ -41,7 +41,7 @@ public class CommandsSystem extends InputAdapter {
         boolean isRun = false;
         for (ICommand command : allCommands) {
             if (command.isReadyToRun()) {
-                isRun = runCommand(command);
+                isRun = isRun || runCommand(command);
             }
         }
 
