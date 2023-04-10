@@ -1,9 +1,8 @@
 package com.talosvfx.talos.editor.addons.scene.events;
 
-import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.TalosEvent;
 
-public class LayerListUpdated implements TalosEvent {
+public class LayerListUpdatedEvent implements TalosEvent {
 
     @Override
     public void reset () {

@@ -12,7 +12,7 @@ import java.util.UUID;
 public class SceneLayer implements Json.Serializable {
     private UUID uniqueID;
     private String name;
-    private int index;
+    private transient int index;
 
     private RenderStrategy renderStrategy = RenderStrategy.SCENE;
 
@@ -36,7 +36,6 @@ public class SceneLayer implements Json.Serializable {
     public void write (Json json) {
         json.writeValue("name", name);
         json.writeValue("uuid", uniqueID.toString());
-        json.writeValue("index", index);
     }
 
     @Override
@@ -47,6 +46,5 @@ public class SceneLayer implements Json.Serializable {
         } else {
             uniqueID = UUID.randomUUID();
         }
-        index = jsonData.getInt("index");
     }
 }

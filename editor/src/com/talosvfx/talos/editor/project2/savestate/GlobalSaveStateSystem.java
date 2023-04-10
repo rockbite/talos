@@ -4,6 +4,7 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.ObjectSet;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
+import com.talosvfx.talos.editor.addons.scene.events.LayerListUpdatedEvent;
 import com.talosvfx.talos.editor.notifications.CommandEventHandler;
 import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.commands.enums.Commands;
@@ -206,10 +207,19 @@ public class GlobalSaveStateSystem implements Observer {
 
 	@EventHandler
 	public void onProjectUnload(ProjectUnloadEvent projectUnloadEvent) {
+		clearGlobalState();
+	}
+
+	// clear everything, when layer data is updated
+	@EventHandler
+	public void onLayerListUpdated(LayerListUpdatedEvent layerListUpdatedEvent) {
+		clearGlobalState();
+	}
+
+	private void clearGlobalState () {
 		redoStateObjects.clear();
 		undoStateObjects.clear();
 		hasChanges.clear();
 		rawStringHistoryMap.clear();
 	}
-
 }

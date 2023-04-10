@@ -1325,31 +1325,6 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		return currentContainer.getSelfObject();
 	}
 
-	@EventHandler
-	public void onLayerListUpdated (LayerListUpdated event) {
-		Array<SceneLayer> layerList = getLayerList();
-		// find all game objects and if any of them is on layer that does not exist, change its layer to default
-		Array<GameObject> list = new Array<>();
-		list = currentContainer.getSelfObject().getChildrenByComponent(RendererComponent.class, list);
-
-		for (GameObject gameObject : list) {
-			RendererComponent component = gameObject.getComponentAssignableFrom(RendererComponent.class);
-
-			boolean foundLayer = false;
-			for (SceneLayer sceneLayer : layerList) {
-				if (sceneLayer.getName().equals(component.sortingLayer.getName())) {
-					component.getSortingLayer().setIndex(sceneLayer.getIndex());
-					foundLayer = true;
-					break;
-				}
-			}
-
-			if (!foundLayer) {
-				component.setSortingLayer(SharedResources.currentProject.getSceneData().getPreferredSceneLayer());
-			}
-		}
-	}
-
 	public MainRenderer getRenderer () {
 		return renderer;
 	}

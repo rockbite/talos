@@ -3,6 +3,7 @@ package com.talosvfx.talos.runtime.assets;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.talosvfx.talos.runtime.scene.SceneData;
+import com.talosvfx.talos.runtime.scene.SceneLayer;
 
 public class GameAssetsExportStructure {
 	public Array<GameAssetExportStructure> gameAssets = new Array<>();
@@ -18,6 +19,14 @@ public class GameAssetsExportStructure {
 			buildCache();
 		}
 		return cache.get(uuid);
+	}
+
+	void buildLayerIndices() {
+		Array<SceneLayer> renderLayers = sceneData.getRenderLayers();
+		for (int i = 0; i < renderLayers.size; i++) {
+			SceneLayer sceneLayer = renderLayers.get(i);
+			sceneLayer.setIndex(i);
+		}
 	}
 
 	private void buildCache () {

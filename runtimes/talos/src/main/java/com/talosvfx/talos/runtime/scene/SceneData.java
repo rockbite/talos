@@ -6,9 +6,10 @@ import lombok.Data;
 @Data
 public class SceneData {
 	private Array<SceneLayer> renderLayers = new Array<>(new SceneLayer[]{
-			new SceneLayer("Default", 0),
-			new SceneLayer("UI", 1),
-	new SceneLayer("Misc", 2)});
+		new SceneLayer("Default", 0),
+		new SceneLayer("UI", 1),
+		new SceneLayer("Misc", 2)
+	});
 
 	private SceneLayer preferredSceneLayer;
 
