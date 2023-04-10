@@ -6,16 +6,21 @@ import com.talosvfx.talos.runtime.RuntimeContext;
 import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.runtime.routine.RoutineNode;
 import com.talosvfx.talos.runtime.scene.GameObject;
+import com.talosvfx.talos.runtime.scene.Prefab;
 import com.talosvfx.talos.runtime.scene.SceneLayer;
+import com.talosvfx.talos.runtime.scene.components.AComponent;
+import com.talosvfx.talos.runtime.scene.components.RendererComponent;
 import com.talosvfx.talos.runtime.scene.components.SpriteRendererComponent;
 import com.talosvfx.talos.runtime.scene.components.TransformComponent;
 import com.talosvfx.talos.runtime.utils.NamingUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SpawnSpriteNode extends RoutineNode {
+import java.util.UUID;
 
-    private static final Logger logger = LoggerFactory.getLogger(SpawnSpriteNode.class);
+public class SpawnPrefabNode extends RoutineNode {
+
+    private static final Logger logger = LoggerFactory.getLogger(SpawnPrefabNode.class);
 
     private Vector2 tmp = new Vector2();
     private GameObject goRef;
@@ -25,43 +30,37 @@ public class SpawnSpriteNode extends RoutineNode {
 
         GameObject target = (GameObject) routineInstanceRef.getSignalPayload();
 
-        GameAsset asset = fetchAssetValue("sprite");
+        GameAsset<Prefab> asset = (GameAsset<Prefab>) fetchAssetValue("prefab");
 
         if(asset != null) {
             tmp.setZero();
-            goRef = new GameObject();
+            Prefab resource = asset.getResource();
             String nm = fetchStringValue("name");
             if(nm == null || nm.isEmpty()) nm = "dynamicGo";
             String name = NamingUtils.getNewName(nm, target.getAllGONames());
-            goRef.setName(name);
-            TransformComponent transformComponent = new TransformComponent();
-            SpriteRendererComponent spriteRendererComponent = new SpriteRendererComponent();
-            goRef.addComponent(transformComponent);
-            goRef.addComponent(spriteRendererComponent);
-            spriteRendererComponent.setGameAsset(asset);
-            spriteRendererComponent.orderingInLayer = fetchIntValue("layerOrder");
+
+            Prefab copy = new Prefab(resource.getAsString(), name);
+            goRef = copy.getSelfObject();
+            goRef.uuid = UUID.randomUUID();
+
+            int orderInLayer = fetchIntValue("layerOrder");
 
             String layerName = fetchStringValue("layerName");
             SceneLayer layer = RuntimeContext.getInstance().sceneData.getSceneLayerByName(layerName);
-            if (layer != null) {
-                spriteRendererComponent.sortingLayer = layer;
-            } else {
-                SceneLayer preferredSceneLayer = RuntimeContext.getInstance().sceneData.getPreferredSceneLayer();
-                spriteRendererComponent.sortingLayer = preferredSceneLayer;
+            if (layer == null) {
+                layer = RuntimeContext.getInstance().sceneData.getPreferredSceneLayer();
+            }
+
+            for (AComponent component : goRef.getComponents()) {
+                if (component instanceof RendererComponent) {
+                    RendererComponent rendererComponent = (RendererComponent) component;
+
+                    rendererComponent.orderingInLayer = orderInLayer;
+                    rendererComponent.sortingLayer = layer;
+                }
             }
 
             target.addGameObject(goRef);
-
-            spriteRendererComponent.size.x = fetchFloatValue("width");
-            spriteRendererComponent.size.y = fetchFloatValue("height");
-
-            String mode = fetchStringValue("mode");
-            if(mode == null) mode = "simple";
-
-            spriteRendererComponent.renderMode = SpriteRendererComponent.RenderMode.simple.valueOf(mode);
-
-            Color color = fetchColorValue("color");
-            spriteRendererComponent.color.set(color);
 
             routineInstanceRef.setSignalPayload(goRef);
             sendSignal("onComplete");

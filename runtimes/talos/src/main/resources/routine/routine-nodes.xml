@@ -6,6 +6,7 @@
             <asset name="scene" type="SCENE">scene</asset>
             <goSelector name="target" default="">Target</goSelector>
             <button name="playButton">Play</button>
+            <button name="resumeButton">Resume</button>
             <value port="output" name="outSignal" type="signal">start</value>
         </module>
         <module name="CallRoutineNode" title="Call Routine" keywords="tween, system" class="DelegatorRoutineNodeWidget">
@@ -30,6 +31,17 @@
             <value port="output" name="onComplete" type="signal">onComplete</value>
         </module>
         <module name="MoveByNode" title="Move By" keywords="movement" class="AsyncRoutineNodeWidget">
+            <value port="input" name="startSignal" type="signal">start</value>
+            <group>
+                <dynamicValue port="input" name="X" type="float" min="-1000" max="1000">X:</dynamicValue>
+                <dynamicValue port="input" name="Y" type="float" min="-1000" max="1000">Y:</dynamicValue>
+            </group>
+            <checkbox name="yoyo" default="false">Yoyo</checkbox>
+            <dynamicValue port="input" name="duration" type="float" default="1">Duration</dynamicValue>
+            <container name="timeline"></container>
+            <value port="output" name="onComplete" type="signal">onComplete</value>
+        </module>
+        <module name="MoveToNode" title="Move To" keywords="movement" class="AsyncRoutineNodeWidget">
             <value port="input" name="startSignal" type="signal">start</value>
             <group>
                 <dynamicValue port="input" name="X" type="float" min="-1000" max="1000">X:</dynamicValue>
@@ -202,6 +214,7 @@
             <inputText port="input" name="layerName" type="string">Layer</inputText>
             <dynamicValue port="input" name="layerOrder" type="int" min="0" max="500" step="1">Layer order
             </dynamicValue>
+            <value port="output" name="gameObject" type="gameobject">gameObject</value>
             <value port="output" name="onComplete" type="signal">onComplete</value>
         </module>
         <module name="SpawnSpineNode" title="Spawn Spine" keywords="" class="RoutineNodeWidget">
@@ -212,6 +225,7 @@
             <inputText port="input" name="layerName" type="string">Layer</inputText>
             <dynamicValue port="input" name="layerOrder" type="int" min="0" max="500" step="1">Layer order
             </dynamicValue>
+            <value port="output" name="gameObject" type="gameobject">gameObject</value>
             <value port="output" name="onComplete" type="signal">onComplete</value>
         </module>
         <module name="SpawnParticleNode" title="Spawn Particle" keywords="" class="RoutineNodeWidget">
@@ -224,6 +238,17 @@
             </group>
             <dynamicValue port="input" name="layerOrder" type="int" min="0" max="500" step="1">Layer order
             </dynamicValue>
+            <value port="output" name="gameObject" type="gameobject">gameObject</value>
+            <value port="output" name="onComplete" type="signal">onComplete</value>
+        </module>
+        <module name="SpawnPrefabNode" title="Spawn Prefab" keywords="" class="RoutineNodeWidget">
+            <value port="input" name="startSignal" type="signal">start</value>
+            <inputText name="name" type="string">name</inputText>
+            <asset port="input" name="prefab" type="PREFAB">prefab</asset>
+            <inputText port="input" name="layerName" type="string">Layer</inputText>
+            <dynamicValue port="input" name="layerOrder" type="int" min="0" max="500" step="1">Layer order
+            </dynamicValue>
+            <value port="output" name="gameObject" type="gameobject">gameObject</value>
             <value port="output" name="onComplete" type="signal">onComplete</value>
         </module>
         <module name="SetSpineAnimationNode" title="Set Spine Animation" keywords=""
@@ -280,7 +305,7 @@
                 <value port="output" name="viewportSize" type="vec2">viewport size</value>
                 <value port="output" name="position" type="vec2">position</value>
                 <value port="output" name="size" type="vec2">size</value>
-                <value port="output" name="gameObject" type="gameObject">gameObject</value>
+                <value port="output" name="gameObject" type="gameobject">gameObject</value>
             </group>
         </module>
         <module name="RenderQuadNode" title="Render Quad" keywords="" class="RoutineNodeWidget">

@@ -41,8 +41,7 @@ public class CommandsSystem extends InputAdapter {
         boolean isRun = false;
         for (ICommand command : allCommands) {
             if (command.isReadyToRun()) {
-                runCommand(command);
-                isRun = true;
+                isRun = isRun || runCommand(command);
             }
         }
 
@@ -60,15 +59,17 @@ public class CommandsSystem extends InputAdapter {
         checkCommandState();
     }
 
-    public void runCommand(ICommand command) {
+    public boolean runCommand(ICommand command) {
         Actor keyboardFocus = SharedResources.inputHandling.keyboardFocus;
         if (keyboardFocus instanceof TextField) {
-            return;
+            return false;
         }
 
         Notifications.fireEvent(getEventForCommand(command));
         command.commandIsRun();
         Toasts.getInstance().showInfoToast("Command - " + command.getCommandType().name);
+
+        return true;
     }
 
     public void clearAfterRunning() {

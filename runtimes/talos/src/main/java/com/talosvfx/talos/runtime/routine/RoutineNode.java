@@ -166,6 +166,7 @@ public abstract class RoutineNode implements Pool.Poolable {
             if(type.equals("ROUTINE")) port.dataType = DataType.ASSET;
             if(type.equals("SOUND")) port.dataType = DataType.ASSET;
             if(type.equals("SCENE")) port.dataType = DataType.ASSET;
+            if(type.equals("PREFAB")) port.dataType = DataType.ASSET;
             if(type.equals("VFX")) port.dataType = DataType.ASSET;
             if(type.equals("SPRITE")) port.dataType = DataType.ASSET;
             if(type.equals("text")) port.dataType = DataType.STRING;

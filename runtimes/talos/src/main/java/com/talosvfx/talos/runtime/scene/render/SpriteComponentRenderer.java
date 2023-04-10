@@ -21,8 +21,9 @@ import com.talosvfx.talos.runtime.scene.components.TransformComponent;
 public class SpriteComponentRenderer extends ComponentRenderer<SpriteRendererComponent> {
 
 
-	private TextureRegion textureRegion = new TextureRegion();
 	private Vector2 vector2 = new Vector2();
+
+	private TextureAtlas.AtlasRegion textureRegion;
 
 	public SpriteComponentRenderer (GameObjectRenderer gameObjectRenderer) {
 		super(gameObjectRenderer);
@@ -36,6 +37,9 @@ public class SpriteComponentRenderer extends ComponentRenderer<SpriteRendererCom
 		GameAsset<TextureAtlas.AtlasRegion> gameResource = spriteRenderer.getGameResource();
 		RawAsset rootRawAsset = gameResource.getRootRawAsset();
 		AMetadata metaData = rootRawAsset.metaData;
+
+		TextureAtlas.AtlasRegion atlasRegion = gameResource.getResource();
+
 		if (metaData instanceof SpriteMetadata) {
 			//It should be
 			SpriteMetadata metadata = (SpriteMetadata)metaData;
@@ -46,9 +50,7 @@ public class SpriteComponentRenderer extends ComponentRenderer<SpriteRendererCom
 				texture.setFilter(metadata.minFilter, metadata.magFilter);
 			}
 
-			if (textureRegion.getTexture() == null || !textureRegion.getTexture().equals(resource)) {
-				textureRegion.setRegion(resource);
-			}
+			setCopyRegion(atlasRegion);
 
 			if (textureRegion != null) {
 				textureRegion.flip(textureRegion.isFlipX() != rendererComponent.flipX, textureRegion.isFlipY() != rendererComponent.flipY);
@@ -213,5 +215,25 @@ public class SpriteComponentRenderer extends ComponentRenderer<SpriteRendererCom
 			}
 		}
 
+	}
+
+	private void setCopyRegion (TextureAtlas.AtlasRegion resource) {
+		if (textureRegion == null) {
+			textureRegion = new TextureAtlas.AtlasRegion(resource);
+		} else {
+			textureRegion.setRegion(resource);
+			textureRegion.index = resource.index;
+			textureRegion.name = resource.name;
+			textureRegion.offsetX = resource.offsetX;
+			textureRegion.offsetY = resource.offsetY;
+			textureRegion.packedWidth = resource.packedWidth;
+			textureRegion.packedHeight = resource.packedHeight;
+			textureRegion.originalWidth = resource.originalWidth;
+			textureRegion.originalHeight = resource.originalHeight;
+			textureRegion.rotate = resource.rotate;
+			textureRegion.degrees = resource.degrees;
+			textureRegion.names = resource.names;
+			textureRegion.values = resource.values;
+		}
 	}
 }

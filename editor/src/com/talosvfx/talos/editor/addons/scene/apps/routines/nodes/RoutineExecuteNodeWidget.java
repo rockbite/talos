@@ -36,7 +36,16 @@ public class RoutineExecuteNodeWidget extends AbstractRoutineNodeWidget {
         playButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-               startPlay();
+               startPlay(true);
+            }
+        });
+
+        ButtonWidget resumeButton = getButton("resumeButton");
+
+        resumeButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                startPlay(false);
             }
         });
 
@@ -52,6 +61,10 @@ public class RoutineExecuteNodeWidget extends AbstractRoutineNodeWidget {
     }
 
     public boolean startPlay() {
+        return startPlay(true);
+    }
+
+    public boolean startPlay(boolean reset) {
         RoutineStage nodeStage = (RoutineStage) nodeBoard.getNodeStage();
         nodeStage.resetNodes();
 
@@ -63,7 +76,9 @@ public class RoutineExecuteNodeWidget extends AbstractRoutineNodeWidget {
         SavableContainer container = null;
         if(sceneAsset != null && sceneAsset.type == GameAssetType.SCENE) {
             ScenePreviewApp scenePreviewApp = nodeStage.openPreviewWindow(sceneAsset);
-            scenePreviewApp.reload();
+            if(reset) {
+                scenePreviewApp.reload();
+            }
 
             container = scenePreviewApp.getWorkspaceWidget().currentScene;
             Array<GameObject> cameraGoList = container.root.getChildrenByComponent(CameraComponent.class, new Array<>());
