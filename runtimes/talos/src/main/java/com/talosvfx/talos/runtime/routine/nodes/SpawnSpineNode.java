@@ -19,6 +19,7 @@ public class SpawnSpineNode extends RoutineNode {
     private static final Logger logger = LoggerFactory.getLogger(SpawnSpineNode.class);
 
     private Vector2 tmp = new Vector2();
+    private GameObject goRef;
 
     @Override
     public void receiveSignal(String portName) {
@@ -29,15 +30,15 @@ public class SpawnSpineNode extends RoutineNode {
 
         if(asset != null) {
             tmp.setZero();
-            GameObject go = new GameObject();
+            goRef = new GameObject();
             String nm = fetchStringValue("name");
             if(nm == null || nm.isEmpty()) nm = "dynamicSpineGo";
             String name = NamingUtils.getNewName(nm, target.getAllGONames());
-            go.setName(name);
+            goRef.setName(name);
             TransformComponent transformComponent = new TransformComponent();
             SpineRendererComponent spineRendererComponent = new SpineRendererComponent();
-            go.addComponent(transformComponent);
-            go.addComponent(spineRendererComponent);
+            goRef.addComponent(transformComponent);
+            goRef.addComponent(spineRendererComponent);
             spineRendererComponent.setGameAsset(asset);
             spineRendererComponent.orderingInLayer = fetchIntValue("layerOrder");
 
@@ -50,13 +51,27 @@ public class SpawnSpineNode extends RoutineNode {
                 spineRendererComponent.sortingLayer = preferredSceneLayer;
             }
 
-            target.addGameObject(go);
+            target.addGameObject(goRef);
 
             Color color = fetchColorValue("color");
             spineRendererComponent.color.set(color);
 
-            routineInstanceRef.setSignalPayload(go);
+            routineInstanceRef.setSignalPayload(goRef);
             sendSignal("onComplete");
         }
+    }
+    @Override
+    public Object queryValue(String targetPortName) {
+        if (targetPortName.equals("gameObject")) {
+            return goRef;
+        }
+        return 0;
+    }
+
+
+    @Override
+    public void reset () {
+        super.reset();
+        goRef = null;
     }
 }

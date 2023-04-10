@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
 
-public class RoutineInstance implements Pool.Poolable {
+public class RoutineInstance implements Pool.Poolable, RoutineEventListener {
 
     private static final Logger logger = LoggerFactory.getLogger(RoutineInstance.class);
 
@@ -65,13 +65,14 @@ public class RoutineInstance implements Pool.Poolable {
     private GameObject cameraGO;
     private boolean paused = false;
 
-
+    private Array<RoutineEventInterface> routineEventListeners = new Array<>();
 
     @Override
     public void reset() {
         clearMemory();
         globalMap.clear();
         scopeNumbers.clear();
+        routineEventListeners.clear();
         timeScale = 1f;
 
         signalPayload = null;
@@ -119,6 +120,18 @@ public class RoutineInstance implements Pool.Poolable {
 
     public void setPaused(boolean paused) {
         this.paused = paused;
+    }
+
+    @Override
+    public void onEventFromRoutines(String eventName, Array<PropertyWrapper<?>> propertyWrappers) {
+        for (RoutineEventInterface routineEventListener : routineEventListeners) {
+            routineEventListener.onEventFromRoutines(eventName, propertyWrappers);
+        }
+    }
+
+    @Override
+    public void addNodeEventListener(RoutineEventInterface routineEventInterface) {
+        routineEventListeners.add(routineEventInterface);
     }
 
     public static class RoutineListenerAdapter implements RoutineListener {

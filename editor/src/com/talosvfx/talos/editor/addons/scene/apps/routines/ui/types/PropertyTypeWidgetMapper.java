@@ -1,13 +1,8 @@
 package com.talosvfx.talos.editor.addons.scene.apps.routines.ui.types;
 
 import com.badlogic.gdx.utils.ObjectMap;
-import com.talosvfx.talos.runtime.scene.utils.propertyWrappers.PropertyBooleanWrapper;
-import com.talosvfx.talos.runtime.scene.utils.propertyWrappers.PropertyColorWrapper;
-import com.talosvfx.talos.runtime.scene.utils.propertyWrappers.PropertyFloatWrapper;
-import com.talosvfx.talos.runtime.scene.utils.propertyWrappers.PropertyGameAssetWrapper;
-import com.talosvfx.talos.runtime.scene.utils.propertyWrappers.PropertyType;
-import com.talosvfx.talos.runtime.scene.utils.propertyWrappers.PropertyVec2Wrapper;
-import com.talosvfx.talos.runtime.scene.utils.propertyWrappers.PropertyWrapper;
+import com.talosvfx.talos.editor.nodes.widgets.CustomGameObjectWidget;
+import com.talosvfx.talos.runtime.scene.utils.propertyWrappers.*;
 
 public class PropertyTypeWidgetMapper {
 
@@ -21,13 +16,16 @@ public class PropertyTypeWidgetMapper {
 		widgetMap.put(PropertyType.COLOR, CustomColorWidget.class);
 		widgetMap.put(PropertyType.ASSET, CustomAssetWidget.class);
 		widgetMap.put(PropertyType.BOOLEAN, CustomBooleanWidget.class);
+		widgetMap.put(PropertyType.STRING, CustomStringWidget.class);
+		widgetMap.put(PropertyType.GAME_OBJECT, CustomGameObjectWidget.class);
 
 		wrapperMap.put(PropertyType.FLOAT, PropertyFloatWrapper.class);
 		wrapperMap.put(PropertyType.VECTOR2, PropertyVec2Wrapper.class);
 		wrapperMap.put(PropertyType.COLOR, PropertyColorWrapper.class);
 		wrapperMap.put(PropertyType.ASSET, PropertyGameAssetWrapper.class);
 		wrapperMap.put(PropertyType.BOOLEAN, PropertyBooleanWrapper.class);
-
+		wrapperMap.put(PropertyType.STRING, PropertyStringWrapper.class);
+		wrapperMap.put(PropertyType.GAME_OBJECT, PropertyGameObjectWrapper.class);
 
 	}
 	public static Class<? extends PropertyWrapper> getWrapperForPropertyType (PropertyType propertyType) {

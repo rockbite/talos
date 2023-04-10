@@ -21,6 +21,8 @@ public class CurveComponent extends AComponent {
 
     public boolean automaticControl = false;
 
+    public float scale = 1;
+
     public CurveComponent() {
         setToNew();
         tmpArr = new Vector2[]{new Vector2(), new Vector2(), new Vector2(), new Vector2()};
@@ -28,10 +30,10 @@ public class CurveComponent extends AComponent {
 
     public void setToNew() {
         points.clear();
-        points.add(new Vector2(-2, 0));
-        points.add(new Vector2(-1, 1));
-        points.add(new Vector2(1, -1));
-        points.add(new Vector2(2, 0));
+        points.add(new Vector2(-2, 0).scl(scale));
+        points.add(new Vector2(-1, 1).scl(scale));
+        points.add(new Vector2(1, -1).scl(scale));
+        points.add(new Vector2(2, 0).scl(scale));
     }
 
     public void addSegment(Vector2 anchorPos) {
@@ -237,5 +239,12 @@ public class CurveComponent extends AComponent {
     public void reset() {
         super.reset();
         setToNew();
+    }
+
+    public void scale(float scale) {
+        this.scale = scale;
+        for (Vector2 point : points) {
+            point.scl(scale);
+        }
     }
 }

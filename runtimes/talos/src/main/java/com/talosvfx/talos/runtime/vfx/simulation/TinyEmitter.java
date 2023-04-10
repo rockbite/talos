@@ -268,6 +268,18 @@ public class TinyEmitter implements IEmitter {
     }
 
     @Override
+    public void reset () {
+        delayTimer = delay;
+        alpha = 0;
+        isComplete = false;
+        particlesToEmmit = 1f;
+        isStopped = true;
+        recordMap.clear();
+        particlePool.freeAll(activeParticles);
+        activeParticles.clear();
+    }
+
+    @Override
     public float getDelayRemaining () {
         return delayTimer;
     }

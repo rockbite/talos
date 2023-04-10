@@ -3,8 +3,6 @@ package com.talosvfx.talos.editor.addons.scene;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Camera;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
@@ -29,10 +27,15 @@ import com.talosvfx.talos.editor.project2.TalosProjectData;
 import com.talosvfx.talos.editor.project2.apps.ProjectExplorerApp;
 import com.talosvfx.talos.editor.project2.apps.SceneEditorApp;
 import com.talosvfx.talos.editor.serialization.VFXProjectData;
-import com.talosvfx.talos.runtime.scene.*;
 import com.talosvfx.talos.runtime.scene.components.*;
+import com.talosvfx.talos.runtime.scene.*;
 import com.talosvfx.talos.runtime.utils.NamingUtils;
 import com.talosvfx.talos.editor.utils.Toasts;
+import com.talosvfx.talos.runtime.scene.GameObject;
+import com.talosvfx.talos.runtime.scene.GameObjectContainer;
+import com.talosvfx.talos.runtime.scene.Prefab;
+import com.talosvfx.talos.runtime.scene.SavableContainer;
+import com.talosvfx.talos.runtime.scene.Scene;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -180,6 +183,11 @@ public class SceneUtils {
 					//Add a layer also
 					TalosLayer layer = new TalosLayer("NewLayer");
 					((MapComponent)component).getLayers().add(layer);
+				}
+				if (component instanceof CurveComponent) {
+					final SceneEditorApp currentApp = SharedResources.appManager.getSingletonAppInstance(SceneEditorApp.class);
+					final Supplier<Camera> currentCameraSupplier = currentApp.getWorkspaceWidget().getViewportViewSettings().getCurrentCameraSupplier();
+					((CurveComponent) component).scale(currentCameraSupplier.get().viewportWidth / 10);
 				}
 
 			} catch (Exception e) {

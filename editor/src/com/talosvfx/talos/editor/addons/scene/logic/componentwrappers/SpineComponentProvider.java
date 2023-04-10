@@ -57,6 +57,11 @@ public class SpineComponentProvider extends RendererComponentProvider<SpineRende
 		}, new PropertyWidget.ValueChanged<String>() {
 			@Override
 			public void report (String value) {
+				if (value.equalsIgnoreCase("remove animation")) {
+					component.currAnimation = null;
+					component.animationState.setEmptyAnimation(0, 0);
+					return;
+				}
 				Animation animation = component.skeleton.getData().findAnimation(value);
 				component.animationState.setAnimation(0, animation, true);
 				component.currAnimation = value;
@@ -72,6 +77,7 @@ public class SpineComponentProvider extends RendererComponentProvider<SpineRende
 				for (Animation animation : animations) {
 					names.add(animation.getName());
 				}
+				names.add("remove animation");
 				return names;
 			}
 		});

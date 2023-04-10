@@ -147,6 +147,7 @@ public abstract class ViewportWidget extends Table {
 
 		groupSelectionGizmo = new GroupSelectionGizmo(this);
 		gizmos.gizmoList.add(groupSelectionGizmo);
+		groupSelectionGizmo.setViewport(this);
 
 		Table fullscreenUITable = new Table();
 		fullscreenUITable.top().defaults().top();

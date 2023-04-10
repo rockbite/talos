@@ -6,8 +6,10 @@ public class ConditionBooleanNode extends RoutineNode {
 
     @Override
     public void receiveSignal(String portName) {
-
-        boolean result = fetchBooleanValue("value");
+        boolean result = false;
+        if (isPortConnected("value")) {
+            result = fetchBooleanValue("value");
+        }
 
         if(result) {
             sendSignal("trueOutput");

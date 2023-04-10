@@ -61,9 +61,9 @@ public class RuntimeAssetRepository extends BaseAssetRepository {
 
 		loadType(GameAssetType.VFX, sorted, baseDir);
 		loadType(GameAssetType.VFX_OUTPUT, sorted, baseDir);
-		loadType(GameAssetType.ROUTINE, sorted, baseDir);
 		loadType(GameAssetType.PREFAB, sorted, baseDir);
 		loadType(GameAssetType.SCENE, sorted, baseDir);
+		loadType(GameAssetType.ROUTINE, sorted, baseDir);
 
 		loadType(GameAssetType.TILE_PALETTE, sorted, baseDir);
 

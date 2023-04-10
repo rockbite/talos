@@ -95,6 +95,7 @@ public class PropertyWrapperProviders {
 		propertyProvidersForClass.put(TileDataComponent.class, TileDataComponentProvider.class);
 		propertyProvidersForClass.put(TransformComponent.class, TransformComponentProvider.class);
 		propertyProvidersForClass.put(DataComponent.class, DataComponentProvider.class);
+		propertyProvidersForClass.put(PathRendererComponent.class, PathRendererComponentProvider.class);
 
 
 		//Routine Nodes

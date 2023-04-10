@@ -42,12 +42,7 @@ import com.talosvfx.talos.editor.widgets.ui.SearchFilteredTree;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 import com.talosvfx.talos.editor.widgets.ui.common.SquareButton;
 import com.talosvfx.talos.runtime.scene.SceneLayer;
-import com.talosvfx.talos.runtime.scene.components.AComponent;
-import com.talosvfx.talos.runtime.scene.components.DataComponent;
-import com.talosvfx.talos.runtime.scene.components.RendererComponent;
-import com.talosvfx.talos.runtime.scene.components.RoutineRendererComponent;
-import com.talosvfx.talos.runtime.scene.components.ScriptComponent;
-import com.talosvfx.talos.runtime.scene.components.SpriteRendererComponent;
+import com.talosvfx.talos.runtime.scene.components.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -260,6 +255,10 @@ public class SEPropertyPanel extends PropertyPanel {
             FilteredTree.Node<Object> spriteComponentNode = new FilteredTree.Node<>("newspritecomponent", spriteComponent);
             tree.add(spriteComponentNode);
 
+            Label pathComponent = new Label("Path Renderer Component", getSkin());
+            FilteredTree.Node<Object> pathComponentNode = new FilteredTree.Node<>("newpathcomponent", pathComponent);
+            tree.add(pathComponentNode);
+
 
 
             setToTree();
@@ -468,6 +467,21 @@ public class SEPropertyPanel extends PropertyPanel {
 
                                 gameObject.addComponent(spriteRendererComponent);
                                 SceneUtils.componentAdded(gameObject.getGameObjectContainerRoot(), gameObject, spriteRendererComponent);
+                                remove();
+                            }
+                        }
+
+                        if (name.equals("newpathcomponent")) {
+                            if (gameObject.hasComponentType(RendererComponent.class)) {
+                                Toasts.getInstance().showErrorToast("Already has a renderer component");
+                            } else {
+                                PathRendererComponent pathRendererComponent = new PathRendererComponent();
+
+                                SceneLayer preferredSceneLayer = RuntimeContext.getInstance().sceneData.getPreferredSceneLayer();
+                                pathRendererComponent.sortingLayer = preferredSceneLayer;
+
+                                gameObject.addComponent(pathRendererComponent);
+                                SceneUtils.componentAdded(gameObject.getGameObjectContainerRoot(), gameObject, pathRendererComponent);
                                 remove();
                             }
                         }

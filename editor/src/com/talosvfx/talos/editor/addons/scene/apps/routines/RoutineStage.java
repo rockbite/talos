@@ -243,7 +243,7 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
 
     @EventHandler
     public void onNodeCreatedEvent (NodeCreatedEvent event) {
-        routineUpdated();
+//        routineUpdated();
         routineEditorApp.controlWindow.update();
     }
 

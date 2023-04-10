@@ -39,6 +39,7 @@
             <components>
                 <component className="TransformComponent"></component>
                 <component className="CurveComponent"></component>
+                <component className="CurveRendererComponent"></component>
             </components>
         </template>
         <template name = "psurface" title = "Paintable Surface" nameTemplate = "Surface" keywords = "">

@@ -18,6 +18,7 @@ public class SpawnParticleNode extends RoutineNode implements TickableNode {
     private Vector2 tmp = new Vector2();
 
     private Array<GameObject> trackingVFX = new Array();
+    private GameObject goRef;
 
     @Override
     public void receiveSignal (String portName) {
@@ -39,22 +40,22 @@ public class SpawnParticleNode extends RoutineNode implements TickableNode {
 
         if (asset != null) {
             tmp.setZero();
-            GameObject go = new GameObject();
+            goRef = new GameObject();
             String name = NamingUtils.getNewName("dynamicParticleGo", target.getAllGONames());
-            go.setName(name);
+            goRef.setName(name);
             TransformComponent transformComponent = new TransformComponent();
             transformComponent.position.set(fetchFloatValue("x"), fetchFloatValue("y"));
             ParticleComponent particleComponent = new ParticleComponent();
-            go.addComponent(transformComponent);
-            go.addComponent(particleComponent);
+            goRef.addComponent(transformComponent);
+            goRef.addComponent(particleComponent);
             particleComponent.setGameAsset(asset);
             particleComponent.orderingInLayer = fetchIntValue("layerOrder");
 
-            target.addGameObject(go);
+            target.addGameObject(goRef);
 
-            trackingVFX.add(go);
+            trackingVFX.add(goRef);
 
-            routineInstanceRef.setSignalPayload(go);
+            routineInstanceRef.setSignalPayload(goRef);
             sendSignal("onComplete");
         }
     }
@@ -73,5 +74,20 @@ public class SpawnParticleNode extends RoutineNode implements TickableNode {
                 }
             }
         }
+    }
+
+    @Override
+    public Object queryValue(String targetPortName) {
+        if (targetPortName.equals("gameObject")) {
+            return goRef;
+        }
+        return 0;
+    }
+
+
+    @Override
+    public void reset () {
+        super.reset();
+        goRef = null;
     }
 }

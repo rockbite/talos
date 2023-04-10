@@ -2,6 +2,7 @@ package com.talosvfx.talos.editor.addons.scene.widgets.gizmos;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -20,6 +21,8 @@ import com.talosvfx.talos.runtime.scene.GameObjectContainer;
 import com.talosvfx.talos.runtime.scene.components.AComponent;
 import com.talosvfx.talos.runtime.scene.components.TransformComponent;
 import com.talosvfx.talos.runtime.scene.utils.TransformSettings;
+
+import java.util.function.Supplier;
 
 public abstract class Gizmo extends Actor implements Pool.Poolable {
 
@@ -115,7 +118,12 @@ public abstract class Gizmo extends Actor implements Pool.Poolable {
     }
 
     public void setSizeForUIElements (float totalScreenSpaceParentSize, float totalWorldWidth) {
-        worldPerPixel = totalWorldWidth / totalScreenSpaceParentSize;
+        worldPerPixel = getViewPortScale() * totalWorldWidth / totalScreenSpaceParentSize;
+    }
+
+    public float getViewPortScale(){
+        final Supplier<Camera> currentCameraSupplier = viewport.getViewportViewSettings().getCurrentCameraSupplier();
+        return currentCameraSupplier.get().viewportWidth / 10;
     }
 
     void getHitBox(Polygon boudningPolygon) {

@@ -35,4 +35,22 @@ public class GOSelectorNode extends RoutineNode {
         }
         routineInstanceRef.endDepth();
     }
+
+
+    @Override
+    public Object queryValue(String targetPortName) {
+        SavableContainer container = routineInstanceRef.getContainer();
+
+        if(container == null) return null;
+
+        gameObjects.clear();
+        String target = fetchStringValue("target");
+        if (target == null) {
+            gameObjects = container.findGameObjects("");
+        } else {
+            gameObjects = container.findGameObjects(target);
+        }
+
+        return gameObjects;
+    }
 }

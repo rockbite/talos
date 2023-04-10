@@ -7,6 +7,7 @@ import com.badlogic.gdx.utils.*;
 import com.talosvfx.talos.runtime.RuntimeContext;
 import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.runtime.assets.GameAssetType;
+import com.talosvfx.talos.runtime.scene.GameObject;
 import lombok.Getter;
 
 import java.util.UUID;
@@ -34,7 +35,8 @@ public abstract class RoutineNode implements Pool.Poolable {
         ASSET,
         STRING,
         BOOLEAN,
-        FLUID
+        FLUID,
+        GAMEOBJECT
     }
 
     public enum PortType {
@@ -164,14 +166,14 @@ public abstract class RoutineNode implements Pool.Poolable {
             if(type.equals("ROUTINE")) port.dataType = DataType.ASSET;
             if(type.equals("SOUND")) port.dataType = DataType.ASSET;
             if(type.equals("SCENE")) port.dataType = DataType.ASSET;
+            if(type.equals("PREFAB")) port.dataType = DataType.ASSET;
             if(type.equals("VFX")) port.dataType = DataType.ASSET;
             if(type.equals("SPRITE")) port.dataType = DataType.ASSET;
             if(type.equals("text")) port.dataType = DataType.STRING;
             if(type.equals("fluid")) port.dataType = DataType.FLUID;
+            if(type.equals("gameobject")) port.dataType = DataType.GAMEOBJECT;
+            if(name.equals("asset")) port.dataType = DataType.ASSET;
 
-            if(name.equals("asset")) {
-                port.dataType = DataType.ASSET;
-            }
 
             if(row.getName().equals("checkbox")) {
                 port.valueOverride = row.getBooleanAttribute("default", false);
@@ -228,7 +230,7 @@ public abstract class RoutineNode implements Pool.Poolable {
                     }
 
                 } catch (Exception e) {
-                    //e.printStackTrace();
+                    e.printStackTrace();
                 }
             } else {
                 try {
@@ -403,6 +405,14 @@ public abstract class RoutineNode implements Pool.Poolable {
         }
 
         return (int)object;
+    }
+    protected GameObject fetchGameObjectValue (String key) {
+        Object object = fetchValue(key);
+
+        if (object instanceof GameObject) {
+            return ((GameObject) object);
+        }
+        return null;
     }
 
     protected Vector2 fetchVector2Value(String key) {
