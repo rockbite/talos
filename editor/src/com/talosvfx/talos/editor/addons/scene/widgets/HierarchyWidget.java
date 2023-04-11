@@ -643,6 +643,8 @@ public class HierarchyWidget extends Table implements Observer, EventContextProv
                 gameObjectNameChanged.newName = newText;
                 gameObjectNameChanged.oldName = oldName;
                 Notifications.fireEvent(gameObjectNameChanged);
+
+                SceneUtils.markContainerChanged(currentContainer);
             }
         });
 
