@@ -13,6 +13,7 @@ public abstract class RendererComponent extends AComponent implements Json.Seria
 
     public SceneLayer sortingLayer;
     public int orderingInLayer;
+    public float fakeOffsetY;
 
     public boolean visible = true;
     public boolean childrenVisible = true;
@@ -32,6 +33,7 @@ public abstract class RendererComponent extends AComponent implements Json.Seria
         json.writeValue("orderingInLayer", orderingInLayer);
         json.writeValue("visible", visible);
         json.writeValue("childrenVisible", childrenVisible);
+        json.writeValue("fakeOffsetY", fakeOffsetY);
 
     }
 
@@ -44,6 +46,7 @@ public abstract class RendererComponent extends AComponent implements Json.Seria
         orderingInLayer = jsonData.getInt("orderingInLayer", 0);
         visible = jsonData.getBoolean("visible", true);
         childrenVisible = jsonData.getBoolean("childrenVisible", true);
+        fakeOffsetY = jsonData.getFloat("fakeOffsetY", 0);
     }
 
     public abstract void minMaxBounds (GameObject parentEntity, BoundingBox rectangle);

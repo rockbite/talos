@@ -26,6 +26,7 @@ public abstract class RendererComponentProvider<T extends RendererComponent> ext
 		PropertyWidget visibleWidget = WidgetFactory.generate(component, "visible", "Visible");
 		PropertyWidget childrenVisibleWidget = WidgetFactory.generate(component, "childrenVisible", "Children Visible");
 		PropertyWidget orderingInLayerWidget = WidgetFactory.generate(component, "orderingInLayer", "Ordering");
+		PropertyWidget fakeY = WidgetFactory.generate(component, "fakeOffsetY", "Fake Y Offset");
 
 		SelectBoxWidget layerWidget = new SelectBoxWidget("Sorting Layer", new Supplier<String>() {
 			@Override
@@ -56,6 +57,7 @@ public abstract class RendererComponentProvider<T extends RendererComponent> ext
 		properties.add(visibleWidget);
 		properties.add(childrenVisibleWidget);
 		properties.add(orderingInLayerWidget);
+		properties.add(fakeY);
 		properties.add(layerWidget);
 
 		return properties;
