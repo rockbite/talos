@@ -92,7 +92,7 @@ public class SceneEditorApp extends AppManager.BaseApp<Scene> implements GameAss
 	@Override
 	public void onRemove () {
 		gameAsset.listeners.removeValue(this, true);
-		Notifications.registerObserver(this);
+		Notifications.unregisterObserver(this);
 	}
 
 	@Override
