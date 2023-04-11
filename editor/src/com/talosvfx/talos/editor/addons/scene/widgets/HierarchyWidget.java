@@ -3,19 +3,27 @@ package com.talosvfx.talos.editor.addons.scene.widgets;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.Selection;
 import com.badlogic.gdx.utils.*;
+import com.esotericsoftware.spine.SkeletonData;
 import com.kotcrab.vis.ui.widget.MenuItem;
 import com.kotcrab.vis.ui.widget.PopupMenu;
 import com.talosvfx.talos.editor.addons.scene.SceneUtils;
+import com.talosvfx.talos.editor.layouts.LayoutApp;
+import com.talosvfx.talos.editor.project2.GlobalDragAndDrop;
+import com.talosvfx.talos.editor.project2.apps.SceneEditorApp;
+import com.talosvfx.talos.editor.serialization.VFXProjectData;
 import com.talosvfx.talos.runtime.RuntimeContext;
 import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.runtime.assets.GameAssetType;
@@ -167,6 +175,90 @@ public class HierarchyWidget extends Table implements Observer, EventContextProv
         });
 
         Notifications.registerObserver(this);
+
+        SharedResources.globalDragAndDrop.addTarget(new DragAndDrop.Target(HierarchyWidget.this) {
+			@Override
+			public boolean drag (DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
+				if (currentContainer == null) return false;
+
+				GlobalDragAndDrop.BaseDragAndDropPayload object = (GlobalDragAndDrop.BaseDragAndDropPayload)payload.getObject();
+
+				if (object instanceof GlobalDragAndDrop.GameAssetDragAndDropPayload) {
+					//We support single game asset drops
+
+					return true;
+				}
+
+				return false;
+			}
+
+			@Override
+			public void drop (DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
+				GlobalDragAndDrop.BaseDragAndDropPayload object = (GlobalDragAndDrop.BaseDragAndDropPayload)payload.getObject();
+				// TODO: this needs a nicer system
+
+                Selection<FilteredTree.Node<GameObject>> selection = tree.getSelection();
+                Vector2 vec = new Vector2();
+                GameObject parent;
+                if (selection.size() == 1) {
+                    // add payload as child
+                    parent = selection.first().getObject();
+                } else {
+                    // add payload to root
+                    parent = currentContainer.getSelfObject();
+                }
+
+                if (object instanceof GlobalDragAndDrop.GameAssetDragAndDropPayload) {
+					//We support single game asset drops
+					GlobalDragAndDrop.GameAssetDragAndDropPayload gameAssetPayload = (GlobalDragAndDrop.GameAssetDragAndDropPayload)object;
+					if (gameAssetPayload.getGameAsset().type == GameAssetType.SPRITE) {
+						GameAsset<TextureAtlas.AtlasRegion> gameAsset = (GameAsset<TextureAtlas.AtlasRegion>)gameAssetPayload.getGameAsset();
+
+
+						SceneUtils.createSpriteObject(currentContainer, gameAsset, vec, parent);
+
+						//forcefully make active if we aren't active
+                        SceneEditorApp sceneEditorApp = SharedResources.appManager.getAppForAsset(SceneEditorApp.class, HierarchyWidget.this.gameAsset);
+                        LayoutApp gridAppReference = sceneEditorApp.getGridAppReference();
+						SharedResources.currentProject.getLayoutGrid().setLayoutActive(gridAppReference.getLayoutContent());
+
+					} else if (gameAssetPayload.getGameAsset().type == GameAssetType.PREFAB) {
+						GameAsset<Prefab> gameAsset = (GameAsset<Prefab>)gameAssetPayload.getGameAsset();
+
+						SceneUtils.createFromPrefab(currentContainer, gameAsset, vec, parent);
+
+                        //forcefully make active if we aren't active
+                        SceneEditorApp sceneEditorApp = SharedResources.appManager.getAppForAsset(SceneEditorApp.class, HierarchyWidget.this.gameAsset);
+                        LayoutApp gridAppReference = sceneEditorApp.getGridAppReference();
+                        SharedResources.currentProject.getLayoutGrid().setLayoutActive(gridAppReference.getLayoutContent());
+
+					} else if (gameAssetPayload.getGameAsset().type == GameAssetType.SKELETON) {
+						GameAsset<SkeletonData> gameAsset = (GameAsset<SkeletonData>)gameAssetPayload.getGameAsset();
+
+						SceneUtils.createSpineObject(currentContainer, gameAsset, vec, parent);
+
+                        //forcefully make active if we aren't active
+                        SceneEditorApp sceneEditorApp = SharedResources.appManager.getAppForAsset(SceneEditorApp.class, HierarchyWidget.this.gameAsset);
+                        LayoutApp gridAppReference = sceneEditorApp.getGridAppReference();
+                        SharedResources.currentProject.getLayoutGrid().setLayoutActive(gridAppReference.getLayoutContent());
+
+					} else if (gameAssetPayload.getGameAsset().type == GameAssetType.VFX) {
+						GameAsset<VFXProjectData> gameAsset = (GameAsset<VFXProjectData>)gameAssetPayload.getGameAsset();
+
+						SceneUtils.createParticle(currentContainer, gameAsset, vec, parent);
+
+                        //forcefully make active if we aren't active
+                        SceneEditorApp sceneEditorApp = SharedResources.appManager.getAppForAsset(SceneEditorApp.class, HierarchyWidget.this.gameAsset);
+                        LayoutApp gridAppReference = sceneEditorApp.getGridAppReference();
+                        SharedResources.currentProject.getLayoutGrid().setLayoutActive(gridAppReference.getLayoutContent());
+
+					}
+					return;
+				}
+				logger.info("TODO other implementations of drag drop payloads");
+
+			}
+		});
     }
 
     public void copySelected () {
