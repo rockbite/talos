@@ -167,29 +167,9 @@ public class HierarchyWidget extends Table implements Observer, EventContextProv
         });
 
         Notifications.registerObserver(this);
-
-        addListeners();
     }
 
-    private void addListeners () {
-        addListener(new InputListener() {
-            @Override
-            public boolean keyDown (InputEvent event, int keycode) {
-
-                // TODO: 13.01.23 later change this into new shortcut system
-
-                if (keycode == Input.Keys.DEL || keycode == Input.Keys.FORWARD_DEL) deleteSelected();
-
-                if (keycode == Input.Keys.C && ctrlPressed()) copySelected();
-
-                if (keycode == Input.Keys.V && ctrlPressed()) pasteFromClipboard();
-
-                return super.keyDown(event, keycode);
-            }
-        });
-    }
-
-    private void copySelected () {
+    public void copySelected () {
         final Selection<FilteredTree.Node<GameObject>> selection = tree.getSelection();
         final OrderedSet<GameObject> arraySelection = new OrderedSet<>();
         for (FilteredTree.Node<GameObject> gameObjectNode : selection) {
@@ -199,7 +179,7 @@ public class HierarchyWidget extends Table implements Observer, EventContextProv
         SceneUtils.copy(gameAsset, arraySelection);
     }
 
-    private void deleteSelected () {
+    public void deleteSelected () {
         ObjectSet<GameObject> selection = new ObjectSet<>();
         for(FilteredTree.Node<GameObject> nodeObject: tree.getSelection()) {
             if(objectMap.containsKey(nodeObject.getObject().uuid.toString())) {
@@ -213,7 +193,7 @@ public class HierarchyWidget extends Table implements Observer, EventContextProv
         }
     }
 
-    private void pasteFromClipboard () {
+    public void pasteFromClipboard () {
         tree.clearSelection(true);
         SceneUtils.paste(gameAsset);
     }
