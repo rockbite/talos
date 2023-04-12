@@ -172,7 +172,7 @@ public class ParticleRenderPassSystem extends RenderPassSystem implements Partic
 
 			particleEmitter.getScope().setCurrentRequestMode(ScopePayload.SUB_PARTICLE_ALPHA);
 
-			meshGenerator.render(this, drawableModule.getMaterialModule(), particlePointDataGeneratorModule.pointData);
+			meshGenerator.render(this, drawableModule.getMaterialModule(), particleEmitter.pointData());
 
 
 

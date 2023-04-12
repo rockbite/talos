@@ -114,7 +114,7 @@ public class SpriteBatchParticleRenderer implements ParticleRenderer {
 			int cachedRequesterID = particleEmitter.getScope().getRequesterID();
 
 			particleEmitter.getScope().setCurrentRequestMode(ScopePayload.SUB_PARTICLE_ALPHA);
-			meshGenerator.render(this, drawableModule.getMaterialModule(), particlePointDataGeneratorModule.pointData);
+			meshGenerator.render(this, drawableModule.getMaterialModule(), particleEmitter.pointData());
 
 			particleEmitter.getScope().setCurrentRequestMode(cachedMode);
 			particleEmitter.getScope().setCurrentRequesterID(cachedRequesterID);

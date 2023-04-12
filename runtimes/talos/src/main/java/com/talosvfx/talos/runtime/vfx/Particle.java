@@ -20,6 +20,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool;
 import com.talosvfx.talos.runtime.vfx.modules.DrawableModule;
 import com.talosvfx.talos.runtime.vfx.modules.HistoryParticlePointDataGeneratorModule;
@@ -52,6 +53,7 @@ public class Particle implements Pool.Poolable {
     public int requesterID;
 
     public float durationAtInit;
+
 
     public Particle() {
         // empty constructor

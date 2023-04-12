@@ -73,12 +73,19 @@ public class ParticleEmitterInstance implements IEmitter {
 	private int uniqueID;
 	private static int globalUniqueID = 1;
 
+	private Array<ParticlePointGroup> pointData = new Array<>();
+
     public ParticleEmitterInstance (ParticleEmitterDescriptor moduleGraph, ParticleEffectInstance particleEffectInstance) {
 		this.emitterGraph = moduleGraph;
         parentParticleInstance = particleEffectInstance;
         setScope(particleEffectInstance.scopePayload); //Default set to the parent payload instance
         init();
 		uniqueID = globalUniqueID++;
+	}
+
+	@Override
+	public Array<ParticlePointGroup> pointData () {
+		return pointData;
 	}
 
 	public void init () {
@@ -259,7 +266,7 @@ public class ParticleEmitterInstance implements IEmitter {
 		if (drawableModule == null) return;
 
 		if (drawableModule.getPointDataGenerator() != null) {
-			drawableModule.getPointDataGenerator().freePoints(particlePointDataPool, groupPool);
+			drawableModule.getPointDataGenerator().freePoints(this, particlePointDataPool, groupPool);
 		}
 
 		for (int i = activeParticles.size - 1; i >= 0; i--) {
