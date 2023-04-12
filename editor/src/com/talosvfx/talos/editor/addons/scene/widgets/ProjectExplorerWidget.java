@@ -766,8 +766,6 @@ public class ProjectExplorerWidget extends Table implements Observer {
             }
         }
 
-        filesToManipulate.clear();
-
         loadDirectoryTree((String) rootNode.getObject());
 
         expand(destination.path());
