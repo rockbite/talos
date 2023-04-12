@@ -119,6 +119,17 @@ public class GroupSelectionGizmo extends Gizmo {
 		}
 
 		for (GameObject object : viewportWidget.selection) {
+			GameObject parent = object;
+			boolean needUpdate = true;
+			while ((parent = parent.getParent()) != null) {
+				if (viewportWidget.selection.contains(parent)) {
+					needUpdate = false;
+					break;
+				}
+			}
+			if (!needUpdate)
+				continue;
+
 			if (object.hasComponent(TransformComponent.class)) {
 				Vector2 worldSpaceOffset = worldSpaceStartingOffsets.get(object);
 				Vector2 newWorldSpace = new Vector2(x, y).sub(worldSpaceOffset);
