@@ -293,7 +293,6 @@ public class SceneUtils {
 		final SavableContainer currentContainer = gameAsset.getResource();
 
 		if (!copyPasteBuffer.containsKey(currentContainer)) return;
-		if (copyPasteBuffer.get(currentContainer).isEmpty()) return;
 
 		final Vector3 camPosAtPaste = getCameraPosForScene(gameAsset);
 
