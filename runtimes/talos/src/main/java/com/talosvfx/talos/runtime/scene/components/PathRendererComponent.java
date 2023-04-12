@@ -37,7 +37,7 @@ public class PathRendererComponent extends RendererComponent implements GameReso
     public transient Color finalColor = new Color();
 
     @ValueProperty
-    public int repeatCount = 5;
+    public float repeatCount = 5f;
 
     private short[] indices;
     private float[] vertices;
@@ -68,6 +68,7 @@ public class PathRendererComponent extends RendererComponent implements GameReso
             }
         }
     };
+    private float THRESHOLD = 0.0001f;
 
 
     @Override
@@ -112,7 +113,7 @@ public class PathRendererComponent extends RendererComponent implements GameReso
 
 
         thickness = jsonData.getFloat("thickness", 3f);
-        repeatCount = jsonData.getInt("repeatCount", 5);
+        repeatCount = jsonData.getFloat("repeatCount", 5f);
 
         super.read(json, jsonData);
     }
@@ -165,6 +166,7 @@ public class PathRendererComponent extends RendererComponent implements GameReso
         edgePoints.clear();
         vectorPool.freeAll(points);
         vectorPool.freeAll(edgePoints);
+        progress = 0;
         if (this.prev != null) {
             vectorPool.free(this.prev);
         }
@@ -183,17 +185,6 @@ public class PathRendererComponent extends RendererComponent implements GameReso
             points.add(vectorPool.obtain().set(curr));
         }
 
-        computeEdgePoints(points, thickness);
-
-        int ATTRIBUTE_COUNT = 5;
-        int verticesLength = edgePoints.size * ATTRIBUTE_COUNT + (repeatCount) * 2 * ATTRIBUTE_COUNT;
-        if (vertices == null || verticesLength != vertices.length) {
-            vertices = new float[verticesLength];
-
-            int indicesLength = (vertices.length / ATTRIBUTE_COUNT - 2) * 3;
-            indices = new short[indicesLength];
-        }
-
         float length = 0;
         Vector2 prev = vectorPool.obtain().set(points.get(0).x, points.get(0).y);
         for (int i = 1; i < points.size; i++) {
@@ -203,6 +194,19 @@ public class PathRendererComponent extends RendererComponent implements GameReso
         vectorPool.free(prev);
 
         float pixelSize = repeatCount / length;
+
+        addCriticalPoints(pixelSize);
+
+        computeEdgePoints(points, thickness);
+
+        int ATTRIBUTE_COUNT = 5;
+        int verticesLength = (int) (edgePoints.size * ATTRIBUTE_COUNT + (Math.ceil(repeatCount)) * 2 * ATTRIBUTE_COUNT);
+        if (vertices == null || verticesLength != vertices.length) {
+            vertices = new float[verticesLength];
+
+            int indicesLength = (vertices.length / ATTRIBUTE_COUNT - 2) * 3;
+            indices = new short[indicesLength];
+        }
 
         int idx = 0;
         this.prev = null;
@@ -221,6 +225,33 @@ public class PathRendererComponent extends RendererComponent implements GameReso
             indices[tri++] = (short) (i + 2);
             indices[tri++] = (short) (i + 3);
         }
+    }
+
+    private void addCriticalPoints(float pixelSize) {
+        Vector2 prev = vectorPool.obtain().set(points.get(0));
+        float progress = 0f;
+        int size = points.size;
+        for (int i = 1; i < size; i++) {
+            Vector2 point = points.get(i);
+            float length = point.dst(prev) * pixelSize;
+            if (progress + length > 1f) {
+                float x = (1f - progress) / pixelSize;
+                float distance = prev.dst(point);
+                float newX = prev.x + (x / distance) * (point.x - prev.x);
+                float newY = prev.y + (x / distance) * (point.y - prev.y);
+                Vector2 newPoint = vectorPool.obtain().set(newX, newY);
+                float v = progress + prev.dst(newPoint) * pixelSize;
+                points.insert(i, newPoint);
+                size++;
+                progress = 0;
+                prev.set(newX, newY);
+                continue;
+            } else {
+                progress += length;
+            }
+            prev.set(point);
+        }
+        vectorPool.free(prev);
     }
 
     public int getNumSegments() {
@@ -268,13 +299,15 @@ public class PathRendererComponent extends RendererComponent implements GameReso
 
     public int setData(int idx, float x1, float y1, float x2, float y2, float centerX, float centerY, float pixelSize) {
         TextureRegion region = gameAsset.getResource();
-        float u = MathUtils.lerp(region.getU(), region.getU2(), progress);
 
         if (prev != null) {
             progress += prev.dst(centerX, centerY) * pixelSize;
         } else {
             prev = vectorPool.obtain();
         }
+
+
+        float u = progress;
 
         prev.set(centerX, centerY);
 
@@ -294,7 +327,7 @@ public class PathRendererComponent extends RendererComponent implements GameReso
         vertices[idx++] = u; // u
         vertices[idx++] = v2; // v
 
-        if (progress >= 1f) {
+        if (Math.abs(progress - 1f) < THRESHOLD) {
             progress = 0f;
 
             vertices[idx++] = x1; // x
