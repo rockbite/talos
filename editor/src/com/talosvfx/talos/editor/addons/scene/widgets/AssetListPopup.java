@@ -33,6 +33,8 @@ public class AssetListPopup<T> extends VisWindow {
     private FilteredTree.Node<GameAsset<T>> rootNode;
     private FilteredTree.ItemListener<GameAsset<T>> filterTreeListener;
 
+    private static final float MIN_HEIGHT = 400f;
+
     public void resetSelection () {
         tree.getSelection().clear();
     }
@@ -62,7 +64,7 @@ public class AssetListPopup<T> extends VisWindow {
         tree = new FilteredTree<>(getSkin());
         searchFilteredTree = new SearchFilteredTree<>(getSkin(), tree, null);
 
-        add(searchFilteredTree).width(300).height(200).row();
+        add(searchFilteredTree).width(300).height(MIN_HEIGHT).row();
         invalidate(); pack();
 
         createListeners();
@@ -131,8 +133,8 @@ public class AssetListPopup<T> extends VisWindow {
         getStage().setScrollFocus(searchFilteredTree.scrollPane);
         tree.collapseAll();
 
-        if(getHeight() < 200) {
-            setHeight(200);
+        if(getHeight() < MIN_HEIGHT) {
+            setHeight(MIN_HEIGHT);
         }
 
         tree.expandAll();
