@@ -88,6 +88,9 @@ public class PaintSurfaceGizmo extends Gizmo implements Observer, GameAsset.Game
 
         PaintSurfaceComponent surface = gameObject.getComponent(PaintSurfaceComponent.class);
 
+        if (surface.getGameResource().getResource() == null)
+            return;
+
         Texture resource = surface.getGameResource().getResource().getTexture();
         if (resource != null && !surface.getGameResource().isBroken()) {
             Vector2 size = surface.size;
@@ -155,8 +158,9 @@ public class PaintSurfaceGizmo extends Gizmo implements Observer, GameAsset.Game
 
         final float brushWidthInPixels = brushTexture.getWidth();
         final float brushHeightInPixels = brushTexture.getHeight();
-        final float brushXPosInPixels = mouseXPosOnSceneInPixels / surfaceSize.x - brushWidthInPixels / 2.0f;
-        final float brushYPosInPixels = mouseYPosOnSceneInPixels / surfaceSize.y - brushHeightInPixels / 2.0f;
+
+        final float brushXPosInPixels = (float) (Math.floor(mouseXPosOnSceneInPixels / surfaceSize.x) - brushWidthInPixels / 2.0f);
+        final float brushYPosInPixels = (float) (Math.ceil(mouseYPosOnSceneInPixels / surfaceSize.y) - brushHeightInPixels / 2.0f);
 
         innerBatch.draw(brushTexture, brushXPosInPixels, brushYPosInPixels, brushWidthInPixels, brushHeightInPixels);
         innerBatch.end();
