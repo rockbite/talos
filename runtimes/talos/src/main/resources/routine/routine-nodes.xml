@@ -236,6 +236,7 @@
                 <dynamicValue port="input" name="x" type="float" min="-1000" max="1000">x:</dynamicValue>
                 <dynamicValue port="input" name="y" type="float" min="-1000" max="1000">y:</dynamicValue>
             </group>
+            <inputText port="input" name="layerName" type="string">Layer</inputText>
             <dynamicValue port="input" name="layerOrder" type="int" min="0" max="500" step="1">Layer order
             </dynamicValue>
             <value port="output" name="gameObject" type="gameobject">gameObject</value>

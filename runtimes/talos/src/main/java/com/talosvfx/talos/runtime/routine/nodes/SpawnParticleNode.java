@@ -3,11 +3,14 @@ package com.talosvfx.talos.runtime.routine.nodes;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 
+import com.talosvfx.talos.runtime.RuntimeContext;
 import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.runtime.routine.RoutineNode;
 import com.talosvfx.talos.runtime.routine.TickableNode;
 import com.talosvfx.talos.runtime.scene.GameObject;
+import com.talosvfx.talos.runtime.scene.SceneLayer;
 import com.talosvfx.talos.runtime.scene.components.ParticleComponent;
+import com.talosvfx.talos.runtime.scene.components.SpineRendererComponent;
 import com.talosvfx.talos.runtime.scene.components.TransformComponent;
 import com.talosvfx.talos.runtime.utils.NamingUtils;
 import com.talosvfx.talos.runtime.vfx.ParticleEffectInstance;
@@ -50,6 +53,15 @@ public class SpawnParticleNode extends RoutineNode implements TickableNode {
             goRef.addComponent(particleComponent);
             particleComponent.setGameAsset(asset);
             particleComponent.orderingInLayer = fetchIntValue("layerOrder");
+
+            String layerName = fetchStringValue("layerName");
+            SceneLayer layer = RuntimeContext.getInstance().sceneData.getSceneLayerByName(layerName);
+            if (layer != null) {
+                particleComponent.sortingLayer = layer;
+            } else {
+                SceneLayer preferredSceneLayer = RuntimeContext.getInstance().sceneData.getPreferredSceneLayer();
+                particleComponent.sortingLayer = preferredSceneLayer;
+            }
 
             target.addGameObject(goRef);
 
