@@ -16,6 +16,8 @@ public interface IEmitter {
     EmitterModule getEmitterModule();
     DrawableModule getDrawableModule();
     Vector3 getEffectPosition();
+
+    int getEffectUniqueID ();
     ScopePayload getScope();
     Color getTint();
 

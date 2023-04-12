@@ -292,4 +292,10 @@ public class Particle implements Pool.Poolable {
             ((HistoryParticlePointDataGeneratorModule)pointDataGenerator).onParticleKilled(this);
         }
     }
+
+    public int getRequesterIDUniqueToGlobalScope () {
+        int x = requesterID;
+        int y = emitterReference.getEffectUniqueID();
+        return ((x + y) * (x + y + 1)) / 2 + y;
+    }
 }

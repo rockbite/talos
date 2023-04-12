@@ -70,11 +70,15 @@ public class ParticleEmitterInstance implements IEmitter {
 	};
     private boolean isStopped = false;
 
+	private int uniqueID;
+	private static int globalUniqueID = 1;
+
     public ParticleEmitterInstance (ParticleEmitterDescriptor moduleGraph, ParticleEffectInstance particleEffectInstance) {
 		this.emitterGraph = moduleGraph;
         parentParticleInstance = particleEffectInstance;
         setScope(particleEffectInstance.scopePayload); //Default set to the parent payload instance
         init();
+		uniqueID = globalUniqueID++;
 	}
 
 	public void init () {
@@ -364,6 +368,11 @@ public class ParticleEmitterInstance implements IEmitter {
 	@Override
 	public Vector3 getEffectPosition () {
 		return getEffect().position;
+	}
+
+	@Override
+	public int getEffectUniqueID () {
+		return uniqueID;
 	}
 
 	public ScopePayload getScope () {
