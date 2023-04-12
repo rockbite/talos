@@ -8,6 +8,8 @@ import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.rockbite.bongo.engine.Bongo;
 import com.rockbite.bongo.engine.EngineBuilder;
 import com.rockbite.bongo.engine.components.render.DepthLayer;
@@ -24,6 +26,7 @@ import com.rockbite.bongo.engine.systems.render.EngineDebugSystem;
 import com.rockbite.bongo.engine.systems.render.EnvironmentConfigSystem;
 import com.rockbite.bongo.engine.systems.render.PBRShadedPassSystem;
 import com.rockbite.bongo.engine.systems.render.ShadowPassSystem;
+import com.talosvfx.talos.runtime.scene.components.TransformComponent;
 import com.talosvfx.talos.runtime.vfx.ParticleEffectInstance;
 import com.talosvfx.talos.runtime.components.Particle;
 import com.talosvfx.talos.runtime.systems.render.ParticleRenderPassSystem;
@@ -79,6 +82,11 @@ public class BongoPreview {
 		entity.getComponent(Particle.class).setParticleEffectInstance(particleEffectInstance);
 	}
 
+	public void updateParticlePosition (Vector3 vector3) {
+		Entity entity = world.getEntity(particleEntityID);
+		Particle component = entity.getComponent(Particle.class);
+		component.getTransform().setToTranslation(vector3);
+	}
 
 	private SceneModelInstance createBox (String name, Color color, float width, float height, float depth, float metal, float roughness) {
 		final SceneModel testBox = CubeUtils.createBox(

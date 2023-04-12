@@ -101,7 +101,7 @@ public class HistoryParticlePointDataGeneratorModule extends ParticlePointDataGe
 				shouldAdd = true;
 			} else {
 				final Vector3 newest = locationPoints.peek();
-				final float dist = tempVec3.set(newest).dst(particle.position);
+				final float dist = tempVec3.set(newest).dst(particle.getX(), particle.getY(), particle.getZ());
 				if (dist > minDistance.getFloat()) {
 					shouldAdd = true;
 				}
@@ -112,7 +112,7 @@ public class HistoryParticlePointDataGeneratorModule extends ParticlePointDataGe
 				if (shouldPop) {
 					locationPoints.removeIndex(0);
 				}
-				locationPoints.add(vectorPool.obtain().set(particle.position));
+				locationPoints.add(vectorPool.obtain().set(particle.getX(), particle.getY(), particle.getZ()));
 			}
 
 		}
