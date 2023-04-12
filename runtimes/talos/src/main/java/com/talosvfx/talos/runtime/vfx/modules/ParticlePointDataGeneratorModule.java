@@ -28,16 +28,6 @@ public abstract class ParticlePointDataGeneratorModule extends AbstractModule {
 
 	protected abstract void createPoints (Particle particle, Pool<ParticlePointData> particlePointDataPool, ParticlePointGroup group);
 
-	public void freePoints (IEmitter emitter, Pool<ParticlePointData> particlePointDataPool, Pool<ParticlePointGroup> groupPool) {
-		Array<ParticlePointGroup> pointData = emitter.pointData();
-		for (ParticlePointGroup group : pointData) {
-			particlePointDataPool.freeAll(group.pointDataArray);
-			group.pointDataArray.clear();
-
-			groupPool.free(group);
-		}
-		pointData.clear();
-	}
 
 
 
