@@ -324,6 +324,8 @@ public class ParticleEmitterInstance implements IEmitter {
 			particlePool.free(next);
 			iterator.remove();
 		}
+		freePoints(this, particlePointDataPool, groupPool);
+
 	}
 
 	@Override
