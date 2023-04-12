@@ -298,7 +298,7 @@ public class PathRendererComponent extends RendererComponent implements GameReso
     private Vector2 prev;
 
     public int setData(int idx, float x1, float y1, float x2, float y2, float centerX, float centerY, float pixelSize) {
-        TextureRegion region = gameAsset.getResource();
+        TextureAtlas.AtlasRegion region = gameAsset.getResource();
 
         if (prev != null) {
             progress += prev.dst(centerX, centerY) * pixelSize;
@@ -307,7 +307,7 @@ public class PathRendererComponent extends RendererComponent implements GameReso
         }
 
 
-        float u = progress;
+        float u = MathUtils.lerp(region.getU(), region.getU2(), progress);
 
         prev.set(centerX, centerY);
 
