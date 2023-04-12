@@ -103,11 +103,12 @@ public class GameObjectRenderer {
 				Vector2 size = ((SpriteRendererComponent)componentAssignableFrom).size;
 				Vector2 worldScale = transformComponent.worldScale;
 
-				float fakeOffsetY = componentAssignableFrom.fakeOffsetY;
-
 				float totalHeight = size.y * worldScale.y;
 				y -= totalHeight/2f;
+			}
 
+			if (componentAssignableFrom instanceof RendererComponent) {
+				float fakeOffsetY = componentAssignableFrom.fakeOffsetY;
 				y += fakeOffsetY;
 			}
 
