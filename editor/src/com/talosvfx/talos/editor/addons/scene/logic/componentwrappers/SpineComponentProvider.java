@@ -45,6 +45,8 @@ public class SpineComponentProvider extends RendererComponentProvider<SpineRende
 		PropertyWidget inheritParentColorWidget = WidgetFactory.generate(component, "shouldInheritParentColor", "Inherit Parent Color");
 		properties.add(inheritParentColorWidget);
 
+		properties.add(WidgetFactory.generate(component, "applyAnimation", "Apply Animation"));
+
 		SelectBoxWidget animSelectWidget = new SelectBoxWidget("Animation", new Supplier<String>() {
 			@Override
 			public String get () {
