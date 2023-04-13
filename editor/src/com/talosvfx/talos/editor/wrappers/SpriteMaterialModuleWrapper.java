@@ -18,7 +18,7 @@ package com.talosvfx.talos.editor.wrappers;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasSprite;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
@@ -34,9 +34,9 @@ import com.talosvfx.talos.runtime.vfx.modules.SpriteMaterialModule;
 public class SpriteMaterialModuleWrapper extends ModuleWrapper<SpriteMaterialModule> {
 
     private Label assetNameLabel;
-    private GenericAssetSelectionWidget<AtlasRegion> selector;
+    private GenericAssetSelectionWidget<AtlasSprite> selector;
 
-    private GameAsset<AtlasRegion> asset;
+    private GameAsset<AtlasSprite> asset;
 
     public SpriteMaterialModuleWrapper() {
         super();

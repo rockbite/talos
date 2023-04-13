@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasSprite;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -212,7 +213,7 @@ public class HierarchyWidget extends Table implements Observer, EventContextProv
 					//We support single game asset drops
 					GlobalDragAndDrop.GameAssetDragAndDropPayload gameAssetPayload = (GlobalDragAndDrop.GameAssetDragAndDropPayload)object;
 					if (gameAssetPayload.getGameAsset().type == GameAssetType.SPRITE) {
-						GameAsset<TextureAtlas.AtlasRegion> gameAsset = (GameAsset<TextureAtlas.AtlasRegion>)gameAssetPayload.getGameAsset();
+						GameAsset<AtlasSprite> gameAsset = (GameAsset<AtlasSprite>) gameAssetPayload.getGameAsset();
 
 
 						SceneUtils.createSpriteObject(currentContainer, gameAsset, vec, parent);

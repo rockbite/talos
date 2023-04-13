@@ -2,7 +2,7 @@ package com.talosvfx.talos.editor.addons.scene.logic.componentwrappers;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasSprite;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Array;
@@ -31,14 +31,14 @@ public class PaintSurfaceComponentProvider extends AComponentProvider<PaintSurfa
 
 		Array<PropertyWidget> properties = new Array<>();
 
-		PropertyPanelAssetSelectionWidget<AtlasRegion> textureWidget = new PropertyPanelAssetSelectionWidget<>("Texture", GameAssetType.SPRITE, new Supplier<GameAsset<AtlasRegion>>() {
+		PropertyPanelAssetSelectionWidget<AtlasSprite> textureWidget = new PropertyPanelAssetSelectionWidget<>("Texture", GameAssetType.SPRITE, new Supplier<GameAsset<AtlasSprite>>() {
 			@Override
-			public GameAsset<AtlasRegion> get () {
+			public GameAsset<AtlasSprite> get () {
 				return component.gameAsset;
 			}
-		}, new PropertyWidget.ValueChanged<GameAsset<AtlasRegion>>() {
+		}, new PropertyWidget.ValueChanged<GameAsset<AtlasSprite>>() {
 			@Override
-			public void report (GameAsset<AtlasRegion> value) {
+			public void report (GameAsset<AtlasSprite> value) {
 				component.setGameAsset(value);
 				GameObject gameObject = component.getGameObject();
 				GameObjectContainer gameObjectContainer = gameObject.getGameObjectContainerRoot();

@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.PixmapIO;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.TextureData;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasSprite;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
@@ -19,9 +19,9 @@ import com.talosvfx.talos.runtime.scene.ValueProperty;
 import java.util.UUID;
 import java.util.function.Supplier;
 
-public class PaintSurfaceComponent extends AComponent implements GameResourceOwner<AtlasRegion>, Json.Serializable {
+public class PaintSurfaceComponent extends AComponent implements GameResourceOwner<AtlasSprite>, Json.Serializable {
 
-    public GameAsset<AtlasRegion> gameAsset;
+    public GameAsset<AtlasSprite> gameAsset;
 
     @ValueProperty(prefix = {"W", "H"})
     public Vector2 size = new Vector2(1, 1);
@@ -58,12 +58,12 @@ public class PaintSurfaceComponent extends AComponent implements GameResourceOwn
 
 
     @Override
-    public GameAsset<AtlasRegion> getGameResource () {
+    public GameAsset<AtlasSprite> getGameResource () {
         return gameAsset;
     }
 
     @Override
-    public void setGameAsset (GameAsset<AtlasRegion> newGameAsset) {
+    public void setGameAsset (GameAsset<AtlasSprite> newGameAsset) {
         if (this.gameAsset != null) {
             //Remove from old game asset, it might be the same, but it may also have changed
             this.gameAsset.listeners.removeValue(gameAssetUpdateListener, true);
@@ -88,7 +88,7 @@ public class PaintSurfaceComponent extends AComponent implements GameResourceOwn
     }
 
     public void saveOnFile () {
-        GameAsset<AtlasRegion> gameResource = getGameResource();
+        GameAsset<AtlasSprite> gameResource = getGameResource();
         if (gameResource.isBroken()) {
             return;
         }
@@ -120,12 +120,12 @@ public class PaintSurfaceComponent extends AComponent implements GameResourceOwn
     }
 
     private void loadTextureFromIdentifier (String gameResourceIdentifier) {
-        GameAsset<AtlasRegion> assetForIdentifier = RuntimeContext.getInstance().AssetRepository.getAssetForIdentifier(gameResourceIdentifier, GameAssetType.SPRITE);
+        GameAsset<AtlasSprite> assetForIdentifier = RuntimeContext.getInstance().AssetRepository.getAssetForIdentifier(gameResourceIdentifier, GameAssetType.SPRITE);
         setGameAsset(assetForIdentifier);
     }
 
     private void loadTextureFromUniqueIdentifier (UUID gameResourceUUID) {
-        GameAsset<AtlasRegion> assetForUniqueIdentifier = RuntimeContext.getInstance().AssetRepository.getAssetForUniqueIdentifier(gameResourceUUID, GameAssetType.SPRITE);
+        GameAsset<AtlasSprite> assetForUniqueIdentifier = RuntimeContext.getInstance().AssetRepository.getAssetForUniqueIdentifier(gameResourceUUID, GameAssetType.SPRITE);
         setGameAsset(assetForUniqueIdentifier);
     }
 }
