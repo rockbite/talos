@@ -19,7 +19,8 @@ package com.talosvfx.talos.runtime.vfx.modules;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasSprite;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasSprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
@@ -32,12 +33,12 @@ import com.talosvfx.talos.runtime.vfx.ParticleEmitterDescriptor;
 import com.talosvfx.talos.runtime.vfx.values.ModuleValue;
 
 
-public class SpriteMaterialModule extends MaterialModule implements GameResourceOwner<AtlasRegion>, GameAsset.GameAssetUpdateListener {
+public class SpriteMaterialModule extends MaterialModule implements GameResourceOwner<AtlasSprite>, GameAsset.GameAssetUpdateListener {
 
 
 	private transient TextureRegion region;
 
-	public GameAsset<AtlasRegion> asset;
+	public GameAsset<AtlasSprite> asset;
 
 	/**
 	 * To be removed, here for backwards compatibility
@@ -72,7 +73,7 @@ public class SpriteMaterialModule extends MaterialModule implements GameResource
 		//deprecated
 		assetIdentifier = jsonData.getString("asset", "white");
 
-		GameAsset<AtlasRegion> asset = GameResourceOwner.readAsset(json, jsonData);
+		GameAsset<AtlasSprite> asset = GameResourceOwner.readAsset(json, jsonData);
 
 		if (asset != null) {
 			if (asset.isBroken()) {
@@ -85,7 +86,7 @@ public class SpriteMaterialModule extends MaterialModule implements GameResource
 	}
 
 	public void setToDefault () {
-		GameAsset<AtlasRegion> defaultValue = RuntimeContext.getInstance().AssetRepository.getAssetForIdentifier("white", GameAssetType.SPRITE);
+		GameAsset<AtlasSprite> defaultValue = RuntimeContext.getInstance().AssetRepository.getAssetForIdentifier("white", GameAssetType.SPRITE);
 		setGameAsset(defaultValue);
 	}
 
@@ -110,12 +111,12 @@ public class SpriteMaterialModule extends MaterialModule implements GameResource
 	}
 
 	@Override
-	public GameAsset<AtlasRegion> getGameResource () {
+	public GameAsset<AtlasSprite> getGameResource () {
 		return asset;
 	}
 
 	@Override
-	public void setGameAsset (GameAsset<AtlasRegion> gameAsset) {
+	public void setGameAsset (GameAsset<AtlasSprite> gameAsset) {
 		if (this.asset != null) {
 			//Remove from old game asset, it might be the same, but it may also have changed
 			this.asset.listeners.removeValue(this, true);

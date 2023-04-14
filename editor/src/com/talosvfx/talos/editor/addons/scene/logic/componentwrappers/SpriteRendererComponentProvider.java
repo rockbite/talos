@@ -2,7 +2,7 @@ package com.talosvfx.talos.editor.addons.scene.logic.componentwrappers;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasSprite;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Array;
@@ -29,14 +29,14 @@ public final class SpriteRendererComponentProvider extends RendererComponentProv
 	public Array<PropertyWidget> getListOfProperties () {
 		Array<PropertyWidget> properties = new Array<>();
 
-		PropertyPanelAssetSelectionWidget<AtlasRegion> textureWidget = new PropertyPanelAssetSelectionWidget<>("Texture", GameAssetType.SPRITE, new Supplier<GameAsset<AtlasRegion>>() {
+		PropertyPanelAssetSelectionWidget<AtlasSprite> textureWidget = new PropertyPanelAssetSelectionWidget<>("Texture", GameAssetType.SPRITE, new Supplier<GameAsset<AtlasSprite>>() {
 			@Override
-			public GameAsset<AtlasRegion> get () {
+			public GameAsset<AtlasSprite> get () {
 				return component.getGameResource();
 			}
-		}, new PropertyWidget.ValueChanged<GameAsset<AtlasRegion>>() {
+		}, new PropertyWidget.ValueChanged<GameAsset<AtlasSprite>>() {
 			@Override
-			public void report (GameAsset<AtlasRegion> value) {
+			public void report (GameAsset<AtlasSprite> value) {
 				component.setGameAsset(value);
 				GameObject gameObject = getComponent().getGameObject();
 				SceneUtils.componentUpdated(gameObject.getGameObjectContainerRoot(), gameObject, getComponent(), false);
@@ -70,7 +70,7 @@ public final class SpriteRendererComponentProvider extends RendererComponentProv
 				if (!component.shouldFixAspectRatio(true))
 					return;
 
-				final AtlasRegion texture = component.getGameResource().getResource();
+				final AtlasSprite texture = component.getGameResource().getResource();
 
 				if (texture != null) {
 					final float aspect = texture.getRegionHeight() * 1f / texture.getRegionWidth();
@@ -93,7 +93,7 @@ public final class SpriteRendererComponentProvider extends RendererComponentProv
 					final Vector2PropertyWidget vector2PropertyWidget = ((Vector2PropertyWidget)sizeWidget);
 					final ValueWidget xValue = vector2PropertyWidget.xValue;
 					final ValueWidget yValue = vector2PropertyWidget.yValue;
-					final AtlasRegion texture = component.getGameResource().getResource();
+					final AtlasSprite texture = component.getGameResource().getResource();
 
 					if (texture != null) {
 						final float aspect = texture.getRegionHeight() * 1f / texture.getRegionWidth();

@@ -5,7 +5,7 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasSprite;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.collision.BoundingBox;
 import com.badlogic.gdx.utils.Json;
@@ -21,10 +21,12 @@ import com.talosvfx.talos.runtime.scene.ValueProperty;
 
 import java.util.UUID;
 
-public class SpriteRendererComponent extends RendererComponent implements GameResourceOwner<AtlasRegion>, ISizableComponent, IColorHolder {
+import static com.badlogic.gdx.graphics.g2d.TextureAtlas.*;
 
-    public transient GameAsset<AtlasRegion> defaultGameAsset;
-    public GameAsset<AtlasRegion> gameAsset;
+public class SpriteRendererComponent extends RendererComponent implements GameResourceOwner<AtlasSprite>, ISizableComponent, IColorHolder {
+
+    public transient GameAsset<AtlasSprite> defaultGameAsset;
+    public GameAsset<AtlasSprite> gameAsset;
 
     public Color color = new Color(Color.WHITE);
     public transient Color finalColor = new Color();
@@ -46,12 +48,12 @@ public class SpriteRendererComponent extends RendererComponent implements GameRe
     }
 
     @Override
-    public GameAsset<AtlasRegion> getGameResource () {
+    public GameAsset<AtlasSprite> getGameResource () {
         return gameAsset;
     }
 
     @Override
-    public void setGameAsset (GameAsset<AtlasRegion> newGameAsset) {
+    public void setGameAsset (GameAsset<AtlasSprite> newGameAsset) {
         if (this.gameAsset != null) {
             //Remove from old game asset, it might be the same, but it may also have changed
             this.gameAsset.listeners.removeValue(gameAssetUpdateListener, true);
@@ -67,10 +69,10 @@ public class SpriteRendererComponent extends RendererComponent implements GameRe
         gameAssetUpdateListener.onUpdate();
 
         if (fixAspectRatio) {
-            final AtlasRegion texture = this.gameAsset.getResource();
+            final AtlasSprite texture = this.gameAsset.getResource();
 
             if (texture == null) return;
-            final float aspect = texture.getRegionHeight() * 1f / texture.getRegionWidth();
+            final float aspect = texture.getRegionWidth() * 1f / texture.getRegionWidth();
             size.y = size.x * aspect;
         }
     }
@@ -92,12 +94,12 @@ public class SpriteRendererComponent extends RendererComponent implements GameRe
     };
 
     private void loadTextureFromIdentifier (String gameResourceIdentifier) {
-        GameAsset<AtlasRegion> assetForIdentifier = RuntimeContext.getInstance().AssetRepository.getAssetForIdentifier(gameResourceIdentifier, GameAssetType.SPRITE);
+        GameAsset<AtlasSprite> assetForIdentifier = RuntimeContext.getInstance().AssetRepository.getAssetForIdentifier(gameResourceIdentifier, GameAssetType.SPRITE);
         setGameAsset(assetForIdentifier);
     }
 
     private void loadTextureFromUniqueIdentifier (UUID gameResourceIdentifier) {
-        GameAsset<AtlasRegion> assetForUniqueIdentifier = RuntimeContext.getInstance().AssetRepository.getAssetForUniqueIdentifier(gameResourceIdentifier, GameAssetType.SPRITE);
+        GameAsset<AtlasSprite> assetForUniqueIdentifier = RuntimeContext.getInstance().AssetRepository.getAssetForUniqueIdentifier(gameResourceIdentifier, GameAssetType.SPRITE);
         setGameAsset(assetForUniqueIdentifier);
     }
 

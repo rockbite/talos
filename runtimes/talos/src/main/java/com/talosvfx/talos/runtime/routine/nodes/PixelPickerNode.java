@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasSprite;
 import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.runtime.routine.RoutineNode;
 
@@ -20,7 +20,7 @@ public class PixelPickerNode extends RoutineNode {
         int x = (int)fetchFloatValue("x");
         int y = (int)fetchFloatValue("y");
 
-        GameAsset<AtlasRegion> asset = (GameAsset<AtlasRegion>) fetchAssetValue("texture");
+        GameAsset<AtlasSprite> asset = (GameAsset<AtlasSprite>) fetchAssetValue("texture");
         if (asset == null) {
             return Color.BLACK;
         }

@@ -6,7 +6,7 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasSprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.PixmapTextureData;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
@@ -101,7 +101,7 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 
 	private ObjectMap<GameAssetType, ObjectMap<String, GameAsset<?>>> identifierGameAssetMap = new ObjectMap<>();
 	private ObjectMap<GameAssetType, ObjectMap<UUID, GameAsset<?>>> uniqueIdentifierGameAssetMap = new ObjectMap<>();
-	private ObjectMap<GameAsset<AtlasRegion>, NinePatch> patchCache = new ObjectMap<>();
+	private ObjectMap<GameAsset<AtlasSprite>, NinePatch> patchCache = new ObjectMap<>();
 	private ObjectSet<FileHandle> newFilesSeen = new ObjectSet<>();
 
 	public <T> GameAsset<T> getAssetForUniqueIdentifier (UUID uuid, GameAssetType type) {
@@ -129,7 +129,7 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 	}
 
 	@Override
-	public NinePatch obtainNinePatch (GameAsset<AtlasRegion> gameAsset) {
+	public NinePatch obtainNinePatch (GameAsset<AtlasSprite> gameAsset) {
 		if (patchCache.containsKey(gameAsset) && false) { //something better, maybe hash on pixel size + texture for this
 			return patchCache.get(gameAsset);
 		} else {
@@ -144,7 +144,7 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 	@EventHandler
 	public void onSpritePixelPerUnitUpdateEvent (SpritePixelPerUnitUpdateEvent event) {
 		final SpriteMetadata metadata = event.getSpriteMetadata();
-		for (ObjectMap.Entry<GameAsset<AtlasRegion>, NinePatch> gameAssetNinePatchEntry : patchCache) {
+		for (ObjectMap.Entry<GameAsset<AtlasSprite>, NinePatch> gameAssetNinePatchEntry : patchCache) {
 			if (gameAssetNinePatchEntry.key.getRootRawAsset().metaData.equals(metadata)) {
 				final NinePatch patch = new NinePatch(gameAssetNinePatchEntry.key.getResource(), metadata.borderData[0], metadata.borderData[1], metadata.borderData[2], metadata.borderData[3]);
 				final float scale = 1 / metadata.pixelsPerUnit;
@@ -911,7 +911,7 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 			case SPRITE:
 
 				if (gameAssetOut == null) {
-					GameAsset<AtlasRegion> textureGameAsset = new GameAsset<>(gameAssetIdentifier, assetTypeFromExtension);
+					GameAsset<AtlasSprite> textureGameAsset = new GameAsset<>(gameAssetIdentifier, assetTypeFromExtension);
 					gameAssetOut = textureGameAsset;
 
 					if (createLinks) {
@@ -921,7 +921,7 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 				}
 
 				Texture resourcePayload = new Texture(value.handle);
-				((GameAsset<AtlasRegion>)gameAssetOut).setResourcePayload(new AtlasRegion(new TextureRegion(resourcePayload)));
+				((GameAsset<AtlasSprite>)gameAssetOut).setResourcePayload(new AtlasSprite(new TextureAtlas.AtlasRegion(new TextureRegion(resourcePayload))));
 
 				break;
 			case ATLAS:
@@ -1240,7 +1240,7 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 			switch (assetTypeFromExtension) {
 			case SPRITE:
 
-				GameAsset<AtlasRegion> textureGameAsset = (GameAsset<AtlasRegion>)gameAsset;
+				GameAsset<AtlasSprite> textureGameAsset = (GameAsset<AtlasSprite>)gameAsset;
 				textureGameAsset.getResource().getTexture().dispose();
 				break;
 			case ATLAS:
@@ -1981,7 +1981,7 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 		}
 	}
 
-	public void resizeAsset (GameAsset<AtlasRegion> gameAsset, int width, int height) {
+	public void resizeAsset (GameAsset<AtlasSprite> gameAsset, int width, int height) {
 		final FileHandle fileHandle = gameAsset.getRootRawAsset().handle;
 		final Pixmap oldPixmap = new Pixmap(fileHandle);
 		final Pixmap newPixmap = new Pixmap(width, height, oldPixmap.getFormat());
@@ -1989,7 +1989,7 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 
 		PixmapIO.writePNG(fileHandle, newPixmap);
 
-		gameAsset.setResourcePayload(new AtlasRegion(new TextureRegion(new Texture(newPixmap))));
+		gameAsset.setResourcePayload(new AtlasSprite(new TextureAtlas.AtlasRegion(new TextureRegion(new Texture(newPixmap)))));
 		gameAsset.setUpdated();
 
 		if (!oldPixmap.isDisposed()) {
@@ -2002,7 +2002,7 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 		Notifications.fireEvent(event);
 	}
 
-	public void fillAssetColor (GameAsset<AtlasRegion> gameAsset, Color color) {
+	public void fillAssetColor (GameAsset<AtlasSprite> gameAsset, Color color) {
 		final FileHandle fileHandle = gameAsset.getRootRawAsset().handle;
 		final Pixmap pixmap = new Pixmap(fileHandle);
 
@@ -2012,7 +2012,7 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 		PixmapIO.writePNG(fileHandle, pixmap);
 
 		if (!gameAsset.isBroken()) {
-			AtlasRegion resource = gameAsset.getResource();
+			AtlasSprite resource = gameAsset.getResource();
 			TextureData textureData = resource.getTexture().getTextureData();
 			if (textureData instanceof PixmapTextureData) {
 				textureData.consumePixmap().dispose();
@@ -2020,7 +2020,7 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 			resource.getTexture().dispose();
 		}
 
-		gameAsset.setResourcePayload(new AtlasRegion(new TextureRegion(new Texture(pixmap))));
+		gameAsset.setResourcePayload(new AtlasSprite(new TextureAtlas.AtlasRegion(new TextureRegion(new Texture(pixmap)))));
 		gameAsset.setUpdated();
 
 		// fire asset color fill event
