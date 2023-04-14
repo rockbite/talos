@@ -9,7 +9,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.PolygonBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasSprite;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
@@ -263,7 +263,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 					//We support single game asset drops
 					GlobalDragAndDrop.GameAssetDragAndDropPayload gameAssetPayload = (GlobalDragAndDrop.GameAssetDragAndDropPayload)object;
 					if (gameAssetPayload.getGameAsset().type == GameAssetType.SPRITE) {
-						GameAsset<AtlasRegion> gameAsset = (GameAsset<AtlasRegion>)gameAssetPayload.getGameAsset();
+						GameAsset<AtlasSprite> gameAsset = (GameAsset<AtlasSprite>)gameAssetPayload.getGameAsset();
 
 						Vector2 vec = new Vector2(Gdx.input.getX(), Gdx.input.getY());
 						Vector3 touchToWorld = getTouchToWorld(vec.x, vec.y);

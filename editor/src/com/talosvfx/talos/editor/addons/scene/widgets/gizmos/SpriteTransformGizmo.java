@@ -4,7 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasSprite;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Rectangle;
@@ -115,7 +115,7 @@ public class SpriteTransformGizmo extends SmartTransformGizmo {
 
         // if aspect ratio is fixed set height by width
         if (spriteRendererComponent.shouldFixAspectRatio(false)) {
-            AtlasRegion texture = spriteRendererComponent.getGameResource().getResource();
+            AtlasSprite texture = spriteRendererComponent.getGameResource().getResource();
 
             if (texture != null) {
                 final float aspect = texture.getRegionHeight() * 1f / texture.getRegionWidth();

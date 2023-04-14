@@ -8,7 +8,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.PolygonBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasSprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
@@ -295,7 +295,7 @@ public class MainRenderer implements Observer {
         GridPosition gridPosition = staticTile.getGridPosition();
         GameAsset<?> staticTilesAsset = staticTile.getStaticTilesAsset();
         if (staticTilesAsset.type == GameAssetType.SPRITE) {
-            GameAsset<AtlasRegion> texGameAsset = (GameAsset<AtlasRegion>)staticTilesAsset;
+            GameAsset<AtlasSprite> texGameAsset = (GameAsset<AtlasSprite>)staticTilesAsset;
             Texture resource = texGameAsset.getResource().getTexture();
 
             batch.draw(resource, gridPosition.getIntX(), gridPosition.getIntY(), tileSizeX, tileSizeY);

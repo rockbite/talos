@@ -2,14 +2,13 @@ package com.talosvfx.talos.runtime.assets;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Preferences;
-import com.badlogic.gdx.assets.loaders.FileHandleResolver;
 import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import lombok.Getter;
 
 import java.util.UUID;
+
+import static com.badlogic.gdx.graphics.g2d.TextureAtlas.*;
 
 public abstract class BaseAssetRepository {
 
@@ -32,7 +31,7 @@ public abstract class BaseAssetRepository {
 
 	public abstract <U> GameAsset<U> getAssetForUniqueIdentifier (UUID uuid, GameAssetType type);
 
-	public abstract NinePatch obtainNinePatch (GameAsset<TextureAtlas.AtlasRegion> gameAsset);
+	public abstract NinePatch obtainNinePatch (GameAsset<AtlasSprite> gameAsset);
 
 
 }

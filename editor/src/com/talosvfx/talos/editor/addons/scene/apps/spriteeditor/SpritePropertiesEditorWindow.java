@@ -3,7 +3,7 @@ package com.talosvfx.talos.editor.addons.scene.apps.spriteeditor;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasSprite;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -130,7 +130,7 @@ public class SpritePropertiesEditorWindow extends SpriteEditorWindow {
     }
 
     @Override
-    public void updateForGameAsset (GameAsset<AtlasRegion> gameAsset) {
+    public void updateForGameAsset (GameAsset<AtlasSprite> gameAsset) {
         this.gameAsset = gameAsset;
 
         final Texture texture = gameAsset.getResource().getTexture();

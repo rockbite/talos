@@ -2,7 +2,7 @@ package com.talosvfx.talos.runtime.scene.utils.propertyWrappers;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasSprite;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.talosvfx.talos.runtime.assets.GameAsset;
@@ -19,7 +19,7 @@ public class PropertyGameAssetWrapper extends PropertyWrapper<GameAsset<?>> impl
     };
 
     @Override
-    public GameAsset<AtlasRegion> parseValueFromString(String value) {
+    public GameAsset<AtlasSprite> parseValueFromString(String value) {
         return null; // todo: this is important when we bring back the scripts
     }
 
