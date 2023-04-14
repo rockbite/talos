@@ -1,6 +1,7 @@
 package com.talosvfx.talos.editor.addons.scene.logic.componentwrappers;
 
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasSprite;
 import com.badlogic.gdx.utils.Array;
 import com.talosvfx.talos.editor.addons.scene.SceneUtils;
 import com.talosvfx.talos.editor.addons.scene.widgets.property.PropertyPanelAssetSelectionWidget;
@@ -22,14 +23,14 @@ public class PathRendererComponentProvider extends RendererComponentProvider<Pat
     public Array<PropertyWidget> getListOfProperties () {
         Array<PropertyWidget> properties = new Array<>();
 
-        PropertyPanelAssetSelectionWidget<TextureAtlas.AtlasRegion> textureWidget = new PropertyPanelAssetSelectionWidget<>("Texture", GameAssetType.SPRITE, new Supplier<GameAsset<TextureAtlas.AtlasRegion>>() {
+        PropertyPanelAssetSelectionWidget<AtlasSprite> textureWidget = new PropertyPanelAssetSelectionWidget<>("Texture", GameAssetType.SPRITE, new Supplier<GameAsset<AtlasSprite>>() {
             @Override
-            public GameAsset<TextureAtlas.AtlasRegion> get () {
+            public GameAsset<AtlasSprite> get () {
                 return component.getGameResource();
             }
-        }, new PropertyWidget.ValueChanged<GameAsset<TextureAtlas.AtlasRegion>>() {
+        }, new PropertyWidget.ValueChanged<GameAsset<AtlasSprite>>() {
             @Override
-            public void report (GameAsset<TextureAtlas.AtlasRegion> value) {
+            public void report (GameAsset<AtlasSprite> value) {
                 component.setGameAsset(value);
                 GameObject gameObject = getComponent().getGameObject();
                 SceneUtils.componentUpdated(gameObject.getGameObjectContainerRoot(), gameObject, getComponent(), false);

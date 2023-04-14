@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.PolygonBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasSprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Bezier;
 import com.badlogic.gdx.math.MathUtils;
@@ -25,9 +26,9 @@ import com.talosvfx.talos.runtime.scene.ValueProperty;
 import java.util.UUID;
 
 
-public class PathRendererComponent extends RendererComponent implements GameResourceOwner<TextureAtlas.AtlasRegion>, ISizableComponent, IColorHolder {
-    public transient GameAsset<TextureAtlas.AtlasRegion> defaultGameAsset;
-    public GameAsset<TextureAtlas.AtlasRegion> gameAsset;
+public class PathRendererComponent extends RendererComponent implements GameResourceOwner<AtlasSprite>, ISizableComponent, IColorHolder {
+    public transient GameAsset<AtlasSprite> defaultGameAsset;
+    public GameAsset<AtlasSprite> gameAsset;
 
     @ValueProperty
     public float thickness = 2f;
@@ -77,7 +78,7 @@ public class PathRendererComponent extends RendererComponent implements GameReso
     }
 
     @Override
-    public GameAsset<TextureAtlas.AtlasRegion> getGameResource() {
+    public GameAsset<AtlasSprite> getGameResource() {
         return gameAsset;
     }
 
@@ -92,12 +93,12 @@ public class PathRendererComponent extends RendererComponent implements GameReso
     }
 
     private void loadTextureFromIdentifier(String gameResourceIdentifier) {
-        GameAsset<TextureAtlas.AtlasRegion> assetForIdentifier = RuntimeContext.getInstance().AssetRepository.getAssetForIdentifier(gameResourceIdentifier, GameAssetType.SPRITE);
+        GameAsset<AtlasSprite> assetForIdentifier = RuntimeContext.getInstance().AssetRepository.getAssetForIdentifier(gameResourceIdentifier, GameAssetType.SPRITE);
         setGameAsset(assetForIdentifier);
     }
 
     private void loadTextureFromUniqueIdentifier(UUID gameResourceIdentifier) {
-        GameAsset<TextureAtlas.AtlasRegion> assetForUniqueIdentifier = RuntimeContext.getInstance().AssetRepository.getAssetForUniqueIdentifier(gameResourceIdentifier, GameAssetType.SPRITE);
+        GameAsset<AtlasSprite> assetForUniqueIdentifier = RuntimeContext.getInstance().AssetRepository.getAssetForUniqueIdentifier(gameResourceIdentifier, GameAssetType.SPRITE);
         setGameAsset(assetForUniqueIdentifier);
     }
 
@@ -119,7 +120,7 @@ public class PathRendererComponent extends RendererComponent implements GameReso
     }
 
     @Override
-    public void setGameAsset(GameAsset<TextureAtlas.AtlasRegion> gameAsset) {
+    public void setGameAsset(GameAsset<AtlasSprite> gameAsset) {
         if (this.gameAsset != null) {
             //Remove from old game asset, it might be the same, but it may also have changed
             this.gameAsset.listeners.removeValue(gameAssetUpdateListener, true);
@@ -298,7 +299,7 @@ public class PathRendererComponent extends RendererComponent implements GameReso
     private Vector2 prev;
 
     public int setData(int idx, float x1, float y1, float x2, float y2, float centerX, float centerY, float pixelSize) {
-        TextureAtlas.AtlasRegion region = gameAsset.getResource();
+        AtlasSprite region = gameAsset.getResource();
 
         if (prev != null) {
             progress += prev.dst(centerX, centerY) * pixelSize;
