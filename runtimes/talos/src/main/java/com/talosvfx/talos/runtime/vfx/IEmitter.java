@@ -9,6 +9,8 @@ import com.talosvfx.talos.runtime.vfx.modules.ParticleModule;
 
 public interface IEmitter {
 
+    Array<ParticlePointGroup> pointData();
+
     void init();
 
     float getAlpha();
@@ -16,6 +18,8 @@ public interface IEmitter {
     EmitterModule getEmitterModule();
     DrawableModule getDrawableModule();
     Vector3 getEffectPosition();
+
+    int getEffectUniqueID ();
     ScopePayload getScope();
     Color getTint();
 

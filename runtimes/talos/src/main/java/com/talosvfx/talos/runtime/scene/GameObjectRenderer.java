@@ -96,12 +96,18 @@ public class GameObjectRenderer {
 
 			float y = transformComponent.worldPosition.y;
 
+
 			if (componentAssignableFrom instanceof SpriteRendererComponent) {
 				Vector2 size = ((SpriteRendererComponent)componentAssignableFrom).size;
 				Vector2 worldScale = transformComponent.worldScale;
 
 				float totalHeight = size.y * worldScale.y;
 				y -= totalHeight/2f;
+			}
+
+			if (componentAssignableFrom instanceof RendererComponent) {
+				float fakeOffsetY = componentAssignableFrom.fakeOffsetY;
+				y += fakeOffsetY;
 			}
 
 			return y;

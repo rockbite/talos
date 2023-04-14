@@ -70,11 +70,22 @@ public class ParticleEmitterInstance implements IEmitter {
 	};
     private boolean isStopped = false;
 
+	private int uniqueID;
+	private static int globalUniqueID = 1;
+
+	private Array<ParticlePointGroup> pointData = new Array<>();
+
     public ParticleEmitterInstance (ParticleEmitterDescriptor moduleGraph, ParticleEffectInstance particleEffectInstance) {
 		this.emitterGraph = moduleGraph;
         parentParticleInstance = particleEffectInstance;
         setScope(particleEffectInstance.scopePayload); //Default set to the parent payload instance
         init();
+		uniqueID = globalUniqueID++;
+	}
+
+	@Override
+	public Array<ParticlePointGroup> pointData () {
+		return pointData;
 	}
 
 	public void init () {
@@ -254,9 +265,7 @@ public class ParticleEmitterInstance implements IEmitter {
 		final DrawableModule drawableModule = getDrawableModule();
 		if (drawableModule == null) return;
 
-		if (drawableModule.getPointDataGenerator() != null) {
-			drawableModule.getPointDataGenerator().freePoints(particlePointDataPool, groupPool);
-		}
+		freePoints(this, particlePointDataPool, groupPool);
 
 		for (int i = activeParticles.size - 1; i >= 0; i--) {
 			Particle particle = activeParticles.get(i);
@@ -315,6 +324,8 @@ public class ParticleEmitterInstance implements IEmitter {
 			particlePool.free(next);
 			iterator.remove();
 		}
+		freePoints(this, particlePointDataPool, groupPool);
+
 	}
 
 	@Override
@@ -366,6 +377,11 @@ public class ParticleEmitterInstance implements IEmitter {
 		return getEffect().position;
 	}
 
+	@Override
+	public int getEffectUniqueID () {
+		return uniqueID;
+	}
+
 	public ScopePayload getScope () {
     	return scopePayload;
 	}
@@ -407,4 +423,16 @@ public class ParticleEmitterInstance implements IEmitter {
 	public void setTint(Color color) {
     	tint.set(color);
 	}
+
+	public void freePoints (IEmitter emitter, Pool<ParticlePointData> particlePointDataPool, Pool<ParticlePointGroup> groupPool) {
+		Array<ParticlePointGroup> pointData = emitter.pointData();
+		for (ParticlePointGroup group : pointData) {
+			particlePointDataPool.freeAll(group.pointDataArray);
+			group.pointDataArray.clear();
+
+			groupPool.free(group);
+		}
+		pointData.clear();
+	}
+
 }

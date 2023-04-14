@@ -7,7 +7,7 @@ import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasSprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.PixmapTextureData;
@@ -88,6 +88,9 @@ public class PaintSurfaceGizmo extends Gizmo implements Observer, GameAsset.Game
 
         PaintSurfaceComponent surface = gameObject.getComponent(PaintSurfaceComponent.class);
 
+        if (surface.getGameResource().getResource() == null)
+            return;
+
         Texture resource = surface.getGameResource().getResource().getTexture();
         if (resource != null && !surface.getGameResource().isBroken()) {
             Vector2 size = surface.size;
@@ -155,8 +158,9 @@ public class PaintSurfaceGizmo extends Gizmo implements Observer, GameAsset.Game
 
         final float brushWidthInPixels = brushTexture.getWidth();
         final float brushHeightInPixels = brushTexture.getHeight();
-        final float brushXPosInPixels = mouseXPosOnSceneInPixels / surfaceSize.x - brushWidthInPixels / 2.0f;
-        final float brushYPosInPixels = mouseYPosOnSceneInPixels / surfaceSize.y - brushHeightInPixels / 2.0f;
+
+        final float brushXPosInPixels = (float) (Math.floor(mouseXPosOnSceneInPixels / surfaceSize.x) - brushWidthInPixels / 2.0f);
+        final float brushYPosInPixels = (float) (Math.ceil(mouseYPosOnSceneInPixels / surfaceSize.y) - brushHeightInPixels / 2.0f);
 
         innerBatch.draw(brushTexture, brushXPosInPixels, brushYPosInPixels, brushWidthInPixels, brushHeightInPixels);
         innerBatch.end();
@@ -171,7 +175,7 @@ public class PaintSurfaceGizmo extends Gizmo implements Observer, GameAsset.Game
 
     private void updateAssetFromPixmap (Pixmap pixmap, boolean updateListeners) {
         final PaintSurfaceComponent surface = gameObject.getComponent(PaintSurfaceComponent.class);
-        final GameAsset<AtlasRegion> gameAsset = surface.gameAsset;
+        final GameAsset<AtlasSprite> gameAsset = surface.gameAsset;
 
         if (gameAsset.isBroken()) return;
 
@@ -194,7 +198,7 @@ public class PaintSurfaceGizmo extends Gizmo implements Observer, GameAsset.Game
         final Texture texture = new Texture(newPixmap);
         texture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
 
-        surface.gameAsset.setResourcePayload(new AtlasRegion(new TextureRegion(texture)));
+        surface.gameAsset.setResourcePayload(new AtlasSprite(new TextureAtlas.AtlasRegion(new TextureRegion(texture))));
 
         if (updateListeners) {
             surface.gameAsset.listeners.removeValue(this, true);
@@ -239,7 +243,7 @@ public class PaintSurfaceGizmo extends Gizmo implements Observer, GameAsset.Game
         }
 
         PaintSurfaceComponent surface = gameObject.getComponent(PaintSurfaceComponent.class);
-        GameAsset<AtlasRegion> gameResource = surface.getGameResource();
+        GameAsset<AtlasSprite> gameResource = surface.getGameResource();
         if (gameResource.isBroken()) {
             // no texture is assigned to the surface,skip
             return null;

@@ -1,6 +1,9 @@
 package com.talosvfx.talos.editor.addons.scene.logic.componentwrappers;
 
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.utils.Array;
+import com.talosvfx.talos.editor.addons.scene.apps.spriteeditor.SpriteEditorApp;
+import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.widgets.property.PropertyPanelAssetSelectionWidget;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.ButtonPropertyWidget;
@@ -61,8 +64,20 @@ public class ParticleComponentProvider<T extends BaseVFXProjectData> extends Ren
 			}
 		});
 
+		ButtonPropertyWidget<String> playButton = new ButtonPropertyWidget<String>("Play", new ButtonPropertyWidget.ButtonListener<String>() {
+			@Override
+			public void clicked (ButtonPropertyWidget<String> widget) {
+				component.getEffectRef().restart();
+			}
+		});
+
 		properties.add(descriptorWidget);
 		properties.add(linkedToWidget);
+		properties.add(playButton);
+
+
+
+
 		properties.addAll(super.getListOfProperties());
 
 		return properties;

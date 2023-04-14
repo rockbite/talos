@@ -37,6 +37,8 @@ public class SpineRendererComponent extends RendererComponent implements Json.Se
     @ValueProperty(prefix = {"scale"})
     public float scale = 1f;
 
+    public boolean applyAnimation = true;
+
     @Override
     public GameAssetType getGameAssetType () {
         return GameAssetType.SKELETON;
@@ -55,6 +57,7 @@ public class SpineRendererComponent extends RendererComponent implements Json.Se
         json.writeValue("shouldInheritParentColor", shouldInheritParentColor);
         json.writeValue("scale", scale);
         json.writeValue("animation", currAnimation);
+        json.writeValue("applyAnimation", applyAnimation);
         super.write(json);
     }
 
@@ -64,14 +67,17 @@ public class SpineRendererComponent extends RendererComponent implements Json.Se
 
         scale = jsonData.getFloat("scale", 1/128f);
         currAnimation = jsonData.getString("animation", "");
+        applyAnimation = jsonData.getBoolean("applyAnimation", true);
         shouldInheritParentColor = jsonData.getBoolean("shouldInheritParentColor", true);
 
         loadSkeletonFromIdentifier(gameResourceIdentifier);
 
-        if(!currAnimation.isEmpty()) {
-            Animation animation = skeleton.getData().findAnimation(currAnimation);
-            if(animation != null) {
-                animationState.setAnimation(0, animation, true);
+        if (applyAnimation) {
+            if (!currAnimation.isEmpty()) {
+                Animation animation = skeleton.getData().findAnimation(currAnimation);
+                if (animation != null) {
+                    animationState.setAnimation(0, animation, true);
+                }
             }
         }
 

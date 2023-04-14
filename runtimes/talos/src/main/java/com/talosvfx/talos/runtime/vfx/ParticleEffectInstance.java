@@ -19,7 +19,6 @@ package com.talosvfx.talos.runtime.vfx;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.talosvfx.talos.runtime.vfx.render.ParticleRenderer;
-import com.talosvfx.talos.runtime.vfx.simulation.TinyEmitter;
 
 import java.util.Comparator;
 
@@ -124,10 +123,6 @@ public class ParticleEffectInstance {
         emitters.add(particleEmitterInstance);
     }
 
-    public void addAdvancedEmitter(ParticleEmitterDescriptor particleEmitterDescriptor) {
-		final TinyEmitter emitter = new TinyEmitter(particleEmitterDescriptor, this);
-		emitters.add(emitter);
-	}
 
 	public void removeEmitterForEmitterDescriptor (ParticleEmitterDescriptor emitter) {
 		for (int i = emitters.size - 1; i >= 0; i--) {

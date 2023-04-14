@@ -68,8 +68,9 @@ public class HistoryParticlePointDataGeneratorModule extends ParticlePointDataGe
 	};
 
 	public void onParticleKilled (Particle particle) {
-		if (locationMap.containsKey(particle.requesterID)) {
-			Array<Vector3> remove = locationMap.remove(particle.requesterID);
+		int particleUniqueID = particle.getRequesterIDUniqueToGlobalScope();
+		if (locationMap.containsKey(particleUniqueID)) {
+			Array<Vector3> remove = locationMap.remove(particleUniqueID);
 			vectorPool.freeAll(remove);
 			arrayPool.free(remove);
 			remove.clear();
@@ -84,11 +85,12 @@ public class HistoryParticlePointDataGeneratorModule extends ParticlePointDataGe
 		int cachedRequestMode = getScope().getRequestMode();
 		int cachedRequesterID = getScope().getRequesterID();
 
-		if (!locationMap.containsKey(cachedRequesterID)) {
-			locationMap.put(cachedRequesterID, arrayPool.obtain());
+		int particleUniqueID = particle.getRequesterIDUniqueToGlobalScope();
+		if (!locationMap.containsKey(particleUniqueID)) {
+			locationMap.put(particleUniqueID, arrayPool.obtain());
 		}
 
-		Array<Vector3> locationPoints = locationMap.get(cachedRequesterID);
+		Array<Vector3> locationPoints = locationMap.get(particleUniqueID);
 
 		int numPoints = (int)maxPoints.get(0);
 		if (numPoints > 0) {
@@ -101,7 +103,7 @@ public class HistoryParticlePointDataGeneratorModule extends ParticlePointDataGe
 				shouldAdd = true;
 			} else {
 				final Vector3 newest = locationPoints.peek();
-				final float dist = tempVec3.set(newest).dst(particle.position);
+				final float dist = tempVec3.set(newest).dst(particle.getX(), particle.getY(), particle.getZ());
 				if (dist > minDistance.getFloat()) {
 					shouldAdd = true;
 				}
@@ -112,7 +114,7 @@ public class HistoryParticlePointDataGeneratorModule extends ParticlePointDataGe
 				if (shouldPop) {
 					locationPoints.removeIndex(0);
 				}
-				locationPoints.add(vectorPool.obtain().set(particle.position));
+				locationPoints.add(vectorPool.obtain().set(particle.getX(), particle.getY(), particle.getZ()));
 			}
 
 		}

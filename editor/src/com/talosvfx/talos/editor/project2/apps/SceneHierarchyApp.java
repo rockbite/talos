@@ -3,6 +3,11 @@ package com.talosvfx.talos.editor.project2.apps;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Queue;
+import com.talosvfx.talos.editor.notifications.CommandEventHandler;
+import com.talosvfx.talos.editor.notifications.Notifications;
+import com.talosvfx.talos.editor.notifications.Observer;
+import com.talosvfx.talos.editor.notifications.commands.enums.Commands;
+import com.talosvfx.talos.editor.notifications.events.commands.CommandContextEvent;
 import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.runtime.scene.GameObject;
 import com.talosvfx.talos.runtime.scene.GameObjectContainer;
@@ -16,11 +21,12 @@ import com.talosvfx.talos.editor.project2.localprefs.TalosLocalPrefs;
 import com.talosvfx.talos.runtime.scene.Scene;
 
 @SingletonApp
-public class SceneHierarchyApp extends AppManager.BaseApp<Scene> implements GameAsset.GameAssetUpdateListener, ContainerOfPrefs<HierarchyPreference> {
+public class SceneHierarchyApp extends AppManager.BaseApp<Scene> implements GameAsset.GameAssetUpdateListener, ContainerOfPrefs<HierarchyPreference>, Observer {
 
 	private final HierarchyWidget hierarchyWidget;
 
 	public SceneHierarchyApp () {
+		Notifications.registerObserver(this);
 		hierarchyWidget = new HierarchyWidget();
 		DummyLayoutApp<Scene> hierarchyApp = new DummyLayoutApp<Scene>(SharedResources.skin, this, getAppName()) {
 			@Override
@@ -75,7 +81,7 @@ public class SceneHierarchyApp extends AppManager.BaseApp<Scene> implements Game
 
 	@Override
 	public void onRemove () {
-			
+		Notifications.unregisterObserver(this);
 	}
 
 	@Override
@@ -133,6 +139,21 @@ public class SceneHierarchyApp extends AppManager.BaseApp<Scene> implements Game
 		}
 
 		return preference;
+	}
+
+	@CommandEventHandler(commandType = Commands.CommandType.DELETE)
+	public void onDeleteCommand (CommandContextEvent commandContextEvent) {
+		hierarchyWidget.deleteSelected();
+	}
+
+	@CommandEventHandler(commandType = Commands.CommandType.COPY)
+	public void onCopyCommand (CommandContextEvent event) {
+		hierarchyWidget.copySelected();
+	}
+
+	@CommandEventHandler(commandType = Commands.CommandType.PASTE)
+	public void onPasteCommand (CommandContextEvent commandContextEvent) {
+		hierarchyWidget.pasteFromClipboard();
 	}
 }
 

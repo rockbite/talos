@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.graphics.glutils.HdpiUtils;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.rockbite.bongo.engine.systems.RenderPassSystem;
 import com.talosvfx.talos.editor.wrappers.IDragPointProvider;
@@ -228,6 +229,12 @@ public class Preview3D extends PreviewWidget {
 
         batch.begin();
 
+    }
+
+    @Override
+    protected void updateParticlePosition (Vector3 tmp) {
+        super.updateParticlePosition(tmp);
+        bongoPreview.updateParticlePosition(tmp);
     }
 
     boolean isPerspective = true;

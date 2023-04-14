@@ -5,7 +5,7 @@ import com.badlogic.gdx.Net;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasSprite;
 import com.badlogic.gdx.net.HttpStatus;
 import com.badlogic.gdx.tools.texturepacker.TexturePacker;
 import com.badlogic.gdx.tools.texturepacker.TextureUnpacker;
@@ -200,7 +200,7 @@ public class RepositoryOptimizer {
 		Texture.TextureFilter minFilter;
 
 		ObjectSet<GameAsset<TextureAtlas>> atlasesToUnpack = new ObjectSet<>();
-		ObjectSet<GameAsset<AtlasRegion>> texturesToPack = new ObjectSet<>();
+		ObjectSet<GameAsset<AtlasSprite>> texturesToPack = new ObjectSet<>();
 
 		GameAsset<TextureAtlas> generatedTextureAtlas;
 
@@ -215,13 +215,13 @@ public class RepositoryOptimizer {
 		ObjectSet<TextureBucket> buckets = new ObjectSet<>();
 
 		ObjectSet<GameAsset<TextureAtlas>> atlases = new ObjectSet<>();
-		ObjectSet<GameAsset<AtlasRegion>> sprites = new ObjectSet<>();
+		ObjectSet<GameAsset<AtlasSprite>> sprites = new ObjectSet<>();
 		for (GameAsset<?> gameAsset : gameAssetsToExport) {
 			if (gameAsset.type == GameAssetType.ATLAS) {
 				atlases.add((GameAsset<TextureAtlas>)gameAsset);
 			}
 			if (gameAsset.type == GameAssetType.SPRITE) {
-				sprites.add((GameAsset<AtlasRegion>)gameAsset);
+				sprites.add((GameAsset<AtlasSprite>)gameAsset);
 			}
 		}
 
@@ -230,8 +230,8 @@ public class RepositoryOptimizer {
 			TextureBucket bucket = findOrCreateBucket(resource, buckets);
 			bucket.atlasesToUnpack.add(atlas);
 		}
-		for (GameAsset<AtlasRegion> sprite : sprites) {
-			AtlasRegion resource = sprite.getResource();
+		for (GameAsset<AtlasSprite> sprite : sprites) {
+			AtlasSprite resource = sprite.getResource();
 			TextureBucket bucket = findOrCreateBucket(resource.getTexture(), buckets, (SpriteMetadata)sprite.getRootRawAsset().metaData);
 			bucket.texturesToPack.add(sprite);
 		}
@@ -252,7 +252,7 @@ public class RepositoryOptimizer {
 
 				try {
 					for (TextureBucket bucket : buckets) {
-						for (GameAsset<AtlasRegion> textureGameAsset : bucket.texturesToPack) {
+						for (GameAsset<AtlasSprite> textureGameAsset : bucket.texturesToPack) {
 
 							//Set nothing to export because its now in atlas
 							for (RawAsset dependentRawAsset : textureGameAsset.dependentRawAssets) {
@@ -325,7 +325,7 @@ public class RepositoryOptimizer {
 				raws.mkdirs();
 				result.mkdirs();
 
-				for (GameAsset<AtlasRegion> textureGameAsset : bucket.texturesToPack) {
+				for (GameAsset<AtlasSprite> textureGameAsset : bucket.texturesToPack) {
 					textureGameAsset.getRootRawAsset().handle.copyTo(raws);
 				}
 

@@ -4,8 +4,9 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasSprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.GdxRuntimeException;
@@ -36,7 +37,7 @@ public class RuntimeAssetRepository extends BaseAssetRepository {
 	protected ObjectMap<GameAssetType, ObjectMap<String, GameAsset<?>>> identifierToGameAssetMap = new ObjectMap<>();
 	protected ObjectMap<UUID, GameAsset<?>> uuidGameAssetObjectMap = new ObjectMap<>();
 
-	protected ObjectMap<GameAsset<AtlasRegion>, NinePatch> patchCache = new ObjectMap<>();
+	protected ObjectMap<GameAsset<AtlasSprite>, NinePatch> patchCache = new ObjectMap<>();
 
 	public RuntimeAssetRepository () {
 	}
@@ -108,7 +109,7 @@ public class RuntimeAssetRepository extends BaseAssetRepository {
 
 
 	private <T> GameAsset<T> spriteLoader (GameAssetExportStructure exportStructure, FileHandle baseFolder) {
-		GameAsset<AtlasRegion> gameAsset = new GameAsset<>(exportStructure.identifier, exportStructure.type);
+		GameAsset<AtlasSprite> gameAsset = new GameAsset<>(exportStructure.identifier, exportStructure.type);
 
 		String first = exportStructure.relativePathsOfRawFiles.first();
 		FileHandle child = baseFolder.child(exportStructure.type.name()).child(first);
@@ -121,7 +122,11 @@ public class RuntimeAssetRepository extends BaseAssetRepository {
 			if (assetForUniqueIdentifier != null) {
 
 				TextureAtlas resource = assetForUniqueIdentifier.getResource();
-				gameAsset.setResourcePayload(resource.findRegion(exportStructure.identifier));
+				Sprite sprite = resource.createSprite(exportStructure.identifier);
+				if (!(sprite instanceof AtlasSprite)) {
+					sprite = new AtlasSprite(new TextureAtlas.AtlasRegion(sprite));
+				}
+				gameAsset.setResourcePayload((AtlasSprite) sprite);
 				gameAsset.dependentGameAssets.add(assetForUniqueIdentifier);
 				gameAsset.dependentRawAssets.add(fakeMeta(child, SpriteMetadata.class));
 
@@ -129,7 +134,7 @@ public class RuntimeAssetRepository extends BaseAssetRepository {
 			}
 		}
 
-		gameAsset.setResourcePayload(new AtlasRegion(new TextureRegion(new Texture(child))));
+		gameAsset.setResourcePayload(new AtlasSprite(new TextureAtlas.AtlasRegion(new TextureRegion(new Texture(child)))));
 		gameAsset.dependentRawAssets.add(fakeMeta(child, SpriteMetadata.class));
 		return (GameAsset<T>)gameAsset;
 	}
@@ -310,7 +315,7 @@ public class RuntimeAssetRepository extends BaseAssetRepository {
 	}
 
 	@Override
-	public NinePatch obtainNinePatch (GameAsset<AtlasRegion> gameAsset) {
+	public NinePatch obtainNinePatch (GameAsset<AtlasSprite> gameAsset) {
 		if (patchCache.containsKey(gameAsset)) { //something better, maybe hash on pixel size + texture for this
 			return patchCache.get(gameAsset);
 		} else {

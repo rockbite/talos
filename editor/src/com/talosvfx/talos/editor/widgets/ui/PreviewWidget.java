@@ -169,24 +169,22 @@ public abstract class PreviewWidget extends ViewportWidget {
 
 				getWorldFromLocal(tmp.set(x, y, 0)); // I can't really explain
 				pos.set(tmp.x, tmp.y);
-//
-//                if(moving) {
-//                    final ParticleEffectInstance particleEffect = TalosMain.Instance().TalosProject().getParticleEffect();
-//                    particleEffect.setPosition(tmp.x, tmp.y);
-//                } else {
-//                    getWorldFromLocal(tmp.set(prevPos.x, prevPos.y, 0));
-//                    getWorldFromLocal(tmp2.set(x, y, 0));
-//
-//                    if(currentlyDragging == null) {
-//                        // panning
-//
-//                        camera.position.sub(tmp2.x-tmp.x, tmp2.y-tmp.y, 0);
-//                    } else {
-//                        // dragging a point
-//                        currentlyDragging.position.add(tmp2.x-tmp.x, tmp2.y-tmp.y);
-//                        dragPointProvider.dragPointChanged(currentlyDragging);
-//                    }
-//                }
+
+                if(moving) {
+                    effectInstance.setPosition(tmp.x, tmp.y, 0);
+					updateParticlePosition(tmp);
+                } else {
+                    getWorldFromLocal(tmp.set(prevPos.x, prevPos.y, 0));
+                    getWorldFromLocal(tmp2.set(x, y, 0));
+
+                    if(currentlyDragging == null) {
+                        // panning
+                    } else {
+                        // dragging a point
+                        currentlyDragging.position.add(tmp2.x-tmp.x, tmp2.y-tmp.y, 0);
+                        dragPointProvider.dragPointChanged(currentlyDragging);
+                    }
+                }
 
 				prevPos.set(x, y);
 			}
@@ -199,6 +197,10 @@ public abstract class PreviewWidget extends ViewportWidget {
 		};
 
 		addListener(inputListener);
+	}
+
+	protected void updateParticlePosition (Vector3 tmp) {
+
 	}
 
 	public void fileDrop (float x, float y, String[] paths) {
