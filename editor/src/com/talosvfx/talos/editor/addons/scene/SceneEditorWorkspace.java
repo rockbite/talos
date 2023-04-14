@@ -6,9 +6,7 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.PolygonBatch;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
@@ -29,7 +27,6 @@ import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.logic.IPropertyHolder;
 import com.talosvfx.talos.editor.addons.scene.logic.MultiPropertyHolder;
 import com.talosvfx.talos.editor.addons.scene.logic.PropertyWrapperProviders;
-import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.CurveGizmo;
 import com.talosvfx.talos.editor.widgets.ui.gizmos.GroupSelectionGizmo;
 import com.talosvfx.talos.runtime.RuntimeContext;
 import com.talosvfx.talos.runtime.assets.GameAsset;
@@ -543,7 +540,10 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		ObjectSet<GameObject> deleteList = new ObjectSet<>();
 		deleteList.addAll(selection);
 		requestSelectionClear();
-		deleteGameObjects(deleteList);
+
+		if (currentContainer != null) {
+			SceneUtils.deleteGameObjects(currentContainer, deleteList);
+		}
 	}
 
 	public void escapePressed() {
@@ -1001,36 +1001,6 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		if (gameObjects != null) {
 			for (int i = 0; i < gameObjects.size; i++) {
 				selectGameObjectAndChildren(gameObjects.get(i));
-			}
-		}
-	}
-
-	public void deleteGameObjects (ObjectSet<GameObject> gameObjects) {
-		if (currentContainer != null) {
-			for (GameObject gameObject : gameObjects) {
-
-				if (gameObject == null)
-					continue;
-
-				GameObject parent = gameObject.getParent();
-				if (parent != null) {
-
-					Array<GameObject> deletedObjects = null;
-
-					if (parent.hasGOWithName(gameObject.getName())) {
-						deletedObjects = parent.deleteGameObject(gameObject);
-					}
-
-					if (deletedObjects != null) {
-						for (GameObject deletedObject : deletedObjects) {
-							SceneUtils.deleteGameObject(currentContainer, deletedObject);
-						}
-					}
-
-				} else {
-					SceneUtils.deleteGameObject(currentContainer, gameObject);
-				}
-
 			}
 		}
 	}

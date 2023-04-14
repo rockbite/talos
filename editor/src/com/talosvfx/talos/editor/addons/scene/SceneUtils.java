@@ -3,8 +3,6 @@ package com.talosvfx.talos.editor.addons.scene;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Camera;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
@@ -259,6 +257,26 @@ public class SceneUtils {
 
 		markContainerChanged(gameObjectContainer);
 
+	}
+
+	public static void deleteGameObjects (GameObjectContainer gameObjectContainer, ObjectSet<GameObject> gameObjects) {
+		for (GameObject gameObject : gameObjects) {
+			Array<GameObject> childrenToBeDeleted = new Array<>();
+			gameObject.clearChildren(childrenToBeDeleted);
+			gameObjects.addAll(childrenToBeDeleted);
+		}
+
+		for (GameObject gameObject : gameObjects) {
+			DeSelectGameObjectExternallyEvent deSelectGameObjectExternallyEvent = Notifications.obtainEvent(DeSelectGameObjectExternallyEvent.class);
+			deSelectGameObjectExternallyEvent.setGameObject(gameObject);
+			Notifications.fireEvent(deSelectGameObjectExternallyEvent);
+
+			GameObjectDeleted gameObjectDeleted = Notifications.obtainEvent(GameObjectDeleted.class);
+			gameObjectDeleted.set(gameObjectContainer, gameObject);
+			Notifications.fireEvent(gameObjectDeleted);
+		}
+
+		markContainerChanged(gameObjectContainer);
 	}
 
 	private static ObjectMap<GameObjectContainer, OrderedSet<GameObject>> copyPasteBuffer = new ObjectMap<>();
