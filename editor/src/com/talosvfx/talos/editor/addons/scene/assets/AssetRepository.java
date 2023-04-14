@@ -647,6 +647,9 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 			assetExportStructure.type = gameAsset.type;
 			assetExportStructure.dependentGameAssets.addAll(dependentGameAssetsToUUIDArray(gameAsset));
 
+			FileHandle metadataHandleFor = AssetImporter.getMetadataHandleFor(gameAsset.getRootRawAsset().handle);
+			String metaFileName = metadataHandleFor.name();
+
 			boolean primaryFile = true;
 			for (RawAsset dependentRawAsset : dependentRawAssets) {
 
@@ -671,6 +674,8 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 						converted = true;
 
 						assetExportStructure.relativePathsOfRawFiles.add(relativeFromRootDir + newFileName);
+
+						metaFileName = newFileName + ".meta";
 					}
 				}
 
@@ -681,12 +686,8 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 					assetExportStructure.relativePathsOfRawFiles.add(relativeFromRootDir + dependentRawAsset.handle.name());
 				}
 
-				if (!copyMetaIfExists(dependentRawAsset.handle, dirToCopyInto)) {
-					if (primaryFile) {
-						FileHandle metadataHandleFor = AssetImporter.getMetadataHandleFor(gameAsset.getRootRawAsset().handle);
-						dirToCopyInto.child(metadataHandleFor.name()).writeString(json.prettyPrint(gameAsset.getRootRawAsset().metaData), false);
-
-					}
+				if (primaryFile) {
+					dirToCopyInto.child(metaFileName).writeString(json.prettyPrint(gameAsset.getRootRawAsset().metaData), false);
 				}
 
 				primaryFile = false;
