@@ -454,7 +454,7 @@ public abstract class ViewportWidget extends Table {
 						hitGizmo = hitGizmoGameObject(hitCords.x, hitCords.y, selection.first());
 
 						if (hitGizmo != null) {
-							hitGizmo.touchDown(hitCords.x, hitCords.y, button);
+							onGizmoTouch(hitGizmo, hitCords.x, hitCords.y, button);
 						}
 
 						event.stop();
@@ -469,7 +469,7 @@ public abstract class ViewportWidget extends Table {
 
 							hitGizmo = testGizmo;
 
-							hitGizmo.touchDown(hitCords.x, hitCords.y, button);
+							onGizmoTouch(hitGizmo, hitCords.x, hitCords.y, button);
 							event.stop();
 							return true;
 
@@ -489,11 +489,13 @@ public abstract class ViewportWidget extends Table {
 									selectGameObject(entityUnderMouse);
 
 									if (hitGizmo != null) {
-										hitGizmo.touchDown(hitCords.x, hitCords.y, button);
+										onGizmoTouch(hitGizmo, hitCords.x, hitCords.y, button);
 									}
 									getStage().setKeyboardFocus(ViewportWidget.this);
 									event.handle();
 									return true;
+								}else{
+									onEmptyAreaTouch();
 								}
 							}
 
@@ -513,7 +515,7 @@ public abstract class ViewportWidget extends Table {
 						selectGameObject(touchDownedGameObject);
 
 						if (hitGizmo != null) {
-							hitGizmo.touchDown(hitCords.x, hitCords.y, button);
+							onGizmoTouch(hitGizmo, hitCords.x, hitCords.y, button);
 						}
 						getStage().setKeyboardFocus(ViewportWidget.this);
 						event.handle();
@@ -524,11 +526,12 @@ public abstract class ViewportWidget extends Table {
 						if (canTouchGizmo(hitGizmo)) {
 
 							selectGameObject(hitGizmo.getGameObject());
-
-							hitGizmo.touchDown(hitCords.x, hitCords.y, button);
+							onGizmoTouch(hitGizmo, hitCords.x, hitCords.y, button);
 							getStage().setKeyboardFocus(ViewportWidget.this);
 							event.handle();
 							return true;
+						} else {
+							onEmptyAreaTouch();
 						}
 					}
 
@@ -1399,5 +1402,12 @@ public abstract class ViewportWidget extends Table {
 			}
 		}
 		SceneUtils.componentBatchUpdated(selection.orderedItems().get(0).getGameObjectContainerRoot(), selection.orderedItems(), TransformComponent.class, false);
+	}
+
+	protected void onGizmoTouch(Gizmo hitGizmo, float x, float y, int button) {
+		hitGizmo.touchDown(x, y, button);
+	}
+
+	protected void onEmptyAreaTouch() {
 	}
 }
