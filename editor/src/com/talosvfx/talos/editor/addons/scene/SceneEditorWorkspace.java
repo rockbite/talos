@@ -6,9 +6,7 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.PolygonBatch;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasSprite;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
@@ -29,7 +27,6 @@ import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.logic.IPropertyHolder;
 import com.talosvfx.talos.editor.addons.scene.logic.MultiPropertyHolder;
 import com.talosvfx.talos.editor.addons.scene.logic.PropertyWrapperProviders;
-import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.CurveGizmo;
 import com.talosvfx.talos.editor.widgets.ui.gizmos.GroupSelectionGizmo;
 import com.talosvfx.talos.runtime.RuntimeContext;
 import com.talosvfx.talos.runtime.assets.GameAsset;
@@ -543,7 +540,10 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		ObjectSet<GameObject> deleteList = new ObjectSet<>();
 		deleteList.addAll(selection);
 		requestSelectionClear();
-		deleteGameObjects(deleteList);
+
+		if (currentContainer != null) {
+			SceneUtils.deleteGameObjects(currentContainer, deleteList);
+		}
 	}
 
 	public void escapePressed() {
@@ -1005,36 +1005,6 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		}
 	}
 
-	public void deleteGameObjects (ObjectSet<GameObject> gameObjects) {
-		if (currentContainer != null) {
-			for (GameObject gameObject : gameObjects) {
-
-				if (gameObject == null)
-					continue;
-
-				GameObject parent = gameObject.getParent();
-				if (parent != null) {
-
-					Array<GameObject> deletedObjects = null;
-
-					if (parent.hasGOWithName(gameObject.getName())) {
-						deletedObjects = parent.deleteGameObject(gameObject);
-					}
-
-					if (deletedObjects != null) {
-						for (GameObject deletedObject : deletedObjects) {
-							SceneUtils.deleteGameObject(currentContainer, deletedObject);
-						}
-					}
-
-				} else {
-					SceneUtils.deleteGameObject(currentContainer, gameObject);
-				}
-
-			}
-		}
-	}
-
 	@EventHandler
 	public void onGameObjectCreated (GameObjectCreated event) {
 		GameObject gameObject = event.getTarget();
@@ -1315,10 +1285,6 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		return fullPath.replace(projectFullPath, "").substring(1);
 	}
 
-
-
-
-
 	public Array<SceneLayer> getLayerList () {
 		SceneData sceneData = SharedResources.currentProject.getSceneData();
 
@@ -1329,31 +1295,6 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		if (currentContainer == null)
 			return null;
 		return currentContainer.getSelfObject();
-	}
-
-	@EventHandler
-	public void onLayerListUpdated (LayerListUpdated event) {
-		Array<SceneLayer> layerList = getLayerList();
-		// find all game objects and if any of them is on layer that does not exist, change its layer to default
-		Array<GameObject> list = new Array<>();
-		list = currentContainer.getSelfObject().getChildrenByComponent(RendererComponent.class, list);
-
-		for (GameObject gameObject : list) {
-			RendererComponent component = gameObject.getComponentAssignableFrom(RendererComponent.class);
-
-			boolean foundLayer = false;
-			for (SceneLayer sceneLayer : layerList) {
-				if (sceneLayer.getName().equals(component.sortingLayer.getName())) {
-					component.getSortingLayer().setIndex(sceneLayer.getIndex());
-					foundLayer = true;
-					break;
-				}
-			}
-
-			if (!foundLayer) {
-				component.setSortingLayer(GameObjectRenderer.DEFAULT_SCENE_LAYER);
-			}
-		}
 	}
 
 	public MainRenderer getRenderer () {

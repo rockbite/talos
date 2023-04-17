@@ -35,6 +35,7 @@ public class GdxAssetRepoLoader extends AsynchronousAssetLoader<GdxAssetRepo, Gd
 		baseFolder = parameter.exportFile.parent();
 
 		gameAssetsExportStructure = new Json().fromJson(GameAssetsExportStructure.class, parameter.exportFile);
+		gameAssetsExportStructure.buildLayerIndices();
 
 		instance.setSceneData(gameAssetsExportStructure.sceneData);
 

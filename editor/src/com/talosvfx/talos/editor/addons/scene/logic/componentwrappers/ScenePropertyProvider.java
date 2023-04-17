@@ -9,7 +9,7 @@ import com.talosvfx.talos.editor.widgets.ui.FilteredTree;
 import com.talosvfx.talos.runtime.scene.SceneData;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.DynamicItemListWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.IPropertyProvider;
-import com.talosvfx.talos.editor.widgets.propertyWidgets.ItemData;
+import com.talosvfx.talos.editor.widgets.propertyWidgets.SceneLayerWrapper;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.LabelWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
 import com.talosvfx.talos.runtime.scene.Scene;
@@ -21,8 +21,8 @@ import java.util.function.Supplier;
 public class ScenePropertyProvider implements IPropertyProvider {
 
 	private final Scene scene;
-	private SelectBoxWidget renderStategy;
-	private String selectedLayer;
+	private SelectBoxWidget renderStrategy;
+	private SceneLayer selectedLayer;
 
 	public ScenePropertyProvider (Scene scene) {
 		this.scene = scene;
@@ -30,6 +30,8 @@ public class ScenePropertyProvider implements IPropertyProvider {
 
 	@Override
 	public Array<PropertyWidget> getListOfProperties () {
+		selectedLayer = SharedResources.currentProject.getSceneData().getPreferredSceneLayer();
+
 		Array<PropertyWidget> properties = new Array<>();
 
 		LabelWidget labelWidget = new LabelWidget("Name", new Supplier<String>() {
@@ -39,63 +41,66 @@ public class ScenePropertyProvider implements IPropertyProvider {
 			}
 		});
 
-		Supplier<ItemData> newItemDataSupplier = new Supplier<ItemData>() {
+		Supplier<SceneLayerWrapper> newItemDataSupplier = new Supplier<SceneLayerWrapper>() {
 			@Override
-			public ItemData get () {
+			public SceneLayerWrapper get () {
 				String base = "NewLayer";
 				String newLayer = getNextAvailableLayerName(base);
-
-				return new ItemData(newLayer, newLayer);
+				SceneData sceneData = SharedResources.currentProject.getSceneData();
+				Array<SceneLayer> renderLayers = sceneData.getRenderLayers();
+				SceneLayer sceneLayer = new SceneLayer(newLayer, renderLayers.size);
+				renderLayers.add(sceneLayer);
+				return new SceneLayerWrapper(sceneLayer);
 			}
 		};
-		DynamicItemListWidget<ItemData> itemListWidget = new DynamicItemListWidget<ItemData>("Layers", new Supplier<Array<ItemData>>() {
+		DynamicItemListWidget<SceneLayerWrapper> itemListWidget = new DynamicItemListWidget<SceneLayerWrapper>("Layers", new Supplier<Array<SceneLayerWrapper>>() {
 			@Override
-			public Array<ItemData> get () {
-				Array<ItemData> list = new Array<>();
+			public Array<SceneLayerWrapper> get () {
 				TalosProjectData currentProject = SharedResources.currentProject;
-				Array<SceneLayer> renderLayers = currentProject.getSceneData().getRenderLayers();
-				for (SceneLayer layer : renderLayers) {
-					ItemData itemData = new ItemData(layer.getName());
-					if (layer.getName().equals("Default")) {
-						itemData.canDelete = false;
-					}
-					list.add(itemData);
+				SceneData sceneData = currentProject.getSceneData();
+				Array<SceneLayer> renderLayers = sceneData.getRenderLayers();
+				Array<SceneLayerWrapper> sceneLayerWrappers = new Array<>();
+				for (SceneLayer renderLayer : renderLayers) {
+					SceneLayerWrapper sceneLayerWrapper = new SceneLayerWrapper(renderLayer);
+					sceneLayerWrappers.add(sceneLayerWrapper);
 				}
-				return list;
+
+				return sceneLayerWrappers;
 			}
-		}, new PropertyWidget.ValueChanged<Array<ItemData>>() {
+		}, new PropertyWidget.ValueChanged<Array<SceneLayerWrapper>>() {
 			@Override
-			public void report (Array<ItemData> value) {
-				TalosProjectData currentProject = SharedResources.currentProject;
-				Array<SceneLayer> renderLayers = currentProject.getSceneData().getRenderLayers();
+			public void report (Array<SceneLayerWrapper> value) {
+				SceneData sceneData = SharedResources.currentProject.getSceneData();
+				Array<SceneLayer> renderLayers = sceneData.getRenderLayers();
 				renderLayers.clear();
-				int i = 0;
-				for (ItemData item : value) {
-					SceneLayer sceneLayer = new SceneLayer(item.text, i++);
-					renderLayers.add(sceneLayer);
+				for (int i = 0; i < value.size; i++) {
+					SceneLayerWrapper sceneLayerWrapper = value.get(i);
+					SceneLayer instance = sceneLayerWrapper.getInstance();
+					instance.setIndex(i);
+					renderLayers.add(instance);
 				}
-				SceneUtils.layersUpdated();
 			}
 		}) {
 			@Override
-			public boolean canDelete (ItemData itemData) {
-				return itemData.canDelete;
+			public boolean canDelete (SceneLayerWrapper itemData) {
+				return itemData.canDelete();
 			}
 		};
 
-		itemListWidget.setInteraction(new DynamicItemListWidget.DynamicItemListInteraction<ItemData>() {
+
+		itemListWidget.setInteraction(new DynamicItemListWidget.DynamicItemListInteraction<SceneLayerWrapper>() {
 			@Override
-			public Supplier<ItemData> newInstanceCreator () {
+			public Supplier<SceneLayerWrapper> newInstanceCreator () {
 				return newItemDataSupplier;
 			}
 
 			@Override
-			public String getID (ItemData o) {
-				return o.id;
+			public String getID (SceneLayerWrapper o) {
+				return o.getID().toString();
 			}
 
 			@Override
-			public String updateName (ItemData itemData, String newText) {
+			public String updateName (SceneLayerWrapper itemData, String newText) {
 				newText = getNextAvailableLayerName(newText);
 				itemData.updateName(newText);
 				return newText;
@@ -103,25 +108,32 @@ public class ScenePropertyProvider implements IPropertyProvider {
 
 			@Override
 			public void onUpdate() {
-				int preferredLayerIndex = SharedResources.currentProject.getSceneData().getPreferredSceneLayer().getIndex();
+				SceneData sceneData = SharedResources.currentProject.getSceneData();
+				int preferredLayerIndex = sceneData.getPreferredSceneLayer().getIndex();
 				itemListWidget.list.addNodeToSelectionByIndex(preferredLayerIndex);
 
-				setSelectedLayer(itemListWidget.list.getSelection().first().getObject().id);
+				setSelectedLayer(itemListWidget.list.getSelection().first().getObject().getInstance());
 			}
 
 			@Override
-			public void onDeleteNode(ItemData itemData) {
+			public void onDeleteNode(SceneLayerWrapper itemData) {
 				SceneData sceneData = SharedResources.currentProject.getSceneData();
-				if(itemData.text.equals(sceneData.getPreferredSceneLayer().getName())){
-					sceneData.setPreferredSceneLayer("Default");
-					int preferredLayerIndex = sceneData.getPreferredSceneLayer().getIndex();
-					itemListWidget.list.addNodeToSelectionByIndex(preferredLayerIndex);
+				Array<SceneLayer> renderLayers = sceneData.getRenderLayers();
+				boolean removed = renderLayers.removeValue(itemData.getInstance(), true);
+				if (removed) {
+					SceneUtils.layersUpdated();
+
+					if (sceneData.getPreferredSceneLayer() == itemData.getInstance()) {
+						sceneData.setPreferredSceneLayer("Default");
+						int preferredLayerIndex = sceneData.getPreferredSceneLayer().getIndex();
+						itemListWidget.list.addNodeToSelectionByIndex(preferredLayerIndex);
+					}
 				}
 			}
 		});
-		itemListWidget.list.addItemListener(new FilteredTree.ItemListener<ItemData>() {
+		itemListWidget.list.addItemListener(new FilteredTree.ItemListener<SceneLayerWrapper>() {
 			@Override
-			public void selected (FilteredTree.Node<ItemData> node) {
+			public void selected (FilteredTree.Node<SceneLayerWrapper> node) {
 				super.selected(node);
 				SharedResources.currentProject.getSceneData().setPreferredSceneLayer(node.getName());
 			}
@@ -133,24 +145,22 @@ public class ScenePropertyProvider implements IPropertyProvider {
 		properties.add(labelWidget);
 		properties.add(itemListWidget);
 
-		itemListWidget.list.addItemListener(new FilteredTree.ItemListener<ItemData>() {
+		itemListWidget.list.addItemListener(new FilteredTree.ItemListener<SceneLayerWrapper>() {
 			@Override
-			public void selected (FilteredTree.Node<ItemData> node) {
+			public void selected (FilteredTree.Node<SceneLayerWrapper> node) {
 				super.selected(node);
-				setSelectedLayer(node.getObject().id);
+				selectedLayer = node.getObject().getInstance();
 			}
 		});
 
-		renderStategy = new SelectBoxWidget("Layer render mode", new Supplier<String>() {
+		renderStrategy = new SelectBoxWidget("Layer render mode", new Supplier<String>() {
 			@Override
 			public String get () {
-				SceneLayer selectedLayer = getSelectedLayer();
 				return selectedLayer.getRenderStrategy().name();
 			}
 		}, new PropertyWidget.ValueChanged<String>() {
 			@Override
 			public void report (String value) {
-				SceneLayer selectedLayer = getSelectedLayer();
 				RenderStrategy startToSet = RenderStrategy.valueOf(value);
 				selectedLayer.setRenderStrategy(startToSet);
 			}
@@ -165,19 +175,15 @@ public class ScenePropertyProvider implements IPropertyProvider {
 			}
 		});
 
-		properties.add(renderStategy);
+		properties.add(renderStrategy);
 
 
 		return properties;
 	}
-	private SceneLayer getSelectedLayer () {
-		SceneData sceneData = SharedResources.currentProject.getSceneData();
-		return sceneData.getSceneLayerByName(selectedLayer);
-	}
 
-	private void setSelectedLayer (String layerID) {
-		selectedLayer = layerID;
-		renderStategy.updateValue();
+	private void setSelectedLayer (SceneLayer sceneLayer) {
+		selectedLayer = sceneLayer;
+		renderStrategy.updateValue();
 	}
 
 	@Override

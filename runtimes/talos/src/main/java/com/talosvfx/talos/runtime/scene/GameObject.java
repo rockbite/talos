@@ -133,10 +133,10 @@ public class GameObject implements GameObjectContainer, RoutineEventListener, Js
 
     @Override
     public  Array<GameObject> deleteGameObject (GameObject gameObject) {
-        tmp.clear();
+        Array<GameObject> deletedGameObjects = new Array<>();
 
         String name = gameObject.getName();
-        if(childrenMap.containsKey(name)) {
+        if (childrenMap.containsKey(name)) {
             GameObject objectToRemove = childrenMap.get(name);
             childrenMap.remove(name);
             children.removeValue(objectToRemove, true);
@@ -145,7 +145,7 @@ public class GameObject implements GameObjectContainer, RoutineEventListener, Js
             objectToRemove.clearChildren(tmp);
         }
 
-        return tmp;
+        return deletedGameObjects;
     }
 
     @Override
@@ -159,6 +159,10 @@ public class GameObject implements GameObjectContainer, RoutineEventListener, Js
 
     @Override
     public void clearChildren (Array<GameObject> tmp) {
+        for (GameObject child : children) {
+            child.clearChildren(tmp);
+        }
+
         tmp.addAll(children);
 
         children.clear();

@@ -1,16 +1,12 @@
 package com.talosvfx.talos.editor.addons.scene.widgets;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasSprite;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.InputListener;
-import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
@@ -50,8 +46,6 @@ import com.talosvfx.talos.runtime.scene.Scene;
 import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static com.talosvfx.talos.editor.utils.InputUtils.ctrlPressed;
 
 public class HierarchyWidget extends Table implements Observer, EventContextProvider<GameObjectContainer> {
 
@@ -281,8 +275,11 @@ public class HierarchyWidget extends Table implements Observer, EventContextProv
             }
         }
 
-        for (GameObject object : selection) {
-            SceneUtils.deleteGameObject(currentContainer, object);
+        ObjectSet<GameObject> deleteList = new ObjectSet<>();
+        deleteList.addAll(selection);
+
+        if (currentContainer != null) {
+            SceneUtils.deleteGameObjects(currentContainer, deleteList);
         }
     }
 
