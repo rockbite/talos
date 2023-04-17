@@ -16,12 +16,7 @@ import com.badlogic.gdx.utils.ObjectSet;
 import com.esotericsoftware.spine.SkeletonBinary;
 import com.esotericsoftware.spine.SkeletonData;
 import com.talosvfx.talos.runtime.RuntimeContext;
-import com.talosvfx.talos.runtime.assets.meta.AtlasMetadata;
-import com.talosvfx.talos.runtime.assets.meta.EmptyMetadata;
-import com.talosvfx.talos.runtime.assets.meta.PrefabMetadata;
-import com.talosvfx.talos.runtime.assets.meta.SceneMetadata;
-import com.talosvfx.talos.runtime.assets.meta.SpineMetadata;
-import com.talosvfx.talos.runtime.assets.meta.SpriteMetadata;
+import com.talosvfx.talos.runtime.assets.meta.*;
 import com.talosvfx.talos.runtime.routine.serialization.BaseRoutineData;
 import com.talosvfx.talos.runtime.routine.serialization.RuntimeRoutineData;
 import com.talosvfx.talos.runtime.scene.Prefab;
@@ -209,6 +204,7 @@ public class RuntimeAssetRepository extends BaseAssetRepository {
 		vfxExportData.setDescriptorLoaded(particleEffectDescriptor);
 
 		gameAsset.setResourcePayload(vfxExportData);
+		gameAsset.dependentRawAssets.add(fakeMeta(vfxPFile, TlsMetadata.class));
 
 		return (GameAsset<T>)gameAsset;
 	}
