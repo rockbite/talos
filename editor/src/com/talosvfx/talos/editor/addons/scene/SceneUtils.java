@@ -3,8 +3,6 @@ package com.talosvfx.talos.editor.addons.scene;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Camera;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasSprite;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
@@ -12,6 +10,8 @@ import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.esotericsoftware.spine.SkeletonData;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
+import com.talosvfx.talos.editor.addons.scene.events.save.SaveRequest;
+import com.talosvfx.talos.editor.utils.CollectionFunctionalUtils;
 import com.talosvfx.talos.runtime.RuntimeContext;
 import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.runtime.assets.GameAssetType;
@@ -28,6 +28,7 @@ import com.talosvfx.talos.editor.project2.apps.ProjectExplorerApp;
 import com.talosvfx.talos.editor.project2.apps.SceneEditorApp;
 import com.talosvfx.talos.editor.serialization.VFXProjectData;
 import com.talosvfx.talos.runtime.scene.components.*;
+import com.talosvfx.talos.runtime.scene.*;
 import com.talosvfx.talos.runtime.utils.NamingUtils;
 import com.talosvfx.talos.editor.utils.Toasts;
 import com.talosvfx.talos.runtime.scene.GameObject;
@@ -433,9 +434,50 @@ public class SceneUtils {
 	}
 
 	public static void layersUpdated () {
+
+		Array<GameAsset<Scene>> scenesAssets = AssetRepository.getInstance().getAssetsForType(GameAssetType.SCENE);
+		Array<Scene> scenes = CollectionFunctionalUtils.map(scenesAssets, sceneGameAsset -> sceneGameAsset.getResource());
+		validateLayersFor(scenes);
+
+		Array<GameAsset<Prefab>> prefabAssets = AssetRepository.getInstance().getAssetsForType(GameAssetType.PREFAB);
+		Array<Prefab> prefabs = CollectionFunctionalUtils.map(prefabAssets, prefabGameAsset -> prefabGameAsset.getResource());
+		validateLayersFor(prefabs);
+
 		TalosProjectData currentProject = SharedResources.currentProject;
 		currentProject.save();
-		Notifications.fireEvent(Notifications.obtainEvent(LayerListUpdated.class));
+
+		// save current assets
+		Notifications.quickFire(SaveRequest.class);
+
+		// clear states for undo, redo
+		Notifications.quickFire(LayerListUpdatedEvent.class);
+	}
+
+	private static void validateLayersFor (Array<? extends GameObjectContainer> containers) {
+		SceneData sceneData = SharedResources.currentProject.getSceneData();
+		Array<SceneLayer> renderLayers = sceneData.getRenderLayers();
+
+		// update all game objects with renderer component
+		// that point to removed layer
+		for (int i = 0; i < containers.size; i++) {
+			GameObjectContainer container = containers.get(i);
+			Array<GameObject> gameObjects = container.getGameObjects();
+			boolean containerChanged = false;
+			for (int j = 0; j < gameObjects.size; j++) {
+				GameObject gameObject = gameObjects.get(j);
+				RendererComponent rendererComponent = gameObject.getComponentAssignableFrom(RendererComponent.class);
+				if (rendererComponent != null) {
+					SceneLayer sortingLayer = rendererComponent.getSortingLayer();
+					if (!renderLayers.contains(sortingLayer, true)) {
+						rendererComponent.setSortingLayer(SharedResources.currentProject.getSceneData().getPreferredSceneLayer());
+						containerChanged = true;
+					}
+				}
+			}
+			if (containerChanged) {
+				markContainerChanged(container);
+			}
+		}
 	}
 
 	public static void markContainerChanged (GameObjectContainer currentHolder) {

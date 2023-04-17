@@ -2,16 +2,14 @@ package com.talosvfx.talos.editor.project2;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.utils.Json;
-import com.badlogic.gdx.utils.JsonReader;
-import com.badlogic.gdx.utils.JsonValue;
-import com.badlogic.gdx.utils.JsonWriter;
+import com.badlogic.gdx.utils.*;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.layouts.LayoutGrid;
 import com.talosvfx.talos.editor.project2.apps.ProjectExplorerApp;
 import com.talosvfx.talos.editor.project2.localprefs.TalosLocalPrefs;
 import com.talosvfx.talos.runtime.scene.SceneData;
 import com.talosvfx.talos.editor.utils.Toasts;
+import com.talosvfx.talos.runtime.scene.SceneLayer;
 import lombok.Getter;
 import lombok.Setter;
 import org.slf4j.Logger;
@@ -107,6 +105,11 @@ public class TalosProjectData implements Json.Serializable {
 			jsonLayoutRepresentation = jsonData.getChild("currentLayout");
 		}
 		sceneData = json.readValue("sceneData", SceneData.class, new SceneData(), jsonData);
+		Array<SceneLayer> renderLayers = sceneData.getRenderLayers();
+		for (int i = 0; i < renderLayers.size; i++) {
+			SceneLayer sceneLayer = renderLayers.get(i);
+			sceneLayer.setIndex(i);
+		}
 		defaultPixelPerMeter = jsonData.getString("defaultPixelPerMeter", "100");
 	}
 
