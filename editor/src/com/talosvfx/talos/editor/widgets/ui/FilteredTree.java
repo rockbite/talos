@@ -320,27 +320,6 @@ public class FilteredTree<T> extends WidgetGroup {
                 return super.touchDown(event, x, y, pointer, button);
             }
 
-            @Override
-            public boolean keyDown (InputEvent event, int keycode) {
-
-                if (keycode == Input.Keys.DEL || keycode == Input.Keys.FORWARD_DEL) {
-                    if(!selection.isEmpty()) {
-                        Array<FilteredTree.Node<T>> nodes = new Array<>();
-                        for(Object nodeObject: selection) {
-                            FilteredTree.Node<T> node = (FilteredTree.Node<T>) nodeObject;
-                            if (node.canDelete) {
-                                nodes.add(node);
-                            }
-                        }
-                        for (ItemListener<T> itemListener : itemListeners) {
-                            itemListener.delete(nodes);
-                        }
-                        selection.removeAll(nodes);
-                    }
-                }
-                return super.keyDown(event, keycode);
-            }
-
             public boolean mouseMoved (InputEvent event, float x, float y) {
                 setOverNode(getNodeAt(y));
                 for (ItemListener<T> itemListener : itemListeners) {
