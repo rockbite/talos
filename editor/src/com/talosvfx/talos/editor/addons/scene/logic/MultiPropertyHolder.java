@@ -3,6 +3,7 @@ package com.talosvfx.talos.editor.addons.scene.logic;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.ObjectSet;
+import com.talosvfx.talos.editor.addons.scene.logic.componentwrappers.SpriteRendererComponentProvider;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.IPropertyProvider;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
 
@@ -160,6 +161,15 @@ public class MultiPropertyHolder<T extends IPropertyHolder> implements IProperty
         @Override
         public Class<? extends IPropertyProvider> getType() {
             return providers.first().getType();
+        }
+
+        public void propagateChanges() {
+            for (IPropertyProvider provider : providers) {
+                if (provider instanceof SpriteRendererComponentProvider) {
+                    SpriteRendererComponentProvider spriteRendererComponentProvider = (SpriteRendererComponentProvider) provider;
+                    spriteRendererComponentProvider.applyConstrains();
+                }
+            }
         }
     }
 }
