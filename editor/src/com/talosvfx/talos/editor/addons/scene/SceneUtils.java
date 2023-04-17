@@ -262,6 +262,26 @@ public class SceneUtils {
 
 	}
 
+	public static void deleteGameObjects (GameObjectContainer gameObjectContainer, ObjectSet<GameObject> gameObjects) {
+		for (GameObject gameObject : gameObjects) {
+			Array<GameObject> childrenToBeDeleted = new Array<>();
+			gameObject.clearChildren(childrenToBeDeleted);
+			gameObjects.addAll(childrenToBeDeleted);
+		}
+
+		for (GameObject gameObject : gameObjects) {
+			DeSelectGameObjectExternallyEvent deSelectGameObjectExternallyEvent = Notifications.obtainEvent(DeSelectGameObjectExternallyEvent.class);
+			deSelectGameObjectExternallyEvent.setGameObject(gameObject);
+			Notifications.fireEvent(deSelectGameObjectExternallyEvent);
+
+			GameObjectDeleted gameObjectDeleted = Notifications.obtainEvent(GameObjectDeleted.class);
+			gameObjectDeleted.set(gameObjectContainer, gameObject);
+			Notifications.fireEvent(gameObjectDeleted);
+		}
+
+		markContainerChanged(gameObjectContainer);
+	}
+
 	private static ObjectMap<GameObjectContainer, OrderedSet<GameObject>> copyPasteBuffer = new ObjectMap<>();
 
 	public static void copy (GameAsset<Scene> gameAsset, OrderedSet<GameObject> selection) {
