@@ -8,10 +8,11 @@ import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
 import com.rockbite.bongo.engine.camera.BongoCameraController;
+import com.talosvfx.talos.editor.project2.apps.preferences.ViewportPreferences;
+import com.talosvfx.talos.editor.project2.apps.preferences.ViewportSettingPreferences;
 import com.talosvfx.talos.editor.utils.CameraController;
 import lombok.Data;
 import lombok.Getter;
-import lombok.Setter;
 
 import java.util.function.Supplier;
 
@@ -110,6 +111,10 @@ public class ViewportViewSettings {
 		this.currentCamera = orthographicCamera;
 	}
 
+	public float getWorldWidth () {
+		return worldWidth;
+	}
+
 	public void setWorldWidth (float worldWidth) {
 		this.worldWidth = worldWidth;
 	}
@@ -157,5 +162,69 @@ public class ViewportViewSettings {
 		orthographicCamera.update();
 	}
 
+	public void applyPreferences(ViewportPreferences viewportPreferences) {
+		getCurrentCamera().position.set(viewportPreferences.cameraPos);
+		if (viewportPreferences.cameraDirection != null) {
+			getCurrentCamera().direction.set(viewportPreferences.cameraDirection);
+		}
+		setZoom(viewportPreferences.cameraZoom);
+
+		if (viewportPreferences.getSettingPreferences() != null) {
+			ViewportSettingPreferences settingPreferences = viewportPreferences.getSettingPreferences();
+			setWorldWidth(settingPreferences.width);
+			setFov(settingPreferences.fov);
+			setNear(settingPreferences.near);
+			setFar(settingPreferences.far);
+
+
+			set3D(settingPreferences.is3D);
+			setPositiveZUp(settingPreferences.positiveZUp);
+
+			switch (settingPreferences.currentCameraType) {
+				case PERSPECTIVE:
+					setPerspective();
+					break;
+				case ORTHOGRAPHIC:
+					setOrthographic();
+					break;
+			}
+
+			setShowAxis(settingPreferences.isShowAxis());
+			setShowGrid(settingPreferences.isShowGrid());
+			setGridSize(settingPreferences.getGridSize());
+		}
+	}
+
+	public enum CurrentCameraType {
+		ORTHOGRAPHIC,
+		PERSPECTIVE
+	}
+
+	public void collectPreferences(ViewportPreferences viewportPreferences) {
+		viewportPreferences.setCameraPos(new Vector3(getCurrentCamera().position));
+		viewportPreferences.setCameraDirection(new Vector3(getCurrentCamera().direction));
+		viewportPreferences.setCameraZoom(getZoom());
+
+		ViewportSettingPreferences settingPreferences = new ViewportSettingPreferences();
+		settingPreferences.setWidth(getWorldWidth());
+		settingPreferences.setFov(getFov());
+		settingPreferences.setNear(getNear());
+		settingPreferences.setFar(getFar());
+
+		settingPreferences.set3D(is3D);
+		settingPreferences.setPositiveZUp(positiveZUp);
+
+		if (currentCamera instanceof OrthographicCamera) {
+			settingPreferences.setCurrentCameraType(CurrentCameraType.ORTHOGRAPHIC);
+		} else if (currentCamera instanceof PerspectiveCamera) {
+			settingPreferences.setCurrentCameraType(CurrentCameraType.PERSPECTIVE);
+		}
+
+		settingPreferences.setShowAxis(isShowAxis());
+		settingPreferences.setShowGrid(isShowGrid());
+		settingPreferences.setGridSize(getGridSize());
+
+		viewportPreferences.setSettingPreferences(settingPreferences);
+	}
 
 }

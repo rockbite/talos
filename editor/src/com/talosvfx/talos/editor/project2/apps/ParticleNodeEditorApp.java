@@ -282,15 +282,13 @@ public class ParticleNodeEditorApp extends AppManager.BaseApp<VFXProjectData> im
 
 	@Override
 	public void applyFromPreferences(ViewportPreferences prefs) {
-		moduleGraphStageWrapper.setCameraPos(prefs.cameraPos);
-		moduleGraphStageWrapper.setCameraZoom(prefs.cameraZoom);
+		moduleGraphStageWrapper.applyPreferences(prefs);
 	}
 
 	@Override
 	public ViewportPreferences getPrefs() {
 		ViewportPreferences prefs = new ViewportPreferences();
-		prefs.cameraPos = moduleGraphStageWrapper.getCameraPos();
-		prefs.cameraZoom = moduleGraphStageWrapper.getCameraZoom();
+		moduleGraphStageWrapper.collectPreferences(prefs);
 		return prefs;
 	}
 

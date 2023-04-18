@@ -202,15 +202,13 @@ public class RoutineEditorApp extends AppManager.BaseApp<RoutineStageData> imple
     }
 
     public void applyFromPreferences(ViewportPreferences prefs) {
-        routineStageWrapper.setCameraPos(prefs.cameraPos);
-        routineStageWrapper.setCameraZoom(prefs.cameraZoom);
+        routineStageWrapper.applyPreferences(prefs);
     }
 
     @Override
     public ViewportPreferences getPrefs() {
         ViewportPreferences prefs = new ViewportPreferences();
-        prefs.cameraPos = routineStageWrapper.getCameraPos();
-        prefs.cameraZoom = routineStageWrapper.getCameraZoom();
+        routineStageWrapper.collectPreferences(prefs);
         return prefs;
     }
 }
