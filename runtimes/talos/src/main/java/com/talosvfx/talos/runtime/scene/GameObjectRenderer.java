@@ -233,7 +233,7 @@ public class GameObjectRenderer {
 		}
 	}
 
-	private void fillRenderableEntities (Array<GameObject> rootObjects, Array<GameObject> list) {
+	protected void fillRenderableEntities (Array<GameObject> rootObjects, Array<GameObject> list) {
 		for (GameObject root : rootObjects) {
 			if (!root.active || !root.isEditorVisible()) continue;
 
