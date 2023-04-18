@@ -36,11 +36,13 @@ public class SceneLayer implements Json.Serializable {
     public void write (Json json) {
         json.writeValue("name", name);
         json.writeValue("uuid", uniqueID.toString());
+        json.writeValue("renderStrategy", renderStrategy);
     }
 
     @Override
     public void read (Json json, JsonValue jsonData) {
         name = jsonData.getString("name");
+        renderStrategy = json.readValue("renderStrategy", RenderStrategy.class, RenderStrategy.SCENE, jsonData);
         if (jsonData.has("uuid")) {
             uniqueID = UUID.fromString(jsonData.getString("uuid"));
         } else {

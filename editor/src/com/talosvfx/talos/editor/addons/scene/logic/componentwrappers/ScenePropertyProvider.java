@@ -135,6 +135,8 @@ public class ScenePropertyProvider implements IPropertyProvider {
 			@Override
 			public void selected (FilteredTree.Node<SceneLayerWrapper> node) {
 				super.selected(node);
+				setSelectedLayer(node.getObject().getInstance());
+
 				SharedResources.currentProject.getSceneData().setPreferredSceneLayer(node.getName());
 			}
 		});
