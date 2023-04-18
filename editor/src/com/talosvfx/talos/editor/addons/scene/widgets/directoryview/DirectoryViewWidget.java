@@ -830,7 +830,7 @@ public class DirectoryViewWidget extends Table {
 	}
 
 	public FileHandle getCurrentFolder () {
-		return fileHandle;
+		return fileHandle != null ? fileHandle : SharedResources.currentProject.rootProjectDir();
 	}
 
 	private void navigateTo (FileHandle destination) {
