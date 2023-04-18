@@ -165,7 +165,7 @@ public class GameObjectRenderer {
 		return new PathComponentRenderer(this);
 	}
 
-	private void sort (Array<GameObject> list) {
+	protected void sort (Array<GameObject> list) {
 		list.sort(parentSorter);
 	}
 
