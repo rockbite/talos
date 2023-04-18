@@ -173,15 +173,13 @@ public class SceneEditorApp extends AppManager.BaseApp<Scene> implements GameAss
 
 	@Override
 	public void applyFromPreferences(ViewportPreferences prefs) {
-		workspaceWidget.setCameraPos(prefs.cameraPos);
-		workspaceWidget.setCameraZoom(prefs.cameraZoom);
+		workspaceWidget.applyPreferences(prefs);
 	}
 
 	@Override
 	public ViewportPreferences getPrefs() {
 		ViewportPreferences prefs = new ViewportPreferences();
-		prefs.cameraPos = workspaceWidget.getCameraPos();
-		prefs.cameraZoom = workspaceWidget.getCameraZoom();
+		workspaceWidget.collectPreferences(prefs);
 		return prefs;
 	}
 }

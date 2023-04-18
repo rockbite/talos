@@ -52,6 +52,7 @@ import com.kotcrab.vis.ui.widget.VisTextField;
 import com.talosvfx.talos.editor.addons.scene.SceneUtils;
 import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.EightPointGizmo;
 import com.talosvfx.talos.editor.project2.SharedResources;
+import com.talosvfx.talos.editor.project2.apps.preferences.ViewportPreferences;
 import com.talosvfx.talos.editor.render.Render;
 import com.talosvfx.talos.editor.addons.scene.events.GameObjectSelectionChanged;
 import com.talosvfx.talos.runtime.scene.GameObject;
@@ -168,27 +169,6 @@ public abstract class ViewportWidget extends Table {
 		dropdownForWorld = new VisImageButton(SharedResources.skin.getDrawable("eye"));
 		dropdownForWorld.getImage().setScaling(Scaling.fill);
 
-		VisTable viewTable = createViewSettingsDialog();
-
-		dropdownForWorld.addListener(new ClickListener() {
-			@Override
-			public void clicked (InputEvent event, float x, float y) {
-				super.clicked(event, x, y);
-
-				if (dropdownForWorld.isChecked()) {
-					addActor(viewTable);
-
-					Vector2 vector2 = new Vector2();
-					vector2.set(dropdownForWorld.getWidth(), 0);
-					dropdownForWorld.localToActorCoordinates(ViewportWidget.this, vector2);
-					viewTable.pack();
-					viewTable.setPosition(vector2.x - viewTable.getWidth(), vector2.y - viewTable.getHeight());
-
-				} else {
-					viewTable.remove();
-				}
-			}
-		});
 		topToolbar.add(dropdownForWorld).size(iconSize);
 
 		addActor(fullscreenUITable);
@@ -233,7 +213,7 @@ public abstract class ViewportWidget extends Table {
 
 
 		VisLabel viewportWidthLabel = new VisLabel("ViewportWidth");
-		VisTextField viewportWidthField = new VisTextField(viewportViewSettings.getFov()+"");
+		VisTextField viewportWidthField = new VisTextField(viewportViewSettings.getWorldWidth() + "");
 		viewportWidthField.setTextFieldFilter(new FloatRangeDigitFilter());
 		viewportWidthField.addListener(new ChangeListener() {
 			@Override
@@ -1362,25 +1342,6 @@ public abstract class ViewportWidget extends Table {
 		Vector2 local = getWorldFromLocal(vec.x, vec.y);
 		return local;
 	}
-	public Vector3 getCameraPos () {
-		ViewportViewSettings settings = viewportViewSettings.getViewportWidget().viewportViewSettings;
-		return new Vector3(settings.getCurrentCamera().position);
-	}
-
-	public float getCameraZoom() {
-		ViewportViewSettings settings = viewportViewSettings.getViewportWidget().viewportViewSettings;
-		return settings.getZoom();
-	}
-
-	public void setCameraPos (Vector3 pos) {
-		ViewportViewSettings settings = viewportViewSettings.getViewportWidget().viewportViewSettings;
-		settings.getCurrentCamera().position.set(pos);
-	}
-
-	public void setCameraZoom (float zoom) {
-		ViewportViewSettings settings = viewportViewSettings.getViewportWidget().viewportViewSettings;
-		settings.setZoom(zoom);
-	}
 
 	private static float zoomStepScale (float currentZoom, float minZoom, float maxZoom) {
 		float current = (currentZoom - minZoom) / (maxZoom - minZoom);
@@ -1399,5 +1360,34 @@ public abstract class ViewportWidget extends Table {
 			}
 		}
 		SceneUtils.componentBatchUpdated(selection.orderedItems().get(0).getGameObjectContainerRoot(), selection.orderedItems(), TransformComponent.class, false);
+	}
+
+	public void applyPreferences(ViewportPreferences prefs) {
+		viewportViewSettings.applyPreferences(prefs);
+
+		VisTable viewTable = createViewSettingsDialog();
+		dropdownForWorld.addListener(new ClickListener() {
+			@Override
+			public void clicked (InputEvent event, float x, float y) {
+				super.clicked(event, x, y);
+
+				if (dropdownForWorld.isChecked()) {
+					addActor(viewTable);
+
+					Vector2 vector2 = new Vector2();
+					vector2.set(dropdownForWorld.getWidth(), 0);
+					dropdownForWorld.localToActorCoordinates(ViewportWidget.this, vector2);
+					viewTable.pack();
+					viewTable.setPosition(vector2.x - viewTable.getWidth(), vector2.y - viewTable.getHeight());
+
+				} else {
+					viewTable.remove();
+				}
+			}
+		});
+	}
+
+	public void collectPreferences(ViewportPreferences prefs) {
+		viewportViewSettings.collectPreferences(prefs);
 	}
 }
