@@ -131,6 +131,8 @@ public abstract class ViewportWidget extends Table {
 	@Getter
 	protected ViewportViewSettings viewportViewSettings;
 
+	private VisTable viewSettingsDialog;
+
     public ViewportWidget() {
 		 viewportViewSettings = new ViewportViewSettings(this);
 
@@ -168,6 +170,27 @@ public abstract class ViewportWidget extends Table {
 
 		dropdownForWorld = new VisImageButton(SharedResources.skin.getDrawable("eye"));
 		dropdownForWorld.getImage().setScaling(Scaling.fill);
+
+		viewSettingsDialog = createViewSettingsDialog();
+		dropdownForWorld.addListener(new ClickListener() {
+			@Override
+			public void clicked(InputEvent event, float x, float y) {
+				super.clicked(event, x, y);
+
+				if (dropdownForWorld.isChecked()) {
+					addActor(viewSettingsDialog);
+
+					Vector2 vector2 = new Vector2();
+					vector2.set(dropdownForWorld.getWidth(), 0);
+					dropdownForWorld.localToActorCoordinates(ViewportWidget.this, vector2);
+					viewSettingsDialog.pack();
+					viewSettingsDialog.setPosition(vector2.x - viewSettingsDialog.getWidth(), vector2.y - viewSettingsDialog.getHeight());
+
+				} else {
+					viewSettingsDialog.remove();
+				}
+			}
+		});
 
 		topToolbar.add(dropdownForWorld).size(iconSize);
 
@@ -1365,26 +1388,7 @@ public abstract class ViewportWidget extends Table {
 	public void applyPreferences(ViewportPreferences prefs) {
 		viewportViewSettings.applyPreferences(prefs);
 
-		VisTable viewTable = createViewSettingsDialog();
-		dropdownForWorld.addListener(new ClickListener() {
-			@Override
-			public void clicked (InputEvent event, float x, float y) {
-				super.clicked(event, x, y);
-
-				if (dropdownForWorld.isChecked()) {
-					addActor(viewTable);
-
-					Vector2 vector2 = new Vector2();
-					vector2.set(dropdownForWorld.getWidth(), 0);
-					dropdownForWorld.localToActorCoordinates(ViewportWidget.this, vector2);
-					viewTable.pack();
-					viewTable.setPosition(vector2.x - viewTable.getWidth(), vector2.y - viewTable.getHeight());
-
-				} else {
-					viewTable.remove();
-				}
-			}
-		});
+		viewSettingsDialog = createViewSettingsDialog();
 	}
 
 	public void collectPreferences(ViewportPreferences prefs) {
