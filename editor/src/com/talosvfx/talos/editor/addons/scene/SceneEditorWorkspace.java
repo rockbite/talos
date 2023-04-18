@@ -1089,38 +1089,30 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
 		if (event.get().size == 1) { //Only select gizmos if one is selected
 			selectGizmos(gameObjects);
-		} else {
+		} else if(event.get().size > 1){
 			unselectGizmos();
 			groupSelectionGizmo.setSelected(true);
+			showPropertyPanelForGameObjects(gameObjects);
 		}
 
 		// now for properties
 
-		if (gameObjects.size == 0) {
-			// we select the main container then
-			if (currentContainer instanceof Scene) {
-				Scene scene = (Scene) currentContainer;
-				selectPropertyHolder(PropertyWrapperProviders.getOrCreateHolder(scene));
-			} else if (currentContainer instanceof Prefab) {
-				Prefab prefab = (Prefab) currentContainer;
-				selectPropertyHolder(PropertyWrapperProviders.getOrCreateHolder(prefab));
-			}
-		} else {
+		mapEditorState.update(event);
+	}
+
+	public void showPropertyPanelForGameObjects(ObjectSet<GameObject> gameObjects) {
 			if (gameObjects.size == 1) {
 				selectPropertyHolder(PropertyWrapperProviders.getOrCreateHolder(gameObjects.first()));
-			} else {
+			} else if(gameObjects.size > 1){
 				ObjectSet<IPropertyHolder> tempList = new ObjectSet<>();
 				for (GameObject gameObject : gameObjects) {
 					tempList.add(PropertyWrapperProviders.getOrCreateHolder(gameObject));
 				}
 				selectPropertyHolder(PropertyWrapperProviders.getOrCreateHolder(new MultiPropertyHolder<>(tempList)));
-				if(aligningToolsPane.getParent() == null) {
+				if (aligningToolsPane.getParent() == null) {
 					groupSelectionGizmo.getViewportWidget().addActor(aligningToolsPane);
 				}
 			}
-		}
-
-		mapEditorState.update(event);
 	}
 
 	@EventHandler
@@ -1441,11 +1433,22 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		Notifications.fireEvent(gameObjectSelectionChanged);
 	}
 
-	@EventHandler
-	public void onGameAssetOpened (GameAssetOpenEvent gameAssetOpenEvent) {
-		GameAsset<?> gameAsset = gameAssetOpenEvent.getGameAsset();
-		if (gameAsset.type == GameAssetType.SCENE) {
-			this.gameAsset = (GameAsset<Scene>) gameAsset;
+	@Override
+	protected void onGizmoTouch(Gizmo hitGizmo, float x, float y, int button) {
+		super.onGizmoTouch(hitGizmo, x, y, button);
+		showPropertyPanelForGameObjects(selection);
+	}
+
+	@Override
+	protected void onEmptyAreaTouch() {
+		super.onEmptyAreaTouch();
+
+		if (currentContainer instanceof Scene) {
+			Scene scene = (Scene) currentContainer;
+			selectPropertyHolder(PropertyWrapperProviders.getOrCreateHolder(scene));
+		} else if (currentContainer instanceof Prefab) {
+			Prefab prefab = (Prefab) currentContainer;
+			selectPropertyHolder(PropertyWrapperProviders.getOrCreateHolder(prefab));
 		}
 	}
 }

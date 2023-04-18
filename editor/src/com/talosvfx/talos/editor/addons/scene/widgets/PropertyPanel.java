@@ -96,6 +96,8 @@ public class PropertyPanel extends Table implements Observer {
     }
 
     public void showPanel (IPropertyHolder target, Iterable<IPropertyProvider> propertyProviders) {
+        if (currentPropertyHolder != null && currentPropertyHolder.equals(target))
+            return;
         providerSet.clear();
         for(IPropertyProvider propertyProvider: propertyProviders) {
             if(propertyProvider.getType() == null) continue;
