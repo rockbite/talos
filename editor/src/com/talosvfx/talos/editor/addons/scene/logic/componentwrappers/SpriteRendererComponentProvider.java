@@ -42,6 +42,20 @@ public final class SpriteRendererComponentProvider extends RendererComponentProv
 				component.setGameAsset(value);
 				GameObject gameObject = getComponent().getGameObject();
 				SceneUtils.componentUpdated(gameObject.getGameObjectContainerRoot(), gameObject, getComponent(), false);
+
+				// snap to aspect ratio
+				if (!component.shouldFixAspectRatio(true))
+					return;
+
+				final AtlasSprite texture = component.getGameResource().getResource();
+
+				if (texture != null) {
+					final float aspect = texture.getRegionHeight() * 1f / texture.getRegionWidth();
+					component.size.y = component.size.x * aspect;
+				}
+
+				final ValueWidget yValue = (sizeWidget).yValue;
+				yValue.setValue(component.size.y, false);
 			}
 		});
 
