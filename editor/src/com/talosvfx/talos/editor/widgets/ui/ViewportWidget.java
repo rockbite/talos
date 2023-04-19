@@ -33,7 +33,10 @@ import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
@@ -42,13 +45,12 @@ import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.ObjectSet;
 import com.badlogic.gdx.utils.OrderedSet;
 import com.badlogic.gdx.utils.Scaling;
+import com.kotcrab.vis.ui.VisUI;
 import com.kotcrab.vis.ui.widget.VisCheckBox;
 import com.kotcrab.vis.ui.widget.VisImage;
 import com.kotcrab.vis.ui.widget.VisImageButton;
-import com.kotcrab.vis.ui.widget.VisLabel;
 import com.kotcrab.vis.ui.widget.VisSelectBox;
 import com.kotcrab.vis.ui.widget.VisTable;
-import com.kotcrab.vis.ui.widget.VisTextField;
 import com.talosvfx.talos.editor.addons.scene.SceneUtils;
 import com.talosvfx.talos.editor.addons.scene.widgets.gizmos.EightPointGizmo;
 import com.talosvfx.talos.editor.project2.SharedResources;
@@ -217,9 +219,11 @@ public abstract class ViewportWidget extends Table {
 		cameraTable.defaults().pad(5);
 		cameraTable.left().defaults().left();
 
-		VisLabel cameraLabel = new VisLabel("Camera");
+		Skin skin = VisUI.getSkin();
 
-		VisLabel cameraTypeLabel = new VisLabel("Type");
+		Label cameraLabel = new Label("Camera", skin);
+
+		Label cameraTypeLabel = new Label("Type", skin);
 		VisSelectBox<String> cameraTypeBox = new VisSelectBox<>();
 		cameraTypeBox.setItems("Orthographic", "Perspective");
 		cameraTypeBox.setSelected(viewportViewSettings.getCurrentCamera() instanceof OrthographicCamera ? "Orthographic" : "Perspective");
@@ -235,8 +239,8 @@ public abstract class ViewportWidget extends Table {
 		});
 
 
-		VisLabel viewportWidthLabel = new VisLabel("ViewportWidth");
-		VisTextField viewportWidthField = new VisTextField(viewportViewSettings.getWorldWidth() + "");
+		Label viewportWidthLabel = new Label("ViewportWidth", skin);
+		TextField viewportWidthField = new TextField(viewportViewSettings.getWorldWidth() + "", skin);
 		viewportWidthField.setTextFieldFilter(new FloatRangeDigitFilter());
 		viewportWidthField.addListener(new ChangeListener() {
 			@Override
@@ -249,8 +253,8 @@ public abstract class ViewportWidget extends Table {
 		});
 
 
-		VisLabel fovLabel = new VisLabel("Fov");
-		VisTextField fovField = new VisTextField(viewportViewSettings.getFov()+"");
+		Label fovLabel = new Label("Fov", skin);
+		TextField fovField = new TextField(viewportViewSettings.getFov() + "", skin);
 		fovField.setTextFieldFilter(new FloatRangeDigitFilter());
 		fovField.addListener(new ChangeListener() {
 			@Override
@@ -262,8 +266,8 @@ public abstract class ViewportWidget extends Table {
 			}
 		});
 
-		VisLabel nearLabel = new VisLabel("Near");
-		VisTextField nearField  = new VisTextField(viewportViewSettings.getNear()+"");
+		Label nearLabel = new Label("Near", skin);
+		TextField nearField  = new TextField(viewportViewSettings.getNear() + "", skin);
 		nearField.setTextFieldFilter(new FloatRangeDigitFilter());
 		nearField.addListener(new ChangeListener() {
 			@Override
@@ -275,8 +279,8 @@ public abstract class ViewportWidget extends Table {
 			}
 		});
 
-		VisLabel farLabel = new VisLabel("Far");
-		VisTextField farField  = new VisTextField(viewportViewSettings.getFar()+"");
+		Label farLabel = new Label("Far", skin);
+		TextField farField  = new TextField(viewportViewSettings.getFar() + "", skin);
 		farField.setTextFieldFilter(new FloatRangeDigitFilter());
 		farField.addListener(new ChangeListener() {
 			@Override
@@ -337,7 +341,7 @@ public abstract class ViewportWidget extends Table {
 		axisTable.defaults().pad(5);
 		axisTable.left().defaults().left();
 
-		VisLabel axisLabel = new VisLabel("Axis");
+		Label axisLabel = new Label("Axis", skin);
 
 		axisTable.add(axisLabel).colspan(2);
 		axisTable.row();
@@ -361,10 +365,9 @@ public abstract class ViewportWidget extends Table {
 			}
 		});
 
-		VisLabel gridSizeLabel = new VisLabel("Grid Size");
-		VisTextField gridSizeField = new VisTextField(viewportViewSettings.getGridSize() + "");
+		Label gridSizeLabel = new Label("Grid Size", skin);
+		TextField gridSizeField = new TextField(viewportViewSettings.getGridSize() + "", skin);
 		gridSizeField.setTextFieldFilter(new FloatRangeDigitFilter());
-
 		gridSizeField.addListener(new ChangeListener() {
 			@Override
 			public void changed (ChangeEvent event, Actor actor) {
