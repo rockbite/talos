@@ -8,7 +8,6 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasSprite;
 import com.badlogic.gdx.net.HttpStatus;
 import com.badlogic.gdx.tools.texturepacker.TexturePacker;
-import com.badlogic.gdx.tools.texturepacker.TextureUnpacker;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Base64Coder;
 import com.badlogic.gdx.utils.GdxRuntimeException;
@@ -184,8 +183,13 @@ public class RepositoryOptimizer {
 		return downloadFuture;
 	}
 
+	private static FileHandle getUserHomeTalosDir () {
+		String userHome = System.getProperty("user.home");
+		return Gdx.files.absolute(userHome).child("Talos");
+	}
+
 	private static FileHandle getJarLocation () {
-		return Gdx.files.local("Exports/binaries/tools-jar.jar");
+		return getUserHomeTalosDir().child("Exports/binaries/tools-jar.jar");
 	}
 
 	private static boolean hasToolsBinary () {
@@ -307,7 +311,7 @@ public class RepositoryOptimizer {
 			public TextureBucket get () {
 				ExportPayload exportPayload = new ExportPayload();
 
-				FileHandle exportParent = Gdx.files.local("Exports");
+				FileHandle exportParent = getUserHomeTalosDir().child("Exports");
 				exportParent.mkdirs();
 
 				String name = SharedResources.currentProject.getProjectDir().name();
@@ -413,6 +417,7 @@ public class RepositoryOptimizer {
 			int i = process.waitFor();
 
 			if (i != 0) {
+				Toasts.getInstance().showErrorToast("Exception in packing, check logs");
 				throw new GdxRuntimeException("Exception in packing");
 			}
 			objectCompletableFuture.complete(null);
