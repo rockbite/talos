@@ -1,12 +1,12 @@
 package com.talosvfx.talos.editor.widgets.ui;
 
-import com.kotcrab.vis.ui.widget.VisTextField;
+import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 
-public class FloatRangeDigitFilter implements VisTextField.TextFieldFilter {
+public class FloatRangeDigitFilter implements TextField.TextFieldFilter {
 
 
 	@Override
-	public boolean acceptChar (VisTextField textField, char c) {
+	public boolean acceptChar (TextField textField, char c) {
 		boolean hasAPointAlready = false;
 
 		if (textField.getText() == null || textField.getText().isEmpty()) {
