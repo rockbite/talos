@@ -36,27 +36,12 @@ public final class SpriteRendererComponentProvider extends RendererComponentProv
 			public GameAsset<AtlasSprite> get () {
 				return component.getGameResource();
 			}
-		}, new PropertyWidget.ValueChanged<GameAsset<AtlasSprite>>() {
-			@Override
-			public void report (GameAsset<AtlasSprite> value) {
-				component.setGameAsset(value);
-				GameObject gameObject = getComponent().getGameObject();
-				SceneUtils.componentUpdated(gameObject.getGameObjectContainerRoot(), gameObject, getComponent(), false);
+		}, value -> {
+			component.setGameAsset(value);
+			GameObject gameObject = getComponent().getGameObject();
+			SceneUtils.componentUpdated(gameObject.getGameObjectContainerRoot(), gameObject, getComponent(), false);
 
-				// snap to aspect ratio
-				if (!component.shouldFixAspectRatio(true))
-					return;
-
-				final AtlasSprite texture = component.getGameResource().getResource();
-
-				if (texture != null) {
-					final float aspect = texture.getRegionHeight() * 1f / texture.getRegionWidth();
-					component.size.y = component.size.x * aspect;
-				}
-
-				final ValueWidget yValue = (sizeWidget).yValue;
-				yValue.setValue(component.size.y, false);
-			}
+			snapToAspectRatio(sizeWidget);
 		});
 
 		PropertyWidget colorWidget = WidgetFactory.generate(component, "color", "Color");
@@ -83,18 +68,7 @@ public final class SpriteRendererComponentProvider extends RendererComponentProv
 		fixAspectRatioWidget.addListener(new ChangeListener() {
 			@Override
 			public void changed (ChangeEvent event, Actor actor) {
-				if (!component.shouldFixAspectRatio(true))
-					return;
-
-				final AtlasSprite texture = component.getGameResource().getResource();
-
-				if (texture != null) {
-					final float aspect = texture.getRegionHeight() * 1f / texture.getRegionWidth();
-					component.size.y = component.size.x * aspect;
-				}
-
-				final ValueWidget yValue = ((Vector2PropertyWidget)sizeWidget).yValue;
-				yValue.setValue(component.size.y, false);
+				snapToAspectRatio(sizeWidget);
 			}
 		});
 
@@ -106,7 +80,7 @@ public final class SpriteRendererComponentProvider extends RendererComponentProv
 					return;
 
 				if (event.getTarget() instanceof ValueWidget) {
-					final Vector2PropertyWidget vector2PropertyWidget = ((Vector2PropertyWidget)sizeWidget);
+					final Vector2PropertyWidget vector2PropertyWidget = sizeWidget;
 					final ValueWidget xValue = vector2PropertyWidget.xValue;
 					final ValueWidget yValue = vector2PropertyWidget.yValue;
 					final AtlasSprite texture = component.getGameResource().getResource();
@@ -143,6 +117,21 @@ public final class SpriteRendererComponentProvider extends RendererComponentProv
 		properties.add(tileSizeWidget);
 
 		return properties;
+	}
+
+	private void snapToAspectRatio(Vector2PropertyWidget sizeWidget) {
+		if (!component.shouldFixAspectRatio(true))
+			return;
+
+		final AtlasSprite texture = component.getGameResource().getResource();
+
+		if (texture != null) {
+			final float aspect = texture.getRegionHeight() * 1f / texture.getRegionWidth();
+			component.size.y = component.size.x * aspect;
+		}
+
+		final ValueWidget yValue = sizeWidget.yValue;
+		yValue.setValue(component.size.y, false);
 	}
 
 	@Override
