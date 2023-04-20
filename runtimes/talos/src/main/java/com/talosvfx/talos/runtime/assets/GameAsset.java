@@ -89,13 +89,11 @@ public class GameAsset<T> {
 		if (this == o) return true;
 		if (!(o instanceof GameAsset)) return false;
 		GameAsset<?> other = (GameAsset<?>) o;
-		return other.type == this.type
-				&& Objects.equals(nameIdentifier, other.nameIdentifier)
-				&& Objects.equals(getRootRawAsset().metaData.uuid, other.getRootRawAsset().metaData.uuid);
+		return Objects.equals(getRootRawAsset().metaData.uuid, other.getRootRawAsset().metaData.uuid);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(nameIdentifier, type, getRootRawAsset().metaData.uuid);
+		return Objects.hash(getRootRawAsset().metaData.uuid);
 	}
 }
