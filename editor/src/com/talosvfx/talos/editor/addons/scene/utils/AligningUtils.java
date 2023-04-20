@@ -32,10 +32,10 @@ public class AligningUtils {
         TransformComponent transformComponent = gameObject.getComponent(TransformComponent.class);
         if (gameObject.hasComponent(SpriteRendererComponent.class)) {
             SpriteRendererComponent spriteRendererComponent = gameObject.getComponent(SpriteRendererComponent.class);
-            return temp.set(spriteRendererComponent.getWidth() * transformComponent.scale.x,
-                    spriteRendererComponent.getHeight() * transformComponent.scale.y);
+            return temp.set(spriteRendererComponent.getWidth() * transformComponent.worldScale.x,
+                    spriteRendererComponent.getHeight() * transformComponent.worldScale.y);
         }
-        return temp.set(transformComponent.scale.x, transformComponent.scale.y);
+        return temp.set(transformComponent.worldScale.x, transformComponent.worldScale.y);
     }
 
     public static Vector2 calculateCenterPosition(Array<GameObject> selection) {
@@ -43,7 +43,7 @@ public class AligningUtils {
         float ySum = 0;
 
         for (GameObject gameObject : selection) {
-            Vector2 position = gameObject.getComponent(TransformComponent.class).position;
+            Vector2 position = gameObject.getComponent(TransformComponent.class).worldPosition;
             xSum += position.x;
             ySum += position.y;
         }
@@ -55,11 +55,11 @@ public class AligningUtils {
 
     public static float calculateLeftX(Array<GameObject> selection) {
         TransformComponent firstObjectComponent = selection.get(0).getComponent(TransformComponent.class);
-        float leftX = firstObjectComponent.position.x
+        float leftX = firstObjectComponent.worldPosition.x
                 - getSize(selection.get(0)).x / 2;
         for (GameObject gameObject : selection) {
             TransformComponent component = gameObject.getComponent(TransformComponent.class);
-            float x = component.position.x - getSize(gameObject).x / 2;
+            float x = component.worldPosition.x - getSize(gameObject).x / 2;
             if (x < leftX) {
                 leftX = x;
             }
@@ -69,11 +69,11 @@ public class AligningUtils {
 
     public static float calculateRightX(Array<GameObject> selection) {
         TransformComponent firstObjectComponent = selection.get(0).getComponent(TransformComponent.class);
-        float leftX = firstObjectComponent.position.x
+        float leftX = firstObjectComponent.worldPosition.x
                 + getSize(selection.get(0)).x / 2;
         for (GameObject gameObject : selection) {
             TransformComponent component = gameObject.getComponent(TransformComponent.class);
-            float x = component.position.x + getSize(gameObject).x / 2;
+            float x = component.worldPosition.x + getSize(gameObject).x / 2;
             if (x > leftX) {
                 leftX = x;
             }
@@ -83,11 +83,11 @@ public class AligningUtils {
 
     public static float calculateTopY(Array<GameObject> selection) {
         TransformComponent firstObjectComponent = selection.get(0).getComponent(TransformComponent.class);
-        float topY = firstObjectComponent.position.y
+        float topY = firstObjectComponent.worldPosition.y
                 + getSize(selection.get(0)).y / 2;
         for (GameObject gameObject : selection) {
             TransformComponent component = gameObject.getComponent(TransformComponent.class);
-            float y = component.position.y + getSize(gameObject).y / 2;
+            float y = component.worldPosition.y + getSize(gameObject).y / 2;
             if (y > topY) {
                 topY = y;
             }
@@ -97,11 +97,11 @@ public class AligningUtils {
 
     public static float calculateBottomY(Array<GameObject> selection) {
         TransformComponent firstObjectComponent = selection.get(0).getComponent(TransformComponent.class);
-        float bottomY = firstObjectComponent.position.y
+        float bottomY = firstObjectComponent.worldPosition.y
                 - getSize(selection.get(0)).y / 2;
         for (GameObject gameObject : selection) {
             TransformComponent component = gameObject.getComponent(TransformComponent.class);
-            float y = component.position.y - getSize(gameObject).y / 2;
+            float y = component.worldPosition.y - getSize(gameObject).y / 2;
             if (y < bottomY) {
                 bottomY = y;
             }
@@ -118,22 +118,24 @@ public class AligningUtils {
         gameObjects.sort((o1, o2) -> {
             TransformComponent componentO1 = o1.getComponent(TransformComponent.class);
             TransformComponent componentO2 = o2.getComponent(TransformComponent.class);
-            return Float.compare(componentO2.position.y, componentO1.position.y);
+            return Float.compare(componentO2.worldPosition.y, componentO1.worldPosition.y);
         });
 
         TransformComponent topComponent = gameObjects.get(0).getComponent(TransformComponent.class);
         TransformComponent bottomComponent = gameObjects.get(gameObjects.size - 1).getComponent(TransformComponent.class);
 
-        float topY = topComponent.position.y;
-        float bottomY = bottomComponent.position.y;
+        float topY = topComponent.worldPosition.y;
+        float bottomY = bottomComponent.worldPosition.y;
 
         float space = AligningUtils.calculateVerticalSpace(bottomY, topY, gameObjects.size - 1);
 
 
         for (int i = 0; i < gameObjects.size; i++) {
-            TransformComponent component = gameObjects.get(i).getComponent(TransformComponent.class);
-            float y = topY + i * space + multiplayer * getSize(gameObjects.get(i)).y;
-            component.position.set(component.position.x, y);
+            GameObject gameObject = gameObjects.get(i);
+            TransformComponent component = gameObject.getComponent(TransformComponent.class);
+            float y = topY + i * space + multiplayer * getSize(gameObject).y;
+            Vector2 worldPosition = new Vector2(component.worldPosition.x, y);
+            GameObject.setPositionFromWorldPosition(gameObject, worldPosition);
         }
     }
 
@@ -142,38 +144,44 @@ public class AligningUtils {
         gameObjects.sort((o1, o2) -> {
             TransformComponent componentO1 = o1.getComponent(TransformComponent.class);
             TransformComponent componentO2 = o2.getComponent(TransformComponent.class);
-            return Float.compare(componentO2.position.x, componentO1.position.x);
+            return Float.compare(componentO2.worldPosition.x, componentO1.worldPosition.x);
         });
 
         TransformComponent topComponent = gameObjects.get(0).getComponent(TransformComponent.class);
         TransformComponent bottomComponent = gameObjects.get(gameObjects.size - 1).getComponent(TransformComponent.class);
 
-        float leftX = topComponent.position.x;
-        float rightX = bottomComponent.position.x;
+        float leftX = topComponent.worldPosition.x;
+        float rightX = bottomComponent.worldPosition.x;
 
         float space = AligningUtils.calculateVerticalSpace(rightX, leftX, gameObjects.size - 1);
 
 
         for (int i = 0; i < gameObjects.size; i++) {
-            TransformComponent component = gameObjects.get(i).getComponent(TransformComponent.class);
-            float x = leftX + i * space + multiplayer * getSize(gameObjects.get(i)).x;
-            component.position.set(x, component.position.y);
+            GameObject gameObject = gameObjects.get(i);
+            TransformComponent component = gameObject.getComponent(TransformComponent.class);
+            float x = leftX + i * space + multiplayer * getSize(gameObject).x;
+            Vector2 worldPosition = new Vector2(x, component.worldPosition.y);
+            GameObject.setPositionFromWorldPosition(gameObject, worldPosition);
         }
     }
 
-    public static void updateItemsY(Array<GameObject> gameObjects, float y, PositionAlign positionAlign) {
+    public static void updateItemsY(Array<GameObject> gameObjects, float worldY, PositionAlign positionAlign) {
         float multiplayer = positionAlign.getMultiplayer();
         for (GameObject gameObject : gameObjects) {
             TransformComponent component = gameObject.getComponent(TransformComponent.class);
-            component.position.set(component.position.x, y + multiplayer * getSize(gameObject).y);
+            Vector2 size = getSize(gameObject);
+            Vector2 worldPosition = new Vector2(component.worldPosition.x, worldY + multiplayer * size.y);
+            GameObject.setPositionFromWorldPosition(gameObject, worldPosition);
         }
     }
 
-    public static void updateItemsX(Array<GameObject> gameObjects, float x, PositionAlign positionAlign) {
+    public static void updateItemsX(Array<GameObject> gameObjects, float worldX, PositionAlign positionAlign) {
         float multiplayer = positionAlign.getMultiplayer();
         for (GameObject gameObject : gameObjects) {
             TransformComponent component = gameObject.getComponent(TransformComponent.class);
-            component.position.set(x + multiplayer * getSize(gameObject).x, component.position.y);
+            Vector2 size = getSize(gameObject);
+            Vector2 worldPosition = new Vector2(worldX + multiplayer * size.x, component.worldPosition.y);
+            GameObject.setPositionFromWorldPosition(gameObject, worldPosition);
         }
     }
 
@@ -197,7 +205,7 @@ public class AligningUtils {
         updateItemsX(gameObjects, calculateRightX(gameObjects), PositionAlign.LEFT);
     }
 
-    public static void alignVerticalCenter(Array<GameObject> gameObjects) {
+    public static void alignVerticalCenter(Array<GameObject> gameObjects) { // current
         updateItemsX(gameObjects, calculateCenterPosition(gameObjects).x, PositionAlign.CENTER);
     }
 
