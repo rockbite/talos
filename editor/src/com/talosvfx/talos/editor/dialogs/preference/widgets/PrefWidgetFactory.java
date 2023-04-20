@@ -1,6 +1,7 @@
 package com.talosvfx.talos.editor.dialogs.preference.widgets;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.CheckBox;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -48,6 +49,9 @@ public class PrefWidgetFactory {
         }
         if(item.getName().equals("path")) {
             widget = new PathWidget(parentPath, item);
+        }
+        if (item.getName().equals("color")) {
+            widget = new ColorWidget(parentPath, item);
         }
 
         if(widget != null) {
@@ -435,6 +439,31 @@ public class PrefWidgetFactory {
         @Override
         protected String writeString() {
             return fileOpener.getPath();
+        }
+    }
+
+    public static class ColorWidget extends PrefRowWidget {
+        private final com.talosvfx.talos.editor.nodes.widgets.ColorWidget widget;
+
+        public ColorWidget(String parentPath, XmlReader.Element xml) {
+            super(parentPath, xml);
+            Label label = new LabelWithZoom(xml.getText(), SharedResources.skin);
+            leftContent.add(label).right().expandX();
+
+            widget = new com.talosvfx.talos.editor.nodes.widgets.ColorWidget();
+            widget.init(SharedResources.skin, null);
+            rightContent.add(widget).left().expandX().padLeft(7).padBottom(5);
+        }
+
+        @Override
+        protected void fromString(String str) {
+            Color color = Color.valueOf(str);
+            widget.setColor(color);
+        }
+
+        @Override
+        protected String writeString() {
+            return widget.getValue().toString();
         }
     }
 }

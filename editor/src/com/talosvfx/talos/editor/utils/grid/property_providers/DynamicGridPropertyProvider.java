@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
+import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.utils.grid.GridLine;
 import com.talosvfx.talos.editor.utils.grid.GridPropertyProvider;
 
@@ -132,15 +133,13 @@ public class DynamicGridPropertyProvider implements GridPropertyProvider {
         float visibleEndY = cameraY + visibleHeight / 2;
 
         // configure colors
-        Color gridMainLineColor = new Color();
-        gridMainLineColor.set(Color.GRAY);
+        Color gridMainLineColor = Color.valueOf(SharedResources.currentProject.getGridColor());
         gridMainLineColor.a =  mainLinesAlpha * parentAlpha;
 
-        Color comingLinesColor = new Color();
-        comingLinesColor.set(Color.GRAY);
+        Color comingLinesColor = Color.valueOf(SharedResources.currentProject.getGridColor());
         comingLinesColor.a =  linesToAppearAlpha * parentAlpha;
 
-        Color smallLinesColor = new Color();
+        Color smallLinesColor = Color.valueOf(SharedResources.currentProject.getGridColor());
         smallLinesColor.set(Color.GRAY);
         smallLinesColor.a =  smallLinesAlpha * parentAlpha;
 
