@@ -8,11 +8,9 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.PolygonBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasSprite;
+import com.badlogic.gdx.graphics.glutils.HdpiUtils;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
@@ -906,7 +904,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 			}
 			gridRenderer.setGridPropertyProvider(gridPropertyProvider);
 			rulerRenderer.setGridPropertyProvider(gridPropertyProvider);
-			if (viewportViewSettings.isShowGrid() && !viewportViewSettings.is3D()) {
+			if (viewportViewSettings.isShowGrid() && !viewportViewSettings.is3D() && !viewportViewSettings.isGridOnTop()) {
 				gridRenderer.drawGrid(batch, shapeRenderer);
 			}
 			renderer.setRenderParentTiles(false);
@@ -924,13 +922,23 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
 		batch.end();
 
+
 		beginEntitySelectionBuffer();
 		drawEntitiesForSelection();
 		endEntitySelectionBuffer();
 
+		HdpiUtils.glViewport((int) currentGlViewport.x, (int) currentGlViewport.y, (int) currentGlViewport.width, (int) currentGlViewport.height);
+
+		if (viewportViewSettings.isShowGrid() && !viewportViewSettings.is3D() && viewportViewSettings.isGridOnTop()) {
+			gridRenderer.drawGrid(batch, shapeRenderer);
+		}
+
 		batch.begin();
 
 	}
+
+	private Matrix4 tempProj = new Matrix4();
+	private Matrix4 tempTrans = new Matrix4();
 
 	private void drawMainRenderer (PolygonBatch batch, float parentAlpha) {
 		if (currentContainer == null)

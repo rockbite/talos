@@ -348,9 +348,11 @@ public abstract class ViewportWidget extends Table {
 
 		VisCheckBox axisCheckbox = new VisCheckBox("Axis");
 		VisCheckBox gridCheckbox = new VisCheckBox("Grid");
+		VisCheckBox gridOnTop = new VisCheckBox("Grid On Top");
 
 		axisCheckbox.setChecked(viewportViewSettings.isShowAxis());
 		gridCheckbox.setChecked(viewportViewSettings.isShowGrid());
+		gridOnTop.setChecked(viewportViewSettings.isGridOnTop());
 
 		axisCheckbox.addListener(new ChangeListener() {
 			@Override
@@ -362,6 +364,12 @@ public abstract class ViewportWidget extends Table {
 			@Override
 			public void changed (ChangeEvent event, Actor actor) {
 				viewportViewSettings.setShowGrid(gridCheckbox.isChecked());
+			}
+		});
+		gridOnTop.addListener(new ChangeListener() {
+			@Override
+			public void changed (ChangeEvent event, Actor actor) {
+				viewportViewSettings.setGridOnTop(gridOnTop.isChecked());
 			}
 		});
 
@@ -381,6 +389,8 @@ public abstract class ViewportWidget extends Table {
 		axisTable.add(axisCheckbox).colspan(2);
 		axisTable.row();
 		axisTable.add(gridCheckbox).colspan(2);
+		axisTable.row();
+		axisTable.add(gridOnTop).colspan(2);
 		axisTable.row();
 
 		axisTable.add(gridSizeLabel);
@@ -875,6 +885,8 @@ public abstract class ViewportWidget extends Table {
 		removeListener(inputListener);
 	}
 
+	protected Rectangle currentGlViewport = new Rectangle();
+
 	@Override
 	public void draw (Batch batch, float parentAlpha) {
 		clearScreen(batch, parentAlpha);
@@ -893,6 +905,7 @@ public abstract class ViewportWidget extends Table {
 		int ssWidth = x2 - x;
 		int ssHeight = y - y2;
 
+		currentGlViewport.set(x, Gdx.graphics.getHeight() - y, ssWidth, ssHeight);
 		HdpiUtils.glViewport(x, Gdx.graphics.getHeight() - y, ssWidth, ssHeight);
 
 

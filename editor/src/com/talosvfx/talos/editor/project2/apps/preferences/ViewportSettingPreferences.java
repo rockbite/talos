@@ -18,5 +18,6 @@ public class ViewportSettingPreferences {
 
     public boolean showAxis;
     public boolean showGrid;
+    public boolean gridOnTop;
     public float gridSize;
 }

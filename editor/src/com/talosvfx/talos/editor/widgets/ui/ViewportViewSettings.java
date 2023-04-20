@@ -50,6 +50,7 @@ public class ViewportViewSettings {
 	private boolean showAxis;
 
 	private boolean showGrid = true;
+	private boolean gridOnTop = false;
 
 	private float gridSize = 1;
 
@@ -191,6 +192,7 @@ public class ViewportViewSettings {
 
 			setShowAxis(settingPreferences.isShowAxis());
 			setShowGrid(settingPreferences.isShowGrid());
+			setGridOnTop(settingPreferences.isGridOnTop());
 			setGridSize(settingPreferences.getGridSize());
 		}
 	}
@@ -222,6 +224,7 @@ public class ViewportViewSettings {
 
 		settingPreferences.setShowAxis(isShowAxis());
 		settingPreferences.setShowGrid(isShowGrid());
+		settingPreferences.setGridOnTop(isGridOnTop());
 		settingPreferences.setGridSize(getGridSize());
 
 		viewportPreferences.setSettingPreferences(settingPreferences);
