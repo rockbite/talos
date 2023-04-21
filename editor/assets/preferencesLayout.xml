@@ -20,6 +20,12 @@
                 <number name="defaultPixelPerMeter" default="100" shared-project="true">Default Pixel Per Unit</number>
             </block>
         </tab>
+        <tab name="guides" title="Guides, Grid &amp; Slices">
+            <block name="grid" title="Grid">
+                <color name="gridColor" default="ffffffff" shared-project="true">Color</color>
+<!--                <number name="subdivisions" default="5" shared-project="true">Subdivisions</number>-->
+            </block>
+        </tab>
         <tab name="keymap" title="Keymap">
             <injectable name = "keymap">KeymapBlock</injectable>
         </tab>
