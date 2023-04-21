@@ -31,9 +31,10 @@ public class SearchFilteredTree<T> extends Table {
     private FilteredTree<T> filteredTree;
     public ScrollPane scrollPane;
 
+    private Table searchTable;
     public SearchFilteredTree (Skin skin, final FilteredTree<T> tree, final TextField.TextFieldFilter filter) {
 
-        Table searchTable = new Table();
+        searchTable = new Table();
         Image image = new Image(skin.newDrawable("search"));
 
         textField = new TextField("", skin);
@@ -88,6 +89,11 @@ public class SearchFilteredTree<T> extends Table {
         filteredTree.invalidateHierarchy();
         filteredTree.invalidate();
         filteredTree.layout();
+    }
+
+    public void setPad (float padTop, float padLeft, float padBottom, float padRight) {
+        Cell<TextField> textFieldCell = searchTable.getCell(textField);
+        textFieldCell.pad(padTop, padLeft, padBottom, padRight);
     }
 
 }
