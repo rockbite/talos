@@ -72,7 +72,7 @@ public class SpriteRendererComponent extends RendererComponent implements GameRe
             final AtlasSprite texture = this.gameAsset.getResource();
 
             if (texture == null) return;
-            final float aspect = texture.getRegionWidth() * 1f / texture.getRegionWidth();
+            final float aspect = texture.getRegionHeight() * 1f / texture.getRegionWidth();
             size.y = size.x * aspect;
         }
     }
