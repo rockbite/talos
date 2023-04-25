@@ -106,6 +106,11 @@ public class SceneEditorApp extends AppManager.BaseApp<Scene> implements GameAss
 		workspaceWidget.copySelected();
 	}
 
+	@CommandEventHandler(commandType = Commands.CommandType.CUT)
+	public void onCutCommand (CommandContextEvent event) {
+		workspaceWidget.cutSelected();
+	}
+
 	@CommandEventHandler(commandType = Commands.CommandType.PASTE)
 	public void onPasteCommand (CommandContextEvent commandContextEvent) {
 		workspaceWidget.pasteFromClipboard();

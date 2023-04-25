@@ -104,6 +104,7 @@ public class HierarchyWidget extends Table implements Observer, EventContextProv
                 addToSelectionEvent.set(currentContainer, gameObject);
                 Notifications.fireEvent(addToSelectionEvent);
 
+                SceneUtils.shouldPasteTo(currentContainer, getSelection().first());
             }
 
             @Override
@@ -115,14 +116,18 @@ public class HierarchyWidget extends Table implements Observer, EventContextProv
                 removeFromSelectionEvent.setGameObject(gameObject);
                 Notifications.fireEvent(removeFromSelectionEvent);
 
+                if (getSelection().isEmpty()) {
+                    SceneUtils.shouldPasteToRoot(currentContainer);
+                }
             }
 
             @Override
             public void clearSelection () {
                 super.clearSelection();
-
                 RequestSelectionClearEvent requestSelectionClearEvent = Notifications.obtainEvent(RequestSelectionClearEvent.class);
                 Notifications.fireEvent(requestSelectionClearEvent);
+
+                SceneUtils.shouldPasteToRoot(currentContainer);
             }
 
             @Override
@@ -257,13 +262,22 @@ public class HierarchyWidget extends Table implements Observer, EventContextProv
     }
 
     public void copySelected () {
+        OrderedSet<GameObject> selection = getSelection();
+        SceneUtils.copy(gameAsset, selection);
+    }
+
+    public void cutSelected () {
+        OrderedSet<GameObject> selection = getSelection();
+        SceneUtils.cut(gameAsset, selection);
+    }
+
+    public OrderedSet<GameObject> getSelection () {
         final Selection<FilteredTree.Node<GameObject>> selection = tree.getSelection();
         final OrderedSet<GameObject> arraySelection = new OrderedSet<>();
         for (FilteredTree.Node<GameObject> gameObjectNode : selection) {
             arraySelection.add(gameObjectNode.getObject());
         }
-
-        SceneUtils.copy(gameAsset, arraySelection);
+        return arraySelection;
     }
 
     public void deleteSelected () {
@@ -284,7 +298,6 @@ public class HierarchyWidget extends Table implements Observer, EventContextProv
     }
 
     public void pasteFromClipboard () {
-        tree.clearSelection(true);
         SceneUtils.paste(gameAsset);
     }
 
@@ -605,7 +618,7 @@ public class HierarchyWidget extends Table implements Observer, EventContextProv
 
     @EventHandler
     public void onGameObjectSelectionChanged(GameObjectSelectionChanged event) {
-        if(currentContainer != null) {
+        if (currentContainer != null) {
             ObjectSet<GameObject> gameObjects = event.get();
             Array<FilteredTree.Node<GameObject>> nodes = new Array<>();
             for(GameObject gameObject: gameObjects) {
@@ -618,7 +631,6 @@ public class HierarchyWidget extends Table implements Observer, EventContextProv
 
             tree.clearSelection(false);
             tree.addNodesToSelection(nodes, false);
-
 
             if (!nodes.isEmpty()) {
                 //Focus on first one
