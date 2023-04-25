@@ -7,11 +7,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.FloatArray;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
-import com.esotericsoftware.spine.Animation;
-import com.esotericsoftware.spine.AnimationState;
-import com.esotericsoftware.spine.AnimationStateData;
-import com.esotericsoftware.spine.Skeleton;
-import com.esotericsoftware.spine.SkeletonData;
+import com.esotericsoftware.spine.*;
 import com.talosvfx.talos.runtime.RuntimeContext;
 import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.runtime.assets.GameAssetType;
@@ -19,6 +15,8 @@ import com.talosvfx.talos.runtime.assets.GameResourceOwner;
 import com.talosvfx.talos.runtime.scene.GameObject;
 import com.talosvfx.talos.runtime.scene.IColorHolder;
 import com.talosvfx.talos.runtime.scene.ValueProperty;
+import lombok.Getter;
+import lombok.Setter;
 
 public class SpineRendererComponent extends RendererComponent implements Json.Serializable, GameResourceOwner<SkeletonData>, IColorHolder {
 
@@ -36,6 +34,9 @@ public class SpineRendererComponent extends RendererComponent implements Json.Se
 
     @ValueProperty(prefix = {"scale"})
     public float scale = 1f;
+
+    @Getter@Setter
+    private String skin;
 
     public boolean applyAnimation = true;
 
@@ -58,6 +59,7 @@ public class SpineRendererComponent extends RendererComponent implements Json.Se
         json.writeValue("scale", scale);
         json.writeValue("animation", currAnimation);
         json.writeValue("applyAnimation", applyAnimation);
+        json.writeValue("skin", skin);
         super.write(json);
     }
 
@@ -69,8 +71,19 @@ public class SpineRendererComponent extends RendererComponent implements Json.Se
         currAnimation = jsonData.getString("animation", "");
         applyAnimation = jsonData.getBoolean("applyAnimation", true);
         shouldInheritParentColor = jsonData.getBoolean("shouldInheritParentColor", true);
+        skin = jsonData.getString("skin", null);
 
         loadSkeletonFromIdentifier(gameResourceIdentifier);
+
+        if (skin != null) {
+            Skin skinToApply = skeleton.getData().findSkin(skin);
+            if (skinToApply != null) {
+                skeleton.setSkin(skinToApply);
+            }
+        } else {
+            Skin skinToApply = skeleton.getData().getDefaultSkin();
+            skeleton.setSkin(skinToApply);
+        }
 
         if (applyAnimation) {
             if (!currAnimation.isEmpty()) {

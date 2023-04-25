@@ -3,6 +3,7 @@ package com.talosvfx.talos.editor.addons.scene.logic.componentwrappers;
 import com.badlogic.gdx.utils.Array;
 import com.esotericsoftware.spine.Animation;
 import com.esotericsoftware.spine.SkeletonData;
+import com.esotericsoftware.spine.Skin;
 import com.talosvfx.talos.editor.addons.scene.widgets.property.PropertyPanelAssetSelectionWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.SelectBoxWidget;
@@ -46,6 +47,32 @@ public class SpineComponentProvider extends RendererComponentProvider<SpineRende
 		properties.add(inheritParentColorWidget);
 
 		properties.add(WidgetFactory.generate(component, "applyAnimation", "Apply Animation"));
+
+		SelectBoxWidget skinSelectWidget = new SelectBoxWidget("Skin", new Supplier<String>() {
+			@Override
+			public String get () {
+				return component.skeleton.getSkin().getName();
+			}
+		}, new PropertyWidget.ValueChanged<String>() {
+			@Override
+			public void report (String value) {
+				component.setSkin(value);
+				component.skeleton.setSkin(value);
+			}
+		}, new Supplier<Array<String>>() {
+			@Override
+			public Array<String> get () {
+
+				Array<String> names = new Array<>();
+
+				for (Skin skin : component.skeleton.getData().getSkins()) {
+					names.add(skin.getName());
+				}
+
+				return names;
+			}
+		});
+		properties.add(skinSelectWidget);
 
 		SelectBoxWidget animSelectWidget = new SelectBoxWidget("Animation", new Supplier<String>() {
 			@Override
