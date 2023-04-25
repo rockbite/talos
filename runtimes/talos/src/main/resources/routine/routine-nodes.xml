@@ -172,7 +172,7 @@
                 <value port="input" name="flag" type="boolean">flag</value>
             </group>
             <dynamicValue name="count" type="float" default="10" step="1" min="0" max="1000">count</dynamicValue>
-            <dynamicValue name="interval" type="float" default="1" step="0.0001">interval</dynamicValue>
+            <dynamicValue port="input"  name="interval" type="float" default="1" step="0.0001">interval</dynamicValue>
             <value port="output" name="onComplete" type="signal">onComplete</value>
         </module>
         <module name="EventNode" title="Event Node" keywords="tween, system" class="EventNodeWidget">
