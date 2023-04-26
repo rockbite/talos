@@ -36,7 +36,6 @@ public class GOSelectorNode extends RoutineNode {
         routineInstanceRef.endDepth();
     }
 
-
     @Override
     public Object queryValue(String targetPortName) {
         SavableContainer container = routineInstanceRef.getContainer();
@@ -49,6 +48,10 @@ public class GOSelectorNode extends RoutineNode {
             gameObjects = container.findGameObjects("");
         } else {
             gameObjects = container.findGameObjects(target);
+        }
+
+        if (targetPortName.equals("gameObject")) {
+            return gameObjects.first();
         }
 
         return gameObjects;
