@@ -21,6 +21,7 @@ import com.talosvfx.talos.editor.layouts.LayoutApp;
 import com.talosvfx.talos.editor.project2.GlobalDragAndDrop;
 import com.talosvfx.talos.editor.project2.apps.SceneEditorApp;
 import com.talosvfx.talos.editor.serialization.VFXProjectData;
+import com.talosvfx.talos.editor.widgets.ui.SearchFilteredTree;
 import com.talosvfx.talos.runtime.RuntimeContext;
 import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.runtime.assets.GameAssetType;
@@ -55,6 +56,7 @@ public class HierarchyWidget extends Table implements Observer, EventContextProv
 
     @Getter
     private FilteredTree<GameObject> tree;
+    private SearchFilteredTree<GameObject> searchFilteredTree;
 
     private ObjectMap<String, GameObject> objectMap = new ObjectMap<>();
     private GameObjectContainer currentContainer;
@@ -67,14 +69,15 @@ public class HierarchyWidget extends Table implements Observer, EventContextProv
     public HierarchyWidget() {
         tree = new FilteredTree<>(SharedResources.skin, "modern");
         tree.draggable = true;
-        //tree.getSelection().setMultiple(true);
+        searchFilteredTree = new SearchFilteredTree<>(SharedResources.skin, tree, null);
+        searchFilteredTree.setPad(0, 20, 0, 0);
 
         setBackground(SharedResources.skin.newDrawable("white", Color.valueOf("#252525ff")));
 
         top();
         defaults().top();
 
-        scrollPane = new ScrollPane(tree);
+        scrollPane = new ScrollPane(searchFilteredTree);
 
         add(scrollPane).height(0).grow().pad(5).padRight(0);
 
