@@ -3,6 +3,8 @@ package com.talosvfx.talos.editor.addons.scene.logic.componentwrappers;
 import com.badlogic.gdx.utils.Array;
 import com.esotericsoftware.spine.Animation;
 import com.esotericsoftware.spine.SkeletonData;
+import com.esotericsoftware.spine.Skin;
+import com.talosvfx.talos.editor.addons.scene.SceneUtils;
 import com.talosvfx.talos.editor.addons.scene.widgets.property.PropertyPanelAssetSelectionWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.SelectBoxWidget;
@@ -47,6 +49,42 @@ public class SpineComponentProvider extends RendererComponentProvider<SpineRende
 
 		properties.add(WidgetFactory.generate(component, "applyAnimation", "Apply Animation"));
 
+		SelectBoxWidget skinSelectWidget = new SelectBoxWidget("Skin", new Supplier<String>() {
+			@Override
+			public String get () {
+				if (component.skeleton == null) {
+					return "noskin";
+
+				}
+				Skin skin = component.skeleton.getSkin();
+				if (skin == null) return "noskin";
+				return skin.getName();
+			}
+		}, new PropertyWidget.ValueChanged<String>() {
+			@Override
+			public void report (String value) {
+				if (value.equalsIgnoreCase("noskin")) {
+					value = null;
+				}
+				component.setAndUpdateSkin(value);
+				SceneUtils.componentUpdated(component.getGameObject().getGameObjectContainerRoot(), component.getGameObject(), component, false);
+
+			}
+		}, new Supplier<Array<String>>() {
+			@Override
+			public Array<String> get () {
+
+				Array<String> names = new Array<>();
+
+				for (Skin skin : component.skeleton.getData().getSkins()) {
+					names.add(skin.getName());
+				}
+
+				return names;
+			}
+		});
+		properties.add(skinSelectWidget);
+
 		SelectBoxWidget animSelectWidget = new SelectBoxWidget("Animation", new Supplier<String>() {
 			@Override
 			public String get () {
@@ -67,6 +105,9 @@ public class SpineComponentProvider extends RendererComponentProvider<SpineRende
 				Animation animation = component.skeleton.getData().findAnimation(value);
 				component.animationState.setAnimation(0, animation, true);
 				component.currAnimation = value;
+
+				SceneUtils.componentUpdated(component.getGameObject().getGameObjectContainerRoot(), component.getGameObject(), component, false);
+
 			}
 		}, new Supplier<Array<String>>() {
 			@Override
