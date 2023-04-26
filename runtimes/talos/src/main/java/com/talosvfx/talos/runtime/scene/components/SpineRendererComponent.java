@@ -75,21 +75,24 @@ public class SpineRendererComponent extends RendererComponent implements Json.Se
 
         loadSkeletonFromIdentifier(gameResourceIdentifier);
 
-        if (skin != null) {
-            Skin skinToApply = skeleton.getData().findSkin(skin);
-            if (skinToApply != null) {
+        if (skeleton != null) {
+            if (skin != null) {
+                Skin skinToApply = skeleton.getData().findSkin(skin);
+                if (skinToApply != null) {
+                    setAndUpdateSkin(skinToApply.getName());
+                }
+            } else {
+                Skin skinToApply = skeleton.getData().getDefaultSkin();
                 setAndUpdateSkin(skinToApply.getName());
             }
-        } else {
-            Skin skinToApply = skeleton.getData().getDefaultSkin();
-            setAndUpdateSkin(skinToApply.getName());
-        }
 
-        if (applyAnimation) {
-            if (!currAnimation.isEmpty()) {
-                Animation animation = skeleton.getData().findAnimation(currAnimation);
-                if (animation != null) {
-                    animationState.setAnimation(0, animation, true);
+
+            if (applyAnimation) {
+                if (!currAnimation.isEmpty()) {
+                    Animation animation = skeleton.getData().findAnimation(currAnimation);
+                    if (animation != null) {
+                        animationState.setAnimation(0, animation, true);
+                    }
                 }
             }
         }

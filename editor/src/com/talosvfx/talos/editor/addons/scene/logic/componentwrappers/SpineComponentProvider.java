@@ -52,11 +52,20 @@ public class SpineComponentProvider extends RendererComponentProvider<SpineRende
 		SelectBoxWidget skinSelectWidget = new SelectBoxWidget("Skin", new Supplier<String>() {
 			@Override
 			public String get () {
-				return component.skeleton.getSkin().getName();
+				if (component.skeleton == null) {
+					return "noskin";
+
+				}
+				Skin skin = component.skeleton.getSkin();
+				if (skin == null) return "noskin";
+				return skin.getName();
 			}
 		}, new PropertyWidget.ValueChanged<String>() {
 			@Override
 			public void report (String value) {
+				if (value.equalsIgnoreCase("noskin")) {
+					value = null;
+				}
 				component.setAndUpdateSkin(value);
 				SceneUtils.componentUpdated(component.getGameObject().getGameObjectContainerRoot(), component.getGameObject(), component, false);
 
