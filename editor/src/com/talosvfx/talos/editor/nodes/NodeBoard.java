@@ -908,6 +908,10 @@ public class NodeBoard<T extends DynamicNodeStageData> extends WidgetGroup imple
 	}
 
 	private void collectNodesNodeAffects (Array<NodeWidget> nodeList, NodeWidget node) {
+		if (nodeList.contains(node, true)) {
+			return;
+		}
+
 		nodeList.add(node);
 
 		for (Array<NodeWidget.Connection> connections : node.outputs.values()) {
