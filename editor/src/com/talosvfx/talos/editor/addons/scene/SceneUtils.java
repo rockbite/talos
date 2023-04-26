@@ -245,9 +245,28 @@ public class SceneUtils {
 		Notifications.fireEvent(Notifications.obtainEvent(SelectGameObjectExternallyEvent.class).setGameObject(childThatHasMoved));
 
 		markContainerChanged(currentContainer);
-
 	}
 
+	/**
+	 * Reposition batch of game objects together, before marking the scene changes.
+	 */
+	public static void repositionGameObjects (GameObjectContainer currentContainer, GameObject parentToMoveTo, ObjectSet<GameObject> batch) {
+		if (parentToMoveTo == null) {
+			parentToMoveTo = currentContainer.getSelfObject();
+		}
+
+		for (GameObject childThatHasMoved : batch) {
+			if (childThatHasMoved.parent != null) {
+				childThatHasMoved.parent.removeObject(childThatHasMoved);
+			}
+			GameObject.projectInParentSpace(parentToMoveTo, childThatHasMoved);
+
+			parentToMoveTo.addGameObject(childThatHasMoved);
+			GameObject.projectInParentSpace(parentToMoveTo, childThatHasMoved);
+		}
+		//for updating left panel values
+		markContainerChanged(currentContainer);
+	}
 
 	public static void deleteGameObject (GameObjectContainer gameObjectContainer, GameObject gameObject) {
 		DeSelectGameObjectExternallyEvent deSelectGameObjectExternallyEvent = Notifications.obtainEvent(DeSelectGameObjectExternallyEvent.class);
@@ -569,6 +588,39 @@ public class SceneUtils {
 		Notifications.fireEvent(Notifications.obtainEvent(DirectoryChangedEvent.class).set(prefabs.path()));
 	}
 
+	public static void convertToGroup (GameObjectContainer container, ObjectSet<GameObject> gameObjects) {
+		if (gameObjects.isEmpty() || gameObjects.size == 1) {
+			return;
+		}
+
+
+		final GameObject rootGO = container.getSelfObject();
+		GameObject toptLevelObjectsParent = getTopLevelParentFor(rootGO, gameObjects);
+		if (toptLevelObjectsParent == null) {
+			return;
+		}
+
+		// calculate world center of provided game object
+		Vector2 center = Pools.obtain(Vector2.class);
+		for (GameObject gameObject : gameObjects) {
+			if (gameObject != null && gameObject.hasComponent(TransformComponent.class)) {
+				TransformComponent component = gameObject.getComponent(TransformComponent.class);
+				center.add(component.worldPosition);
+			}
+		}
+
+		center.scl(1 / (float) gameObjects.size);
+		GameObject dummyParent = SceneUtils.createEmpty(container, center, toptLevelObjectsParent);
+		Pools.free(center);
+
+		// This is being done in the next frame because relative positioning is calculated based on render position of the objects
+		Gdx.app.postRunnable(() -> {
+			repositionGameObjects(rootGO, dummyParent, gameObjects);
+
+			Notifications.fireEvent(Notifications.obtainEvent(GameObjectsRestructured.class).set(container, gameObjects));
+		});
+	}
+
 	public static void visibilityUpdated (GameObjectContainer gameObjectContainer, GameObject gameObject) {
 		Notifications.fireEvent(Notifications.obtainEvent(GameObjectVisibilityChanged.class).set(gameObjectContainer, gameObject));
 		markContainerChanged(gameObjectContainer);
@@ -577,6 +629,31 @@ public class SceneUtils {
 	public static void lockUpdated (GameObjectContainer gameObjectContainer, GameObject gameObject) {
 		Notifications.fireEvent(Notifications.obtainEvent(GameObjectLockChanged.class).set(gameObjectContainer, gameObject));
 		markContainerChanged(gameObjectContainer);
+	}
+
+	/**
+	 * Returns common parent of provided game objects.
+	 */
+	private static GameObject getTopLevelParentFor(GameObject rootGO, ObjectSet<GameObject> gameObjects) {
+		Array<GameObject> childrenGameObjects = rootGO.getGameObjects();
+		if (childrenGameObjects == null) {
+			return null;
+		}
+
+		for (GameObject gameObject : gameObjects) {
+			if (childrenGameObjects.contains(gameObject, true)) {
+				return rootGO;
+			}
+		}
+
+		for (GameObject object : childrenGameObjects) {
+			GameObject topLevelParent = getTopLevelParentFor(object, gameObjects);
+			if (topLevelParent != null) {
+				return topLevelParent;
+			}
+		}
+
+		return null;
 	}
 
 }

@@ -554,25 +554,10 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 			return;
 		}
 
-		Array<GameObject> selectedObjects = new Array<>();
+		ObjectSet<GameObject> selectedObjects = new ObjectSet<>();
 		selectedObjects.addAll(selection.orderedItems());
 
-		GameObject rootGO = getRootGO();
-		GameObject topestLevelObjectsParentFor = getTopestLevelObjectsParentFor(rootGO, selectedObjects);
-
-
-		GameObject dummyParent = SceneUtils.createEmpty(currentContainer, new Vector2(groupSelectionGizmo.getCenterX(), groupSelectionGizmo.getCenterY()), topestLevelObjectsParentFor);
-
-		// This is being done in the next frame because relative positioning is calculated based on render position of the objects
-		Gdx.app.postRunnable(() -> {
-			for (GameObject gameObject : selectedObjects) {
-				SceneUtils.repositionGameObject(rootGO, dummyParent, gameObject);
-			}
-
-			Notifications.fireEvent(Notifications.obtainEvent(GameObjectsRestructured.class).set(getEventContext(), selectedObjects));
-
-			selectGameObjectExternally(dummyParent);
-		});
+		SceneUtils.convertToGroup(currentContainer, selectedObjects);
 	}
 
 	public GameObject getGameObjectForUUID (String uuid) {
@@ -586,28 +571,6 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		}
 
 		return rootGO.getChildByUUID(uuid);
-	}
-
-	private GameObject getTopestLevelObjectsParentFor (GameObject gameObject, Array<GameObject> gameObjects) {
-		Array<GameObject> childGameObjects = gameObject.getGameObjects();
-		if (childGameObjects == null) {
-			return null;
-		}
-
-		for (GameObject object : gameObjects) {
-			if (childGameObjects.contains(object, true)) {
-				return gameObject;
-			}
-		}
-
-		for (GameObject object : childGameObjects) {
-			GameObject topestLevelObjectsParentFor = getTopestLevelObjectsParentFor(object, gameObjects);
-			if (topestLevelObjectsParentFor != null) {
-				return topestLevelObjectsParentFor;
-			}
-		}
-
-		return null;
 	}
 
 	private void eraseTileAt (float x, float y) {
