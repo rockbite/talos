@@ -78,11 +78,11 @@ public class SpineRendererComponent extends RendererComponent implements Json.Se
         if (skin != null) {
             Skin skinToApply = skeleton.getData().findSkin(skin);
             if (skinToApply != null) {
-                skeleton.setSkin(skinToApply);
+                setAndUpdateSkin(skinToApply.getName());
             }
         } else {
             Skin skinToApply = skeleton.getData().getDefaultSkin();
-            skeleton.setSkin(skinToApply);
+            setAndUpdateSkin(skinToApply.getName());
         }
 
         if (applyAnimation) {
@@ -147,7 +147,6 @@ public class SpineRendererComponent extends RendererComponent implements Json.Se
             vec.set(0, 0);
             transformComponent.localToWorld(ownerEntity, vec);
 
-            skeleton.setSlotsToSetupPose();
             skeleton.setBonesToSetupPose();
             skeleton.updateWorldTransform();
 
@@ -188,5 +187,14 @@ public class SpineRendererComponent extends RendererComponent implements Json.Se
     @Override
     public boolean shouldInheritParentColor() {
         return shouldInheritParentColor;
+    }
+
+    public void setAndUpdateSkin (String value) {
+        setSkin(value);
+        skeleton.setSkin(value);
+        skeleton.setSlotsToSetupPose();
+        if (animationState != null) {
+            animationState.apply(skeleton);
+        }
     }
 }

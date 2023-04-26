@@ -4,6 +4,7 @@ import com.badlogic.gdx.utils.Array;
 import com.esotericsoftware.spine.Animation;
 import com.esotericsoftware.spine.SkeletonData;
 import com.esotericsoftware.spine.Skin;
+import com.talosvfx.talos.editor.addons.scene.SceneUtils;
 import com.talosvfx.talos.editor.addons.scene.widgets.property.PropertyPanelAssetSelectionWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.SelectBoxWidget;
@@ -56,8 +57,9 @@ public class SpineComponentProvider extends RendererComponentProvider<SpineRende
 		}, new PropertyWidget.ValueChanged<String>() {
 			@Override
 			public void report (String value) {
-				component.setSkin(value);
-				component.skeleton.setSkin(value);
+				component.setAndUpdateSkin(value);
+				SceneUtils.componentUpdated(component.getGameObject().getGameObjectContainerRoot(), component.getGameObject(), component, false);
+
 			}
 		}, new Supplier<Array<String>>() {
 			@Override
@@ -94,6 +96,9 @@ public class SpineComponentProvider extends RendererComponentProvider<SpineRende
 				Animation animation = component.skeleton.getData().findAnimation(value);
 				component.animationState.setAnimation(0, animation, true);
 				component.currAnimation = value;
+
+				SceneUtils.componentUpdated(component.getGameObject().getGameObjectContainerRoot(), component.getGameObject(), component, false);
+
 			}
 		}, new Supplier<Array<String>>() {
 			@Override
