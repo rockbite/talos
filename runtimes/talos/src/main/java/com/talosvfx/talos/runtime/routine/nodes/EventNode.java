@@ -25,9 +25,12 @@ public class EventNode extends RoutineNode {
 
         for (PropertyWrapper<?> wrapper : propertyWrappers) {
             String propertyName = wrapper.propertyName;
-            Object val = fetchValue(propertyName);
-            if(val != null) {
-                wrapper.setValueUnsafe(val);
+
+            if (isInputAndConnected(propertyName)) {
+                Object val = fetchValue(propertyName);
+                if (val != null) {
+                    wrapper.setValueUnsafe(val);
+                }
             }
         }
 
