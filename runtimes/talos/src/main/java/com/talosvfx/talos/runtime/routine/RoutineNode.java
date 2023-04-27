@@ -421,6 +421,16 @@ public abstract class RoutineNode implements Pool.Poolable {
         return (Vector2)object;
     }
 
+    protected boolean isInputAndConnected (String key) {
+        routineInstanceRef.setRequester(uniqueId);
+
+        Port port = inputs.get(key);
+        if(port == null) return false;
+
+        if (port.connections.isEmpty()) return false;
+        return true;
+    }
+
     /**
      * Ask my input port for it's value
      * @param key
