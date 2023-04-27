@@ -9,6 +9,7 @@ public class GOSelectorNode extends RoutineNode {
 
     private Array<GameObject> gameObjects = new Array<>();
 
+    private Array<GameObject> temp = new Array<>();
     @Override
     public void receiveSignal(String portName) {
         SavableContainer container = routineInstanceRef.getContainer();
@@ -16,12 +17,30 @@ public class GOSelectorNode extends RoutineNode {
         if(container == null) return;
 
         gameObjects.clear();
+
+        GameObject parentGameObject = fetchGameObjectValue("parentGameObject");
+
+
         String target = fetchStringValue("target");
-        if (target == null) {
-            gameObjects = container.findGameObjects("");
+
+        if (parentGameObject != null) {
+            temp.clear();
+            if (target == null) {
+                container.findGameObjects(temp, parentGameObject, "");
+                gameObjects.addAll(temp);
+            } else {
+                container.findGameObjects(temp, parentGameObject, target);
+                gameObjects.addAll(temp);
+            }
         } else {
-            gameObjects = container.findGameObjects(target);
+            if (target == null) {
+                gameObjects = container.findGameObjects("");
+            } else {
+                gameObjects = container.findGameObjects(target);
+            }
         }
+
+
 
         routineInstanceRef.storeGlobal("executedTargets", gameObjects);
 

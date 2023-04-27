@@ -16,11 +16,7 @@
             <checkbox name="payloadOverride" default="false">Override Payload</checkbox>
             <value port="output" name="onComplete" type="signal">onComplete</value>
         </module>
-        <module name="GOSelectorNode" title="Game Object Selector" keywords="" class="RoutineNodeWidget">
-            <value port="input" name="input" type="signal">in</value>
-            <inputText name="target" default="">Target</inputText>
-            <value port="output" name="outSignal" type="signal">out</value>
-        </module>
+
         <module name="CompleteRoutineNode" title="Complete Routine" keywords="tween, system" class="RoutineNodeWidget">
             <value port="input" name="startSignal" type="signal">execute</value>
         </module>
@@ -536,6 +532,7 @@
         </module>
         <module name="GOSelectorNode" title="Game Object Selector" keywords="" class="RoutineNodeWidget">
             <value port="input" name="input" type="signal">in</value>
+            <value port="input" name="parentGameObject" type="gameobject">Parent GO</value>
             <inputText name="target" default="">Target</inputText>
             <value port="output" name="outSignal" type="signal">out</value>
             <value port="output" name="gameObject" type="gameobject">gameObject</value>
