@@ -11,9 +11,13 @@ public class StopParticleEffectNode extends RoutineNode {
     public void receiveSignal(String portName) {
         GameObject target = (GameObject) routineInstanceRef.getSignalPayload();
 
+        if(target == null) return;
+
         ParticleComponent component = target.getComponent(ParticleComponent.class);
         ParticleEffectInstance effectRef = component.getEffectRef();
-        effectRef.allowCompletion();
+        if(effectRef != null) {
+            effectRef.allowCompletion();
+        }
 
         sendSignal("onComplete");
     }
