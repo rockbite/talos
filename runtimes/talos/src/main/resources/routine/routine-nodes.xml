@@ -242,6 +242,10 @@
             <value port="output" name="gameObject" type="gameobject">gameObject</value>
             <value port="output" name="onComplete" type="signal">onComplete</value>
         </module>
+        <module name="StopParticleEffectNode" title="Stop Particle Effect" keywords="" class="RoutineNodeWidget">
+            <value port="input" name="startSignal" type="signal">start</value>
+            <value port="output" name="onComplete" type="signal">onComplete</value>
+        </module>
         <module name="SpawnPrefabNode" title="Spawn Prefab" keywords="" class="RoutineNodeWidget">
             <value port="input" name="startSignal" type="signal">start</value>
             <inputText name="name" type="string">name</inputText>
