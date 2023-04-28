@@ -31,6 +31,7 @@ public class GameObjectSelectWidget extends PropertyWidget<GameObject> {
 	private GameObject gameObject;
 
 	private Predicate<FilteredTree.Node<GameObject>> filter;
+	protected GameObjectSelectWidget () {}
 
 	public GameObjectSelectWidget (String name, Supplier<GameObject> supplier, ValueChanged<GameObject> valueChanged, Object parent) {
 		super(name, supplier, valueChanged, parent);

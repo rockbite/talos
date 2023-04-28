@@ -13,6 +13,7 @@ import java.util.function.Supplier;
 public class EditableLabelWidget extends PropertyWidget<String> {
 
     private EditableLabel propertyValue;
+    protected EditableLabelWidget () {}
 
     public EditableLabelWidget(String name, Supplier<String> supplier, ValueChanged<String> valueChanged, Object parent) {
         super(name, supplier, valueChanged, parent);

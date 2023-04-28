@@ -17,6 +17,7 @@ import java.util.function.Supplier;
 public class TalosLayerPropertiesWidget extends PropertyWidget<TalosLayer> {
 
     Table subWidgetTable;
+    protected TalosLayerPropertiesWidget () {}
 
     public TalosLayerPropertiesWidget (String name, Supplier<TalosLayer> supplier, ValueChanged<TalosLayer> valueChanged, Object parent) {
         super(name, supplier, valueChanged, parent);

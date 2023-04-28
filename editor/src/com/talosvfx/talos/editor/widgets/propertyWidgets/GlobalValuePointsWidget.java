@@ -14,6 +14,7 @@ public class GlobalValuePointsWidget extends PropertyWidget<Array<AttachmentPoin
     GlobalValueListContainer listContainer;
 
     public Supplier<Array<Bone>> boneListSuppler;
+    protected GlobalValuePointsWidget () {}
 
     public GlobalValuePointsWidget (String name, Supplier<Array<AttachmentPoint>> supplier, ValueChanged<Array<AttachmentPoint>> valueChanged, Object parent) {
         super(name, supplier, valueChanged, parent);

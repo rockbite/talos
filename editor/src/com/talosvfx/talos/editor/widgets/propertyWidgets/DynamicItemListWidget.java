@@ -36,6 +36,7 @@ public class DynamicItemListWidget<T> extends PropertyWidget<Array<T>> {
 
         void onDeleteNode(T t);
     }
+    protected DynamicItemListWidget () {}
 
 
     public DynamicItemListWidget (String name, Supplier<Array<T>> supplier, ValueChanged<Array<T>> valueChanged, DynamicItemListInteraction<T> interaction, Object parent) {

@@ -21,6 +21,7 @@ public class SelectBoxWidget extends PropertyWidget<String> {
 
     Supplier<Array<String>> optionListSupplier;
 
+    protected SelectBoxWidget () {}
 
     public SelectBoxWidget(String name, Supplier<String> supplier, ValueChanged<String> valueChanged, Supplier<Array<String>> optionListSupplier, Object parent) {
         super(name, supplier, valueChanged, parent);

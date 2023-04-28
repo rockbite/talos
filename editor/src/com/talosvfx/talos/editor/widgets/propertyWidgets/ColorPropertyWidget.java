@@ -19,6 +19,7 @@ public class ColorPropertyWidget extends PropertyWidget<Color> {
 
     private Image box;
     private ColorPicker colorPicker;
+    protected ColorPropertyWidget () {}
 
     public ColorPropertyWidget(String name, Supplier<Color> supplier, ValueChanged<Color> valueChanged, Object parent) {
         super(name, supplier, valueChanged, parent);

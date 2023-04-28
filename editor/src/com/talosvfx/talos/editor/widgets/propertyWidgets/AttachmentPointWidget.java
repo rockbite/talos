@@ -15,18 +15,8 @@ public class AttachmentPointWidget extends PropertyWidget<AttachmentPoint> {
 
     public Supplier<Array<Bone>> boneListSuppler;
 
-    public AttachmentPointWidget (String name, Supplier<AttachmentPoint> supplier, ValueChanged<AttachmentPoint> valueChanged, Object parent) {
-        super(name, supplier, valueChanged, parent);
-    }
 
-
-    @Override
-    public PropertyWidget clone() {
-        AttachmentPointWidget clone = (AttachmentPointWidget) super.clone();
-        clone.boneListSuppler = this.boneListSuppler;
-
-        return clone;
-    }
+    protected AttachmentPointWidget () {}
 
 
     @Override
@@ -46,6 +36,13 @@ public class AttachmentPointWidget extends PropertyWidget<AttachmentPoint> {
     @Override
     public void updateWidget(AttachmentPoint value) {
         attachmentPointBox.setData(value);
+    }
+    @Override
+    public PropertyWidget clone() {
+        AttachmentPointWidget clone = (AttachmentPointWidget) super.clone();
+        clone.boneListSuppler = this.boneListSuppler;
+
+        return clone;
     }
 
 
