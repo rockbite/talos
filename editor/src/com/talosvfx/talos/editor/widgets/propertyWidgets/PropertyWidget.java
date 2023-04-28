@@ -83,17 +83,15 @@ public abstract class PropertyWidget<T> extends Table {
 		void report(T value);
 	}
 
-	public PropertyWidget () {
-		build("empty");
+
+	public PropertyWidget (Supplier<T> supplier, ValueChanged<T> valueChanged, Object parent) {
+		this("empty", supplier, valueChanged, parent);
 	}
 
-	public PropertyWidget (Supplier<T> supplier, ValueChanged<T> valueChanged) {
-		this(null, supplier, valueChanged);
-	}
-
-	public PropertyWidget (String name, Supplier<T> supplier, ValueChanged<T> valueChanged) {
+	public PropertyWidget (String name, Supplier<T> supplier, ValueChanged<T> valueChanged, Object parent) {
 		this.supplier = supplier;
 		this.valueChanged = valueChanged;
+		setParent(parent);
 		build(name);
 	}
 

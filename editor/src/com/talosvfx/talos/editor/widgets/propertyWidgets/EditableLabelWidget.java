@@ -14,12 +14,8 @@ public class EditableLabelWidget extends PropertyWidget<String> {
 
     private EditableLabel propertyValue;
 
-    public EditableLabelWidget() {
-        super();
-    }
-
-    public EditableLabelWidget(String name, Supplier<String> supplier, ValueChanged<String> valueChanged) {
-        super(name, supplier, valueChanged);
+    public EditableLabelWidget(String name, Supplier<String> supplier, ValueChanged<String> valueChanged, Object parent) {
+        super(name, supplier, valueChanged, parent);
     }
 
     @Override

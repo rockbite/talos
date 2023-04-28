@@ -11,12 +11,9 @@ public class LabelWidget extends PropertyWidget<String> {
 
 	private LabelWithZoom propertyValue;
 
-	public LabelWidget() {
-		super();
-	}
 
-	public LabelWidget(String name, Supplier<String> supplier) {
-		super(name, supplier, null);
+	public LabelWidget(String name, Supplier<String> supplier, Object parent) {
+		super(name, supplier, null, parent);
 	}
 
 	@Override

@@ -18,8 +18,8 @@ public class TalosLayerPropertiesWidget extends PropertyWidget<TalosLayer> {
 
     Table subWidgetTable;
 
-    public TalosLayerPropertiesWidget (String name, Supplier<TalosLayer> supplier, ValueChanged<TalosLayer> valueChanged) {
-        super(name, supplier, valueChanged);
+    public TalosLayerPropertiesWidget (String name, Supplier<TalosLayer> supplier, ValueChanged<TalosLayer> valueChanged, Object parent) {
+        super(name, supplier, valueChanged, parent);
     }
 
     @Override
@@ -56,7 +56,7 @@ public class TalosLayerPropertiesWidget extends PropertyWidget<TalosLayer> {
                 public void report(GameAsset<TilePaletteData> value) {
                     layer.setGameAsset(value);
                 }
-            });
+            }, layer);
             paletteWidget.updateValue(); //kind of a hack to do this /shrug face
             widgets.add(paletteWidget);
 

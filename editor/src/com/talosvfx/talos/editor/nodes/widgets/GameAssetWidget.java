@@ -34,34 +34,35 @@ public class GameAssetWidget<T> extends AbstractWidget<GameAsset<T>> implements 
 
     private Table bottomContainer;
 
-    public GameAssetWidget() {
+    public GameAssetWidget () {
         Notifications.registerObserver(this);
 
         final Array<String> types = new Array<>();
         GameAssetType[] values = GameAssetType.values();
-        for(GameAssetType type: values) {
+        for (GameAssetType type : values) {
             types.add(type.name());
         }
 
         typeSelector = new SelectBoxWidget("type", new Supplier<String>() {
             @Override
-            public String get() {
+            public String get () {
                 return type.name();
             }
         }, new PropertyWidget.ValueChanged<String>() {
             @Override
-            public void report(String value) {
+            public void report (String value) {
                 type = GameAssetType.valueOf(value);
                 build(type.toString());
                 fireChangedEvent();
             }
         }, new Supplier<Array<String>>() {
             @Override
-            public Array<String> get() {
+            public Array<String> get () {
                 return types;
             }
-        });
-        type=GameAssetType.SPRITE;
+        }, null);
+
+        type = GameAssetType.SPRITE;
         typeSelector.updateWidget(type.name());
 
         typeSelectorCell = content.add(typeSelector).growX().padBottom(4).padRight(1);
@@ -71,7 +72,7 @@ public class GameAssetWidget<T> extends AbstractWidget<GameAsset<T>> implements 
         content.add(bottomContainer).growX();
     }
 
-    public void build(String typeString) {
+    public void build (String typeString) {
         bottomContainer.clear();
 
         type = GameAssetType.valueOf(typeString);
@@ -79,7 +80,7 @@ public class GameAssetWidget<T> extends AbstractWidget<GameAsset<T>> implements 
         widget = new GenericAssetSelectionWidget<>(type);
         widget.addListener(new ChangeListener() {
             @Override
-            public void changed(ChangeEvent event, Actor actor) {
+            public void changed (ChangeEvent event, Actor actor) {
                 gameAsset = widget.getValue();
                 fireChangedEvent();
             }
@@ -89,9 +90,9 @@ public class GameAssetWidget<T> extends AbstractWidget<GameAsset<T>> implements 
     }
 
     @Override
-    public void loadFromXML(XmlReader.Element element) {
+    public void loadFromXML (XmlReader.Element element) {
         String typeString = element.getAttribute("type", "");
-        if(typeString.equals("")) {
+        if (typeString.equals("")) {
             // widget is generic
             build("SPRITE");
         } else {
@@ -103,12 +104,12 @@ public class GameAssetWidget<T> extends AbstractWidget<GameAsset<T>> implements 
     }
 
     @Override
-    public GameAsset<T> getValue() {
+    public GameAsset<T> getValue () {
         return gameAsset;
     }
 
     @Override
-    public void read(Json json, JsonValue jsonValue) {
+    public void read (Json json, JsonValue jsonValue) {
         try {
             GameAssetType type = json.readValue("type", GameAssetType.class, jsonValue);
             UUID uuid = readGameAssetUniqueIdentifier(jsonValue);
@@ -123,7 +124,8 @@ public class GameAssetWidget<T> extends AbstractWidget<GameAsset<T>> implements 
             typeSelector.updateWidget(type.name());
 
             widget.updateWidget(gameAsset);
-        } catch (Exception e) {}
+        } catch (Exception e) {
+        }
     }
 
     static String readGameAssetIdentifier (JsonValue jsonValue) {
@@ -140,9 +142,9 @@ public class GameAssetWidget<T> extends AbstractWidget<GameAsset<T>> implements 
     }
 
     @Override
-    public void write(Json json, String name) {
+    public void write (Json json, String name) {
         json.writeObjectStart(name);
-        if(gameAsset != null && !gameAsset.isBroken()) {
+        if (gameAsset != null && !gameAsset.isBroken()) {
             json.writeValue("type", type);
             json.writeValue("id", gameAsset.nameIdentifier);
             json.writeValue("uuid", gameAsset.getRootRawAsset().metaData.uuid.toString());
@@ -151,7 +153,7 @@ public class GameAssetWidget<T> extends AbstractWidget<GameAsset<T>> implements 
     }
 
     @EventHandler
-    public void onAssetPathChangedEvent(AssetPathChanged assetPathChanged) {
+    public void onAssetPathChangedEvent (AssetPathChanged assetPathChanged) {
         GameAsset<?> assetForPath = AssetRepository.getInstance().getAssetForPath(assetPathChanged.newHandle, true);
         if (assetForPath == gameAsset) {
             widget.updateWidget(gameAsset);

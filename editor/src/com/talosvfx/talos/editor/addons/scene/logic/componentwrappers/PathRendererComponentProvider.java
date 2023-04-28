@@ -23,22 +23,10 @@ public class PathRendererComponentProvider extends RendererComponentProvider<Pat
     public Array<PropertyWidget> getListOfProperties () {
         Array<PropertyWidget> properties = new Array<>();
 
-        PropertyPanelAssetSelectionWidget<AtlasSprite> textureWidget = new PropertyPanelAssetSelectionWidget<>("Texture", GameAssetType.SPRITE, new Supplier<GameAsset<AtlasSprite>>() {
-            @Override
-            public GameAsset<AtlasSprite> get () {
-                return component.getGameResource();
-            }
-        }, new PropertyWidget.ValueChanged<GameAsset<AtlasSprite>>() {
-            @Override
-            public void report (GameAsset<AtlasSprite> value) {
-                component.setGameAsset(value);
-                GameObject gameObject = getComponent().getGameObject();
-                SceneUtils.componentUpdated(gameObject.getGameObjectContainerRoot(), gameObject, getComponent(), false);
-            }
-        });
+        PropertyWidget textureWidget = WidgetFactory.generateForGameAsset(component, "gameAsset", null, "Texture", GameAssetType.SPRITE);
+
         PropertyWidget thicknessWidget = WidgetFactory.generate(component, "thickness", "thickness");
         PropertyWidget repeatCount = WidgetFactory.generate(component, "repeatCount", "repeat count");
-
 
 
         properties.add(textureWidget);

@@ -24,14 +24,14 @@ public class CurveComponentProvider extends AComponentProvider<CurveComponent> {
 			public String get () {
 				return component.getNumSegments() + "";
 			}
-		}));
+		}, component));
 
 		properties.add(new LabelWidget("points", new Supplier<String>() {
 			@Override
 			public String get () {
 				return component.points.size + "";
 			}
-		}));
+		}, component));
 
 		ButtonPropertyWidget<String> cleanButton = new ButtonPropertyWidget<String>("Create New", new ButtonPropertyWidget.ButtonListener() {
 			@Override
@@ -51,10 +51,10 @@ public class CurveComponentProvider extends AComponentProvider<CurveComponent> {
 			@Override
 			public void report (Boolean value) {
 				if (component.isClosed != value) {
-					component.setClosedState(value);
+					component.setClosedState(value); //TODO THIS SHOULD BE WIDGET FACTORY AND USE REFLECTION METHOD OVERRIDE
 				}
 			}
-		});
+		}, component);
 
 		properties.add(cleanButton);
 		properties.add(isClosedWidget);
@@ -74,7 +74,7 @@ public class CurveComponentProvider extends AComponentProvider<CurveComponent> {
 					}
 				}
 			}
-		});
+		}, component);
 		properties.add(autoSetWidget);
 
 		return properties;

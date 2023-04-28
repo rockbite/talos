@@ -17,12 +17,8 @@ public class FloatPropertyWidget extends PropertyWidget<Float>  {
     private Label title;
     private ValueProperty annotation;
 
-    public FloatPropertyWidget() {
-        super();
-    }
-
-    public FloatPropertyWidget(String name, Supplier<Float> supplier, ValueChanged<Float> valueChanged) {
-        super(name, supplier, valueChanged);
+    public FloatPropertyWidget(String name, Supplier<Float> supplier, ValueChanged<Float> valueChanged, Object parent) {
+        super(name, supplier, valueChanged, parent);
     }
 
     @Override

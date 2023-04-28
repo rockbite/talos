@@ -35,7 +35,7 @@ public class SpineComponentProvider extends RendererComponentProvider<SpineRende
 			public void report (GameAsset<SkeletonData> value) {
 				component.setGameAsset(value);
 			}
-		});
+		}, component);
 
 		properties.add(atlasWidget);
 
@@ -67,7 +67,6 @@ public class SpineComponentProvider extends RendererComponentProvider<SpineRende
 					value = null;
 				}
 				component.setAndUpdateSkin(value);
-				SceneUtils.componentUpdated(component.getGameObject().getGameObjectContainerRoot(), component.getGameObject(), component, false);
 
 			}
 		}, new Supplier<Array<String>>() {
@@ -82,7 +81,7 @@ public class SpineComponentProvider extends RendererComponentProvider<SpineRende
 
 				return names;
 			}
-		});
+		}, component);
 		properties.add(skinSelectWidget);
 
 		SelectBoxWidget animSelectWidget = new SelectBoxWidget("Animation", new Supplier<String>() {
@@ -106,8 +105,6 @@ public class SpineComponentProvider extends RendererComponentProvider<SpineRende
 				component.animationState.setAnimation(0, animation, true);
 				component.currAnimation = value;
 
-				SceneUtils.componentUpdated(component.getGameObject().getGameObjectContainerRoot(), component.getGameObject(), component, false);
-
 			}
 		}, new Supplier<Array<String>>() {
 			@Override
@@ -123,7 +120,7 @@ public class SpineComponentProvider extends RendererComponentProvider<SpineRende
 				names.add("remove animation");
 				return names;
 			}
-		});
+		}, component);
 		properties.add(animSelectWidget);
 
 		Array<PropertyWidget> superList = super.getListOfProperties();

@@ -42,7 +42,7 @@ public class SpineMetaDataProvider extends AMetaDataProvider<SpineMetadata> {
 			public void report(String value) {
 				meta.atlasPath = value;
 			}
-		});
+		}, null);
 		propertyWidgets.add(atlasWidget);
 
 		return propertyWidgets;

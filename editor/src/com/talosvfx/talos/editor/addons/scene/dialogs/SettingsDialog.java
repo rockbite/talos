@@ -173,7 +173,7 @@ public class SettingsDialog extends VisWindow {
             public void report (Integer value) {
                 serverPort = value;
             }
-        });
+        }, null);
 
         add(serverPortWidget).pad(5).growX();
     }

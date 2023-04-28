@@ -31,20 +31,7 @@ public class PaintSurfaceComponentProvider extends AComponentProvider<PaintSurfa
 
 		Array<PropertyWidget> properties = new Array<>();
 
-		PropertyPanelAssetSelectionWidget<AtlasSprite> textureWidget = new PropertyPanelAssetSelectionWidget<>("Texture", GameAssetType.SPRITE, new Supplier<GameAsset<AtlasSprite>>() {
-			@Override
-			public GameAsset<AtlasSprite> get () {
-				return component.gameAsset;
-			}
-		}, new PropertyWidget.ValueChanged<GameAsset<AtlasSprite>>() {
-			@Override
-			public void report (GameAsset<AtlasSprite> value) {
-				component.setGameAsset(value);
-				GameObject gameObject = component.getGameObject();
-				GameObjectContainer gameObjectContainer = gameObject.getGameObjectContainerRoot();
-				SceneUtils.componentUpdated(gameObjectContainer, gameObject, component);
-			}
-		});
+		PropertyWidget textureWidget = WidgetFactory.generateForGameAsset(component, "gameAsset", null, "Texture", GameAssetType.SPRITE);
 
 		PropertyWidget sizeWidget = WidgetFactory.generate(component, "size", "Size");
 		sizeWidget.addListener(new ChangeListener() {

@@ -24,9 +24,6 @@ public class ButtonPropertyWidget<T> extends PropertyWidget<T> {
         void clicked(ButtonPropertyWidget<T> widget);
     }
 
-    public ButtonPropertyWidget() {
-        super();
-    }
 
     @Override
     public PropertyWidget clone() {
@@ -60,7 +57,7 @@ public class ButtonPropertyWidget<T> extends PropertyWidget<T> {
     }
 
     public ButtonPropertyWidget(String name, String text, ButtonListener btnListener, Supplier<T> supplier, ValueChanged<T> valueChanged) {
-        super(name, supplier, valueChanged);
+        super(name, supplier, valueChanged, null);
         setButtonText(text);
         this.btnListener = btnListener;
     }

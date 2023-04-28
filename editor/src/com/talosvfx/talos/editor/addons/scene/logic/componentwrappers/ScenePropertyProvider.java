@@ -39,7 +39,7 @@ public class ScenePropertyProvider implements IPropertyProvider {
 			public String get () {
 				return scene.getName();
 			}
-		});
+		}, scene);
 
 		Supplier<SceneLayerWrapper> newItemDataSupplier = new Supplier<SceneLayerWrapper>() {
 			@Override
@@ -80,7 +80,7 @@ public class ScenePropertyProvider implements IPropertyProvider {
 					renderLayers.add(instance);
 				}
 			}
-		}) {
+		}, scene) {
 			@Override
 			public boolean canDelete (SceneLayerWrapper itemData) {
 				return itemData.canDelete();
@@ -175,7 +175,7 @@ public class ScenePropertyProvider implements IPropertyProvider {
 				}
 				return options;
 			}
-		});
+		}, scene);
 
 		properties.add(renderStrategy);
 

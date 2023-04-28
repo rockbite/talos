@@ -663,7 +663,7 @@ public abstract class NodeWidget extends EmptyWindow implements Json.Serializabl
             public String get () {
                 return nodeName;
             }
-        });
+        }, this);
         properties.add(labelWidget);
 
         return properties;

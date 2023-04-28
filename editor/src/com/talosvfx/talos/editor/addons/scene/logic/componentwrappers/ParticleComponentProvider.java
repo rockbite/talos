@@ -8,6 +8,7 @@ import com.talosvfx.talos.editor.addons.scene.widgets.property.PropertyPanelAsse
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.ButtonPropertyWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
+import com.talosvfx.talos.editor.widgets.propertyWidgets.WidgetFactory;
 import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.runtime.assets.GameAssetType;
 import com.talosvfx.talos.runtime.assets.RawAsset;
@@ -31,17 +32,7 @@ public class ParticleComponentProvider<T extends BaseVFXProjectData> extends Ren
 		//			this.effectInstance = this.descriptor.createEffectInstance();
 		//		}
 
-		PropertyPanelAssetSelectionWidget<T> descriptorWidget = new PropertyPanelAssetSelectionWidget<>("Effect", GameAssetType.VFX, new Supplier<GameAsset<T>>() {
-			@Override
-			public GameAsset<T> get() {
-				return component.gameAsset;
-			}
-		}, new PropertyWidget.ValueChanged<GameAsset<T>>() {
-			@Override
-			public void report(GameAsset<T> value) {
-				component.setGameAsset(value);
-			}
-		});
+		PropertyWidget descriptorWidget = WidgetFactory.generate(component, "gameAsset", "Effect");
 
 		ButtonPropertyWidget<String> linkedToWidget = new ButtonPropertyWidget<String>("Effect Project", "Edit", new ButtonPropertyWidget.ButtonListener<String>() {
 			@Override
