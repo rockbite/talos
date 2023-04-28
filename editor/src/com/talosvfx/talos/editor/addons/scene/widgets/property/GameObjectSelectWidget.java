@@ -31,13 +31,10 @@ public class GameObjectSelectWidget extends PropertyWidget<GameObject> {
 	private GameObject gameObject;
 
 	private Predicate<FilteredTree.Node<GameObject>> filter;
+	protected GameObjectSelectWidget () {}
 
-	public GameObjectSelectWidget () {
-		super();
-	}
-
-	public GameObjectSelectWidget (String name, Supplier<GameObject> supplier, ValueChanged<GameObject> valueChanged) {
-		super(name, supplier, valueChanged);
+	public GameObjectSelectWidget (String name, Supplier<GameObject> supplier, ValueChanged<GameObject> valueChanged, Object parent) {
+		super(name, supplier, valueChanged, parent);
 		this.filter = new Predicate<FilteredTree.Node<GameObject>>() {
 			@Override
 			public boolean evaluate (FilteredTree.Node<GameObject> node) {

@@ -8,6 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
+import com.badlogic.gdx.utils.reflect.Constructor;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.talosvfx.talos.editor.addons.scene.SceneUtils;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
@@ -83,17 +84,18 @@ public abstract class PropertyWidget<T> extends Table {
 		void report(T value);
 	}
 
-	public PropertyWidget () {
-		build("empty");
+	protected PropertyWidget () {
+
 	}
 
-	public PropertyWidget (Supplier<T> supplier, ValueChanged<T> valueChanged) {
-		this(null, supplier, valueChanged);
+	public PropertyWidget (Supplier<T> supplier, ValueChanged<T> valueChanged, Object parent) {
+		this("empty", supplier, valueChanged, parent);
 	}
 
-	public PropertyWidget (String name, Supplier<T> supplier, ValueChanged<T> valueChanged) {
+	public PropertyWidget (String name, Supplier<T> supplier, ValueChanged<T> valueChanged, Object parent) {
 		this.supplier = supplier;
 		this.valueChanged = valueChanged;
+		setParent(parent);
 		build(name);
 	}
 
@@ -219,7 +221,10 @@ public abstract class PropertyWidget<T> extends Table {
 
 	public PropertyWidget clone()  {
 		try {
-			PropertyWidget widget = ClassReflection.newInstance(this.getClass());
+			Constructor constructor = ClassReflection.getDeclaredConstructor(this.getClass());
+			constructor.setAccessible(true);
+			PropertyWidget widget = (PropertyWidget) constructor.newInstance();
+			widget.build("empty");
 
 			widget.supplier = this.supplier;
 			widget.valueChanged = this.valueChanged;
@@ -227,6 +232,7 @@ public abstract class PropertyWidget<T> extends Table {
 				widget.propertyName.setText(this.propertyName.getText());
 			}
 			return widget;
+
 
 		} catch (ReflectionException e) {
 			e.printStackTrace();

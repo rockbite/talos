@@ -36,17 +36,17 @@ public class DynamicItemListWidget<T> extends PropertyWidget<Array<T>> {
 
         void onDeleteNode(T t);
     }
+    protected DynamicItemListWidget () {}
 
 
-    public DynamicItemListWidget(String name, Supplier<Array<T>> supplier, ValueChanged<Array<T>> valueChanged, DynamicItemListInteraction<T> interaction) {
-        super(name, supplier, valueChanged);
+    public DynamicItemListWidget (String name, Supplier<Array<T>> supplier, ValueChanged<Array<T>> valueChanged, DynamicItemListInteraction<T> interaction, Object parent) {
+        super(name, supplier, valueChanged, parent);
         this.interaction = interaction;
     }
 
-    public DynamicItemListWidget(String name, Supplier<Array<T>> supplier, ValueChanged<Array<T>> valueChanged) {
-        super(name, supplier, valueChanged);
+    public DynamicItemListWidget (String name, Supplier<Array<T>> supplier, ValueChanged<Array<T>> valueChanged, Object parent) {
+        super(name, supplier, valueChanged, parent);
     }
-
     public void setInteraction(DynamicItemListInteraction<T> interaction) {
         this.interaction = interaction;
     }
@@ -61,9 +61,6 @@ public class DynamicItemListWidget<T> extends PropertyWidget<Array<T>> {
         return true;
     }
 
-    public DynamicItemListWidget() {
-        super();
-    }
 
     @Override
     public Actor getSubWidget () {

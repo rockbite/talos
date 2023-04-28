@@ -32,7 +32,7 @@ public class GameObjectPropertyProvider implements IPropertyProvider {
 			public String get () {
 				return gameObject.uuid.toString();
 			}
-		});
+		}, gameObject);
 
 		EditableLabelWidget labelWidget = new EditableLabelWidget("Name", new Supplier<String>() {
 			@Override
@@ -45,7 +45,7 @@ public class GameObjectPropertyProvider implements IPropertyProvider {
 				GONameChangeCommand command = Notifications.obtainEvent(GONameChangeCommand.class).set(gameObject.getGameObjectContainerRoot(), gameObject, value);
 				Notifications.fireEvent(command);
 			}
-		});
+		}, gameObject);
 
 		properties.add(labelWidget);
 		properties.add(uuidWidget);

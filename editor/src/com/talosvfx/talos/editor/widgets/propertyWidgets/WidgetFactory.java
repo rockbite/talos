@@ -92,7 +92,7 @@ public class WidgetFactory {
                 return null;
             }
 
-            generatedWidget.setParent(parent);
+//            generatedWidget.setParent(parent);
             return generatedWidget;
         } catch (IllegalAccessException e) {
             e.printStackTrace();
@@ -135,12 +135,25 @@ public class WidgetFactory {
                    throw new RuntimeException(e);
                }
            }
-       });
+       }, parent);
 
        return gameObjectSelectWidget;
     }
 
-    private static <T> PropertyWidget generateForGameAsset (Object parent, Field field, Object object, String title, GameAssetType assetType) {
+    public static <T> PropertyWidget generateForGameAsset (Object parent, String field, Object object, String title, GameAssetType assetType) {
+        try {
+
+            Field declaredField = ReflectionUtilities.getFieldWithName(field, parent.getClass(), null);
+            declaredField.setAccessible(true);
+            return generateForGameAsset(parent, declaredField, object, title, assetType);
+        } catch (NoSuchFieldException e) {
+            throw new RuntimeException(e);
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static <T> PropertyWidget generateForGameAsset (Object parent, Field field, Object object, String title, GameAssetType assetType) {
         PropertyPanelAssetSelectionWidget<T> textureWidget = new PropertyPanelAssetSelectionWidget<>(title, assetType, new Supplier<GameAsset<T>>() {
             @Override
             public GameAsset<T> get() {
@@ -160,7 +173,7 @@ public class WidgetFactory {
                     e.printStackTrace();
                 }
             }
-        });
+        }, parent);
 
         return textureWidget;
     }
@@ -194,7 +207,7 @@ public class WidgetFactory {
                     e.printStackTrace();
                 }
             }
-        });
+        }, parent);
 
         widget.configureFromAnnotation(field.getAnnotation(ValueProperty.class));
 
@@ -222,7 +235,7 @@ public class WidgetFactory {
                     e.printStackTrace();
                 }
             }
-        });
+        }, parent);
 
         return widget;
     }
@@ -248,7 +261,7 @@ public class WidgetFactory {
                     e.printStackTrace();
                 }
             }
-        });
+        }, parent);
 
         return widget;
     }
@@ -265,7 +278,7 @@ public class WidgetFactory {
                     return "";
                 }
             }
-        });
+        }, parent);
 
         return widget;
     }
@@ -291,7 +304,7 @@ public class WidgetFactory {
                     e.printStackTrace();
                 }
             }
-        });
+        }, parent);
 
         return widget;
     }
@@ -316,7 +329,7 @@ public class WidgetFactory {
                     e.printStackTrace();
                 }
             }
-        });
+        }, parent);
 
         return widget;
     }
@@ -332,7 +345,7 @@ public class WidgetFactory {
             public void report(GameObject value) {
                 wrapper.setValue(value);
             }
-        });
+        }, wrapper);
 
         return widget;
     }
@@ -358,7 +371,7 @@ public class WidgetFactory {
                     e.printStackTrace();
                 }
             }
-        });
+        }, parent);
 
         if (parent instanceof PropertyFloatWrapper) {
             PropertyFloatWrapper numberWrapper = (PropertyFloatWrapper) parent;
@@ -416,8 +429,10 @@ public class WidgetFactory {
             public Array<String> get() {
                 return list;
             }
-        });
+        }, parent);
 
         return  widget;
     }
+
+
 }

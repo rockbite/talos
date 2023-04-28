@@ -31,18 +31,8 @@ public final class SpriteRendererComponentProvider extends RendererComponentProv
 	public Array<PropertyWidget> getListOfProperties () {
 		Array<PropertyWidget> properties = new Array<>();
 
-		PropertyPanelAssetSelectionWidget<AtlasSprite> textureWidget = new PropertyPanelAssetSelectionWidget<>("Texture", GameAssetType.SPRITE, new Supplier<GameAsset<AtlasSprite>>() {
-			@Override
-			public GameAsset<AtlasSprite> get () {
-				return component.getGameResource();
-			}
-		}, value -> {
-			component.setGameAsset(value);
-			GameObject gameObject = getComponent().getGameObject();
-			SceneUtils.componentUpdated(gameObject.getGameObjectContainerRoot(), gameObject, getComponent(), false);
-
-			snapToAspectRatio(sizeWidget);
-		});
+		//TODO aspect ratio shit is broken again now
+		PropertyWidget textureWidget = WidgetFactory.generateForGameAsset(component, "gameAsset", null, "Texture", GameAssetType.SPRITE);
 
 		PropertyWidget colorWidget = WidgetFactory.generate(component, "color", "Color");
 		PropertyWidget inheritParentColorWidget = WidgetFactory.generate(component, "shouldInheritParentColor", "Inherit Parent Color");

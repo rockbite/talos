@@ -31,7 +31,7 @@ public class FilePropertyProvider implements IPropertyProvider {
             public String get() {
                 return fileHandle.name();
             }
-        });
+        }, null);
         properties.add(nameWidget);
 
         LabelWidget sizeWidget = new LabelWidget("Size", new Supplier<String>() {
@@ -49,7 +49,7 @@ public class FilePropertyProvider implements IPropertyProvider {
                 }
                 return fileHandle.length() + " bytes";
             }
-        });
+        }, null);
         properties.add(sizeWidget);
 
         // show dimensions, if we're working with an image
@@ -62,7 +62,7 @@ public class FilePropertyProvider implements IPropertyProvider {
                     Texture texture = new Texture(fileHandle);
                     return texture.getWidth() + " x " + texture.getHeight();
                 }
-            });
+            }, null);
             properties.add(dimensionsWidget);
         }
 

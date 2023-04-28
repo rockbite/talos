@@ -22,13 +22,10 @@ public class Vector2PropertyWidget extends PropertyWidget<Vector2>  {
 
     private ValueProperty annotation;
     private Label title;
+    protected Vector2PropertyWidget () {}
 
-    public Vector2PropertyWidget() {
-        super();
-    }
-
-    public Vector2PropertyWidget(String name, Supplier<Vector2> supplier, ValueChanged<Vector2> valueChanged) {
-        super(name, supplier, valueChanged);
+    public Vector2PropertyWidget(String name, Supplier<Vector2> supplier, ValueChanged<Vector2> valueChanged, Object parent) {
+        super(name, supplier, valueChanged, parent);
     }
 
     @Override

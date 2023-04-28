@@ -13,13 +13,10 @@ import java.util.function.Supplier;
 public class EditableLabelWidget extends PropertyWidget<String> {
 
     private EditableLabel propertyValue;
+    protected EditableLabelWidget () {}
 
-    public EditableLabelWidget() {
-        super();
-    }
-
-    public EditableLabelWidget(String name, Supplier<String> supplier, ValueChanged<String> valueChanged) {
-        super(name, supplier, valueChanged);
+    public EditableLabelWidget(String name, Supplier<String> supplier, ValueChanged<String> valueChanged, Object parent) {
+        super(name, supplier, valueChanged, parent);
     }
 
     @Override

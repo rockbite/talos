@@ -13,12 +13,10 @@ public class CheckboxWidget extends PropertyWidget<Boolean> {
 
 	private CheckboxWithZoom checkBox;
 
-	public CheckboxWidget() {
-		super();
-	}
+	protected CheckboxWidget () {}
 
-	public CheckboxWidget(String name, Supplier<Boolean> supplier, ValueChanged<Boolean> valueChanged) {
-		super(name, supplier, valueChanged);
+	public CheckboxWidget(String name, Supplier<Boolean> supplier, ValueChanged<Boolean> valueChanged, Object parent) {
+		super(name, supplier, valueChanged, parent);
 	}
 
 	@Override

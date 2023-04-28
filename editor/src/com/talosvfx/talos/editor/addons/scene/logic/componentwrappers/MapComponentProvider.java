@@ -77,7 +77,7 @@ public class MapComponentProvider extends RendererComponentProvider<MapComponent
 			public void onDeleteNode(TalosLayer talosLayer) {
 
 			}
-		});
+		}, component);
 
 		talosLayerPropertiesWidget = new TalosLayerPropertiesWidget(null, new Supplier<TalosLayer>() {
 			@Override
@@ -88,7 +88,7 @@ public class MapComponentProvider extends RendererComponentProvider<MapComponent
 			@Override
 			public void report (TalosLayer value) {
 			}
-		});
+		}, component);
 		itemListWidget.list.addItemListener(new FilteredTree.ItemListener<TalosLayer>() {
 			@Override
 			public void selected (FilteredTree.Node<TalosLayer> node) {

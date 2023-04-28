@@ -39,7 +39,6 @@ public abstract class RendererComponentProvider<T extends RendererComponent> ext
 				RendererComponent rendererComponent = component;
 				rendererComponent.sortingLayer = SharedResources.currentProject.getSceneData().getSceneLayerByName(value);
 				GameObject gameObject = rendererComponent.getGameObject();
-				SceneUtils.componentUpdated(gameObject.getGameObjectContainerRoot(), gameObject, rendererComponent, false);
 			}
 		}, new Supplier<Array<String>>() {
 			@Override
@@ -52,7 +51,7 @@ public abstract class RendererComponentProvider<T extends RendererComponent> ext
 				}
 				return layerNames;
 			}
-		});
+		}, component);
 
 		properties.add(visibleWidget);
 		properties.add(childrenVisibleWidget);

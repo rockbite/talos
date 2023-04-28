@@ -24,18 +24,9 @@ public class ButtonPropertyWidget<T> extends PropertyWidget<T> {
         void clicked(ButtonPropertyWidget<T> widget);
     }
 
-    public ButtonPropertyWidget() {
-        super();
-    }
+    protected ButtonPropertyWidget () {}
 
-    @Override
-    public PropertyWidget clone() {
-        ButtonPropertyWidget clone = (ButtonPropertyWidget) super.clone();
-        clone.btnListener = this.btnListener;
-        clone.buttonLabel.setText(buttonLabel.getText());
 
-        return clone;
-    }
 
     public ButtonPropertyWidget(String text) {
         this(null, text, null);
@@ -60,7 +51,7 @@ public class ButtonPropertyWidget<T> extends PropertyWidget<T> {
     }
 
     public ButtonPropertyWidget(String name, String text, ButtonListener btnListener, Supplier<T> supplier, ValueChanged<T> valueChanged) {
-        super(name, supplier, valueChanged);
+        super(name, supplier, valueChanged, null);
         setButtonText(text);
         this.btnListener = btnListener;
     }
@@ -103,5 +94,14 @@ public class ButtonPropertyWidget<T> extends PropertyWidget<T> {
 
     public void setButtonText(String text) {
         buttonLabel.setText(text);
+    }
+
+    @Override
+    public PropertyWidget clone() {
+        ButtonPropertyWidget clone = (ButtonPropertyWidget) super.clone();
+        clone.btnListener = this.btnListener;
+        clone.buttonLabel.setText(buttonLabel.getText());
+
+        return clone;
     }
 }

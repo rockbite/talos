@@ -68,7 +68,7 @@ public class CustomAssetWidget extends ATypeWidget<GameAsset<?>> {
             public Array<String> get() {
                 return types;
             }
-        });
+        }, null);
         typeSelector.updateWidget(currentType.name());
 
         reBuild();

@@ -21,7 +21,7 @@ import lombok.Setter;
 public class SpineRendererComponent extends RendererComponent implements Json.Serializable, GameResourceOwner<SkeletonData>, IColorHolder {
 
     private transient GameAsset<SkeletonData> defaultGameAsset;
-    private GameAsset<SkeletonData> gameAsset;
+    private GameAsset<SkeletonData> gameAsset; //TODO THIS SHOULD BE WIDGET FACTORY AND USE REFLECTION METHOD OVERRIDE
 
     public Skeleton skeleton;
     public AnimationState animationState;

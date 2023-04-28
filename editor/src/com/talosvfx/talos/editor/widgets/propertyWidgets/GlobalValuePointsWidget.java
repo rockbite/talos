@@ -14,10 +14,12 @@ public class GlobalValuePointsWidget extends PropertyWidget<Array<AttachmentPoin
     GlobalValueListContainer listContainer;
 
     public Supplier<Array<Bone>> boneListSuppler;
+    protected GlobalValuePointsWidget () {}
 
-    public GlobalValuePointsWidget() {
-        super();
+    public GlobalValuePointsWidget (String name, Supplier<Array<AttachmentPoint>> supplier, ValueChanged<Array<AttachmentPoint>> valueChanged, Object parent) {
+        super(name, supplier, valueChanged, parent);
     }
+
 
     @Override
     public PropertyWidget clone() {
@@ -28,12 +30,6 @@ public class GlobalValuePointsWidget extends PropertyWidget<Array<AttachmentPoin
     }
 
 
-    public GlobalValuePointsWidget(Supplier<Array<AttachmentPoint>> supplier, Supplier<Array<Bone>> boneListSuppler) {
-        super(supplier, null);
-        this.boneListSuppler = boneListSuppler;
-    }
-
-    @Override
     public Actor getSubWidget() {
         listContainer = new GlobalValueListContainer(SharedResources.skin);
         listContainer.setBoneList(boneListSuppler.get());

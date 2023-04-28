@@ -21,18 +21,7 @@ public class ScriptComponentProvider extends AComponentProvider<ScriptComponent>
 	public Array<PropertyWidget> getListOfProperties () {
 		Array<PropertyWidget> properties = new Array<>();
 
-		PropertyPanelAssetSelectionWidget<String> widget = new PropertyPanelAssetSelectionWidget<>("Script", GameAssetType.SCRIPT, new Supplier<GameAsset<String>>() {
-			@Override
-			public GameAsset<String> get () {
-				return component.getScriptResource();
-			}
-		}, new PropertyWidget.ValueChanged<GameAsset<String>>() {
-			@Override
-			public void report (GameAsset<String> value) {
-				component.setGameAsset(value);
-			}
-		});
-
+		PropertyWidget widget = WidgetFactory.generateForGameAsset(component, "gameAsset", null, "Script", GameAssetType.SCRIPT);
 		properties.add(widget);
 
 		for (PropertyWrapper<?> scriptProperty : component.getScriptProperties()) {

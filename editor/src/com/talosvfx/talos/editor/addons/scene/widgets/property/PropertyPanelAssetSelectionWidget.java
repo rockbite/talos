@@ -31,11 +31,11 @@ public class PropertyPanelAssetSelectionWidget<T> extends PropertyWidget<GameAss
     private Predicate<FilteredTree.Node<GameAsset<T>>> filter;
 
     private AssetListPopup<T> assetListPopup;
-    public PropertyPanelAssetSelectionWidget() {
-        super();
-    }
-    public PropertyPanelAssetSelectionWidget(String name, GameAssetType type, Supplier<GameAsset<T>> supplier, ValueChanged<GameAsset<T>> valueChanged) {
-        super(name, supplier, valueChanged);
+
+    protected PropertyPanelAssetSelectionWidget () {}
+
+    public PropertyPanelAssetSelectionWidget(String name, GameAssetType type, Supplier<GameAsset<T>> supplier, ValueChanged<GameAsset<T>> valueChanged, Object parent) {
+        super(name, supplier, valueChanged, parent);
         assetListPopup = new AssetListPopup<>();
         this.filter = new Predicate<FilteredTree.Node<GameAsset<T>>>() {
             @Override

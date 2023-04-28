@@ -11,6 +11,7 @@ import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.runtime.assets.GameAssetType;
 import com.talosvfx.talos.runtime.routine.serialization.BaseRoutineData;
 import com.talosvfx.talos.runtime.scene.GameObject;
+import com.talosvfx.talos.runtime.scene.components.RendererComponent;
 import com.talosvfx.talos.runtime.scene.components.RoutineRendererComponent;
 import com.talosvfx.talos.runtime.scene.utils.propertyWrappers.PropertyWrapper;
 
@@ -27,19 +28,7 @@ public class RoutineRenderComponentProvider extends RendererComponentProvider<Ro
 	@Override
 	public Array<PropertyWidget> getListOfProperties () {
 		properties.clear();
-		PropertyPanelAssetSelectionWidget<BaseRoutineData> widget = new PropertyPanelAssetSelectionWidget<BaseRoutineData>("Routine", GameAssetType.ROUTINE, new Supplier<GameAsset<BaseRoutineData>>() {
-			@Override
-			public GameAsset<BaseRoutineData> get () {
-				return component.getGameResource();
-			}
-		}, new PropertyWidget.ValueChanged<GameAsset<BaseRoutineData>>() {
-			@Override
-			public void report (GameAsset<BaseRoutineData> value) {
-				component.setGameAsset(value);
-				GameObject gameObject = component.getGameObject();
-				SceneUtils.componentUpdated(gameObject.getGameObjectContainerRoot(), gameObject, component);
-			}
-		});
+		PropertyWidget widget = WidgetFactory.generateForGameAsset(component, "routineResource", null, "Routine", GameAssetType.ROUTINE);
 
 		properties.add(widget);
 
