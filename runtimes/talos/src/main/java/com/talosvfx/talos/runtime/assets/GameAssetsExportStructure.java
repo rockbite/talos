@@ -14,6 +14,8 @@ public class GameAssetsExportStructure {
 
 	private transient boolean cacheBuilt = false;
 
+	public long ageOfYoungestAsset; // max timestamp of exported sprite and atlas assets
+
 	public GameAssetExportStructure findAsset (String uuid) {
 		if (!cacheBuilt) {
 			buildCache();
