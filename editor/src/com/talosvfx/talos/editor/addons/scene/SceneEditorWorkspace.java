@@ -790,6 +790,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		public Array<GameObject> objects = new Array<>();
 		public Array<Vector2> objectWorldPositions = new Array<>();
 		public Vector2 cameraPositionAtCopy = new Vector2(0, 0);
+		public boolean shouldCut = false;
 	}
 
 	public void copySelected () {
@@ -802,6 +803,16 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		SceneUtils.copy(gameAsset, selection);
 	}
 
+	public void cutSelected () {
+
+		// TODO: 23.02.23 dummy refactor
+		if (currentContainer == null) {
+			return;
+		}
+
+		SceneUtils.cut(gameAsset, selection);
+	}
+
 	public void pasteFromClipboard () {
 
 		// TODO: 23.02.23 dummy refactor
@@ -809,6 +820,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 			return;
 		}
 
+		SceneUtils.shouldPasteToRoot(currentContainer);
 		SceneUtils.paste(gameAsset);
 	}
 

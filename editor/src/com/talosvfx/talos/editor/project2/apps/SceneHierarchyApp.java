@@ -19,10 +19,12 @@ import com.talosvfx.talos.editor.project2.apps.preferences.ContainerOfPrefs;
 import com.talosvfx.talos.editor.project2.apps.preferences.HierarchyPreference;
 import com.talosvfx.talos.editor.project2.localprefs.TalosLocalPrefs;
 import com.talosvfx.talos.runtime.scene.Scene;
+import lombok.Getter;
 
 @SingletonApp
 public class SceneHierarchyApp extends AppManager.BaseApp<Scene> implements GameAsset.GameAssetUpdateListener, ContainerOfPrefs<HierarchyPreference>, Observer {
 
+	@Getter
 	private final HierarchyWidget hierarchyWidget;
 
 	public SceneHierarchyApp () {
@@ -149,6 +151,11 @@ public class SceneHierarchyApp extends AppManager.BaseApp<Scene> implements Game
 	@CommandEventHandler(commandType = Commands.CommandType.COPY)
 	public void onCopyCommand (CommandContextEvent event) {
 		hierarchyWidget.copySelected();
+	}
+
+	@CommandEventHandler(commandType = Commands.CommandType.CUT)
+	public void onCutCommand (CommandContextEvent event) {
+		hierarchyWidget.cutSelected();
 	}
 
 	@CommandEventHandler(commandType = Commands.CommandType.PASTE)

@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.UUID;
 import java.util.function.Supplier;
 
 public abstract class SavableContainer implements GameObjectContainer, Json.Serializable {
@@ -186,6 +187,16 @@ public abstract class SavableContainer implements GameObjectContainer, Json.Seri
 		load(TempHackUtil.hackIt(jsonString));
 	}
 
+
+	public GameObject getGameObject(UUID uuid) {
+		Array<GameObject> gameObjects = getGameObjects();
+		for (GameObject gameObject : gameObjects) {
+			if (gameObject.uuid.equals(uuid)) {
+				return gameObject;
+			}
+		}
+		return null;
+	}
 
 	public Array<GameObject> findGameObjects(String targetString) {
 		Array<GameObject> list = new Array<>();

@@ -11,7 +11,11 @@ import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.esotericsoftware.spine.SkeletonData;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.events.save.SaveRequest;
+import com.talosvfx.talos.editor.addons.scene.widgets.HierarchyWidget;
+import com.talosvfx.talos.editor.project2.AppManager;
+import com.talosvfx.talos.editor.project2.apps.SceneHierarchyApp;
 import com.talosvfx.talos.editor.utils.CollectionFunctionalUtils;
+import com.talosvfx.talos.editor.widgets.ui.FilteredTree;
 import com.talosvfx.talos.runtime.RuntimeContext;
 import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.runtime.assets.GameAssetType;
@@ -282,12 +286,16 @@ public class SceneUtils {
 		markContainerChanged(gameObjectContainer);
 	}
 
-	private static ObjectMap<GameObjectContainer, OrderedSet<GameObject>> copyPasteBuffer = new ObjectMap<>();
-
 	public static void copy (GameAsset<Scene> gameAsset, OrderedSet<GameObject> selection) {
-		final GameObjectContainer currentContainer = gameAsset.getResource();
+		storeToClipboard(gameAsset, selection, false);
+	}
 
-		copyPasteBuffer.put(currentContainer, selection);
+	public static void cut (GameAsset<Scene> gameAsset, OrderedSet<GameObject> selection) {
+		storeToClipboard(gameAsset, selection, true);
+	}
+
+	private static void storeToClipboard(GameAsset<Scene> gameAsset, OrderedSet<GameObject> selection, boolean cut) {
+		final GameObjectContainer currentContainer = gameAsset.getResource();
 
 		final Vector3 camPos = getCameraPosForScene(gameAsset);
 
@@ -304,20 +312,31 @@ public class SceneUtils {
 		}
 
 		payload.cameraPositionAtCopy.set(camPos.x, camPos.y);
+		payload.shouldCut = cut;
 
 		Json json = new Json();
 		String clipboard = json.toJson(payload);
 		Gdx.app.getClipboard().setContents(clipboard);
+
+		if (cut) {
+			deleteGameObjects(currentContainer, new ObjectSet<>(selection));
+		}
 	}
+
+	private static final ObjectMap<GameObjectContainer, GameObject> shouldPasteToBuffer = new ObjectMap<>();
+	public static void shouldPasteTo(GameObjectContainer container, GameObject gameObject) {
+		shouldPasteToBuffer.put(container, gameObject);
+	}
+
+	public static void shouldPasteToRoot(GameObjectContainer container) {
+		shouldPasteToBuffer.remove(container);
+	}
+
 
 	public static void paste (GameAsset<Scene> gameAsset) {
 		final SavableContainer currentContainer = gameAsset.getResource();
 
-		if (!copyPasteBuffer.containsKey(currentContainer)) return;
-
 		final Vector3 camPosAtPaste = getCameraPosForScene(gameAsset);
-
-		final OrderedSet<GameObject> selection = copyPasteBuffer.get(currentContainer);
 
 		final String clipboard = Gdx.app.getClipboard().getContents();
 		final Json json = new Json();
@@ -328,12 +347,12 @@ public class SceneUtils {
 			Vector2 offset = new Vector2(camPosAtPaste.x, camPosAtPaste.y);
 			offset.sub(payload.cameraPositionAtCopy);
 
-			GameObject parent = currentContainer.root;
-			if (selection.size == 1 && selection.first() != currentContainer.root) {
-				parent = selection.first().parent;
+			GameObject shouldPasteTo = currentContainer.root;
+			if (shouldPasteToBuffer.containsKey(currentContainer)) {
+				shouldPasteTo = shouldPasteToBuffer.get(currentContainer);
 			}
 
-			clearSelection(currentContainer);
+			ObjectSet<GameObject> selection = new ObjectSet<>();
 
 			for (int i = 0; i < payload.objects.size; i++) {
 				GameObject gameObject = payload.objects.get(i);
@@ -342,11 +361,11 @@ public class SceneUtils {
 
 				gameObject.setName(name);
 				randomizeChildrenUUID(gameObject);
-				parent.addGameObject(gameObject);
+				shouldPasteTo.addGameObject(gameObject);
 				if (gameObject.hasComponentType(TransformComponent.class)) {
 					TransformComponent component = gameObject.getComponent(TransformComponent.class);
 					component.worldPosition.set(payload.objectWorldPositions.get(i));
-					GameObject.projectInParentSpace(parent, gameObject);
+					GameObject.projectInParentSpace(shouldPasteTo, gameObject);
 					component.position.add(offset);
 				}
 
@@ -376,10 +395,6 @@ public class SceneUtils {
 			camPos = camera.position;
 		}
 		return camPos;
-	}
-
-	public static void clearSelection (GameObjectContainer container) {
-		copyPasteBuffer.get(container).clear();
 	}
 
 	// checks if gameObject or its ancestors are already in the selection or not
