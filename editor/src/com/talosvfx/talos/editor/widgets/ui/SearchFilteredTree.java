@@ -17,7 +17,6 @@
 package com.talosvfx.talos.editor.widgets.ui;
 
 
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
@@ -30,6 +29,8 @@ public class SearchFilteredTree<T> extends Table {
     public TextField textField;
     private FilteredTree<T> filteredTree;
     public ScrollPane scrollPane;
+
+    private boolean autoSelect = true;
 
     private Table searchTable;
     public SearchFilteredTree (Skin skin, final FilteredTree<T> tree, final TextField.TextFieldFilter filter) {
@@ -55,7 +56,7 @@ public class SearchFilteredTree<T> extends Table {
         textField.addListener(new ChangeListener() {
             @Override
             public void changed (ChangeEvent event, Actor actor) {
-                tree.smartFilter(textField.getText());
+                tree.smartFilter(textField.getText(), autoSelect);
                 tree.invalidateHierarchy();
                 tree.invalidate();
                 tree.layout();
@@ -65,20 +66,11 @@ public class SearchFilteredTree<T> extends Table {
         textField.addListener(new ClickListener() {
             @Override
             public boolean keyDown(InputEvent event, int keycode)  {
-                if(keycode == Input.Keys.UP) {
-                    filteredTree.selectPrevFilteredNode();
-                }
-                if(keycode == Input.Keys.DOWN) {
-                    filteredTree.selectNextFilteredNode();
-                }
-
                 if(SceneEditorWorkspace.isEnterPressed(keycode)) {
                     filteredTree.reportUserEnter();
                 }
                 return super.keyDown(event, keycode);
             }
-
-
         });
 
     }
@@ -96,4 +88,7 @@ public class SearchFilteredTree<T> extends Table {
         textFieldCell.pad(padTop, padLeft, padBottom, padRight);
     }
 
+    public void setAutoSelect(boolean autoSelect) {
+        this.autoSelect = autoSelect;
+    }
 }

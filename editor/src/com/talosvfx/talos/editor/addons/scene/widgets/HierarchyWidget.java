@@ -70,6 +70,7 @@ public class HierarchyWidget extends Table implements Observer, EventContextProv
         tree = new FilteredTree<>(SharedResources.skin, "modern");
         tree.draggable = true;
         searchFilteredTree = new SearchFilteredTree<>(SharedResources.skin, tree, null);
+        searchFilteredTree.setAutoSelect(false);
         searchFilteredTree.setPad(0, 20, 0, 0);
 
         setBackground(SharedResources.skin.newDrawable("white", Color.valueOf("#252525ff")));

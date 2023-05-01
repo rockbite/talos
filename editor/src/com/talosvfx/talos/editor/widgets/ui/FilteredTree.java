@@ -841,6 +841,19 @@ public class FilteredTree<T> extends WidgetGroup {
         selectFilteredNodeByIndex();
     }
 
+    public void smartFilter(String filter, boolean autoSelect) {
+        Array<MatchingNode<T>> results = new Array<>();
+        gatherMatchingScores(rootNodes, filter, results, 0);
+        smartFilter(results);
+
+        expandAll();
+
+        autoSelectionIndex = 0;
+        if (autoSelect) {
+            selectFilteredNodeByIndex();
+        }
+    }
+
     private void smartFilter (Array<MatchingNode<T>> nodes) {
         for (int i = 0; i < nodes.size; i++) {
             MatchingNode<T> matchingNode = nodes.get(i);
