@@ -32,7 +32,7 @@ public class ParticleComponentProvider<T extends BaseVFXProjectData> extends Ren
 		//			this.effectInstance = this.descriptor.createEffectInstance();
 		//		}
 
-		PropertyWidget descriptorWidget = WidgetFactory.generate(component, "gameAsset", "Effect");
+		PropertyWidget descriptorWidget = WidgetFactory.generateForGameAsset(component, "gameAsset", null, "Effect", GameAssetType.VFX);
 
 		ButtonPropertyWidget<String> linkedToWidget = new ButtonPropertyWidget<String>("Effect Project", "Edit", new ButtonPropertyWidget.ButtonListener<String>() {
 			@Override
