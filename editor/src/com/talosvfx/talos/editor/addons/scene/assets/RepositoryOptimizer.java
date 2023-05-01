@@ -8,17 +8,10 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasSprite;
 import com.badlogic.gdx.net.HttpStatus;
 import com.badlogic.gdx.tools.texturepacker.TexturePacker;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.Base64Coder;
-import com.badlogic.gdx.utils.GdxRuntimeException;
-import com.badlogic.gdx.utils.Json;
-import com.badlogic.gdx.utils.ObjectSet;
+import com.badlogic.gdx.utils.*;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.utils.Toasts;
-import com.talosvfx.talos.runtime.assets.GameAsset;
-import com.talosvfx.talos.runtime.assets.GameAssetType;
-import com.talosvfx.talos.runtime.assets.GameAssetsExportStructure;
-import com.talosvfx.talos.runtime.assets.RawAsset;
+import com.talosvfx.talos.runtime.assets.*;
 import com.talosvfx.talos.runtime.assets.meta.AtlasMetadata;
 import com.talosvfx.talos.runtime.assets.meta.SpriteMetadata;
 import lombok.Data;
@@ -75,13 +68,13 @@ public class RepositoryOptimizer {
 	}
 
 
-	public static void startProcess (ObjectSet<GameAsset<?>> gameAssetsToExport, GameAssetsExportStructure gameAssetExportStructure, Runnable runnable) {
-		checkAndDownload(gameAssetsToExport, gameAssetExportStructure, runnable);
+	public static void startProcess (ObjectSet<GameAsset<?>> gameAssetsToExport, GameAssetsExportStructure gameAssetExportStructure, BaseAssetRepository.AssetRepositoryCatalogueExportOptions settings, Runnable runnable) {
+		checkAndDownload(gameAssetsToExport, gameAssetExportStructure, settings, runnable);
 	}
 
-	private static void checkAndDownload (ObjectSet<GameAsset<?>> gameAssetsToExport, GameAssetsExportStructure gameAssetExportStructure, Runnable runnable) {
+	private static void checkAndDownload (ObjectSet<GameAsset<?>> gameAssetsToExport, GameAssetsExportStructure gameAssetExportStructure, BaseAssetRepository.AssetRepositoryCatalogueExportOptions settings, Runnable runnable) {
 		if (hasToolsBinary()) {
-			process(gameAssetsToExport, gameAssetExportStructure, runnable);
+			process(gameAssetsToExport, gameAssetExportStructure, settings, runnable);
 		} else {
 
 			CompletableFuture<Void> download = download();
@@ -93,7 +86,7 @@ public class RepositoryOptimizer {
 							Toasts.getInstance().showInfoToast("Downloading external tools complete");
 						}
 					});
-					process(gameAssetsToExport, gameAssetExportStructure, runnable);
+					process(gameAssetsToExport, gameAssetExportStructure, settings, runnable);
 				} else {
 					throw new GdxRuntimeException("Failure to download and process");
 				}
@@ -214,8 +207,7 @@ public class RepositoryOptimizer {
 
 	}
 
-	public static void process (ObjectSet<GameAsset<?>> gameAssetsToExport, GameAssetsExportStructure gameAssetExportStructure, Runnable runnable) {
-
+	public static void process (ObjectSet<GameAsset<?>> gameAssetsToExport, GameAssetsExportStructure gameAssetExportStructure, BaseAssetRepository.AssetRepositoryCatalogueExportOptions settings, Runnable runnable) {
 		ObjectSet<TextureBucket> buckets = new ObjectSet<>();
 
 		ObjectSet<GameAsset<TextureAtlas>> atlases = new ObjectSet<>();
@@ -242,9 +234,30 @@ public class RepositoryOptimizer {
 
 		CompletableFuture<TextureBucket>[] futures = new CompletableFuture[buckets.size];
 
+		// mark the age of most recent file, to optimize on the next export
+		// mark it here, because assets may change while packing
+		long ageOfYoungestAssetTmp = 0;
+		for (GameAsset<AtlasSprite> sprite : sprites) {
+			ageOfYoungestAssetTmp = Math.max(ageOfYoungestAssetTmp, sprite.getRootRawAsset().handle.lastModified());
+		}
+		for (GameAsset<TextureAtlas> atlas : atlases) {
+			ageOfYoungestAssetTmp = Math.max(ageOfYoungestAssetTmp, atlas.getRootRawAsset().handle.lastModified());
+		}
+		final long ageOfYoungestAsset = ageOfYoungestAssetTmp;
+
+		// check, if we can skip packing right away
+		// packing can be skipped, if no atlas or texture files were modified in source and old packed files exist
+		boolean canSkipPacking = false;
+		if (settings.getExportPathHandle().child("assetExport.json").exists()) {
+			JsonReader reader = new JsonReader();
+			JsonValue exportInfo = reader.parse(settings.getExportPathHandle().child("assetExport.json"));
+			long prevAgeOfYoungestAsset = exportInfo.getLong("ageOfYoungestAsset", 0);
+			canSkipPacking = prevAgeOfYoungestAsset > 0 && ageOfYoungestAsset == prevAgeOfYoungestAsset;
+		}
+
 		int i = 0;
 		for (TextureBucket bucket : buckets) {
-			futures[i] = CompletableFuture.supplyAsync(createUnpackAndPackTask(bucket));
+			futures[i] = CompletableFuture.supplyAsync(createUnpackAndPackTask(bucket, canSkipPacking));
 			i++;
 		}
 
@@ -300,34 +313,56 @@ public class RepositoryOptimizer {
 					e.printStackTrace();
 				}
 
+				// mark the age of most recent file, to optimize on the next export
+				gameAssetExportStructure.ageOfYoungestAsset = ageOfYoungestAsset;
+
 				Gdx.app.postRunnable(runnable);
 			}
 		});
 	}
 
-	private static Supplier<TextureBucket> createUnpackAndPackTask (TextureBucket bucket) {
+	private static Supplier<TextureBucket> createUnpackAndPackTask (TextureBucket bucket, boolean canSkipPackingFinal) {
 		return new Supplier<TextureBucket>() {
 			@Override
 			public TextureBucket get () {
+				boolean canSkipPacking = canSkipPackingFinal;
+
+				// check if old pack exists
 				ExportPayload exportPayload = new ExportPayload();
 
 				FileHandle exportParent = getUserHomeTalosDir().child("Exports");
-				exportParent.mkdirs();
-
 				String name = SharedResources.currentProject.getProjectDir().name();
-
 				FileHandle workingDir = exportParent.child(name);
 				FileHandle bucketDir = workingDir.child(bucket.identifier);
-
-				if (bucketDir.exists()) {
-					bucketDir.deleteDirectory();
-				}
-				bucketDir.mkdirs();
-
 				FileHandle raws = bucketDir.child("raws");
 				FileHandle result = bucketDir.child("packed");
-				raws.mkdirs();
-				result.mkdirs();
+
+				// extra measures to see if old packed files exist, and we can indeed skip packing process
+				if (exportParent.exists() && workingDir.exists() && bucketDir.exists() && result.exists()) {
+					boolean hasTextures = result.list(".png").length > 0;
+					boolean hasAtlases = result.list(".atlas").length > 0;
+					if (!(hasTextures && hasAtlases)) {
+						canSkipPacking = false;
+					}
+				} else {
+					canSkipPacking = false;
+				}
+
+				if (canSkipPacking) {
+					System.out.println("Skip packing for bucket: " + result);
+				}
+
+				if (!canSkipPacking) {
+					exportParent.mkdirs();
+
+					if (bucketDir.exists()) {
+						bucketDir.deleteDirectory();
+					}
+					bucketDir.mkdirs();
+
+					raws.mkdirs();
+					result.mkdirs();
+				}
 
 				for (GameAsset<AtlasSprite> textureGameAsset : bucket.texturesToPack) {
 					textureGameAsset.getRootRawAsset().handle.copyTo(raws);
@@ -344,18 +379,19 @@ public class RepositoryOptimizer {
 				}
 
 
-
 				PackPayload packPayload = new PackPayload();
 				packPayload.set(bucket.packSettings, raws.file().getAbsolutePath(), result.file().getAbsolutePath(), bucket.identifier);
 				exportPayload.setPackPayload(packPayload);
 
-				CompletableFuture<Void> completableFuture = invokeExternalTool(exportPayload);
-				try {
-					completableFuture.get();
-				} catch (InterruptedException e) {
-					throw new RuntimeException(e);
-				} catch (ExecutionException e) {
-					throw new RuntimeException(e);
+				if (!canSkipPacking) {
+					CompletableFuture<Void> completableFuture = invokeExternalTool(exportPayload);
+					try {
+						completableFuture.get();
+					} catch (InterruptedException e) {
+						throw new RuntimeException(e);
+					} catch (ExecutionException e) {
+						throw new RuntimeException(e);
+					}
 				}
 
 				GameAsset<TextureAtlas> atlasGameAsset = new GameAsset<>(bucket.identifier, GameAssetType.ATLAS);

@@ -78,6 +78,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
@@ -550,8 +551,12 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 
 		if (settings.getExportPathHandle().child("assetExport.json").exists()) {
 			Toasts.getInstance().showInfoToast("Cleaning export directory");
-			settings.getExportPathHandle().deleteDirectory();
-			settings.getExportPathHandle().mkdirs();
+			// remove everything except assetExport.json, because we
+			// need it asset packing optimization
+			FileHandle[] toRemove = settings.getExportPathHandle().list((file, s) -> !s.equals("assetExport.json"));
+			for (FileHandle handle : toRemove) {
+				handle.delete();
+			}
 		}
 
 		if (settings.isForceExportAll()) {
@@ -620,7 +625,7 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 		Thread thread = new Thread(new Runnable() {
 			@Override
 			public void run () {
-				RepositoryOptimizer.startProcess(gameAssetsToExport, gameAssetExportStructure, runnable);
+				RepositoryOptimizer.startProcess(gameAssetsToExport, gameAssetExportStructure, settings, runnable);
 			}
 		});
 		thread.start();
