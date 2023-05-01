@@ -25,6 +25,7 @@ import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.logic.IPropertyHolder;
 import com.talosvfx.talos.editor.addons.scene.logic.MultiPropertyHolder;
 import com.talosvfx.talos.editor.addons.scene.logic.PropertyWrapperProviders;
+import com.talosvfx.talos.editor.utils.InputUtils;
 import com.talosvfx.talos.editor.widgets.ui.gizmos.GroupSelectionGizmo;
 import com.talosvfx.talos.runtime.RuntimeContext;
 import com.talosvfx.talos.runtime.assets.GameAsset;
@@ -257,6 +258,13 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 				if (object instanceof GlobalDragAndDrop.GameAssetDragAndDropPayload) {
 					//We support single game asset drops
 					GlobalDragAndDrop.GameAssetDragAndDropPayload gameAssetPayload = (GlobalDragAndDrop.GameAssetDragAndDropPayload)object;
+					GameObject newGameObject = null;
+					GameObject target = null;
+					if (selection.size == 1) {
+						// if ctrl key is pressed, the new GO will be child of selected target
+						target = selection.first();
+					}
+
 					if (gameAssetPayload.getGameAsset().type == GameAssetType.SPRITE) {
 						GameAsset<AtlasSprite> gameAsset = (GameAsset<AtlasSprite>)gameAssetPayload.getGameAsset();
 
@@ -264,7 +272,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 						Vector3 touchToWorld = getTouchToWorld(vec.x, vec.y);
 						vec.set(touchToWorld.x, touchToWorld.y);
 
-						SceneUtils.createSpriteObject(currentContainer, gameAsset, vec, currentContainer.getSelfObject());
+						newGameObject = SceneUtils.createSpriteObject(currentContainer, gameAsset, vec, currentContainer.getSelfObject());
 
 						//forcefully make active if we aren't active
 						LayoutApp gridAppReference = sceneEditorApp.getGridAppReference();
@@ -289,7 +297,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 						Vector3 touchToWorld = getTouchToWorld(vec.x, vec.y);
 						vec.set(touchToWorld.x, touchToWorld.y);
 
-						SceneUtils.createSpineObject(currentContainer, gameAsset, vec, currentContainer.getSelfObject());
+						newGameObject = SceneUtils.createSpineObject(currentContainer, gameAsset, vec, currentContainer.getSelfObject());
 
 						//forcefully make active if we aren't active
 						LayoutApp gridAppReference = sceneEditorApp.getGridAppReference();
@@ -302,13 +310,23 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 						Vector3 touchToWorld = getTouchToWorld(vec.x, vec.y);
 						vec.set(touchToWorld.x, touchToWorld.y);
 
-						SceneUtils.createParticle(currentContainer, gameAsset, vec, currentContainer.getSelfObject());
+						newGameObject = SceneUtils.createParticle(currentContainer, gameAsset, vec, currentContainer.getSelfObject());
 
 						//forcefully make active if we aren't active
 						LayoutApp gridAppReference = sceneEditorApp.getGridAppReference();
 						SharedResources.currentProject.getLayoutGrid().setLayoutActive(gridAppReference.getLayoutContent());
 
 					}
+
+					if (newGameObject != null && InputUtils.ctrlPressed()) {
+						if (target != null) {
+							SceneUtils.repositionGameObject(currentContainer, target, newGameObject);
+							Array targets = new Array<>();
+							targets.add(newGameObject);
+							Notifications.fireEvent(Notifications.obtainEvent(GameObjectsRestructured.class).set(getEventContext(), targets));
+						}
+					}
+
 					return;
 				}
 				logger.info("TODO other implementations of drag drop payloads");
