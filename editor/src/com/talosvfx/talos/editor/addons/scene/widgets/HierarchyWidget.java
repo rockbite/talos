@@ -420,6 +420,22 @@ public class HierarchyWidget extends Table implements Observer, EventContextProv
             }
         });
 
+        // should have multiple selection active to group
+        final MenuItem group = contextualMenu.addItem("Group", new ClickListener() {
+            @Override
+            public void clicked (InputEvent event, float x, float y) {
+                if (!multipleObjectSelected) return;
+                ObjectSet<GameObject> selection = new ObjectSet<>();
+                for (FilteredTree.Node<GameObject> gameObjectNode : tree.getSelection()) {
+                    if (gameObjectNode != null && gameObjectNode.getObject() != null) {
+                        selection.add(gameObjectNode.getObject());
+                    }
+                }
+                SceneUtils.convertToGroup(currentContainer, selection);
+            }
+        });
+
+
         contextualMenu.addSeparator();
         MenuItem cut = contextualMenu.addItem("Cut", new ClickListener() {
             @Override
@@ -761,7 +777,7 @@ public class HierarchyWidget extends Table implements Observer, EventContextProv
         }
     }
 
-    public void restructureGameObjects (Array<GameObject> selectedObjects) {
+    public void restructureGameObjects (ObjectSet<GameObject> selectedObjects) {
         for (GameObject gameObject : selectedObjects) {
             FilteredTree.Node<GameObject> node = tree.findNode(gameObject);
 

@@ -9,6 +9,15 @@ public class GameObjectSelectionChanged<T> extends AbstractContextRequiredEvent<
 
     private ObjectSet<GameObject> objectArray = new ObjectSet<>();
 
+    public GameObjectSelectionChanged set(T context, GameObject gameObject) {
+        setContext(context);
+
+        objectArray.clear();
+        objectArray.add(gameObject);
+
+        return this;
+    }
+
     public GameObjectSelectionChanged set(T context, ObjectSet<GameObject> arr) {
         setContext(context);
 
