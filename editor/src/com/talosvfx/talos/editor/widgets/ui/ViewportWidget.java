@@ -997,7 +997,7 @@ public abstract class ViewportWidget extends Table {
 
 		GameObject root = getRootSceneObject();
 		if (root != null) {
-			entityUnderMouse = findEntityForColourEncodedUUID(color, root);
+			entityUnderMouse = findEntityForColourEncodedUUID(color, root, true);
 		} else {
 			entityUnderMouse = null;
 		}
@@ -1008,7 +1008,7 @@ public abstract class ViewportWidget extends Table {
 		return null;
 	}
 
-	protected GameObject findEntityForColourEncodedUUID (Color color, GameObject object) {
+	protected GameObject findEntityForColourEncodedUUID (Color color, GameObject object, boolean ignoreLocked) {
 		Color colourForEntityUUID = EntitySelectionBuffer.getColourForEntityUUID(object);
 
 
@@ -1018,7 +1018,7 @@ public abstract class ViewportWidget extends Table {
 			if (object.getGameObjects() != null) {
 				for (GameObject childGameObject : object.getGameObjects()) {
 					GameObject childObjectFound = findEntityForColourEncodedUUID(color, childGameObject);
-					if (childObjectFound != null) {
+					if (childObjectFound != null && (!ignoreLocked || !childObjectFound.isEditorTransformLocked())) {
 						return childObjectFound;
 					}
 				}
@@ -1033,7 +1033,7 @@ public abstract class ViewportWidget extends Table {
 					Array<GameObject> layerRootEntities = talosLayer.getRootEntities();
 					for (int j = 0; j < layerRootEntities.size; j++) {
 						GameObject gameObject = layerRootEntities.get(j);
-						GameObject mapEntityForColourEncodedUUID = findEntityForColourEncodedUUID(color, gameObject);
+						GameObject mapEntityForColourEncodedUUID = findEntityForColourEncodedUUID(color, gameObject, ignoreLocked);
 
 
 
@@ -1046,6 +1046,10 @@ public abstract class ViewportWidget extends Table {
 		}
 
 		return null;
+	}
+
+	protected GameObject findEntityForColourEncodedUUID(Color color, GameObject object) {
+		return findEntityForColourEncodedUUID(color, object, false);
 	}
 
 	private boolean rgbCompare (Color color, Color colourForEntityUUID) {
