@@ -263,8 +263,8 @@ public class DirectoryViewWidget extends Table {
 		fileHandle = Gdx.files.absolute(path);
 
 		fillItems(directory);
-		invalidateHierarchy();
-		layout();
+		items.invalidateHierarchy();
+		items.layout();
 	}
 
 	private Array<FileHandle> convertToFileArray (Array<Item> selected) {
