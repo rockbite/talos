@@ -246,6 +246,7 @@ public class RepositoryOptimizer {
 		final long ageOfYoungestAsset = ageOfYoungestAssetTmp;
 
 		// check, if we can skip packing right away
+		// packing can be skipped, if no atlas or texture files were modified in source and old packed files exist
 		boolean canSkipPacking = false;
 		if (settings.getExportPathHandle().child("assetExport.json").exists()) {
 			JsonReader reader = new JsonReader();
@@ -320,23 +321,40 @@ public class RepositoryOptimizer {
 		});
 	}
 
-	private static Supplier<TextureBucket> createUnpackAndPackTask (TextureBucket bucket, boolean canSkipPacking) {
+	private static Supplier<TextureBucket> createUnpackAndPackTask (TextureBucket bucket, boolean canSkipPackingFinal) {
 		return new Supplier<TextureBucket>() {
 			@Override
 			public TextureBucket get () {
+				boolean canSkipPacking = canSkipPackingFinal;
+
+				// check if old pack exists
 				ExportPayload exportPayload = new ExportPayload();
 
 				FileHandle exportParent = getUserHomeTalosDir().child("Exports");
-				exportParent.mkdirs();
-
 				String name = SharedResources.currentProject.getProjectDir().name();
-
 				FileHandle workingDir = exportParent.child(name);
 				FileHandle bucketDir = workingDir.child(bucket.identifier);
 				FileHandle raws = bucketDir.child("raws");
 				FileHandle result = bucketDir.child("packed");
 
+				// extra measures to see if old packed files exist, and we can indeed skip packing process
+				if (exportParent.exists() && workingDir.exists() && bucketDir.exists() && result.exists()) {
+					boolean hasTextures = result.list(".png").length > 0;
+					boolean hasAtlases = result.list(".atlas").length > 0;
+					if (!(hasTextures && hasAtlases)) {
+						canSkipPacking = false;
+					}
+				} else {
+					canSkipPacking = false;
+				}
+
+				if (canSkipPacking) {
+					System.out.println("Skip packing for bucket: " + result);
+				}
+
 				if (!canSkipPacking) {
+					exportParent.mkdirs();
+
 					if (bucketDir.exists()) {
 						bucketDir.deleteDirectory();
 					}
@@ -359,7 +377,6 @@ public class RepositoryOptimizer {
 					exportPayload.getUnpackPayloads().add(unpackPayload);
 
 				}
-
 
 
 				PackPayload packPayload = new PackPayload();
