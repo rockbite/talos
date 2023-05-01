@@ -321,7 +321,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 					if (newGameObject != null && InputUtils.ctrlPressed()) {
 						if (target != null) {
 							SceneUtils.repositionGameObject(currentContainer, target, newGameObject);
-							Array targets = new Array<>();
+							ObjectSet<GameObject> targets = new ObjectSet<>();
 							targets.add(newGameObject);
 							Notifications.fireEvent(Notifications.obtainEvent(GameObjectsRestructured.class).set(getEventContext(), targets));
 						}
