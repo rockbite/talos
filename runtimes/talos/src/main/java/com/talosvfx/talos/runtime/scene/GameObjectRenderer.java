@@ -1,9 +1,12 @@
 package com.talosvfx.talos.runtime.scene;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.PolygonBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.GdxRuntimeException;
@@ -32,7 +35,12 @@ public class GameObjectRenderer {
 	@Getter
 	private boolean skipUpdates;
 
+
+	private static TextureRegion brokenRegion;
+
 	public GameObjectRenderer () {
+		brokenRegion = new TextureRegion(new Texture(Gdx.files.classpath("missing.png")));
+
 		spriteRenderer = createSpriteRenderer();
 		mapRenderer = createMapRenderer();
 		particleRenderer = createParticleRenderer();
@@ -79,16 +87,18 @@ public class GameObjectRenderer {
 		};
 
 	}
+
 	private Comparator<GameObject> getSorter (RenderStrategy renderMode) {
 		switch (renderMode) {
-		case SCENE:
-			return layerAndDrawOrderComparator;
-		case YDOWN:
-			return yDownDrawOrderComparator;
+			case SCENE:
+				return layerAndDrawOrderComparator;
+			case YDOWN:
+				return yDownDrawOrderComparator;
 		}
 
 		throw new GdxRuntimeException("No sorter found for render mode: " + renderMode);
 	}
+
 	private static float getBottomY (GameObject gameObject) {
 		if (gameObject.hasComponentType(RendererComponent.class)) {
 			RendererComponent componentAssignableFrom = gameObject.getComponentAssignableFrom(RendererComponent.class);
@@ -254,12 +264,34 @@ public class GameObjectRenderer {
 
 	}
 
+
+	public static void renderBrokenComponent (Batch batch, GameObject gameObject, TransformComponent transformComponent) {
+
+		float width = 1f;
+		float height = 1f;
+		if (gameObject.hasComponent(SpriteRendererComponent.class)) {
+			SpriteRendererComponent component = gameObject.getComponent(SpriteRendererComponent.class);
+			width = component.size.x;
+			height = component.size.y;
+		}
+
+		batch.draw(brokenRegion,
+				transformComponent.worldPosition.x - 0.5f, transformComponent.worldPosition.y - 0.5f,
+				0.5f, 0.5f,
+				1f, 1f,
+				width * transformComponent.worldScale.x, height * transformComponent.worldScale.y,
+				transformComponent.worldRotation);
+	}
+
+
 	Array<GameObject> temp = new Array<>();
+
 	public void buildRenderState (PolygonBatch batch, RenderState state, GameObject root) {
 		temp.clear();
 		temp.add(root);
 		buildRenderState(batch, state, temp);
 	}
+
 	public void buildRenderState (PolygonBatch batch, RenderState state, Array<GameObject> rootObjects) {
 		state.list.clear();
 		fillRenderableEntities(rootObjects, state.list);
@@ -285,11 +317,13 @@ public class GameObjectRenderer {
 		}
 
 	}
+
 	public void buildRenderStateAndRender (PolygonBatch batch, Camera camera, RenderState state, GameObject root) {
 		temp.clear();
 		temp.add(root);
 		buildRenderStateAndRender(batch, camera, state, temp);
 	}
+
 	public void buildRenderStateAndRender (PolygonBatch batch, Camera camera, RenderState state, Array<GameObject> rootObjects) {
 		setCamera(camera);
 

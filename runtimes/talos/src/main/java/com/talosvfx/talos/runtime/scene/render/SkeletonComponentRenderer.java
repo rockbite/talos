@@ -4,7 +4,9 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.esotericsoftware.spine.SkeletonData;
 import com.esotericsoftware.spine.TalosSkeletonRenderer;
+import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.runtime.scene.GameObject;
 import com.talosvfx.talos.runtime.scene.GameObjectRenderer;
 import com.talosvfx.talos.runtime.scene.components.SpineRendererComponent;
@@ -22,6 +24,13 @@ public class SkeletonComponentRenderer extends ComponentRenderer<SpineRendererCo
 	public void render (Batch batch, Camera camera, GameObject gameObject, SpineRendererComponent rendererComponent) {
 		TransformComponent transformComponent = gameObject.getComponent(TransformComponent.class);
 		SpineRendererComponent spineRendererComponent = gameObject.getComponent(SpineRendererComponent.class);
+
+		GameAsset<SkeletonData> gameResource = rendererComponent.getGameResource();
+		if (gameResource.isBroken()) {
+			GameObjectRenderer.renderBrokenComponent(batch, gameObject, transformComponent);
+			return;
+		}
+
 
 		spineRendererComponent.skeleton.setPosition(transformComponent.worldPosition.x, transformComponent.worldPosition.y);
 		spineRendererComponent.skeleton.setScale(transformComponent.worldScale.x * spineRendererComponent.scale, transformComponent.worldScale.y * spineRendererComponent.scale);

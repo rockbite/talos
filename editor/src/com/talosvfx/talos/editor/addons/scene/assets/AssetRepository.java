@@ -105,6 +105,7 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 	private ObjectMap<GameAsset<AtlasSprite>, NinePatch> patchCache = new ObjectMap<>();
 	private ObjectSet<FileHandle> newFilesSeen = new ObjectSet<>();
 
+
 	public <T> GameAsset<T> getAssetForUniqueIdentifier (UUID uuid, GameAssetType type) {
 		if (uniqueIdentifierGameAssetMap.containsKey(type)) {
 			if (uniqueIdentifierGameAssetMap.get(type).containsKey(uuid)) {
@@ -701,6 +702,12 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 			gameAssetExportStructure.gameAssets.add(assetExportStructure);
 
 		}
+
+		GameAssetExportStructure value = new GameAssetExportStructure();
+		value.type = GameAssetType.SPRITE;
+		value.identifier = "missing";
+		value.uuid = missingUUID.toString();
+		gameAssetExportStructure.gameAssets.add(value);
 	}
 
 	private ObjectSet<String> dependentGameAssetsToUUIDArray (GameAsset<?> gameAsset) {
@@ -747,7 +754,12 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 		for (AComponent component : selfObject.getComponents()) {
 			if (component instanceof GameResourceOwner) {
 				GameResourceOwner gameResourceOwner = (GameResourceOwner) component;
-				uuids.add(gameResourceOwner.getGameResource().getRootRawAsset().metaData.uuid.toString());
+				GameAsset gameResource = gameResourceOwner.getGameResource();
+				if (gameResource.isBroken()) {
+					uuids.add(missingUUID.toString());
+				} else {
+					uuids.add(gameResource.getRootRawAsset().metaData.uuid.toString());
+				}
 			}
 		}
 		Array<GameObject> gameObjects = selfObject.getGameObjects();

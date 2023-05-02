@@ -11,6 +11,7 @@ import java.util.UUID;
 import static com.badlogic.gdx.graphics.g2d.TextureAtlas.*;
 
 public abstract class BaseAssetRepository {
+	public static final UUID missingUUID = new UUID(-1, -1);
 
 	@Getter
 	public static class AssetRepositoryCatalogueExportOptions {

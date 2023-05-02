@@ -5,6 +5,8 @@ import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.PolygonBatch;
 import com.badlogic.gdx.utils.ObjectMap;
+import com.esotericsoftware.spine.SkeletonData;
+import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.runtime.scene.GameObject;
 import com.talosvfx.talos.runtime.scene.GameObjectRenderer;
 import com.talosvfx.talos.runtime.scene.components.ParticleComponent;
@@ -31,7 +33,17 @@ public class SimpleParticleComponentRenderer<T extends BaseVFXProjectData> exten
 		TransformComponent transformComponent = gameObject.getComponent(TransformComponent.class);
 		ParticleComponent<T> particleComponent = gameObject.getComponent(ParticleComponent.class);
 
-		T resource = particleComponent.gameAsset.getResource();
+		GameAsset<T> gameAsset = particleComponent.gameAsset;
+
+		if (gameAsset.isBroken()) {
+			GameObjectRenderer.renderBrokenComponent(batch, gameObject, transformComponent);
+			return;
+		}
+
+		T resource = gameAsset.getResource();
+
+
+
 		ParticleEffectDescriptor descriptor = resource.getDescriptorSupplier().get();
 
 		if (descriptor == null) return;

@@ -36,6 +36,13 @@ public class SpriteComponentRenderer extends ComponentRenderer<SpriteRendererCom
 
         SpriteRendererComponent spriteRenderer = gameObject.getComponent(SpriteRendererComponent.class);
         GameAsset<AtlasSprite> gameResource = spriteRenderer.getGameResource();
+
+        if (gameResource.isBroken()) {
+            GameObjectRenderer.renderBrokenComponent(batch, gameObject, transformComponent);
+            return;
+        }
+
+
         RawAsset rootRawAsset = gameResource.getRootRawAsset();
         AMetadata metaData = rootRawAsset.metaData;
 

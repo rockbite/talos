@@ -104,6 +104,12 @@ public class RuntimeAssetRepository extends BaseAssetRepository {
 
 
 	private <T> GameAsset<T> spriteLoader (GameAssetExportStructure exportStructure, FileHandle baseFolder) {
+		if (exportStructure.identifier.equals("missing")) {
+			GameAsset<T> missingAsset = new GameAsset<>("missing", GameAssetType.SPRITE);
+			missingAsset.setBroken(new Exception("Missing asset"));
+			return missingAsset;
+		}
+
 		GameAsset<AtlasSprite> gameAsset = new GameAsset<>(exportStructure.identifier, exportStructure.type);
 
 		String first = exportStructure.relativePathsOfRawFiles.first();
