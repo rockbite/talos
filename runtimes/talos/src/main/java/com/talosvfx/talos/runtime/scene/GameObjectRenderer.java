@@ -172,7 +172,7 @@ public class GameObjectRenderer {
 	public void update (GameObject gameObject, float delta) {
 		if (!gameObject.active || !gameObject.isEditorVisible())
 			return;
-		if (gameObject.hasComponent(TransformComponent.class)) {
+		if (gameObject.hasComponent(TransformComponent.class) && !gameObject.hasComponent(BoneComponent.class)) {
 			TransformComponent transform = gameObject.getComponent(TransformComponent.class);
 
 			transform.worldPosition.set(transform.position);

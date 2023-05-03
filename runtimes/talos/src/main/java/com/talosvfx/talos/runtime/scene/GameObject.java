@@ -4,19 +4,16 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.collision.BoundingBox;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.Json;
-import com.badlogic.gdx.utils.JsonValue;
-import com.badlogic.gdx.utils.ObjectMap;
-import com.badlogic.gdx.utils.ObjectSet;
+import com.badlogic.gdx.utils.*;
+import com.esotericsoftware.spine.Bone;
+import com.talosvfx.talos.runtime.RuntimeContext;
 import com.talosvfx.talos.runtime.assets.GameResourceOwner;
 import com.talosvfx.talos.runtime.routine.RoutineEventInterface;
 import com.talosvfx.talos.runtime.routine.RoutineEventListener;
-import com.talosvfx.talos.runtime.scene.components.AComponent;
-import com.talosvfx.talos.runtime.scene.components.RendererComponent;
-import com.talosvfx.talos.runtime.scene.components.TransformComponent;
+import com.talosvfx.talos.runtime.scene.components.*;
 import com.talosvfx.talos.runtime.scene.utils.TransformSettings;
 import com.talosvfx.talos.runtime.scene.utils.propertyWrappers.PropertyWrapper;
+import com.talosvfx.talos.runtime.utils.NamingUtils;
 import lombok.Getter;
 
 import java.util.ArrayList;
@@ -47,7 +44,6 @@ public class GameObject implements GameObjectContainer, RoutineEventListener, Js
 
     public boolean isPlacing;
 
-
     @Getter
     private transient TransformSettings transformSettings = new TransformSettings();
 
@@ -75,6 +71,10 @@ public class GameObject implements GameObjectContainer, RoutineEventListener, Js
 
     @Override
     public void write (Json json) {
+        if (hasComponent(BoneComponent.class)) { // special case, skip
+            return;
+        }
+
         json.writeValue("name", name);
         json.writeValue("uuid", uuid.toString());
         json.writeValue("prefabLink", prefabLink);
@@ -112,6 +112,23 @@ public class GameObject implements GameObjectContainer, RoutineEventListener, Js
         for(JsonValue componentJson : componentsJson) {
             AComponent component = json.readValue(AComponent.class, componentJson);
             addComponent(component);
+        }
+
+        // populate fake children
+        if (hasComponent(SpineRendererComponent.class)) {
+            SpineRendererComponent component = getComponent(SpineRendererComponent.class);
+            for (Bone bone : component.skeleton.getBones()) {
+                GameObject boneObject = new GameObject();
+                boneObject.setName(bone.getData().getName());
+
+                TransformComponent transformComponent = new TransformComponent();
+                boneObject.addComponent(transformComponent);
+
+                BoneComponent boneComponent = new BoneComponent(bone);
+                boneObject.addComponent(boneComponent);
+
+                addGameObject(boneObject);
+            }
         }
 
         JsonValue childrenJson = jsonData.get("children");
@@ -331,21 +348,13 @@ public class GameObject implements GameObjectContainer, RoutineEventListener, Js
     }
 
 
-    public static void setPositionFromWorldPosition (GameObject object, Vector2 worldPosition, boolean changeScale, boolean changeRotation) {
+    public static void setPositionFromWorldPosition (GameObject object, Vector2 worldPosition) {
         TransformComponent transformComponent = object.getComponent(TransformComponent.class);
         transformComponent.worldPosition.set(worldPosition);
-        projectInParentSpace(object.parent, object, changeScale, changeRotation);
+        projectInParentSpace(object.parent, object);
     }
 
-    public static void setPositionFromWorldPosition (GameObject object, Vector2 worldPosition) {
-        setPositionFromWorldPosition(object, worldPosition, true, true);
-    }
-
-
-    public static void projectInParentSpace (GameObject parentToMoveTo, GameObject childThatHasMoved) {
-        projectInParentSpace(parentToMoveTo, childThatHasMoved, true, true);
-    }
-    public static void projectInParentSpace(GameObject parentToMoveTo, GameObject childThatHasMoved, boolean changeScale, boolean changeRotation) {
+    public static void projectInParentSpace(GameObject parentToMoveTo, GameObject childThatHasMoved) {
         if (childThatHasMoved.hasComponent(TransformComponent.class)) {
             TransformComponent childPositionComponent = childThatHasMoved.getComponent(TransformComponent.class);
             TransformComponent parentPositionComponent = new TransformComponent();
@@ -359,12 +368,12 @@ public class GameObject implements GameObjectContainer, RoutineEventListener, Js
             childPositionComponent.position.set(tmp);
             childPositionComponent.rotation -= parentPositionComponent.rotation;
 
-            tmp.set(1 / parentPositionComponent.worldScale.x, 1 / parentPositionComponent.worldScale.y);
-            childPositionComponent.position.scl(tmp);
-
-            tmp.set(childPositionComponent.worldScale);
-            tmp.scl(1 / parentPositionComponent.worldScale.x, 1 / parentPositionComponent.worldScale.y);
-            childPositionComponent.scale.set(tmp);
+//            tmp.set(1 / parentPositionComponent.worldScale.x, 1 / parentPositionComponent.worldScale.y);
+//            childPositionComponent.position.scl(tmp);
+//
+//            tmp.set(childPositionComponent.worldScale);
+//            tmp.scl(1 / parentPositionComponent.worldScale.x, 1 / parentPositionComponent.worldScale.y);
+//            childPositionComponent.scale.set(tmp);
         }
     }
 
