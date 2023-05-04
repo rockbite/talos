@@ -1,5 +1,6 @@
 package com.talosvfx.talos.runtime.scene;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.collision.BoundingBox;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -117,17 +118,9 @@ public class GameObject implements GameObjectContainer, RoutineEventListener, Js
         // populate fake children
         if (hasComponent(SpineRendererComponent.class)) {
             SpineRendererComponent component = getComponent(SpineRendererComponent.class);
-            for (Bone bone : component.skeleton.getBones()) {
-                GameObject boneObject = new GameObject();
-                boneObject.setName(bone.getData().getName());
-
-                TransformComponent transformComponent = new TransformComponent();
-                boneObject.addComponent(transformComponent);
-
-                BoneComponent boneComponent = new BoneComponent(bone);
-                boneObject.addComponent(boneComponent);
-
-                addGameObject(boneObject);
+            Bone rootBone = component.skeleton.getRootBone();
+            for (Bone child : rootBone.getChildren()) {
+                processBone(child, this);
             }
         }
 
@@ -137,6 +130,22 @@ public class GameObject implements GameObjectContainer, RoutineEventListener, Js
                 GameObject childObject = json.readValue(GameObject.class, childJson);
                 addGameObject(childObject);
             }
+        }
+    }
+
+    private void processBone (Bone bone, GameObject parentToAdd) {
+        GameObject boneGO = new GameObject();
+        boneGO.setName(bone.getData().getName());
+
+        TransformComponent transformComponent = new TransformComponent();
+        boneGO.addComponent(transformComponent);
+        BoneComponent boneComponent = new BoneComponent(bone);
+        boneGO.addComponent(boneComponent);
+
+        parentToAdd.addGameObject(boneGO);
+
+        for (Bone child : bone.getChildren()) {
+            processBone(child, boneGO);
         }
     }
 

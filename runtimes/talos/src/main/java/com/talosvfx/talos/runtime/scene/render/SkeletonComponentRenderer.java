@@ -52,7 +52,7 @@ public class SkeletonComponentRenderer extends ComponentRenderer<SpineRendererCo
 			Bone bone =  boneComponent.getBone();
 			TransformComponent transform = boneGO.getComponent(TransformComponent.class);
 
-
+//
 			transform.worldScale.set(bone.getWorldScaleX(), bone.getWorldScaleY());
 			transform.scale.x = bone.getWorldScaleX() / parentTransform.worldScale.x;
 			transform.scale.y = bone.getWorldScaleY() / parentTransform.worldScale.y;
@@ -62,11 +62,16 @@ public class SkeletonComponentRenderer extends ComponentRenderer<SpineRendererCo
 
 
 			transform.worldPosition.set(bone.getWorldX(), bone.getWorldY());
+//
+//			transform.position.set(transform.worldPosition);
+//			transform.position.sub(parentTransform.worldPosition);
+//			transform.position.rotateDeg(-parentTransform.worldRotation);
+//			transform.position.scl(1f/parentTransform.worldScale.x, 1f/parentTransform.worldScale.y);
 
-			transform.position.set(transform.worldPosition);
-			transform.position.sub(parentTransform.worldPosition);
-			transform.position.rotateDeg(-parentTransform.worldRotation);
-			transform.position.scl(1f/parentTransform.worldScale.x, 1f/parentTransform.worldScale.y);
+
+			transform.position.set(bone.getX(), bone.getY());
+			transform.rotation = bone.getRotation();
+			transform.scale.set(bone.getScaleX(), bone.getScaleY());
 
 
 		}

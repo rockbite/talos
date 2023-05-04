@@ -40,7 +40,7 @@ public class TransformGizmo extends Gizmo {
             transform.localToWorld(gameObject, tmp.set(0, 0));
 
             // drawing position point
-            if(selected) {
+            if(selected || true) {
                 drawPoint(batch, SharedResources.skin.getRegion("ic-target"), tmp, Color.ORANGE, 30);
                 drawBoundedBoxIfNeed(batch);
             }
