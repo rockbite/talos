@@ -66,18 +66,8 @@ public abstract class Gizmo extends Actor implements Pool.Poolable {
         if(gameObject.hasComponent(TransformComponent.class)) {
             TransformComponent transform = gameObject.getComponent(TransformComponent.class);
             tmp.set(0, 0);
-            if (gameObject.getName().contains("water")) {
-                TransformComponent.log = true;
-                System.out.println();
-                System.out.println();
-            }
             transform.localToWorld(gameObject, tmp);
-            if (TransformComponent.log) {
-                System.out.println();
-                System.out.println();
-            }
             setPosition(tmp.x, tmp.y);
-            TransformComponent.log =  false;
         }
     }
 

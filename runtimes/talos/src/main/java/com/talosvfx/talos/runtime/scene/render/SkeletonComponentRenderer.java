@@ -4,10 +4,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.Array;
 import com.esotericsoftware.spine.Bone;
-import com.esotericsoftware.spine.SkeletonRendererDebug;
 import com.esotericsoftware.spine.TalosSkeletonRenderer;
 import com.talosvfx.talos.runtime.scene.GameObject;
 import com.talosvfx.talos.runtime.scene.GameObjectRenderer;
@@ -52,42 +50,27 @@ public class SkeletonComponentRenderer extends ComponentRenderer<SpineRendererCo
 			Bone bone =  boneComponent.getBone();
 			TransformComponent transform = boneGO.getComponent(TransformComponent.class);
 
-//
 			transform.worldScale.set(bone.getWorldScaleX(), bone.getWorldScaleY());
-			transform.scale.x = bone.getWorldScaleX() / parentTransform.worldScale.x;
-			transform.scale.y = bone.getWorldScaleY() / parentTransform.worldScale.y;
-
 			transform.worldRotation = bone.localToWorldRotation(bone.getRotation());
-			transform.rotation = transform.worldRotation - parentTransform.worldRotation;
-
-
 			transform.worldPosition.set(bone.getWorldX(), bone.getWorldY());
-//
-//			transform.position.set(transform.worldPosition);
-//			transform.position.sub(parentTransform.worldPosition);
-//			transform.position.rotateDeg(-parentTransform.worldRotation);
-//			transform.position.scl(1f/parentTransform.worldScale.x, 1f/parentTransform.worldScale.y);
-
 
 			transform.position.set(bone.getX(), bone.getY());
 			transform.rotation = bone.getRotation();
 			transform.scale.set(bone.getScaleX(), bone.getScaleY());
-
-
 		}
 
 
-		ShapeRenderer shapeRenderer = new ShapeRenderer();
-		SkeletonRendererDebug skeletonRendererDebug = new SkeletonRendererDebug(shapeRenderer);
-		batch.end();
-
-		skeletonRendererDebug.setScale(1/64f);
-		shapeRenderer.setProjectionMatrix(camera.combined);
-		skeletonRendererDebug.draw(rendererComponent.skeleton);
-
-		shapeRenderer.dispose();
-
-		batch.begin();
+//		ShapeRenderer shapeRenderer = new ShapeRenderer();
+//		SkeletonRendererDebug skeletonRendererDebug = new SkeletonRendererDebug(shapeRenderer);
+//		batch.end();
+//
+//		skeletonRendererDebug.setScale(1/64f);
+//		shapeRenderer.setProjectionMatrix(camera.combined);
+//		skeletonRendererDebug.draw(rendererComponent.skeleton);
+//
+//		shapeRenderer.dispose();
+//
+//		batch.begin();
 
 	}
 }
