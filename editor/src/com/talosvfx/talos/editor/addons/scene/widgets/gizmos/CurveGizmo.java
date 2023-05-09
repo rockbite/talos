@@ -131,7 +131,7 @@ public class CurveGizmo extends Gizmo {
 
         tmp.set(getX(), getY());
 //        if(isPointHit(tmp, x, y, 30)) return false;
-        if (getClosestWorldPoint(tmp2, x, y, 20)) {
+        if (getClosestWorldPoint(tmp2, x, y, 20f)) {
             return true;
         }
 
@@ -320,27 +320,6 @@ public class CurveGizmo extends Gizmo {
             final CurveComponent curve = gameObject.getComponent(CurveComponent.class);
             SceneUtils.componentUpdated(curve.getGameObject().getGameObjectContainerRoot(), curve.getGameObject(), curve, false);
         }
-    }
-
-    private Vector2 toWorld(Vector2 local) {
-        return toWorld(local, tmp3);
-    }
-
-    private Vector2 toWorld(Vector2 local, Vector2 out) {
-        out.set(local);
-        out.add(getX(), getY());
-        return out;
-    }
-
-    private Vector2 toLocal(Vector2 out, float x, float y) {
-        out.set(x, y);
-        out.sub(getX(), getY());
-        return out;
-    }
-
-    private Vector2 toLocal(Vector2 world) {
-        world.sub(getX(), getY());
-        return world;
     }
 
     @Override

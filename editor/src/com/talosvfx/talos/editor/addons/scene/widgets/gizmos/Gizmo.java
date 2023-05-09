@@ -14,6 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.utils.Pool;
+import com.badlogic.gdx.utils.Pools;
 import com.talosvfx.talos.runtime.scene.GameObject;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.ui.ViewportWidget;
@@ -39,6 +40,8 @@ public abstract class Gizmo extends Actor implements Pool.Poolable {
     protected GameObjectContainer gameObjectContainer;
 
     Vector2 tmp = new Vector2();
+    Vector2 tmp2 = new Vector2();
+    Vector2 tmp3 = new Vector2();
 
     protected float worldPerPixel = 1f;
 
@@ -71,15 +74,22 @@ public abstract class Gizmo extends Actor implements Pool.Poolable {
         }
     }
 
+    protected void drawLine(Batch batch, Vector2 from, Vector2 to, Color color, float thickness) {
+        drawLine(batch, from.x, from.y, to.x, to.y, color, thickness);
+    }
 
     protected void drawLine(Batch batch, Vector2 from, Vector2 to, Color color) {
-        drawLine(batch, from.x, from.y, to.x, to.y, color);
+        drawLine(batch, from.x, from.y, to.x, to.y, color, 3f);
     }
 
     protected void drawLine(Batch batch, float x1, float y1, float x2, float y2, Color color) {
+        drawLine(batch, x1, y1, x2, y2, color, 3f);
+    }
+
+    protected void drawLine(Batch batch, float x1, float y1, float x2, float y2, Color color, float thickness) {
         TextureRegion white = SharedResources.skin.getRegion("white");
         tmp.set(x2, y2).sub(x1, y1);
-        float thickness = worldPerPixel * 3f;
+        thickness = worldPerPixel * thickness;
         float length = tmp.len();
         float rotation = tmp.angleDeg();
         tmp.scl(0.5f).add(x1, y1); // center points
@@ -201,6 +211,23 @@ public abstract class Gizmo extends Actor implements Pool.Poolable {
         circle.draw(batch, 1f);
     }
 
+    protected void drawCircle(Vector2 pos, Batch batch, float radius, Color color, float thickness) {
+        int segments = 20;
+        float step = 360f/segments;
+        for(int i = 0; i < segments; i++) {
+            Vector2 v1 = Pools.obtain(Vector2.class);
+            Vector2 v2 = Pools.obtain(Vector2.class);
+
+            v1.set(MathUtils.cosDeg(i*step) * radius + pos.x, MathUtils.sinDeg(i*step) * radius + pos.y);
+            v2.set(MathUtils.cosDeg((i+1)*step) * radius + pos.x, MathUtils.sinDeg((i+1)*step) * radius + pos.y);
+
+            drawLine(batch, v1, v2, color, thickness);
+
+            Pools.free(v1);
+            Pools.free(v2);
+        }
+    }
+
     public boolean catchesShift() {
         return false;
     }
@@ -215,5 +242,27 @@ public abstract class Gizmo extends Actor implements Pool.Poolable {
 
     public boolean isControllingGameObject (GameObject gameObject) {
         return this.gameObject == gameObject;
+    }
+
+
+    protected Vector2 toWorld(Vector2 local) {
+        return toWorld(local, tmp3);
+    }
+
+    protected Vector2 toWorld(Vector2 local, Vector2 out) {
+        out.set(local);
+        out.add(getX(), getY());
+        return out;
+    }
+
+    protected Vector2 toLocal(Vector2 out, float x, float y) {
+        out.set(x, y);
+        out.sub(getX(), getY());
+        return out;
+    }
+
+    protected Vector2 toLocal(Vector2 world) {
+        world.sub(getX(), getY());
+        return world;
     }
 }
