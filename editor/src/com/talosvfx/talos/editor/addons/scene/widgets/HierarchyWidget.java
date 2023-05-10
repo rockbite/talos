@@ -66,6 +66,8 @@ public class HierarchyWidget extends Table implements Observer, EventContextProv
 
     private GameAsset<Scene> gameAsset;
 
+    private GameObject smartSelection;
+
     public HierarchyWidget() {
         tree = new FilteredTree<>(SharedResources.skin, "modern");
         tree.draggable = true;
@@ -96,6 +98,8 @@ public class HierarchyWidget extends Table implements Observer, EventContextProv
                 SelectGameObjectExternallyEvent selectGameObjectExternallyEvent = Notifications.obtainEvent(SelectGameObjectExternallyEvent.class);
                 selectGameObjectExternallyEvent.setGameObject(gameObject);
                 Notifications.fireEvent(selectGameObjectExternallyEvent);
+
+                smartSelection = node.getObject();
             }
 
             @Override
@@ -201,12 +205,11 @@ public class HierarchyWidget extends Table implements Observer, EventContextProv
 				GlobalDragAndDrop.BaseDragAndDropPayload object = (GlobalDragAndDrop.BaseDragAndDropPayload)payload.getObject();
 				// TODO: this needs a nicer system
 
-                Selection<FilteredTree.Node<GameObject>> selection = tree.getSelection();
                 Vector2 vec = new Vector2();
                 GameObject parent;
-                if (selection.size() == 1) {
+                if (smartSelection != null) {
                     // add payload as child
-                    parent = selection.first().getObject();
+                    parent = smartSelection;
                 } else {
                     // add payload to root
                     parent = currentContainer.getSelfObject();
@@ -282,6 +285,14 @@ public class HierarchyWidget extends Table implements Observer, EventContextProv
             arraySelection.add(gameObjectNode.getObject());
         }
         return arraySelection;
+    }
+
+    public GameObject getSmartSelection () {
+        return smartSelection;
+    }
+
+    public void clearSmartSelectoin () {
+        smartSelection = null;
     }
 
     public void deleteSelected () {
@@ -628,9 +639,14 @@ public class HierarchyWidget extends Table implements Observer, EventContextProv
 
     @EventHandler
     public void onGameObjectDeleted(GameObjectDeleted event) {
-        FilteredTree.Node node = nodeMap.get(event.getTarget());
+        FilteredTree.Node<GameObject> node = nodeMap.get(event.getTarget());
         logger.warn("there can be 2 hierarchy widgets open (like prefab and scene), handle to find right instance");
         if (node != null) {
+            // reset smart selection
+            if (node.getObject() != null && node.getObject() == smartSelection) {
+                smartSelection = null;
+            }
+
             tree.remove(node);
             nodeMap.remove(event.getTarget());
         }
