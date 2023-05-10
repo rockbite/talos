@@ -3,10 +3,7 @@ package com.talosvfx.talos.runtime.scene.components;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.collision.BoundingBox;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.FloatArray;
-import com.badlogic.gdx.utils.Json;
-import com.badlogic.gdx.utils.JsonValue;
+import com.badlogic.gdx.utils.*;
 import com.esotericsoftware.spine.*;
 import com.talosvfx.talos.runtime.RuntimeContext;
 import com.talosvfx.talos.runtime.assets.GameAsset;
@@ -39,6 +36,8 @@ public class SpineRendererComponent extends RendererComponent implements Json.Se
     private String skin;
 
     public boolean applyAnimation = true;
+
+    public ObjectMap<String, GameObject> boneGOs = new ObjectMap<>();
 
     @Override
     public GameAssetType getGameAssetType () {
