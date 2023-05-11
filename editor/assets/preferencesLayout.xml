@@ -23,7 +23,7 @@
         <tab name="guides" title="Guides, Grid &amp; Slices">
             <block name="grid" title="Grid">
                 <color name="gridColor" default="ffffffff" shared-project="true">Color</color>
-<!--                <number name="subdivisions" default="5" shared-project="true">Subdivisions</number>-->
+                <number name="thicknessFactor" default="1" shared-project="true">Thickness factor</number>
             </block>
         </tab>
         <tab name="keymap" title="Keymap">
