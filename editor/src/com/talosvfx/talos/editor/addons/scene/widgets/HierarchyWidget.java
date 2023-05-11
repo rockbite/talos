@@ -485,10 +485,12 @@ public class HierarchyWidget extends Table implements Observer, EventContextProv
                 }
             }
         });
+
         MenuItem duplicate = contextualMenu.addItem("Duplicate", new ClickListener() {
             @Override
             public void clicked (InputEvent event, float x, float y) {
-
+                OrderedSet<GameObject> selection = getSelection();
+                SceneUtils.duplicate(currentContainer, selection);
             }
         });
         MenuItem delete = contextualMenu.addItem("Delete", new ClickListener() {
@@ -528,7 +530,7 @@ public class HierarchyWidget extends Table implements Observer, EventContextProv
 
         //cut copy  duplicate delete
         convertToPrefab.setDisabled(multipleObjectSelected || areWeRootOfPrefab);
-
+        group.setDisabled(multipleObjectSelected || !multipleObjectSelected);
         cut.setDisabled(areWeRootOfPrefab);
         copy.setDisabled(areWeRootOfPrefab);
         duplicate.setDisabled(areWeRootOfPrefab);

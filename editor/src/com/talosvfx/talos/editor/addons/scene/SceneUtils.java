@@ -652,6 +652,44 @@ public class SceneUtils {
 	}
 
 	/**
+	 * Hacky way to duplicate game object.
+	 */
+	public static void duplicate (GameObjectContainer container, ObjectSet<GameObject> toDuplicate) {
+		// hacky way to clone game object
+		Json json = new Json();
+		String toDuplicateData = json.toJson(toDuplicate);
+
+		try {
+			final ObjectSet<GameObject> newGameObjects = json.fromJson(ObjectSet.class, toDuplicateData);
+
+			ObjectSet<GameObject> selection = new ObjectSet<>();
+			for (GameObject newGameObject : newGameObjects) {
+				// find parent before information is lost
+				GameObject oldReference = container.getSelfObject().getChildByUUID(newGameObject.uuid);
+				GameObject parent = oldReference.getParent();
+				parent = parent != null ?  parent : container.getSelfObject();
+				parent.addGameObject(newGameObject);
+
+				// update information
+				String name = NamingUtils.getNewName(newGameObject.getName(), container.getAllGONames());
+				newGameObject.setName(name);
+				randomizeChildrenUUID(newGameObject);
+
+				if (!hierarchicallyContains(selection, newGameObject)) {
+					selection.add(newGameObject);
+				}
+
+				Notifications.fireEvent(Notifications.obtainEvent(GameObjectCreated.class).set(container, newGameObject));
+			}
+
+			// update selection
+			Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(container, selection));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
 	 * Returns common parent of provided game objects.
 	 */
 	private static GameObject getTopLevelParentFor(GameObject rootGO, ObjectSet<GameObject> gameObjects) {
