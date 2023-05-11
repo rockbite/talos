@@ -79,7 +79,6 @@ public class SpriteBatchParticleRenderer implements ParticleRenderer {
 
 	@Override
 	public void render (ParticleEffectInstance particleEffectInstance) {
-		batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE);
 
 		for (int i = 0; i < particleEffectInstance.getEmitters().size; i++) {
 			final IEmitter particleEmitter = particleEffectInstance.getEmitters().get(i);
@@ -124,8 +123,6 @@ public class SpriteBatchParticleRenderer implements ParticleRenderer {
  				batch.setShader(prevShader);
 			}
 		}
-
-		batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 	}
 
 	@Override
