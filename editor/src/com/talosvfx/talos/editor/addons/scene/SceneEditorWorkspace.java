@@ -25,7 +25,7 @@ import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.logic.IPropertyHolder;
 import com.talosvfx.talos.editor.addons.scene.logic.MultiPropertyHolder;
 import com.talosvfx.talos.editor.addons.scene.logic.PropertyWrapperProviders;
-import com.talosvfx.talos.editor.utils.InputUtils;
+import com.talosvfx.talos.editor.project2.apps.SceneHierarchyApp;
 import com.talosvfx.talos.editor.widgets.ui.gizmos.GroupSelectionGizmo;
 import com.talosvfx.talos.runtime.RuntimeContext;
 import com.talosvfx.talos.runtime.assets.GameAsset;
@@ -215,6 +215,30 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 				Vector2 pos = new Vector2(x, y);
 				String templateName = template.getAttribute("name");
 				final GameObject newObjectInstance = SceneUtils.createObjectByTypeName(currentContainer, templateName, pos, null, templateName);
+				// if possible get smart selection from hierarchy widget and
+				// add the new game object as child of that target
+
+				if (gameAsset != null) {
+					SceneHierarchyApp hierarchyApp = SharedResources.appManager.getAppForAsset(SceneHierarchyApp.class, gameAsset);
+					if (hierarchyApp != null) {
+						HierarchyWidget hierarchyWidget = hierarchyApp.getHierarchyWidget();
+						GameObject smartSelection = hierarchyWidget.getSmartSelection();
+						boolean hasTarget = smartSelection != null;
+						if (newObjectInstance != null && hasTarget) {
+							Gdx.app.postRunnable(() -> {
+								SceneUtils.repositionGameObject(currentContainer, smartSelection, newObjectInstance);
+								ObjectSet<GameObject> targets = new ObjectSet<>();
+								targets.add(newObjectInstance);
+								Notifications.fireEvent(Notifications.obtainEvent(GameObjectsRestructured.class).set(getEventContext(), targets));
+
+								Array<GameObject> toExpand = new Array<>();
+								toExpand.add(smartSelection);
+								hierarchyWidget.getTree().findExpandedObjects(toExpand);
+							});
+						}
+					}
+				}
+
 				Notifications.fireEvent(Notifications.obtainEvent(SelectGameObjectExternallyEvent.class).setGameObject(newObjectInstance));
 			}
 		});
@@ -259,11 +283,6 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 					//We support single game asset drops
 					GlobalDragAndDrop.GameAssetDragAndDropPayload gameAssetPayload = (GlobalDragAndDrop.GameAssetDragAndDropPayload)object;
 					GameObject newGameObject = null;
-					GameObject target = null;
-					if (selection.size == 1) {
-						// if ctrl key is pressed, the new GO will be child of selected target
-						target = selection.first();
-					}
 
 					if (gameAssetPayload.getGameAsset().type == GameAssetType.SPRITE) {
 						GameAsset<AtlasSprite> gameAsset = (GameAsset<AtlasSprite>)gameAssetPayload.getGameAsset();
@@ -318,19 +337,31 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
 					}
 
-					if (newGameObject != null && InputUtils.ctrlPressed()) {
-						if (target != null) {
-							SceneUtils.repositionGameObject(currentContainer, target, newGameObject);
-							ObjectSet<GameObject> targets = new ObjectSet<>();
-							targets.add(newGameObject);
-							Notifications.fireEvent(Notifications.obtainEvent(GameObjectsRestructured.class).set(getEventContext(), targets));
+					// if possible get smart selection from hierarchy widget and
+					// add the new game object as child of that target
+					if (gameAsset != null) {
+						SceneHierarchyApp hierarchyApp = SharedResources.appManager.getAppForAsset(SceneHierarchyApp.class, gameAsset);
+						if (hierarchyApp != null) {
+							HierarchyWidget hierarchyWidget = hierarchyApp.getHierarchyWidget();
+							GameObject smartSelection = hierarchyWidget.getSmartSelection();
+							boolean hasTarget = smartSelection != null;
+							if (newGameObject != null && hasTarget) {
+								final GameObject child = newGameObject;
+								Gdx.app.postRunnable(() -> {
+									SceneUtils.repositionGameObject(currentContainer, smartSelection, child);
+									ObjectSet<GameObject> targets = new ObjectSet<>();
+									targets.add(child);
+									Notifications.fireEvent(Notifications.obtainEvent(GameObjectsRestructured.class).set(getEventContext(), targets));
+
+									hierarchyWidget.getTree().findNode(child).expandTo();
+								});
+							}
 						}
 					}
 
 					return;
 				}
 				logger.info("TODO other implementations of drag drop payloads");
-
 			}
 		});
 	}
@@ -357,6 +388,16 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
 			@Override
 			public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
+				// clear smart selection
+				if (button == 0) {
+					if (gameAsset != null) {
+						SceneHierarchyApp hierarchyApp = SharedResources.appManager.getAppForAsset(SceneHierarchyApp.class, gameAsset);
+						if (hierarchyApp != null) {
+							hierarchyApp.getHierarchyWidget().clearSmartSelectoin();
+						}
+					}
+				}
+
 
 				if (mapEditorState.isEditing()) {
 					if (mapEditorState.isPainting()) {
@@ -578,19 +619,6 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		SceneUtils.convertToGroup(currentContainer, selectedObjects);
 	}
 
-	public GameObject getGameObjectForUUID (String uuid) {
-		GameObject rootGO = getRootGO();
-		if (rootGO == null) {
-			return null;
-		}
-
-		if (rootGO.uuid.toString().equals(uuid)) {
-			return rootGO;
-		}
-
-		return rootGO.getChildByUUID(uuid);
-	}
-
 	private void eraseTileAt (float x, float y) {
 		if (mapEditorState.isErasing()) {
 			int mouseCellX = gridRenderer.getMouseCellX();
@@ -783,7 +811,19 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 			return;
 		}
 
-		SceneUtils.shouldPasteToRoot(currentContainer);
+		boolean hasGameAsset = gameAsset != null;
+		boolean hasHierarchyApp = hasGameAsset && SharedResources.appManager.getAppForAsset(SceneHierarchyApp.class, gameAsset) != null;
+		boolean hasSmartSelection = hasHierarchyApp && SharedResources.appManager.getAppForAsset(SceneHierarchyApp.class, gameAsset).getHierarchyWidget().getSmartSelection() != null;
+
+		if (hasSmartSelection) {
+			SceneHierarchyApp hierarchyApp = SharedResources.appManager.getAppForAsset(SceneHierarchyApp.class, gameAsset);
+			HierarchyWidget hierarchyWidget = hierarchyApp.getHierarchyWidget();
+			GameObject smartSelection = hierarchyWidget.getSmartSelection();
+			SceneUtils.shouldPasteTo(currentContainer, smartSelection);
+		} else {
+			SceneUtils.shouldPasteToParent(currentContainer);
+		}
+
 		SceneUtils.paste(gameAsset);
 	}
 
@@ -1094,6 +1134,10 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 			unselectGizmos();
 			groupSelectionGizmo.setSelected(true);
 		}
+
+		// update internal selection state for viewport widget caused by external selection change
+		selection.clear();
+		selection.addAll(gameObjects);
 
 		// now for properties
 

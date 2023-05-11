@@ -347,7 +347,7 @@ public class SceneUtils {
 		shouldPasteToBuffer.put(container, gameObject);
 	}
 
-	public static void shouldPasteToRoot(GameObjectContainer container) {
+	public static void shouldPasteToParent(GameObjectContainer container) {
 		shouldPasteToBuffer.remove(container);
 	}
 
@@ -366,15 +366,20 @@ public class SceneUtils {
 			Vector2 offset = new Vector2(camPosAtPaste.x, camPosAtPaste.y);
 			offset.sub(payload.cameraPositionAtCopy);
 
-			GameObject shouldPasteTo = currentContainer.root;
-			if (shouldPasteToBuffer.containsKey(currentContainer)) {
-				shouldPasteTo = shouldPasteToBuffer.get(currentContainer);
-			}
-
 			ObjectSet<GameObject> selection = new ObjectSet<>();
 
 			for (int i = 0; i < payload.objects.size; i++) {
 				GameObject gameObject = payload.objects.get(i);
+
+				GameObject shouldPasteTo;
+				if (shouldPasteToBuffer.containsKey(currentContainer)) {
+					shouldPasteTo = shouldPasteToBuffer.get(currentContainer);
+				} else {
+					GameObject parent;
+					GameObject oldReference = currentContainer.root.getChildByUUID(gameObject.uuid);
+					parent = oldReference.getParent();
+					shouldPasteTo = parent != null ?  parent : currentContainer.root;
+				}
 
 				String name = NamingUtils.getNewName(gameObject.getName(), currentContainer.getAllGONames());
 
