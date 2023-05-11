@@ -619,19 +619,6 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		SceneUtils.convertToGroup(currentContainer, selectedObjects);
 	}
 
-	public GameObject getGameObjectForUUID (String uuid) {
-		GameObject rootGO = getRootGO();
-		if (rootGO == null) {
-			return null;
-		}
-
-		if (rootGO.uuid.toString().equals(uuid)) {
-			return rootGO;
-		}
-
-		return rootGO.getChildByUUID(uuid);
-	}
-
 	private void eraseTileAt (float x, float y) {
 		if (mapEditorState.isErasing()) {
 			int mouseCellX = gridRenderer.getMouseCellX();
@@ -824,7 +811,19 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 			return;
 		}
 
-		SceneUtils.shouldPasteToRoot(currentContainer);
+		boolean hasGameAsset = gameAsset != null;
+		boolean hasHierarchyApp = hasGameAsset && SharedResources.appManager.getAppForAsset(SceneHierarchyApp.class, gameAsset) != null;
+		boolean hasSmartSelection = hasHierarchyApp && SharedResources.appManager.getAppForAsset(SceneHierarchyApp.class, gameAsset).getHierarchyWidget().getSmartSelection() != null;
+
+		if (hasSmartSelection) {
+			SceneHierarchyApp hierarchyApp = SharedResources.appManager.getAppForAsset(SceneHierarchyApp.class, gameAsset);
+			HierarchyWidget hierarchyWidget = hierarchyApp.getHierarchyWidget();
+			GameObject smartSelection = hierarchyWidget.getSmartSelection();
+			SceneUtils.shouldPasteTo(currentContainer, smartSelection);
+		} else {
+			SceneUtils.shouldPasteToParent(currentContainer);
+		}
+
 		SceneUtils.paste(gameAsset);
 	}
 

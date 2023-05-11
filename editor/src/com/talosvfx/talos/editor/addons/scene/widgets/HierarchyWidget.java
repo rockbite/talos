@@ -125,7 +125,7 @@ public class HierarchyWidget extends Table implements Observer, EventContextProv
                 Notifications.fireEvent(removeFromSelectionEvent);
 
                 if (getSelection().isEmpty()) {
-                    SceneUtils.shouldPasteToRoot(currentContainer);
+                    SceneUtils.shouldPasteToParent(currentContainer);
                 }
             }
 
@@ -135,7 +135,7 @@ public class HierarchyWidget extends Table implements Observer, EventContextProv
                 RequestSelectionClearEvent requestSelectionClearEvent = Notifications.obtainEvent(RequestSelectionClearEvent.class);
                 Notifications.fireEvent(requestSelectionClearEvent);
 
-                SceneUtils.shouldPasteToRoot(currentContainer);
+                SceneUtils.shouldPasteToParent(currentContainer);
             }
 
             @Override
