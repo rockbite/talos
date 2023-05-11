@@ -25,6 +25,8 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import javafx.application.Platform;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.update4j.Configuration;
 import org.update4j.LaunchContext;
 import org.update4j.inject.InjectTarget;
@@ -32,6 +34,7 @@ import org.update4j.service.Launcher;
 import org.update4j.util.StringUtils;
 
 public class CustomLauncher implements Launcher {
+    private Logger logger = LoggerFactory.getLogger(CustomLauncher.class);
 
     public static final String DOMAIN_PREFIX = "default.launcher";
     public static final String MAIN_CLASS_PROPERTY_KEY = DOMAIN_PREFIX + ".main.class";
@@ -127,6 +130,7 @@ public class CustomLauncher implements Launcher {
                                 main.invoke(null, new Object[]{argsArray});
                             } catch (Exception e) {
                                 e.printStackTrace();
+                                logger.error("Error: Uncalled exception:" , e);
                             }
                         }
                     });
