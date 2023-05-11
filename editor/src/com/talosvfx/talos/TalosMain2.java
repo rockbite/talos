@@ -20,6 +20,7 @@ import com.talosvfx.talos.editor.notifications.commands.CommandsSystem;
 import com.talosvfx.talos.editor.notifications.events.FinishInitializingEvent;
 import com.talosvfx.talos.editor.notifications.events.ProjectLoadedEvent;
 import com.talosvfx.talos.editor.project2.*;
+import com.talosvfx.talos.editor.project2.debug.DebugUtils;
 import com.talosvfx.talos.editor.project2.localprefs.TalosLocalPrefs;
 import com.talosvfx.talos.editor.project2.input.InputHandling;
 import com.talosvfx.talos.editor.project2.savestate.GlobalSaveStateSystem;
@@ -58,6 +59,7 @@ public class TalosMain2 extends ApplicationAdapter {
 		commandsSystem = new CommandsSystem();
 
 		AssetRepository.init();
+		SharedResources.debug = new DebugUtils();
 		SharedResources.projectLoader = new ProjectLoaderImpl();
 		SharedResources.appManager = new AppManager();
 		SharedResources.inputHandling = new InputHandling();

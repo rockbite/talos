@@ -42,7 +42,7 @@ public class BongoPreview {
 	public BongoPreview () {
 		Bongo.init();
 
-		ShaderProgram.pedantic = false;
+		ShaderProgram.pedantic = true;
 
 		BaseSystem[] userSystems = {
 			new CameraControllerSystem(),

@@ -184,7 +184,7 @@ public class ShaderBuilder {
         String frag = getFragmentString(DEFAULT_TEMPLATE());
 
         ShaderProgram shaderProgram = new ShaderProgram(vert, frag);
-        shaderProgram.pedantic = false;
+        shaderProgram.pedantic = true;
         shaderProgramCache = shaderProgram;
 
         return shaderProgram;

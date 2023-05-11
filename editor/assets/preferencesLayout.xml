@@ -30,6 +30,11 @@
         <tab name="keymap" title="Keymap">
             <injectable name = "keymap">KeymapBlock</injectable>
         </tab>
+        <tab name="debug" title="Debug">
+            <block name="settings" title="Settings">
+                <boolean name = "gpuDebug" default="false"  project="true">GPU Debug</boolean>
+            </block>
+        </tab>
 
     </group>
 <!--    TODO: bring back when re-doing scripts -->

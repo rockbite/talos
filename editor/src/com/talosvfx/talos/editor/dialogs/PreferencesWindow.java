@@ -1,6 +1,7 @@
 package com.talosvfx.talos.editor.dialogs;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
@@ -9,6 +10,7 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pools;
 import com.badlogic.gdx.utils.XmlReader;
+import com.talosvfx.talos.editor.addons.scene.events.prefs.PrefChangedEvent;
 import com.talosvfx.talos.editor.dialogs.preference.tabs.*;
 import com.talosvfx.talos.editor.dialogs.preference.widgets.APrefWidget;
 import com.talosvfx.talos.editor.notifications.EventHandler;
@@ -17,6 +19,7 @@ import com.talosvfx.talos.editor.notifications.Observer;
 import com.talosvfx.talos.editor.notifications.events.FinishInitializingEvent;
 import com.talosvfx.talos.editor.notifications.events.ProjectLoadedEvent;
 import com.talosvfx.talos.editor.project2.SharedResources;
+import com.talosvfx.talos.editor.project2.localprefs.TalosLocalPrefs;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 import lombok.Getter;
 
@@ -252,6 +255,24 @@ public class PreferencesWindow extends AWindowDialog implements Observer {
         public void roundBottom () {
             this.roundBottom = true;
             updateBackground();
+        }
+    }
+
+    @EventHandler
+    public void onPrefChanged (PrefChangedEvent changedEvent) {
+        String id = changedEvent.getId();
+        if (id.equalsIgnoreCase("gpuDebug")) {
+//            SharedResources.toggleGPUDebug();
+
+            Preferences projectPrefs = TalosLocalPrefs.Instance().getProjectPrefs();
+            boolean gpuDebug = projectPrefs.getBoolean("debug.settings.gpuDebug", false);
+
+            if (gpuDebug) {
+                SharedResources.debug.enableGpuDebugging();
+            } else {
+                SharedResources.debug.disableGpuDebugging();
+            }
+
         }
     }
 

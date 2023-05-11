@@ -278,7 +278,7 @@ public class PrefWidgetFactory {
         }
 
         @Override
-        protected String writeString() {
+        protected String writeString () {
             return null;
         }
 
@@ -344,7 +344,7 @@ public class PrefWidgetFactory {
         }
 
         @Override
-        protected String writeString() {
+        protected String writeString () {
             return Boolean.toString(checkBoxWidget.isChecked());
         }
     }
@@ -384,7 +384,7 @@ public class PrefWidgetFactory {
         }
 
         @Override
-        protected String writeString() {
+        protected String writeString () {
             return Float.toString(valueWidget.getValue());
         }
     }
@@ -407,7 +407,7 @@ public class PrefWidgetFactory {
         }
 
         @Override
-        protected String writeString() {
+        protected String writeString () {
             return widget.getValue();
         }
     }
@@ -437,7 +437,7 @@ public class PrefWidgetFactory {
         }
 
         @Override
-        protected String writeString() {
+        protected String writeString () {
             return fileOpener.getPath();
         }
     }
@@ -462,7 +462,7 @@ public class PrefWidgetFactory {
         }
 
         @Override
-        protected String writeString() {
+        protected String writeString () {
             return widget.getValue().toString();
         }
     }

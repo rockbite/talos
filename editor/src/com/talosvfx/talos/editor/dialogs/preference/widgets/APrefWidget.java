@@ -2,6 +2,8 @@ package com.talosvfx.talos.editor.dialogs.preference.widgets;
 
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.XmlReader;
+import com.talosvfx.talos.editor.addons.scene.events.prefs.PrefChangedEvent;
+import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.project2.TalosProjectData;
 import com.talosvfx.talos.editor.project2.localprefs.TalosLocalPrefs;
@@ -37,6 +39,12 @@ public abstract class APrefWidget extends Table {
 
     }
 
+    public void changed () {
+        PrefChangedEvent prefChangedEvent = Notifications.obtainEvent(PrefChangedEvent.class);
+        prefChangedEvent.setId(id);
+        Notifications.fireEvent(prefChangedEvent);
+    }
+
     public void write() {
         String val = writeString();
 
@@ -52,6 +60,8 @@ public abstract class APrefWidget extends Table {
             TalosLocalPrefs.Instance().setProjectPrefs(path, val);
             TalosLocalPrefs.savePrefs();
         }
+
+        changed();
     }
 
 
@@ -107,7 +117,8 @@ public abstract class APrefWidget extends Table {
     }
 
     protected abstract void fromString(String str);
-    protected abstract String writeString();
+
+    protected abstract String writeString ();
 
 
 }
