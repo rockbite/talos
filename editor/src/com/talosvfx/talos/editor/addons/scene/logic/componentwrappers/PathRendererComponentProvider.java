@@ -27,11 +27,13 @@ public class PathRendererComponentProvider extends RendererComponentProvider<Pat
 
         PropertyWidget thicknessWidget = WidgetFactory.generate(component, "thickness", "thickness");
         PropertyWidget repeatCount = WidgetFactory.generate(component, "repeatCount", "repeat count");
+        PropertyWidget colorWidget = WidgetFactory.generate(component, "color", "Color");
 
 
         properties.add(textureWidget);
         properties.add(repeatCount);
         properties.add(thicknessWidget);
+        properties.add(colorWidget);
 
         Array<PropertyWidget> superList = super.getListOfProperties();
         properties.addAll(superList);

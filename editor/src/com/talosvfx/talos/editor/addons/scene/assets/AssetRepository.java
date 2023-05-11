@@ -457,7 +457,13 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 		RawAsset rootRawAsset = gameAssetReference.getRootRawAsset();
 		String gameAssetIdentifier = getGameAssetIdentifierFromRawAsset(rootRawAsset);
 
-		FileHandle temp = Gdx.files.local("temp");
+
+		String userHome = System.getProperty("user.home");
+		FileHandle talos = Gdx.files.absolute(userHome).child("Talos");
+		FileHandle tempDir = talos.child(".temp");
+		tempDir.mkdirs();
+
+		FileHandle temp = tempDir.child("tempForReload.txt");
 		temp.writeString(asSTring, false);
 
 		RawAsset rawAsset = new RawAsset(temp);

@@ -1,11 +1,13 @@
 package com.talosvfx.talos.editor.addons.scene.apps.routines.nodes;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.*;
 import com.talosvfx.talos.editor.nodes.NodeBoard;
 import com.talosvfx.talos.editor.nodes.NodeWidget;
@@ -126,7 +128,8 @@ public class ProbabilityChoiceWidget extends RoutineNodeWidget {
             @Override
             public void changed (ChangeEvent changeEvent, Actor actor) {
                 adjustOthersExcept(widget);
-                reportNodeDataModified();
+
+                reportNodeDataModified(widget.isFastChange());
             }
         });
 

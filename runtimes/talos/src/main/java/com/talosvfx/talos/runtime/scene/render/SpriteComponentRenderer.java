@@ -2,6 +2,7 @@ package com.talosvfx.talos.runtime.scene.render;
 
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
@@ -32,6 +33,8 @@ public class SpriteComponentRenderer extends ComponentRenderer<SpriteRendererCom
 
     @Override
     public void render (Batch batch, Camera camera, GameObject gameObject, SpriteRendererComponent rendererComponent) {
+        batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+
         TransformComponent transformComponent = gameObject.getComponent(TransformComponent.class);
 
         SpriteRendererComponent spriteRenderer = gameObject.getComponent(SpriteRendererComponent.class);

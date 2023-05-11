@@ -1,5 +1,6 @@
 package com.talosvfx.talos.runtime.scene.components;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.collision.BoundingBox;
 import com.badlogic.gdx.utils.Array;
@@ -27,6 +28,8 @@ public class RoutineRendererComponent<T extends BaseRoutineData> extends Rendere
     GameAsset<T> routineResource;
 
     GameAsset.GameAssetUpdateListener updateListener;
+
+    public Color color = new Color(Color.WHITE);
 
     @ValueProperty(prefix = {"W", "H"})
     public Vector2 viewportSize = new Vector2(6, 4);
@@ -59,6 +62,7 @@ public class RoutineRendererComponent<T extends BaseRoutineData> extends Rendere
         json.writeValue("size", viewportSize, Vector2.class);
         json.writeValue("cache", cacheCoolDown);
         json.writeValue("properties", propertyWrappers);
+        json.writeValue("color", color);
 
         requiresWrite = false;
     }
@@ -98,6 +102,16 @@ public class RoutineRendererComponent<T extends BaseRoutineData> extends Rendere
         if (viewportSize == null) viewportSize = new Vector2(6, 4);
 
         cacheCoolDown = jsonData.getFloat("cache", 0.1f);
+
+        color = json.readValue(Color.class, jsonData.get("color"));
+        if(color == null) color = new Color(Color.WHITE);
+    }
+
+
+    @Override
+    public void reset() {
+        super.reset();
+        color.set(Color.WHITE);
     }
 
     public void updatePropertyWrappers (boolean tryToMerge) {

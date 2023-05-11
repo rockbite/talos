@@ -531,6 +531,7 @@ public class RepositoryOptimizer {
 		settings.maxHeight = 2048;
 		settings.filterMag = bucket.magFilter;
 		settings.filterMin = bucket.minFilter;
+		settings.scale = new float[]{Float.parseFloat(SharedResources.currentProject.getExportPackingScale())};
 		return settings;
 	}
 

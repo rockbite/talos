@@ -38,6 +38,9 @@ public class RoutineRenderComponentProvider extends RendererComponentProvider<Ro
 		PropertyWidget cacheWidget = WidgetFactory.generate(component, "cacheCoolDown", "Cache");
 		properties.add(cacheWidget);
 
+		PropertyWidget colorWidget = WidgetFactory.generate(component, "color", "Color");
+		properties.add(colorWidget);
+
 		Array<PropertyWidget> superList = super.getListOfProperties();
 		properties.addAll(superList);
 
