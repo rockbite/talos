@@ -35,6 +35,9 @@ public class TalosProjectData implements Json.Serializable {
 	private String defaultPixelPerMeter = "100";
 
 	@Getter
+	private String exportPackingScale = "1";
+
+	@Getter
 	private String gridColor = "ffffff";
 
 	public TalosProjectData () {
@@ -99,6 +102,7 @@ public class TalosProjectData implements Json.Serializable {
 		json.writeValue("sceneData", sceneData);
 		json.writeValue("currentLayout", layoutGrid);
 		json.writeValue("defaultPixelPerMeter", defaultPixelPerMeter);
+		json.writeValue("exportPackingScale", exportPackingScale);
 		json.writeValue("gridColor", gridColor);
 	}
 
@@ -115,6 +119,7 @@ public class TalosProjectData implements Json.Serializable {
 			sceneLayer.setIndex(i);
 		}
 		defaultPixelPerMeter = jsonData.getString("defaultPixelPerMeter", "100");
+		exportPackingScale = jsonData.getString("exportPackingScale", "1");
 		gridColor = jsonData.getString("gridColor", "ffffffff");
 	}
 
