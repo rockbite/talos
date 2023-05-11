@@ -15,6 +15,8 @@ import com.talosvfx.talos.runtime.assets.*;
 import com.talosvfx.talos.runtime.assets.meta.AtlasMetadata;
 import com.talosvfx.talos.runtime.assets.meta.SpriteMetadata;
 import lombok.Data;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,6 +28,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.function.Supplier;
 
 public class RepositoryOptimizer {
+	private static final Logger logger = LoggerFactory.getLogger(RepositoryOptimizer.class);
 
 	@Data
 	public static class UnpackPayload {
@@ -250,9 +253,13 @@ public class RepositoryOptimizer {
 		boolean canSkipPacking = false;
 		if (settings.getExportPathHandle().child("assetExport.json").exists()) {
 			JsonReader reader = new JsonReader();
-			JsonValue exportInfo = reader.parse(settings.getExportPathHandle().child("assetExport.json"));
-			long prevAgeOfYoungestAsset = exportInfo.getLong("ageOfYoungestAsset", 0);
-			canSkipPacking = prevAgeOfYoungestAsset > 0 && ageOfYoungestAsset == prevAgeOfYoungestAsset;
+			try {
+				JsonValue exportInfo = reader.parse(settings.getExportPathHandle().child("assetExport.json"));
+				long prevAgeOfYoungestAsset = exportInfo.getLong("ageOfYoungestAsset", 0);
+				canSkipPacking = prevAgeOfYoungestAsset > 0 && ageOfYoungestAsset == prevAgeOfYoungestAsset;
+			} catch (SerializationException e) {
+				logger.warn("Bad old export, cannot skip packing ", e);
+			}
 		}
 
 		int i = 0;
