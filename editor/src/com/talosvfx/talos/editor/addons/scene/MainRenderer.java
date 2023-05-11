@@ -269,6 +269,7 @@ public class MainRenderer implements Observer {
                 gameObjectRenderer.renderObject(batch, gameObject);
             }
         }
+        batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
     }
 
     private void renderBrokenComponent (Batch batch, GameObject gameObject, TransformComponent transformComponent) {

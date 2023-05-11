@@ -3,6 +3,7 @@ package com.talosvfx.talos.runtime.scene;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.PolygonBatch;
@@ -332,6 +333,7 @@ public class GameObjectRenderer {
 			GameObject gameObject = state.list.get(i);
 			renderObject(batch, gameObject);
 		}
+		batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 	}
 
 	public void setCamera (Camera camera) {
