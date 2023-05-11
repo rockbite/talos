@@ -1136,6 +1136,10 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 			groupSelectionGizmo.setSelected(true);
 		}
 
+		// update internal selection state for viewport widget caused by external selection change
+		selection.clear();
+		selection.addAll(gameObjects);
+
 		// now for properties
 
 		if (gameObjects.size == 0) {
