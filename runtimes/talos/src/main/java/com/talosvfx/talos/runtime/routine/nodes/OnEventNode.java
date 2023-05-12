@@ -45,6 +45,15 @@ public class OnEventNode extends RoutineNode {
         sendSignal("onEvent");
     }
 
+    public Object queryValue(String targetPortName) {
+        for (PropertyWrapper<?> propertyWrapper : propertyWrappers) {
+            if (propertyWrapper.propertyName.equals(targetPortName)) {
+                return propertyWrapper.getValue();
+            }
+        }
+        return 0;
+    }
+
     @Override
     protected void configureNode(JsonValue properties) {
         eventName = properties.getString("eventName");
