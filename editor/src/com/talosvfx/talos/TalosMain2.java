@@ -4,7 +4,6 @@ import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.LifecycleListener;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -89,7 +88,7 @@ public class TalosMain2 extends ApplicationAdapter {
 
 		TalosVFXUtils.init();
 
-		stage = new SharedStage(new ScreenViewport(), new PolygonSpriteBatch(3000));
+		stage = new SharedStage(new ScreenViewport(), new PolygonSpriteBatchMultiTextureMULTIBIND(3000, null));
 
 		SharedResources.stage = stage;
 		SharedResources.ui = new UIController();

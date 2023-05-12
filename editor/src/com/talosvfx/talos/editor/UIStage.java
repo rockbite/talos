@@ -19,8 +19,6 @@ package com.talosvfx.talos.editor;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
-import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -103,7 +101,7 @@ public class UIStage {
 	private boolean isIn3DMode;
 
 	public UIStage (Skin skin) {
-		this.stage = new SharedStage(new ScreenViewport(), new PolygonSpriteBatch());
+		this.stage = new SharedStage(new ScreenViewport(), new PolygonSpriteBatchMultiTextureMULTIBIND());
 		this.skin = skin;
 		this.dragAndDrop = new DragAndDrop();
 	}
