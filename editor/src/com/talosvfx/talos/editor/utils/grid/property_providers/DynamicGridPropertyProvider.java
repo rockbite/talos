@@ -147,8 +147,11 @@ public class DynamicGridPropertyProvider implements GridPropertyProvider {
         zeroColor.set(Color.CYAN);
         zeroColor.a = zeroAlpha;
 
-        gridLines.add(new GridLine(new Vector2(visibleStartX, 0), new Vector2(visibleEndX, 0), shouldHighlightZero() ? zeroColor : gridMainLineColor, thickness));
-        gridLines.add(new GridLine(new Vector2(0, visibleStartY), new Vector2(0, visibleEndY), shouldHighlightZero() ? zeroColor : gridMainLineColor, thickness));
+        // thickness factor
+        float thicknessFactor = SharedResources.currentProject.getThicknessFactor();
+
+        gridLines.add(new GridLine(new Vector2(visibleStartX, 0), new Vector2(visibleEndX, 0), shouldHighlightZero() ? zeroColor : gridMainLineColor, thickness * thicknessFactor));
+        gridLines.add(new GridLine(new Vector2(0, visibleStartY), new Vector2(0, visibleEndY), shouldHighlightZero() ? zeroColor : gridMainLineColor, thickness * thicknessFactor));
 
         gridXStart = gridUnit * MathUtils.floor(visibleStartX / gridUnit) ;
 
@@ -162,17 +165,17 @@ public class DynamicGridPropertyProvider implements GridPropertyProvider {
                 for (int k = 0; k < baseLineDivisor; k++) {
                     float nextUnitSize = (gridUnit / baseLineDivisor) / baseLineDivisor;
                     gridLines.add(new GridLine(new Vector2(x1 + k * nextUnitSize, cameraY - visibleHeight / 2),
-                            new Vector2(x1 + k * nextUnitSize, cameraY + visibleHeight / 2), comingLinesColor, thickness));
+                            new Vector2(x1 + k * nextUnitSize, cameraY + visibleHeight / 2), comingLinesColor, thickness * thicknessFactor));
                 }
 
                 gridLines.add(new GridLine(new Vector2(x1, cameraY - visibleHeight / 2),
-                        new Vector2(x1, cameraY + visibleHeight / 2), smallLinesColor, thickness));
+                        new Vector2(x1, cameraY + visibleHeight / 2), smallLinesColor, thickness * thicknessFactor));
             }
 
             gridXEnd = i;
             if (i == 0) continue;
             gridLines.add(new GridLine(new Vector2(i, cameraY - visibleHeight / 2),
-                    new Vector2(i, cameraY + visibleHeight / 2), gridMainLineColor, thickness));
+                    new Vector2(i, cameraY + visibleHeight / 2), gridMainLineColor, thickness * thicknessFactor));
         }
 
         gridYStart = gridUnit * MathUtils.floor(visibleStartY / gridUnit);
@@ -185,17 +188,17 @@ public class DynamicGridPropertyProvider implements GridPropertyProvider {
                 for (int k = 0; k < baseLineDivisor; k++) {
                     float nextUnitSize = (gridUnit / baseLineDivisor) / baseLineDivisor;
                     gridLines.add(new GridLine(new Vector2(cameraX - visibleWidth / 2, y1 + k * nextUnitSize),
-                            new Vector2(cameraX + visibleWidth / 2, y1 + k * nextUnitSize), comingLinesColor, thickness));
+                            new Vector2(cameraX + visibleWidth / 2, y1 + k * nextUnitSize), comingLinesColor, thickness  * thicknessFactor));
                 }
 
                 gridLines.add(new GridLine(new Vector2(cameraX - visibleWidth / 2, y1),
-                        new Vector2(cameraX + visibleWidth / 2, y1), smallLinesColor, thickness));
+                        new Vector2(cameraX + visibleWidth / 2, y1), smallLinesColor, thickness * thicknessFactor));
             }
 
             gridYEnd = i;
             if (i == 0) continue;
             gridLines.add(new GridLine(new Vector2(cameraX - visibleWidth / 2, i),
-                    new Vector2(cameraX + visibleWidth / 2, i), gridMainLineColor, thickness));
+                    new Vector2(cameraX + visibleWidth / 2, i), gridMainLineColor, thickness * thicknessFactor));
         }
     }
 
