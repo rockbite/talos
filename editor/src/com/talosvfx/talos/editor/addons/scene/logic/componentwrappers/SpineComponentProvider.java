@@ -1,16 +1,23 @@
 package com.talosvfx.talos.editor.addons.scene.logic.componentwrappers;
 
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ObjectSet;
 import com.esotericsoftware.spine.Animation;
 import com.esotericsoftware.spine.SkeletonData;
 import com.esotericsoftware.spine.Skin;
 import com.talosvfx.talos.editor.addons.scene.SceneUtils;
+import com.talosvfx.talos.editor.addons.scene.events.GameObjectCreated;
+import com.talosvfx.talos.editor.addons.scene.events.GameObjectDeleted;
+import com.talosvfx.talos.editor.addons.scene.events.GameObjectsRestructured;
 import com.talosvfx.talos.editor.addons.scene.widgets.property.PropertyPanelAssetSelectionWidget;
+import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.SelectBoxWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.WidgetFactory;
 import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.runtime.assets.GameAssetType;
+import com.talosvfx.talos.runtime.scene.GameObject;
+import com.talosvfx.talos.runtime.scene.GameObjectContainer;
 import com.talosvfx.talos.runtime.scene.components.SpineRendererComponent;
 
 import java.util.function.Supplier;
@@ -33,7 +40,37 @@ public class SpineComponentProvider extends RendererComponentProvider<SpineRende
 		}, new PropertyWidget.ValueChanged<GameAsset<SkeletonData>>() {
 			@Override
 			public void report (GameAsset<SkeletonData> value) {
+				GameObject gameObject = component.getGameObject();
+				if (!(gameObject != null && gameObject.getGameObjectContainerRoot() != null)) {
+					component.setGameAsset(value);
+					return;
+				}
+				GameObjectContainer container = gameObject.getGameObjectContainerRoot();
+
+				// old bone game objects, that must be cleaned up from hierarchy widget.
+				ObjectSet<GameObject> oldBoneGOs = new ObjectSet<>();
+				oldBoneGOs.addAll(component.directChildrenOfRoot);
+
+				Array<GameObject> childrenToBeBackedUp = new Array<>();
+				GameObject.gatherAllChildrenAttachedToBones(gameObject, component.skeleton.getBones(), childrenToBeBackedUp);
+
+				// update asset
+				// Will move up the children of old bone gos and populate new bone game objects.
 				component.setGameAsset(value);
+
+				ObjectSet<GameObject> restructuredGOs = new ObjectSet<>();
+				restructuredGOs.addAll(childrenToBeBackedUp);
+				Notifications.fireEvent(Notifications.obtainEvent(GameObjectsRestructured.class).set(container, restructuredGOs));
+
+				// Indicate that bone game objects of old skele were removed for ui to update.
+				for (GameObject oldBoneGO : oldBoneGOs) {
+					Notifications.fireEvent(Notifications.obtainEvent(GameObjectDeleted.class).set(container, oldBoneGO));
+				}
+
+				// Bone game objects may have been created for new skele, tell ui to update.
+				for (GameObject directChildOfRootBone : component.directChildrenOfRoot) {
+					Notifications.fireEvent(Notifications.obtainEvent(GameObjectCreated.class).set(container, directChildOfRootBone));
+				}
 			}
 		}, component);
 

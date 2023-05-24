@@ -1070,14 +1070,8 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 
 	@EventHandler
 	public void onGameObjectDeleted (GameObjectDeleted event) {
-		GameObject target = event.getTarget();
-
-		GameObject parent = target.getParent();
-		parent.removeObject(target);
-
 		// remove gizmos
-		removeGizmos(target);
-
+		removeGizmos(event.getTarget());
 	}
 
 	@EventHandler

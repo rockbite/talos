@@ -134,7 +134,7 @@ public class GameObject implements GameObjectContainer, RoutineEventListener, Js
         return null;
     }
 
-    private void gatherAllChildrenAttachedToBones(GameObject parent, Array<Bone> bones, Array<GameObject> out) {
+    public static void gatherAllChildrenAttachedToBones(GameObject parent, Array<Bone> bones, Array<GameObject> out) {
         Bone attachedSpineBoneOrNull = parent.getAttachedSpineBoneOrNull();
 
         if (attachedSpineBoneOrNull != null) {
@@ -171,14 +171,8 @@ public class GameObject implements GameObjectContainer, RoutineEventListener, Js
             addComponent(component);
         }
 
-        // populate fake children
         if (hasComponent(SpineRendererComponent.class)) {
             SpineRendererComponent component = getComponent(SpineRendererComponent.class);
-            Bone rootBone = component.skeleton.getRootBone();
-            for (Bone child : rootBone.getChildren()) {
-                processBone(child, this, component);
-            }
-
             // re attach back the children of bones
             JsonValue childrenJson = jsonData.get("boneAttachedGOs");
             if(childrenJson != null) {
@@ -196,25 +190,6 @@ public class GameObject implements GameObjectContainer, RoutineEventListener, Js
                 GameObject childObject = json.readValue(GameObject.class, childJson);
                 addGameObject(childObject);
             }
-        }
-    }
-
-    private void processBone (Bone bone, GameObject parentToAdd, SpineRendererComponent component) {
-        GameObject boneGO = new GameObject();
-        String boneName = bone.getData().getName();
-        boneGO.setName(boneName);
-
-        component.boneGOs.put(boneName, boneGO);
-
-        TransformComponent transformComponent = new TransformComponent();
-        boneGO.addComponent(transformComponent);
-        BoneComponent boneComponent = new BoneComponent(bone);
-        boneGO.addComponent(boneComponent);
-
-        parentToAdd.addGameObject(boneGO);
-
-        for (Bone child : bone.getChildren()) {
-            processBone(child, boneGO, component);
         }
     }
 
