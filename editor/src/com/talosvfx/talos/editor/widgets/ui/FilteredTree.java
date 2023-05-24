@@ -352,40 +352,40 @@ public class FilteredTree<T> extends WidgetGroup {
 
     private Node<T> previousSelected;
 
-    public void addSource (final Node<T> node) {
-        if(node.draggable) {
-
+        public void addSource (final Node<T> node) {
             node.actor.setUserObject(node);
+            if(node.draggable) {
+                DragAndDrop.Source dragSource = new DragAndDrop.Source(node.actor) {
+                    @Override
+                    public DragAndDrop.Payload dragStart (InputEvent inputEvent, float v, float v1, int i) {
 
-            DragAndDrop.Source dragSource = new DragAndDrop.Source(node.actor) {
-                @Override
-                public DragAndDrop.Payload dragStart (InputEvent inputEvent, float v, float v1, int i) {
-
-                    if (!selection.contains(node)) {
-                        if (!ctrlPressed()) {
-                            clearSelection(true);
+                        if (!selection.contains(node)) {
+                            if (!ctrlPressed()) {
+                                clearSelection(true);
+                            }
+                            addNodeToSelection(node);
                         }
-                        addNodeToSelection(node);
+
+                        DragAndDrop.Payload payload = new DragAndDrop.Payload();
+
+                        Actor dragging;
+                        if (selection.size() > 0) {
+                            dragging = createPayloadFor(selection);
+                        } else if (node.actor instanceof ActorCloneable) {
+                            dragging = ((ActorCloneable) node.actor).copyActor(node.actor);
+                        } else {
+                            dragging = new Label("Dragging label", skin);
+                        }
+
+                        payload.setDragActor(dragging);
+                        payload.setObject(node);
+
+                        return payload;
                     }
+                };
+                rootDrag.addSource(dragSource);
 
-                    DragAndDrop.Payload payload = new DragAndDrop.Payload();
-
-                    Actor dragging;
-                    if (selection.size() > 0) {
-                        dragging = createPayloadFor(selection);
-                    } else if (node.actor instanceof ActorCloneable) {
-                        dragging = ((ActorCloneable) node.actor).copyActor(node.actor);
-                    } else {
-                        dragging = new Label("Dragging label", skin);
-                    }
-
-                    payload.setDragActor(dragging);
-                    payload.setObject(node);
-
-                    return payload;
-                }
-            };
-            rootDrag.addSource(dragSource);
+            }
             DragAndDrop.Target targetSource = new DragAndDrop.Target(node.actor) {
                 @Override
                 public boolean drag (DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
@@ -551,11 +551,10 @@ public class FilteredTree<T> extends WidgetGroup {
                 }
             };
             rootDrag.addTarget(targetSource);
+            for (Node child : node.children) {
+                addSource(child);
+            }
         }
-        for (Node child : node.children) {
-            addSource(child);
-        }
-    }
 
     private Actor createPayloadFor (Selection<Node<T>> selection) {
         Table mainTable = new Table();
