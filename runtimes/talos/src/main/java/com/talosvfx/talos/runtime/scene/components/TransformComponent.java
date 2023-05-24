@@ -6,7 +6,6 @@ import com.talosvfx.talos.runtime.scene.GameObject;
 import com.talosvfx.talos.runtime.scene.ValueProperty;
 
 public class TransformComponent extends AComponent {
-
     @ValueProperty(prefix = {"X", "Y"})
     public Vector2 position = new Vector2();
 

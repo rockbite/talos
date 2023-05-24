@@ -15,8 +15,6 @@ import com.talosvfx.talos.runtime.scene.ValueProperty;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Iterator;
-
 public class SpineRendererComponent extends RendererComponent implements Json.Serializable, GameResourceOwner<SkeletonData>, IColorHolder {
 
     private transient GameAsset<SkeletonData> defaultGameAsset;
