@@ -90,6 +90,13 @@ public class TalosLauncher implements ILauncher {
 				afterCreated();
 				((Lwjgl3Graphics)Gdx.graphics).setTitle("Talos - " + TALOS_BUILD.getVersion() + " " + misc);
 				TALOS_BUILD.printAll();
+
+				Thread.currentThread().setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+					@Override
+					public void uncaughtException (Thread t, Throwable e) {
+						logger.error(t.getName() + "Uncaught exception", e);
+					}
+				});
 			}
 		};
 

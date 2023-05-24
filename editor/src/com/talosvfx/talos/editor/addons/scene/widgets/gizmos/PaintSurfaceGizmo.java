@@ -170,6 +170,9 @@ public class PaintSurfaceGizmo extends Gizmo implements Observer, GameAsset.Game
 
         frameBuffer.end();
 
+        Gdx.gl.glBlendEquationSeparate(GL20.GL_FUNC_ADD, GL20.GL_FUNC_ADD);
+
+
         updateAssetFromPixmap(pixmap, true);
     }
 

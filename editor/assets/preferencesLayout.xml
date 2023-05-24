@@ -18,16 +18,22 @@
             </block>
             <block name="assets" title="Assets">
                 <number name="defaultPixelPerMeter" default="100" shared-project="true">Default Pixel Per Unit</number>
+                <number name="exportPackingScale" default="1" shared-project="true">Export Packing Scale</number>
             </block>
         </tab>
         <tab name="guides" title="Guides, Grid &amp; Slices">
             <block name="grid" title="Grid">
                 <color name="gridColor" default="ffffffff" shared-project="true">Color</color>
-<!--                <number name="subdivisions" default="5" shared-project="true">Subdivisions</number>-->
+                <number name="thicknessFactor" default="1" shared-project="true">Thickness factor</number>
             </block>
         </tab>
         <tab name="keymap" title="Keymap">
             <injectable name = "keymap">KeymapBlock</injectable>
+        </tab>
+        <tab name="debug" title="Debug">
+            <block name="settings" title="Settings">
+                <boolean name = "gpuDebug" default="false"  project="true">GPU Debug</boolean>
+            </block>
         </tab>
 
     </group>

@@ -56,7 +56,6 @@ public class CurveComponentProvider extends AComponentProvider<CurveComponent> {
 			}
 		}, component);
 
-		properties.add(cleanButton);
 		properties.add(isClosedWidget);
 
 		CheckboxWidget autoSetWidget = new CheckboxWidget("Automatic Control", new Supplier<Boolean>() {

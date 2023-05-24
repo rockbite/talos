@@ -11,16 +11,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.PixmapTextureData;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.tools.texturepacker.TexturePacker;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.GdxRuntimeException;
-import com.badlogic.gdx.utils.Json;
-import com.badlogic.gdx.utils.JsonReader;
-import com.badlogic.gdx.utils.JsonValue;
-import com.badlogic.gdx.utils.JsonWriter;
-import com.badlogic.gdx.utils.Null;
-import com.badlogic.gdx.utils.ObjectMap;
-import com.badlogic.gdx.utils.ObjectSet;
-import com.badlogic.gdx.utils.Predicate;
+import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.esotericsoftware.spine.SkeletonBinary;
@@ -104,6 +95,7 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 	private ObjectMap<GameAssetType, ObjectMap<UUID, GameAsset<?>>> uniqueIdentifierGameAssetMap = new ObjectMap<>();
 	private ObjectMap<GameAsset<AtlasSprite>, NinePatch> patchCache = new ObjectMap<>();
 	private ObjectSet<FileHandle> newFilesSeen = new ObjectSet<>();
+
 
 	public <T> GameAsset<T> getAssetForUniqueIdentifier (UUID uuid, GameAssetType type) {
 		if (uniqueIdentifierGameAssetMap.containsKey(type)) {
@@ -456,7 +448,13 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 		RawAsset rootRawAsset = gameAssetReference.getRootRawAsset();
 		String gameAssetIdentifier = getGameAssetIdentifierFromRawAsset(rootRawAsset);
 
-		FileHandle temp = Gdx.files.local("temp");
+
+		String userHome = System.getProperty("user.home");
+		FileHandle talos = Gdx.files.absolute(userHome).child("Talos");
+		FileHandle tempDir = talos.child(".temp");
+		tempDir.mkdirs();
+
+		FileHandle temp = tempDir.child("tempForReload.txt");
 		temp.writeString(asSTring, false);
 
 		RawAsset rawAsset = new RawAsset(temp);
@@ -586,7 +584,6 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 			logger.info("todo check all  other cases");
 		}
 
-
 		//Make deep copies
 		ObjectSet<GameAsset<?>> copiedAssets = new ObjectSet<>();
 		for (GameAsset<?> gameAsset : gameAssetsToExport) {
@@ -701,6 +698,12 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 			gameAssetExportStructure.gameAssets.add(assetExportStructure);
 
 		}
+
+		GameAssetExportStructure value = new GameAssetExportStructure();
+		value.type = GameAssetType.SPRITE;
+		value.identifier = "missing";
+		value.uuid = missingUUID.toString();
+		gameAssetExportStructure.gameAssets.add(value);
 	}
 
 	private ObjectSet<String> dependentGameAssetsToUUIDArray (GameAsset<?> gameAsset) {
@@ -747,7 +750,12 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 		for (AComponent component : selfObject.getComponents()) {
 			if (component instanceof GameResourceOwner) {
 				GameResourceOwner gameResourceOwner = (GameResourceOwner) component;
-				uuids.add(gameResourceOwner.getGameResource().getRootRawAsset().metaData.uuid.toString());
+				GameAsset gameResource = gameResourceOwner.getGameResource();
+				if (gameResource.isBroken()) {
+					uuids.add(missingUUID.toString());
+				} else {
+					uuids.add(gameResource.getRootRawAsset().metaData.uuid.toString());
+				}
 			}
 		}
 		Array<GameObject> gameObjects = selfObject.getGameObjects();

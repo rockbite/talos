@@ -470,10 +470,10 @@ public class GameObject implements GameObjectContainer, RoutineEventListener, Js
         return null;
     }
 
-    public GameObject getChildByUUID (String uuid) {
+    public GameObject getChildByUUID (UUID uuid) {
         for (int i = 0; i < children.size; i++) {
             GameObject child = children.get(i);
-            if (child.uuid.toString().equals(uuid)) {
+            if (child.uuid.equals(uuid)) {
                 return child;
             }
 

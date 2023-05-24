@@ -176,6 +176,11 @@
             <inputText name="eventName" type="string">Event Name</inputText>
             <container name="customParams"></container>
         </module>
+        <module name="OnEventNode" title="On Event Node" keywords="tween, system" class="OnEventNodeWidget">
+            <inputText name="eventName" type="string">Event Name</inputText>
+            <container name="customParams"></container>
+            <value port="output" name="onEvent" type="signal">on Event</value>
+        </module>
     </category>
     <category name="entities" title="Entities">
         <module name="RemoveEntityNode" title="Remove Entity" keywords="" class="RoutineNodeWidget">

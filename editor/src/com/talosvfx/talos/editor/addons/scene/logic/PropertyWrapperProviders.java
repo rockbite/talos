@@ -84,6 +84,7 @@ public class PropertyWrapperProviders {
 		//Components
 		propertyProvidersForClass.put(CameraComponent.class, CameraComponentProvider.class);
 		propertyProvidersForClass.put(CurveComponent.class, CurveComponentProvider.class);
+		propertyProvidersForClass.put(EdgeCollider2DComponent.class, EdgeCollider2DComponentProvider.class);
 		propertyProvidersForClass.put(MapComponent.class, MapComponentProvider.class);
 		propertyProvidersForClass.put(PaintSurfaceComponent.class, PaintSurfaceComponentProvider.class);
 		propertyProvidersForClass.put(ParticleComponent.class, ParticleComponentProvider.class);

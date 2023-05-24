@@ -21,6 +21,10 @@ public interface GameResourceOwner<U> {
                 json.writeValue("gameResourceExtension", gameResource.getRootRawAsset().handle.extension());
                 json.writeValue("type", gameResource.type);
                 json.writeValue("gameResourceUUID", gameResource.getRootRawAsset().metaData.uuid.toString());
+            } else {
+                json.writeValue("gameResourceExtension", "png");
+                json.writeValue("type", GameAssetType.SPRITE);
+                json.writeValue("gameResourceUUID", RuntimeAssetRepository.missingUUID.toString());
             }
         }
     }

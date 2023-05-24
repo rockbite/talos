@@ -89,6 +89,7 @@ public class PathRendererComponent extends RendererComponent implements GameReso
         json.writeValue("shouldInheritParentColor", shouldInheritParentColor());
         json.writeValue("thickness", thickness);
         json.writeValue("repeatCount", repeatCount);
+        json.writeValue("color", color);
         super.write(json);
     }
 
@@ -115,6 +116,8 @@ public class PathRendererComponent extends RendererComponent implements GameReso
 
         thickness = jsonData.getFloat("thickness", 3f);
         repeatCount = jsonData.getFloat("repeatCount", 5f);
+        color = json.readValue(Color.class, jsonData.get("color"));
+        if(color == null) color = new Color(Color.WHITE);
 
         super.read(json, jsonData);
     }
@@ -159,6 +162,12 @@ public class PathRendererComponent extends RendererComponent implements GameReso
     @Override
     public void minMaxBounds(GameObject parentEntity, BoundingBox rectangle) {
 
+    }
+
+    @Override
+    public void reset() {
+        super.reset();
+        color.set(Color.WHITE);
     }
 
     public void setPoints(Array<Vector2> controlPoints) {

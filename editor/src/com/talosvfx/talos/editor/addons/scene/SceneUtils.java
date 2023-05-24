@@ -358,7 +358,7 @@ public class SceneUtils {
 		shouldPasteToBuffer.put(container, gameObject);
 	}
 
-	public static void shouldPasteToRoot(GameObjectContainer container) {
+	public static void shouldPasteToParent(GameObjectContainer container) {
 		shouldPasteToBuffer.remove(container);
 	}
 
@@ -377,15 +377,20 @@ public class SceneUtils {
 			Vector2 offset = new Vector2(camPosAtPaste.x, camPosAtPaste.y);
 			offset.sub(payload.cameraPositionAtCopy);
 
-			GameObject shouldPasteTo = currentContainer.root;
-			if (shouldPasteToBuffer.containsKey(currentContainer)) {
-				shouldPasteTo = shouldPasteToBuffer.get(currentContainer);
-			}
-
 			ObjectSet<GameObject> selection = new ObjectSet<>();
 
 			for (int i = 0; i < payload.objects.size; i++) {
 				GameObject gameObject = payload.objects.get(i);
+
+				GameObject shouldPasteTo;
+				if (shouldPasteToBuffer.containsKey(currentContainer)) {
+					shouldPasteTo = shouldPasteToBuffer.get(currentContainer);
+				} else {
+					GameObject parent;
+					GameObject oldReference = currentContainer.root.getChildByUUID(gameObject.uuid);
+					parent = oldReference.getParent();
+					shouldPasteTo = parent != null ?  parent : currentContainer.root;
+				}
 
 				String name = NamingUtils.getNewName(gameObject.getName(), currentContainer.getAllGONames());
 
@@ -655,6 +660,44 @@ public class SceneUtils {
 	public static void lockUpdated (GameObjectContainer gameObjectContainer, GameObject gameObject) {
 		Notifications.fireEvent(Notifications.obtainEvent(GameObjectLockChanged.class).set(gameObjectContainer, gameObject));
 		markContainerChanged(gameObjectContainer);
+	}
+
+	/**
+	 * Hacky way to duplicate game object.
+	 */
+	public static void duplicate (GameObjectContainer container, ObjectSet<GameObject> toDuplicate) {
+		// hacky way to clone game object
+		Json json = new Json();
+		String toDuplicateData = json.toJson(toDuplicate);
+
+		try {
+			final ObjectSet<GameObject> newGameObjects = json.fromJson(ObjectSet.class, toDuplicateData);
+
+			ObjectSet<GameObject> selection = new ObjectSet<>();
+			for (GameObject newGameObject : newGameObjects) {
+				// find parent before information is lost
+				GameObject oldReference = container.getSelfObject().getChildByUUID(newGameObject.uuid);
+				GameObject parent = oldReference.getParent();
+				parent = parent != null ?  parent : container.getSelfObject();
+				parent.addGameObject(newGameObject);
+
+				// update information
+				String name = NamingUtils.getNewName(newGameObject.getName(), container.getAllGONames());
+				newGameObject.setName(name);
+				randomizeChildrenUUID(newGameObject);
+
+				if (!hierarchicallyContains(selection, newGameObject)) {
+					selection.add(newGameObject);
+				}
+
+				Notifications.fireEvent(Notifications.obtainEvent(GameObjectCreated.class).set(container, newGameObject));
+			}
+
+			// update selection
+			Notifications.fireEvent(Notifications.obtainEvent(GameObjectSelectionChanged.class).set(container, selection));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**

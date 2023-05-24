@@ -39,13 +39,18 @@
             <components>
                 <component className="TransformComponent"></component>
                 <component className="CurveComponent"></component>
-                <component className="PathRendererComponent"></component>
             </components>
         </template>
         <template name = "psurface" title = "Paintable Surface" nameTemplate = "Surface" keywords = "">
             <components>
                 <component className="TransformComponent"></component>
                 <component className="PaintSurfaceComponent"></component>
+            </components>
+        </template>
+        <template name = "edgeCollider" title = "EdgeCollider2D" nameTemplate = "EdgeCollider2D" keywords = "">
+            <components>
+                <component className="TransformComponent"></component>
+                <component className="EdgeCollider2DComponent"></component>
             </components>
         </template>
     </templates>
@@ -79,6 +84,11 @@
         <component className="CurveComponent">
             <gizmos>
                 <gizmo className="CurveGizmo"></gizmo>
+            </gizmos>
+        </component>
+        <component className="EdgeCollider2DComponent">
+            <gizmos>
+                <gizmo className="EdgeColliderGizmo"></gizmo>
             </gizmos>
         </component>
         <component className="PaintSurfaceComponent">

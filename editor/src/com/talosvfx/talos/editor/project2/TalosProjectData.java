@@ -2,6 +2,7 @@ package com.talosvfx.talos.editor.project2;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.*;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.layouts.LayoutGrid;
@@ -35,7 +36,11 @@ public class TalosProjectData implements Json.Serializable {
 	private String defaultPixelPerMeter = "100";
 
 	@Getter
+	private String exportPackingScale = "1";
+
+	@Getter
 	private String gridColor = "ffffff";
+	private String thicknessFactor = "1";
 
 	public TalosProjectData () {
 		layoutGrid = new LayoutGrid(SharedResources.skin);
@@ -99,7 +104,9 @@ public class TalosProjectData implements Json.Serializable {
 		json.writeValue("sceneData", sceneData);
 		json.writeValue("currentLayout", layoutGrid);
 		json.writeValue("defaultPixelPerMeter", defaultPixelPerMeter);
+		json.writeValue("exportPackingScale", exportPackingScale);
 		json.writeValue("gridColor", gridColor);
+		json.writeValue("thicknessFactor", thicknessFactor);
 	}
 
 	@Override
@@ -115,7 +122,18 @@ public class TalosProjectData implements Json.Serializable {
 			sceneLayer.setIndex(i);
 		}
 		defaultPixelPerMeter = jsonData.getString("defaultPixelPerMeter", "100");
+		exportPackingScale = jsonData.getString("exportPackingScale", "1");
 		gridColor = jsonData.getString("gridColor", "ffffffff");
+		setThicknessFactor(jsonData.getString("thicknessFactor", "1"));
+	}
+
+	public void setThicknessFactor(String thicknessFactor) {
+		float factor = Float.parseFloat(thicknessFactor);
+		factor = MathUtils.clamp(factor, 1, 5);
+		this.thicknessFactor = factor + "";
+	}
+	public float getThicknessFactor() {
+		return MathUtils.clamp(Float.parseFloat(thicknessFactor), 1f, 5f);
 	}
 
 	@Getter

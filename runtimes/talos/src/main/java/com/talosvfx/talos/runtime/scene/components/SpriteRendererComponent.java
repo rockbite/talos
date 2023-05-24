@@ -128,6 +128,11 @@ public class SpriteRendererComponent extends RendererComponent implements GameRe
             loadTextureFromIdentifier(gameResourceIdentifier);
         } else {
             loadTextureFromUniqueIdentifier(gameResourceUUID);
+            if (gameAsset.isBroken()) {
+                //fallback
+                String gameResourceIdentifier = GameResourceOwner.readGameResourceFromComponent(jsonData);
+                loadTextureFromIdentifier(gameResourceIdentifier);
+            }
         }
 
         color = json.readValue(Color.class, jsonData.get("color"));

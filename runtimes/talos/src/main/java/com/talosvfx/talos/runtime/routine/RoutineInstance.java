@@ -6,6 +6,7 @@ import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.talosvfx.talos.runtime.routine.draw.DrawableQuad;
+import com.talosvfx.talos.runtime.routine.nodes.OnEventNode;
 import com.talosvfx.talos.runtime.routine.serialization.BaseRoutineData;
 import com.talosvfx.talos.runtime.scene.GameObject;
 import com.talosvfx.talos.runtime.scene.SavableContainer;
@@ -29,6 +30,7 @@ public class RoutineInstance implements Pool.Poolable, RoutineEventListener {
     private ObjectMap<String, PropertyWrapper> properties = new ObjectMap<>();
 
     private Array<TickableNode> tickableNodes = new Array<>();
+    private Array<OnEventNode> onEventNodes = new Array<>();
 
     public IntMap<RoutineNode> lowLevelLookup = new IntMap<>();
 
@@ -211,12 +213,27 @@ public class RoutineInstance implements Pool.Poolable, RoutineEventListener {
                 if(routineNode instanceof TickableNode) {
                     tickableNodes.add((TickableNode) routineNode);
                 }
+
+                //Find us some on event nodes!
+                if (routineNode instanceof OnEventNode) {
+                    onEventNodes.add(((OnEventNode) routineNode));
+                }
             } catch (ReflectionException e) {
                 e.printStackTrace();
             }
         }
 
         configureConnections(connections, idMap);
+
+
+    }
+
+    public void postEventToNodes (String eventName, Array<PropertyWrapper<?>> propertyWrappers) {
+        for (OnEventNode onEventNode : onEventNodes) {
+            if (onEventNode.getEventName().equals(eventName)) {
+                onEventNode.fireEvent(propertyWrappers);
+            }
+        }
     }
 
     private void configureConnections(JsonValue connections, IntMap<RoutineNode> idMap) {
