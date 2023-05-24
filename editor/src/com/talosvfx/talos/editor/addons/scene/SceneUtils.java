@@ -299,9 +299,7 @@ public class SceneUtils {
 		}
 
 		for (GameObject gameObject : gameObjects) {
-			if (gameObject.parent != null) {
-				gameObject.parent.removeObject(gameObject);
-			}
+			gameObject.parent.removeObject(gameObject);
 
 			DeSelectGameObjectExternallyEvent deSelectGameObjectExternallyEvent = Notifications.obtainEvent(DeSelectGameObjectExternallyEvent.class);
 			deSelectGameObjectExternallyEvent.setGameObject(gameObject);
