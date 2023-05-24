@@ -15,6 +15,8 @@ import com.talosvfx.talos.runtime.scene.ValueProperty;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Iterator;
+
 public class SpineRendererComponent extends RendererComponent implements Json.Serializable, GameResourceOwner<SkeletonData>, IColorHolder {
 
     private transient GameAsset<SkeletonData> defaultGameAsset;
@@ -37,8 +39,8 @@ public class SpineRendererComponent extends RendererComponent implements Json.Se
 
     public boolean applyAnimation = true;
 
-    public ObjectMap<String, GameObject> boneGOs = new OrderedMap<>();
-    public ObjectSet<GameObject> directChildrenOfRoot = new ObjectSet<>();
+    private ObjectMap<String, GameObject> boneGOs = new OrderedMap<>();
+    private ObjectSet<GameObject> directChildrenOfRoot = new ObjectSet<>();
 
     @Override
     public GameAssetType getGameAssetType () {
@@ -280,5 +282,13 @@ public class SpineRendererComponent extends RendererComponent implements Json.Se
         if (animationState != null) {
             animationState.apply(skeleton);
         }
+    }
+
+    public GameObject getParentBoneGameObjectFor(String identifier) {
+        return boneGOs.get(identifier);
+    }
+
+    public ObjectSet<GameObject> getDirectChildrenOfRoot() {
+        return new ObjectSet<>(directChildrenOfRoot);
     }
 }

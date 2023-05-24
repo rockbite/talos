@@ -48,8 +48,7 @@ public class SpineComponentProvider extends RendererComponentProvider<SpineRende
 				GameObjectContainer container = gameObject.getGameObjectContainerRoot();
 
 				// old bone game objects, that must be cleaned up from hierarchy widget.
-				ObjectSet<GameObject> oldBoneGOs = new ObjectSet<>();
-				oldBoneGOs.addAll(component.directChildrenOfRoot);
+				ObjectSet<GameObject> oldBoneGOs = component.getDirectChildrenOfRoot();
 
 				Array<GameObject> childrenToBeBackedUp = new Array<>();
 				GameObject.gatherAllChildrenAttachedToBones(gameObject, component.skeleton.getBones(), childrenToBeBackedUp);
@@ -68,7 +67,7 @@ public class SpineComponentProvider extends RendererComponentProvider<SpineRende
 				}
 
 				// Bone game objects may have been created for new skele, tell ui to update.
-				for (GameObject directChildOfRootBone : component.directChildrenOfRoot) {
+				for (GameObject directChildOfRootBone : component.getDirectChildrenOfRoot()) {
 					Notifications.fireEvent(Notifications.obtainEvent(GameObjectCreated.class).set(container, directChildOfRootBone));
 				}
 			}

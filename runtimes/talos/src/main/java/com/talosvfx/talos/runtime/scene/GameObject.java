@@ -178,7 +178,7 @@ public class GameObject implements GameObjectContainer, RoutineEventListener, Js
             if(childrenJson != null) {
                 for (JsonValue childJson : childrenJson) {
                     GameObject childObject = json.readValue(GameObject.class, childJson);
-                    GameObject boneGo = component.boneGOs.get(childObject.readBoneName);
+                    GameObject boneGo = component.getParentBoneGameObjectFor(childObject.readBoneName);
                     boneGo.addGameObject(childObject);
                 }
             }

@@ -44,6 +44,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Supplier;
@@ -93,10 +94,8 @@ public class SceneUtils {
 		rendererComponent.setGameAsset(asset);
 
 		// Spine may create children bone objects, therefore should update hierarchy widget to reflect those.
-		if (!rendererComponent.directChildrenOfRoot.isEmpty()) {
-			for (GameObject directChildOfRootBone : rendererComponent.directChildrenOfRoot) {
-				Notifications.fireEvent(Notifications.obtainEvent(GameObjectCreated.class).set(gameObjectContainer, directChildOfRootBone));
-			}
+		for (GameObject directChildOfRootBone : rendererComponent.getDirectChildrenOfRoot()) {
+			Notifications.fireEvent(Notifications.obtainEvent(GameObjectCreated.class).set(gameObjectContainer, directChildOfRootBone));
 		}
 
 		Notifications.fireEvent(Notifications.obtainEvent(SelectGameObjectExternallyEvent.class).setGameObject(spineObject));
