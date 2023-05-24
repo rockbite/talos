@@ -66,19 +66,5 @@ public class SkeletonComponentRenderer extends ComponentRenderer<SpineRendererCo
 			transform.rotation = bone.getRotation();
 			transform.scale.set(bone.getScaleX(), bone.getScaleY());
 		}
-
-
-//		ShapeRenderer shapeRenderer = new ShapeRenderer();
-//		SkeletonRendererDebug skeletonRendererDebug = new SkeletonRendererDebug(shapeRenderer);
-//		batch.end();
-//
-//		skeletonRendererDebug.setScale(1/64f);
-//		shapeRenderer.setProjectionMatrix(camera.combined);
-//		skeletonRendererDebug.draw(rendererComponent.skeleton);
-//
-//		shapeRenderer.dispose();
-//
-//		batch.begin();
-
 	}
 }

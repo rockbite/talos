@@ -420,13 +420,6 @@ public class GameObject implements GameObjectContainer, RoutineEventListener, Js
             tmp.sub(parentPositionComponent.worldPosition);
             childPositionComponent.position.set(tmp);
             childPositionComponent.rotation -= parentPositionComponent.rotation;
-
-//            tmp.set(1 / parentPositionComponent.worldScale.x, 1 / parentPositionComponent.worldScale.y);
-//            childPositionComponent.position.scl(tmp);
-//
-//            tmp.set(childPositionComponent.worldScale);
-//            tmp.scl(1 / parentPositionComponent.worldScale.x, 1 / parentPositionComponent.worldScale.y);
-//            childPositionComponent.scale.set(tmp);
         }
     }
 
