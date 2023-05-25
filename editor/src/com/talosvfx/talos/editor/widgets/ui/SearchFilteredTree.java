@@ -17,6 +17,8 @@
 package com.talosvfx.talos.editor.widgets.ui;
 
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
@@ -25,6 +27,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
 
 public class SearchFilteredTree<T> extends Table {
+    private static final float AUTO_SCROLL_RANGE = 40;
+    private static final float AUTO_SCROLL_SPEED = 500;
 
     public TextField textField;
     private FilteredTree<T> filteredTree;
@@ -33,6 +37,8 @@ public class SearchFilteredTree<T> extends Table {
     private boolean autoSelect = true;
 
     private Table searchTable;
+
+    private Vector2 tmp = new Vector2();
     public SearchFilteredTree (Skin skin, final FilteredTree<T> tree, final TextField.TextFieldFilter filter) {
 
         searchTable = new Table();
@@ -47,6 +53,7 @@ public class SearchFilteredTree<T> extends Table {
         searchTable.add(textField).growX().padLeft(5);
 
         filteredTree = tree;
+        filteredTree.setSearchFilteredTree(this);
 
         add(searchTable).growX();
         row();
@@ -90,5 +97,24 @@ public class SearchFilteredTree<T> extends Table {
 
     public void setAutoSelect(boolean autoSelect) {
         this.autoSelect = autoSelect;
+    }
+
+    public void onItemHold() {
+        tmp.set(Gdx.input.getX(), Gdx.input.getY());
+        scrollPane.screenToLocalCoordinates(tmp);
+
+        if (isInTopZone(tmp.x, tmp.y)) {
+            scrollPane.setScrollY(scrollPane.getScrollY() - AUTO_SCROLL_SPEED * Gdx.graphics.getDeltaTime());
+        } else if (isInBottomZone(tmp.x, tmp.y)) {
+            scrollPane.setScrollY(scrollPane.getScrollY() + AUTO_SCROLL_SPEED * Gdx.graphics.getDeltaTime());
+        }
+    }
+
+    private boolean isInTopZone(float localX, float localY) {
+        return localY < scrollPane.getHeight() && localY > scrollPane.getHeight() -  AUTO_SCROLL_RANGE;
+    }
+
+    private boolean isInBottomZone(float localX, float localY) {
+        return localY > 0 && localY < AUTO_SCROLL_RANGE;
     }
 }

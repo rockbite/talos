@@ -52,8 +52,6 @@ public class HierarchyWidget extends Table implements Observer, EventContextProv
 
     private static final Logger logger = LoggerFactory.getLogger(HierarchyWidget.class);
 
-    private final ScrollPane scrollPane;
-
     @Getter
     private FilteredTree<GameObject> tree;
     private SearchFilteredTree<GameObject> searchFilteredTree;
@@ -80,9 +78,7 @@ public class HierarchyWidget extends Table implements Observer, EventContextProv
         top();
         defaults().top();
 
-        scrollPane = new ScrollPane(searchFilteredTree);
-
-        add(scrollPane).height(0).grow().pad(5).padRight(0);
+        add(searchFilteredTree).height(0).grow().pad(5).padRight(0);
 
         contextualMenu = new ContextualMenu();
 
@@ -680,13 +676,13 @@ public class HierarchyWidget extends Table implements Observer, EventContextProv
                     @Override
                     public void run () {
                         //Need to do it frame layer after layut
-                        float topY = scrollPane.getScrollY();
-                        float scrollHeight = scrollPane.getScrollHeight();
+                        float topY = searchFilteredTree.scrollPane.getScrollY();
+                        float scrollHeight = searchFilteredTree.scrollPane.getScrollHeight();
 
                         float positionInParent = tree.getHeight() - first.getActor().getY();
 
                         if (positionInParent < topY || positionInParent > (topY + scrollHeight)) {
-                            scrollPane.setScrollY(positionInParent - scrollHeight/2f);
+                            searchFilteredTree.scrollPane.setScrollY(positionInParent - scrollHeight/2f);
                         }
                     }
                 });
@@ -825,7 +821,7 @@ public class HierarchyWidget extends Table implements Observer, EventContextProv
     }
 
     public ScrollPane getScrollPane () {
-        return scrollPane;
+        return searchFilteredTree.scrollPane;
     }
 
     @Override
