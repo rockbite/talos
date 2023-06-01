@@ -14,6 +14,7 @@ import com.talosvfx.talos.runtime.assets.AMetadata;
 import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.runtime.assets.RawAsset;
 import com.talosvfx.talos.runtime.assets.meta.SpriteMetadata;
+import com.talosvfx.talos.runtime.graphics.NineSlice;
 import com.talosvfx.talos.runtime.scene.GameObject;
 import com.talosvfx.talos.runtime.scene.GameObjectRenderer;
 import com.talosvfx.talos.runtime.scene.components.SpriteRendererComponent;
@@ -70,7 +71,12 @@ public class SpriteComponentRenderer extends ComponentRenderer<SpriteRendererCom
                 final float height = spriteRenderer.size.y;
 
                 if (metadata != null && metadata.borderData != null && spriteRenderer.renderMode == SpriteRendererComponent.RenderMode.sliced) {
-                    NinePatch patch = RuntimeContext.getInstance().AssetRepository.obtainNinePatch(gameResource);// todo: this has to be done better
+                    NineSlice patch = RuntimeContext.getInstance().AssetRepository.obtainNinePatch(gameResource);// todo: this has to be done better
+                    float tileWidth = spriteRenderer.tileSize.x;
+                    float tileHeight = spriteRenderer.tileSize.y;
+                    patch.setTileWidth(tileWidth);
+                    patch.setTileHeight(tileHeight);
+                    patch.setRenderMode(spriteRenderer.sliceMode);
                     //todo: and this renders wrong so this needs fixing too
                     float xSign = width < 0 ? -1 : 1;
                     float ySign = height < 0 ? -1 : 1;
@@ -82,7 +88,7 @@ public class SpriteComponentRenderer extends ComponentRenderer<SpriteRendererCom
                     patch.draw(batch,
                             transformComponent.worldPosition.x - pivotX * width * xSign, transformComponent.worldPosition.y - pivotY * height * ySign,
                             pivotX * width * xSign, pivotY * height * ySign,
-                            Math.abs(width), Math.abs(height),
+                            width, height,
                             xSign * transformComponent.worldScale.x, ySign * transformComponent.worldScale.y,
                             transformComponent.worldRotation);
                 } else if (spriteRenderer.renderMode == SpriteRendererComponent.RenderMode.tiled) {

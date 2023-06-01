@@ -17,6 +17,7 @@ import com.esotericsoftware.spine.SkeletonBinary;
 import com.esotericsoftware.spine.SkeletonData;
 import com.talosvfx.talos.runtime.RuntimeContext;
 import com.talosvfx.talos.runtime.assets.meta.*;
+import com.talosvfx.talos.runtime.graphics.NineSlice;
 import com.talosvfx.talos.runtime.routine.serialization.BaseRoutineData;
 import com.talosvfx.talos.runtime.routine.serialization.RuntimeRoutineData;
 import com.talosvfx.talos.runtime.scene.Prefab;
@@ -32,7 +33,7 @@ public class RuntimeAssetRepository extends BaseAssetRepository {
 	protected ObjectMap<GameAssetType, ObjectMap<String, GameAsset<?>>> identifierToGameAssetMap = new ObjectMap<>();
 	protected ObjectMap<UUID, GameAsset<?>> uuidGameAssetObjectMap = new ObjectMap<>();
 
-	protected ObjectMap<GameAsset<AtlasSprite>, NinePatch> patchCache = new ObjectMap<>();
+	protected ObjectMap<GameAsset<AtlasSprite>, NineSlice> patchCache = new ObjectMap<>();
 
 	public RuntimeAssetRepository () {
 	}
@@ -317,12 +318,12 @@ public class RuntimeAssetRepository extends BaseAssetRepository {
 	}
 
 	@Override
-	public NinePatch obtainNinePatch (GameAsset<AtlasSprite> gameAsset) {
+	public NineSlice obtainNinePatch (GameAsset<AtlasSprite> gameAsset) {
 		if (patchCache.containsKey(gameAsset)) { //something better, maybe hash on pixel size + texture for this
 			return patchCache.get(gameAsset);
 		} else {
 			final SpriteMetadata metadata = (SpriteMetadata)gameAsset.getRootRawAsset().metaData;
-			final NinePatch patch = new NinePatch(gameAsset.getResource(), metadata.borderData[0], metadata.borderData[1], metadata.borderData[2], metadata.borderData[3]);
+			final NineSlice patch = new NineSlice(gameAsset.getResource(), metadata.borderData[0], metadata.borderData[1], metadata.borderData[2], metadata.borderData[3]);
 			patch.scale(1 / metadata.pixelsPerUnit, 1 / metadata.pixelsPerUnit); // fix this later
 			patchCache.put(gameAsset, patch);
 			return patch;
