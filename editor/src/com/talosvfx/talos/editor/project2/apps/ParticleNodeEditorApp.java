@@ -83,6 +83,7 @@ public class ParticleNodeEditorApp extends AppManager.BaseApp<VFXProjectData> im
 		moduleGraphUIWrapper = new GenericStageWrappedWidget(uiContent);
 		moduleBoardWidget.sendInUIStage(moduleGraphUIWrapper.getStage());
 		moduleBoardWidget.sendInStage(moduleGraphStageWrapper.getStage());
+		moduleBoardWidget.init();
 
 		final Table content = new Table();
 		Stack stack = new Stack(moduleGraphStageWrapper, moduleGraphUIWrapper);
@@ -316,9 +317,19 @@ public class ParticleNodeEditorApp extends AppManager.BaseApp<VFXProjectData> im
 		moduleBoardWidget.copySelectedModules();
 	}
 
+	@CommandEventHandler(commandType = Commands.CommandType.CUT)
+	public void onCutCommand (CommandContextEvent event) {
+		moduleBoardWidget.cutSelectionModules();
+	}
+
 	@CommandEventHandler(commandType = Commands.CommandType.PASTE)
 	public void onPasteCommand (CommandContextEvent event) {
 		moduleBoardWidget.pasteFromClipboard();
+	}
+
+	@CommandEventHandler(commandType = Commands.CommandType.SELECT_ALL)
+	public void onSelectAllCommand (CommandContextEvent event) {
+		moduleBoardWidget.selectAllModules();
 	}
 
 	@Override
