@@ -235,8 +235,6 @@ public class EditPanel extends Table {
 
                     editPanelListener.changed(getLeft(), getRight(), getTop(), getBottom());
                 }
-
-                image.setPosition(offset.x, offset.y);
             }
 
             @Override
@@ -296,14 +294,15 @@ public class EditPanel extends Table {
             return;
         }
 
-        bounds.x = image.getX() - image.getOriginX() * zoom + texture.getWidth() / 2f;
-        bounds.y = image.getY() - image.getOriginY() * zoom + texture.getHeight() / 2f;
+        bounds.x = image.getX();
+        bounds.y = image.getY();
         bounds.width = texture.getWidth();
         bounds.height = texture.getHeight();
 
-        image.setOrigin(Align.center);
         image.setScale(zoom);
-        image.setPosition(offset.x, offset.y);
+        float width = getWidth() > 0 ? getWidth() : WIDTH;
+        float height = getHeight() > 0 ? getHeight() : HEIGHT;
+        image.setPosition(offset.x + width / 2f - zoom * image.getWidth() / 2f, offset.y + height / 2f - zoom * image.getHeight() / 2f);
 
         if (isHorizontal(activeSide) && isVertical(activeSide)) {
             CursorUtil.setDynamicModeCursor(CursorUtil.CursorType.MOVE_ALL_DIRECTIONS);
@@ -319,17 +318,7 @@ public class EditPanel extends Table {
         this.texture = texture;
         this.image = new Image(texture);
 
-        float zoomX = WIDTH / texture.getWidth();
-        float zoomY = HEIGHT / texture.getHeight();
-        zoom = Math.min(zoomX, zoomY);
-        float longestSide = Math.max(texture.getWidth(), texture.getHeight());
-        offset.set(
-            longestSide / 2f * zoom - texture.getWidth() / 2f,
-            longestSide / 2f * zoom - texture.getHeight() / 2f
-        );
-        delta.setZero();
-        last.setZero();
-        current.setZero();
+        bringToDefaults();
         leftOffset = 0;
         rightOffset = 0;
         topOffset = 0;
@@ -474,6 +463,18 @@ public class EditPanel extends Table {
         leftOffset = 0;
         bottomOffset = 0;
         rightOffset = 0;
+    }
+
+    public void bringToDefaults() {
+        float width = getWidth() > 0 ? getWidth() : WIDTH;
+        float height = getHeight() > 0 ? getHeight() : HEIGHT;
+        float zoomX = width / texture.getWidth();
+        float zoomY = height / texture.getHeight();
+        zoom = Math.min(zoomX, zoomY) * (1.0f - 0.1f);
+        offset.set(0, 0);
+        delta.setZero();
+        last.setZero();
+        current.setZero();
     }
 
 
