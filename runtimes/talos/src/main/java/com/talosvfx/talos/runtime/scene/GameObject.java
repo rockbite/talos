@@ -2,19 +2,13 @@ package com.talosvfx.talos.runtime.scene;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.collision.BoundingBox;
-import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.Json;
-import com.badlogic.gdx.utils.JsonValue;
-import com.badlogic.gdx.utils.ObjectMap;
-import com.badlogic.gdx.utils.ObjectSet;
+import com.badlogic.gdx.utils.*;
+import com.esotericsoftware.spine.Bone;
+import com.esotericsoftware.spine.Skeleton;
 import com.talosvfx.talos.runtime.assets.GameResourceOwner;
 import com.talosvfx.talos.runtime.routine.RoutineEventInterface;
 import com.talosvfx.talos.runtime.routine.RoutineEventListener;
-import com.talosvfx.talos.runtime.scene.components.AComponent;
-import com.talosvfx.talos.runtime.scene.components.RendererComponent;
-import com.talosvfx.talos.runtime.scene.components.TransformComponent;
+import com.talosvfx.talos.runtime.scene.components.*;
 import com.talosvfx.talos.runtime.scene.utils.TransformSettings;
 import com.talosvfx.talos.runtime.scene.utils.propertyWrappers.PropertyWrapper;
 import lombok.Getter;
@@ -47,6 +41,8 @@ public class GameObject implements GameObjectContainer, RoutineEventListener, Js
 
     public boolean isPlacing;
 
+    //ready only
+    private transient String readBoneName;
 
     @Getter
     private transient TransformSettings transformSettings = new TransformSettings();
@@ -75,12 +71,43 @@ public class GameObject implements GameObjectContainer, RoutineEventListener, Js
 
     @Override
     public void write (Json json) {
+
+
+        if (hasComponent(SpineRendererComponent.class)) {
+            //deep collect and flatten of all things attached to bones
+
+            //nested search gather all GO bound to these bones, and serialize
+            SpineRendererComponent spineRendererComponent = getComponent(SpineRendererComponent.class);
+
+            if (spineRendererComponent.getGameResource().isBroken()) {
+                return;
+            }
+
+            Skeleton skeleton = spineRendererComponent.skeleton;
+            Array<Bone> bones = skeleton.getBones();
+
+            Array<GameObject> gosAttachedToBonesFromThisSkele = new Array<>();
+
+            gatherAllChildrenAttachedToBones(this, bones, gosAttachedToBonesFromThisSkele);
+
+            json.writeArrayStart("boneAttachedGOs");
+            for (GameObject boneGO : gosAttachedToBonesFromThisSkele) {
+                json.writeValue(boneGO, GameObject.class);
+            }
+            json.writeArrayEnd();
+
+        }
+
         json.writeValue("name", name);
         json.writeValue("uuid", uuid.toString());
         json.writeValue("prefabLink", prefabLink);
         json.writeValue("active", active);
         json.writeValue("visible", editorVisible);
         json.writeValue("locked", editorTransformLocked);
+        Bone attachedSpineBoneOrNull = getAttachedSpineBoneOrNull();
+        if (attachedSpineBoneOrNull != null) {
+            json.writeValue("parentBone", attachedSpineBoneOrNull.getData().getName());
+        }
 
         json.writeArrayStart("components");
         for (AComponent component : components) {
@@ -90,9 +117,38 @@ public class GameObject implements GameObjectContainer, RoutineEventListener, Js
 
         json.writeArrayStart("children");
         for (GameObject child : children) {
+            if (child.hasComponent(BoneComponent.class)) { // special case, skip
+                continue;
+            }
             json.writeValue(child, GameObject.class);
         }
         json.writeArrayEnd();
+    }
+
+    public Bone getAttachedSpineBoneOrNull () {
+        if (parent != null) {
+            if (parent.hasComponent(BoneComponent.class)) {
+                return parent.getComponent(BoneComponent.class).getBone();
+            }
+        }
+        return null;
+    }
+
+    public static void gatherAllChildrenAttachedToBones(GameObject parent, Array<Bone> bones, Array<GameObject> out) {
+        Bone attachedSpineBoneOrNull = parent.getAttachedSpineBoneOrNull();
+
+        if (attachedSpineBoneOrNull != null) {
+            if (bones.contains(attachedSpineBoneOrNull, true)) {
+
+                if (!parent.hasComponent(BoneComponent.class)) {
+                    out.add(parent);
+                    return;
+                }
+            }
+        }
+        for (GameObject gameObject : parent.getGameObjects()) {
+            gameObject.gatherAllChildrenAttachedToBones(gameObject, bones, out);
+        }
     }
 
     @Override
@@ -107,11 +163,25 @@ public class GameObject implements GameObjectContainer, RoutineEventListener, Js
         active = jsonData.getBoolean("active", this.active);
         editorTransformLocked = jsonData.getBoolean("locked", this.editorTransformLocked);
         editorVisible = jsonData.getBoolean("visible", this.editorVisible);
+        readBoneName = jsonData.getString("parentBone", null);
 
         JsonValue componentsJson = jsonData.get("components");
         for(JsonValue componentJson : componentsJson) {
             AComponent component = json.readValue(AComponent.class, componentJson);
             addComponent(component);
+        }
+
+        if (hasComponent(SpineRendererComponent.class)) {
+            SpineRendererComponent component = getComponent(SpineRendererComponent.class);
+            // re attach back the children of bones
+            JsonValue childrenJson = jsonData.get("boneAttachedGOs");
+            if(childrenJson != null) {
+                for (JsonValue childJson : childrenJson) {
+                    GameObject childObject = json.readValue(GameObject.class, childJson);
+                    GameObject boneGo = component.getParentBoneGameObjectFor(childObject.readBoneName);
+                    boneGo.addGameObject(childObject);
+                }
+            }
         }
 
         JsonValue childrenJson = jsonData.get("children");
@@ -331,21 +401,13 @@ public class GameObject implements GameObjectContainer, RoutineEventListener, Js
     }
 
 
-    public static void setPositionFromWorldPosition (GameObject object, Vector2 worldPosition, boolean changeScale, boolean changeRotation) {
+    public static void setPositionFromWorldPosition (GameObject object, Vector2 worldPosition) {
         TransformComponent transformComponent = object.getComponent(TransformComponent.class);
         transformComponent.worldPosition.set(worldPosition);
-        projectInParentSpace(object.parent, object, changeScale, changeRotation);
+        projectInParentSpace(object.parent, object);
     }
 
-    public static void setPositionFromWorldPosition (GameObject object, Vector2 worldPosition) {
-        setPositionFromWorldPosition(object, worldPosition, true, true);
-    }
-
-
-    public static void projectInParentSpace (GameObject parentToMoveTo, GameObject childThatHasMoved) {
-        projectInParentSpace(parentToMoveTo, childThatHasMoved, true, true);
-    }
-    public static void projectInParentSpace(GameObject parentToMoveTo, GameObject childThatHasMoved, boolean changeScale, boolean changeRotation) {
+    public static void projectInParentSpace(GameObject parentToMoveTo, GameObject childThatHasMoved) {
         if (childThatHasMoved.hasComponent(TransformComponent.class)) {
             TransformComponent childPositionComponent = childThatHasMoved.getComponent(TransformComponent.class);
             TransformComponent parentPositionComponent = new TransformComponent();
@@ -358,13 +420,6 @@ public class GameObject implements GameObjectContainer, RoutineEventListener, Js
             tmp.sub(parentPositionComponent.worldPosition);
             childPositionComponent.position.set(tmp);
             childPositionComponent.rotation -= parentPositionComponent.rotation;
-
-            tmp.set(1 / parentPositionComponent.worldScale.x, 1 / parentPositionComponent.worldScale.y);
-            childPositionComponent.position.scl(tmp);
-
-            tmp.set(childPositionComponent.worldScale);
-            tmp.scl(1 / parentPositionComponent.worldScale.x, 1 / parentPositionComponent.worldScale.y);
-            childPositionComponent.scale.set(tmp);
         }
     }
 

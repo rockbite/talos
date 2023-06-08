@@ -358,6 +358,11 @@ public class NinepatchEditingWindow extends SpriteEditorWindow {
         SharedResources.stage.setScrollFocus(editPanel);
     }
 
+    @Override
+    public void show() {
+        editPanel.bringToDefaults();
+    }
+
     public interface SpriteMetadataListener {
         void changed(int left, int right, int top, int bottom);
     }

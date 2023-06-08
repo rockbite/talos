@@ -44,6 +44,7 @@ import com.talosvfx.talos.editor.widgets.ui.EditableLabel;
 import com.talosvfx.talos.editor.widgets.ui.FilteredTree;
 import com.talosvfx.talos.runtime.scene.Prefab;
 import com.talosvfx.talos.runtime.scene.Scene;
+import com.talosvfx.talos.runtime.scene.components.BoneComponent;
 import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,8 +52,6 @@ import org.slf4j.LoggerFactory;
 public class HierarchyWidget extends Table implements Observer, EventContextProvider<GameObjectContainer> {
 
     private static final Logger logger = LoggerFactory.getLogger(HierarchyWidget.class);
-
-    private final ScrollPane scrollPane;
 
     @Getter
     private FilteredTree<GameObject> tree;
@@ -80,9 +79,7 @@ public class HierarchyWidget extends Table implements Observer, EventContextProv
         top();
         defaults().top();
 
-        scrollPane = new ScrollPane(searchFilteredTree);
-
-        add(scrollPane).height(0).grow().pad(5).padRight(0);
+        add(searchFilteredTree).height(0).grow().pad(5).padRight(0);
 
         contextualMenu = new ContextualMenu();
 
@@ -680,13 +677,13 @@ public class HierarchyWidget extends Table implements Observer, EventContextProv
                     @Override
                     public void run () {
                         //Need to do it frame layer after layut
-                        float topY = scrollPane.getScrollY();
-                        float scrollHeight = scrollPane.getScrollHeight();
+                        float topY = searchFilteredTree.scrollPane.getScrollY();
+                        float scrollHeight = searchFilteredTree.scrollPane.getScrollHeight();
 
                         float positionInParent = tree.getHeight() - first.getActor().getY();
 
                         if (positionInParent < topY || positionInParent > (topY + scrollHeight)) {
-                            scrollPane.setScrollY(positionInParent - scrollHeight/2f);
+                            searchFilteredTree.scrollPane.setScrollY(positionInParent - scrollHeight/2f);
                         }
                     }
                 });
@@ -743,36 +740,51 @@ public class HierarchyWidget extends Table implements Observer, EventContextProv
     }
 
     private FilteredTree.Node<GameObject> createNodeForGameObject (GameObject gameObject) {
-        EditableLabel editableLabel = new EditableLabel(gameObject.getName(), SharedResources.skin);
-        editableLabel.setStage(getStage());
+        Actor nodeTitle;
+        if (gameObject.hasComponent(BoneComponent.class)) { // cannot edit name, set simple label
+            Label label = new Label(gameObject.getName(), SharedResources.skin);
+            nodeTitle = label;
+            nodeTitle.setColor(179/255.f, 179/255.f, 179/255.f, 1);
+        } else {
+            EditableLabel editableLabel = new EditableLabel(gameObject.getName(), SharedResources.skin);
+            nodeTitle = editableLabel;
+            editableLabel.setStage(getStage());
 
-        editableLabel.setListener(new EditableLabel.EditableLabelChangeListener() {
-            @Override
-            public void editModeStarted () {
+            editableLabel.setListener(new EditableLabel.EditableLabelChangeListener() {
+                @Override
+                public void editModeStarted () {
 
-            }
+                }
 
-            @Override
-            public void changed (String newText) {
-                String oldName = gameObject.getName();
+                @Override
+                public void changed (String newText) {
+                    String oldName = gameObject.getName();
 
-                gameObject.setName(newText);
+                    gameObject.setName(newText);
 
-                GameObjectNameChanged gameObjectNameChanged = Notifications.obtainEvent(GameObjectNameChanged.class);
-                gameObjectNameChanged.target = gameObject;
-                gameObjectNameChanged.newName = newText;
-                gameObjectNameChanged.oldName = oldName;
-                Notifications.fireEvent(gameObjectNameChanged);
+                    GameObjectNameChanged gameObjectNameChanged = Notifications.obtainEvent(GameObjectNameChanged.class);
+                    gameObjectNameChanged.target = gameObject;
+                    gameObjectNameChanged.newName = newText;
+                    gameObjectNameChanged.oldName = oldName;
+                    Notifications.fireEvent(gameObjectNameChanged);
 
-                SceneUtils.markContainerChanged(currentContainer);
-            }
-        });
+                    SceneUtils.markContainerChanged(currentContainer);
+                }
+            });
+        }
 
-        FilteredTree.Node<GameObject> newNode = new FilteredTree.Node<>(gameObject.getName(), makeHierarchyWidgetActor(editableLabel, gameObject));
+        FilteredTree.Node<GameObject> newNode = new FilteredTree.Node<>(gameObject.getName(), makeHierarchyWidgetActor(nodeTitle, gameObject));
         newNode.setObject(gameObject);
-        newNode.setCompanionActor(createToolsForNode(newNode));
-
-        newNode.draggable = true;
+        if (gameObject.hasComponent(BoneComponent.class)) {
+            newNode.draggable = false;
+            // no tools for fake bone game object, give it dummy table
+            Table dummyTools = new Table();
+            dummyTools.setSize(37, 15);
+            newNode.setCompanionActor(dummyTools);
+        } else {
+            newNode.draggable = true;
+            newNode.setCompanionActor(createToolsForNode(newNode));
+        }
 
         return newNode;
     }
@@ -825,7 +837,7 @@ public class HierarchyWidget extends Table implements Observer, EventContextProv
     }
 
     public ScrollPane getScrollPane () {
-        return scrollPane;
+        return searchFilteredTree.scrollPane;
     }
 
     @Override

@@ -2,6 +2,8 @@ package com.talosvfx.talos.editor.project2.apps;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.talosvfx.talos.editor.notifications.Notifications;
+import com.talosvfx.talos.editor.notifications.Observer;
 import com.talosvfx.talos.editor.project2.apps.preferences.ContainerOfPrefs;
 import com.talosvfx.talos.editor.project2.apps.preferences.ProjectExplorerPreferences;
 import com.talosvfx.talos.editor.project2.localprefs.TalosLocalPrefs;
@@ -15,12 +17,13 @@ import com.talosvfx.talos.editor.project2.AppManager;
 import com.talosvfx.talos.editor.project2.SharedResources;
 
 @SingletonApp
-public class ProjectExplorerApp extends AppManager.BaseApp<Object> implements ContainerOfPrefs<ProjectExplorerPreferences> {
+public class ProjectExplorerApp extends AppManager.BaseApp<Object> implements ContainerOfPrefs<ProjectExplorerPreferences>, Observer {
 
 	private final ProjectExplorerWidget projectExplorerWidget;
 
 	public ProjectExplorerApp () {
 		super.updateForGameAsset(gameAsset);
+		Notifications.registerObserver(this);
 
 		projectExplorerWidget = new ProjectExplorerWidget();
 		DummyLayoutApp<Object> assetDirectoryApp = new DummyLayoutApp<Object>(SharedResources.skin, this, getAppName()) {
