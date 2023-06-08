@@ -95,28 +95,23 @@ public class NineSlice extends NinePatch {
 
     /** Construct a degenerate "nine" patch with only a center component. */
     public NineSlice(TextureRegion region) {
-        this(//
-                null, null, null, //
-                null, region, null, //
-                null, null, null //
-        );
+        super(new TextureRegion[]{
+                null, null, null,
+                null, region, null,
+                null, null, null
+        });
+
+        this.patches[BOTTOM_LEFT] = null;
+        this.patches[BOTTOM_CENTER] = null;
+        this.patches[BOTTOM_RIGHT] = null;
+        this.patches[MIDDLE_LEFT] = null;
+        this.patches[MIDDLE_CENTER] = region;
+        this.patches[MIDDLE_RIGHT] = null;
+        this.patches[TOP_LEFT] = null;
+        this.patches[TOP_CENTER] = null;
+        this.patches[TOP_RIGHT] = null;
     }
 
-    /** Construct a nine patch from the given nine texture regions. The provided patches must be consistently sized (e.g., any left
-     * edge textures must have the same width, etc). Patches may be <code>null</code>. Patch indices are specified via the public
-     * members {@link #TOP_LEFT}, {@link #TOP_CENTER}, etc. */
-    public NineSlice(TextureRegion... patches) {
-        super(patches);
-        this.patches[BOTTOM_LEFT] = patches[BOTTOM_LEFT];
-        this.patches[BOTTOM_CENTER] = patches[BOTTOM_CENTER];
-        this.patches[BOTTOM_RIGHT] = patches[BOTTOM_RIGHT];
-        this.patches[MIDDLE_LEFT] = patches[MIDDLE_LEFT];
-        this.patches[MIDDLE_CENTER] = patches[MIDDLE_CENTER];
-        this.patches[MIDDLE_RIGHT] = patches[MIDDLE_RIGHT];
-        this.patches[TOP_LEFT] = patches[TOP_LEFT];
-        this.patches[TOP_CENTER] = patches[TOP_CENTER];
-        this.patches[TOP_RIGHT] = patches[TOP_RIGHT];
-    }
 
     @Override
     public void draw(Batch batch, float x, float y, float width, float height) {
@@ -341,8 +336,8 @@ public class NineSlice extends NinePatch {
     }
 
     public void setTileSize (float tileWidth, float tileHeight) {
-        this.tileWidth = tileWidth;
-        this.tileHeight = tileHeight;
+        setTileWidth(tileWidth);
+        setTileHeight(tileHeight);
     }
 
     public void setRenderMode(RenderMode mode) {
