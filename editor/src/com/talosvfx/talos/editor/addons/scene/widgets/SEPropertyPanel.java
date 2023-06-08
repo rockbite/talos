@@ -64,6 +64,11 @@ public class SEPropertyPanel extends PropertyPanel {
 
         if (target instanceof GameObjectPropertyHolder) {
             final GameObjectPropertyHolder gameObjectPropertyHolder = (GameObjectPropertyHolder) target;
+
+            if (gameObjectPropertyHolder.getGameObject().hasComponent(BoneComponent.class)) {
+                return;
+            }
+
             // add part with custom components
 
             container.row();

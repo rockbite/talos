@@ -92,6 +92,11 @@ public class SceneUtils {
 		}
 		rendererComponent.setGameAsset(asset);
 
+		// Spine may create children bone objects, therefore should update hierarchy widget to reflect those.
+		for (GameObject directChildOfRootBone : rendererComponent.getDirectChildrenOfRoot()) {
+			Notifications.fireEvent(Notifications.obtainEvent(GameObjectCreated.class).set(gameObjectContainer, directChildOfRootBone));
+		}
+
 		Notifications.fireEvent(Notifications.obtainEvent(SelectGameObjectExternallyEvent.class).setGameObject(spineObject));
 
 		return spineObject;
@@ -293,6 +298,8 @@ public class SceneUtils {
 		}
 
 		for (GameObject gameObject : gameObjects) {
+			gameObject.parent.removeObject(gameObject);
+
 			DeSelectGameObjectExternallyEvent deSelectGameObjectExternallyEvent = Notifications.obtainEvent(DeSelectGameObjectExternallyEvent.class);
 			deSelectGameObjectExternallyEvent.setGameObject(gameObject);
 			Notifications.fireEvent(deSelectGameObjectExternallyEvent);

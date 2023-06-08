@@ -3,10 +3,7 @@ package com.talosvfx.talos.runtime.scene.components;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.collision.BoundingBox;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.FloatArray;
-import com.badlogic.gdx.utils.Json;
-import com.badlogic.gdx.utils.JsonValue;
+import com.badlogic.gdx.utils.*;
 import com.esotericsoftware.spine.*;
 import com.talosvfx.talos.runtime.RuntimeContext;
 import com.talosvfx.talos.runtime.assets.GameAsset;
@@ -39,6 +36,9 @@ public class SpineRendererComponent extends RendererComponent implements Json.Se
     private String skin;
 
     public boolean applyAnimation = true;
+
+    private ObjectMap<String, GameObject> boneGOs = new OrderedMap<>();
+    private ObjectSet<GameObject> directChildrenOfRoot = new ObjectSet<>();
 
     @Override
     public GameAssetType getGameAssetType () {
@@ -122,11 +122,15 @@ public class SpineRendererComponent extends RendererComponent implements Json.Se
             if (animations.size > 0) {
                 animationState.setAnimation(0, animations.peek(), true);
             }
+
+            populateBoneGameObjects();
         }
     }
 
     @Override
     public void setGameAsset (GameAsset<SkeletonData> gameAsset) {
+        backupChildrenOfBones();
+
         this.gameAsset = gameAsset;
 
         if(defaultGameAsset == null && !gameAsset.isBroken()){
@@ -140,6 +144,83 @@ public class SpineRendererComponent extends RendererComponent implements Json.Se
             }
         });
         createSkeletonFromGameAsset();
+    }
+
+    /**
+     * Two conditions must be met to backup the children of bones.
+     * Condition1 = should have a skeleton data
+     * Condition2 = should be attached to game object
+     */
+    private void backupChildrenOfBones() {
+        boolean hasSkeletonData = skeleton != null;
+        GameObject gameObject = getGameObject();
+        boolean isAttachedToGameObject = gameObject != null;
+
+        if (!(hasSkeletonData && isAttachedToGameObject)) {
+            return;
+        }
+
+        // if game objects, where attached to bones, move them up to not lose
+        Array<GameObject> gosAttachedToBonesFromThisSkele = new Array<>();
+        GameObject.gatherAllChildrenAttachedToBones(gameObject, skeleton.getBones(), gosAttachedToBonesFromThisSkele);
+
+        for (GameObject child : gosAttachedToBonesFromThisSkele) {
+            child.parent.removeObject(child);
+            gameObject.addGameObject(child);
+        }
+    }
+
+    @Override
+    public void setGameObject(GameObject gameObject) {
+        super.setGameObject(gameObject);
+        populateBoneGameObjects();
+    }
+
+    /**
+     * Two conditions must be met to populate bone game objects.
+     * Condition1 = should have a skeleton data
+     * Condition2 = should be attached to game object
+     */
+    private void populateBoneGameObjects () {
+        boolean hasSkeletonData = skeleton != null;
+        boolean isAttachedToGameObject = getGameObject() != null;
+
+        if (!(hasSkeletonData && isAttachedToGameObject)) {
+            return;
+        }
+
+        System.out.println("Populating GameObjects for " + skeleton.getData().getName());
+
+        // clear old bones in map
+        boneGOs.clear();
+        directChildrenOfRoot.clear();
+
+        Bone rootBone = skeleton.getRootBone();
+        for (Bone child : rootBone.getChildren()) {
+            GameObject directChildOfRootBone = processBone(child, getGameObject(), this);
+            directChildrenOfRoot.add(directChildOfRootBone);
+        }
+    }
+
+    private GameObject processBone (Bone bone, GameObject parentToAdd, SpineRendererComponent component) {
+        GameObject boneGO = new GameObject();
+        String boneName = bone.getData().getName();
+        boneGO.setName(boneName);
+
+        component.boneGOs.put(boneName, boneGO);
+
+        TransformComponent transformComponent = new TransformComponent();
+        boneGO.addComponent(transformComponent);
+        BoneComponent boneComponent = new BoneComponent(bone);
+        boneGO.addComponent(boneComponent);
+
+        parentToAdd.addGameObject(boneGO);
+
+        for (Bone child : bone.getChildren()) {
+            processBone(child, boneGO, component);
+        }
+
+        return boneGO;
     }
 
     Vector2 vec = new Vector2();
@@ -199,5 +280,13 @@ public class SpineRendererComponent extends RendererComponent implements Json.Se
         if (animationState != null) {
             animationState.apply(skeleton);
         }
+    }
+
+    public GameObject getParentBoneGameObjectFor(String identifier) {
+        return boneGOs.get(identifier);
+    }
+
+    public ObjectSet<GameObject> getDirectChildrenOfRoot() {
+        return new ObjectSet<>(directChildrenOfRoot);
     }
 }
