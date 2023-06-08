@@ -39,6 +39,8 @@ public abstract class DynamicNodeStage<T extends DynamicNodeStageData> extends W
     public GameAsset<T> gameAsset;
     public T data;
 
+    public boolean shouldAutoMove;
+
     public DynamicNodeStage (Skin skin) {
         super();
         this.skin = skin;
@@ -276,4 +278,8 @@ public abstract class DynamicNodeStage<T extends DynamicNodeStageData> extends W
     }
 
     public abstract void onNodeSelectionChange ();
+
+    public boolean shouldAutoMove() {
+        return shouldAutoMove;
+    }
 }
