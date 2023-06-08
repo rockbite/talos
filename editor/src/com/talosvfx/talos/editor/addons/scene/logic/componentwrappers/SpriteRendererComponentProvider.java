@@ -14,6 +14,7 @@ import com.talosvfx.talos.editor.widgets.propertyWidgets.Vector2PropertyWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.WidgetFactory;
 import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.runtime.assets.GameAssetType;
+import com.talosvfx.talos.runtime.graphics.NineSlice;
 import com.talosvfx.talos.runtime.scene.GameObject;
 import com.talosvfx.talos.runtime.scene.components.SpriteRendererComponent;
 
@@ -41,12 +42,35 @@ public final class SpriteRendererComponentProvider extends RendererComponentProv
 		PropertyWidget fixAspectRatioWidget = WidgetFactory.generate(component, "fixAspectRatio", "Fix Aspect Ratio");
 		PropertyWidget renderModesWidget = WidgetFactory.generate(component, "renderMode", "Render Mode");
 		sizeWidget = (Vector2PropertyWidget) WidgetFactory.generate(component, "size", "Size");
+		PropertyWidget slicedModsWidget = WidgetFactory.generate(component, "sliceMode", "Slice Mode");
 		PropertyWidget tileSizeWidget = WidgetFactory.generate(component, "tileSize", "Tile Size");
 
+		tileSizeWidget.setVisible(component.renderMode == SpriteRendererComponent.RenderMode.tiled
+				|| (component.renderMode == SpriteRendererComponent.RenderMode.sliced && component.sliceMode == NineSlice.RenderMode.Tiled));
+		slicedModsWidget.setVisible(component.renderMode == SpriteRendererComponent.RenderMode.sliced);
 		renderModesWidget.addListener(new ChangeListener() {
 			@Override
 			public void changed (ChangeEvent event, Actor actor) {
-				if (component.renderMode == SpriteRendererComponent.RenderMode.tiled) {
+				if (component.renderMode == SpriteRendererComponent.RenderMode.tiled
+						|| (component.renderMode == SpriteRendererComponent.RenderMode.sliced && component.sliceMode == NineSlice.RenderMode.Tiled) ) {
+					tileSizeWidget.setVisible(true);
+				} else {
+					tileSizeWidget.setVisible(false);
+				}
+
+				if (component.renderMode == SpriteRendererComponent.RenderMode.sliced) {
+					slicedModsWidget.setVisible(true);
+				} else {
+					slicedModsWidget.setVisible(false);
+				}
+			}
+		});
+
+		slicedModsWidget.addListener(new ChangeListener() {
+			@Override
+			public void changed (ChangeEvent event, Actor actor) {
+				if (component.renderMode == SpriteRendererComponent.RenderMode.tiled
+						|| (component.renderMode == SpriteRendererComponent.RenderMode.sliced && component.sliceMode == NineSlice.RenderMode.Tiled) ) {
 					tileSizeWidget.setVisible(true);
 				} else {
 					tileSizeWidget.setVisible(false);
@@ -100,6 +124,7 @@ public final class SpriteRendererComponentProvider extends RendererComponentProv
 		properties.add(flipXWidget);
 		properties.add(flipYWidget);
 		properties.add(renderModesWidget);
+		properties.add(slicedModsWidget);
 
 		Array<PropertyWidget> superList = super.getListOfProperties();
 		properties.addAll(superList);
