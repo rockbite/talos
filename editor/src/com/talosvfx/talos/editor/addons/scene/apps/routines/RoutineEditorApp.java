@@ -1,6 +1,9 @@
 package com.talosvfx.talos.editor.addons.scene.apps.routines;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -39,17 +42,61 @@ public class RoutineEditorApp extends AppManager.BaseApp<RoutineStageData> imple
         Notifications.registerObserver(this);
         routineStage = new RoutineStage(this, SharedResources.skin);
         routineStageWrapper = new GenericStageWrappedViewportWidget(routineStage.getRootActor()) {
+            private static final float AUTO_SCROLL_RANGE = 45.0f;
+            private static final float AUTO_SCROLL_SPEED = 200.0f;
 
             @Override
             protected boolean canMoveAround() {
                 return true;
             }
 
+            private Vector2 tmp = new Vector2();
+
             @Override
             public void act(float delta) {
                 super.act(delta);
 
+                tmp.set(Gdx.input.getX(), Gdx.input.getY());
+                screenToLocalCoordinates(tmp);
+
+                float dt = Gdx.graphics.getDeltaTime();
+                OrthographicCamera camera = (OrthographicCamera) routineStageWrapper.getViewportViewSettings().getCurrentCamera();
+
+                if (routineStage.shouldAutoMove()) {
+                    tmp.set(Gdx.input.getX(), Gdx.input.getY());
+                    routineStageWrapper.screenToLocalCoordinates(tmp);
+
+                    if (isInTopZone(tmp)) {
+                        camera.translate(0, camera.zoom * AUTO_SCROLL_SPEED * dt, 0);
+                    } else if (isInBottomZone(tmp)) {
+                        camera.translate(0, camera.zoom * -AUTO_SCROLL_SPEED * dt, 0);
+                    }
+
+                    if (isInLeftZone(tmp)) {
+                        camera.translate(camera.zoom * AUTO_SCROLL_SPEED * dt, 0, 0);
+                    } else if (isInRightZone(tmp)) {
+                        camera.translate(camera.zoom * -AUTO_SCROLL_SPEED * dt, 0, 0);
+                    }
+                }
+
                 routineStage.act();
+            }
+
+
+            private boolean isInRightZone(Vector2 mouse) {
+                return mouse.x > 0 && mouse.x < AUTO_SCROLL_RANGE;
+            }
+
+            private boolean isInLeftZone(Vector2 mouse) {
+                return mouse.x > routineStageWrapper.getWidth() - AUTO_SCROLL_RANGE && mouse.x < routineStageWrapper.getWidth();
+            }
+
+            private boolean isInBottomZone(Vector2 mouse) {
+                return mouse.y > 0 && mouse.y < AUTO_SCROLL_RANGE;
+            }
+
+            private boolean isInTopZone(Vector2 mouse) {
+                return mouse.y > routineStageWrapper.getHeight() - AUTO_SCROLL_RANGE && mouse.y < routineStageWrapper.getHeight();
             }
         };
         routineStageWrapper.getDropdownForWorld().setVisible(false);

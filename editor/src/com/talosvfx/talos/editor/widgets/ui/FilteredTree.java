@@ -17,7 +17,6 @@
 package com.talosvfx.talos.editor.widgets.ui;
 
 
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.MathUtils;
@@ -74,6 +73,8 @@ public class FilteredTree<T> extends WidgetGroup {
     public boolean draggable;
     private int autoSelectionIndex = 0;
 
+    private SearchFilteredTree<?> searchFilteredTree;
+
     public FilteredTree (Skin skin) {
         this(skin.get(TreeStyle.class));
         this.skin = skin;
@@ -87,6 +88,16 @@ public class FilteredTree<T> extends WidgetGroup {
 
     public void removeItemListener (ItemListener<T> filterTreeListener) {
         boolean b = itemListeners.removeValue(filterTreeListener, true);
+    }
+
+    public void setSearchFilteredTree(SearchFilteredTree<?> searchFilteredTree) {
+        this.searchFilteredTree = searchFilteredTree;
+    }
+
+    private void onItemHold() {
+        if (searchFilteredTree != null) {
+            searchFilteredTree.onItemHold();
+        }
     }
 
     public static abstract class ItemListener<T> {
@@ -352,6 +363,16 @@ public class FilteredTree<T> extends WidgetGroup {
 
     private Node<T> previousSelected;
 
+    private boolean holdingItem = false;
+
+    @Override
+    public void act(float delta) {
+        super.act(delta);
+        if (holdingItem) {
+            onItemHold();
+        }
+    }
+
     public void addSource (final Node<T> node) {
         if(node.draggable) {
 
@@ -382,7 +403,15 @@ public class FilteredTree<T> extends WidgetGroup {
                     payload.setDragActor(dragging);
                     payload.setObject(node);
 
+                    holdingItem = true;
+
                     return payload;
+                }
+
+                @Override
+                public void dragStop(InputEvent event, float x, float y, int pointer, DragAndDrop.Payload payload, DragAndDrop.Target target) {
+                    super.dragStop(event, x, y, pointer, payload, target);
+                    holdingItem = false;
                 }
             };
             rootDrag.addSource(dragSource);

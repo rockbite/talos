@@ -14,9 +14,9 @@ public class SpriteEditorWindow extends Table {
         this.spriteEditor = spriteEditor;
     }
 
-    public void setScrollFocus() {
+    public void setScrollFocus() { }
 
-    }
+    public void show () { }
 
     public void updateForGameAsset (GameAsset<AtlasSprite> gameAsset) {
         this.gameAsset = gameAsset;

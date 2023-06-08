@@ -24,7 +24,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.ui.WidgetGroup;
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
@@ -35,6 +35,7 @@ import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.project2.TalosVFXUtils;
 import com.talosvfx.talos.editor.project2.apps.ParticleNodeEditorApp;
 import com.talosvfx.talos.editor.render.Render;
+import com.talosvfx.talos.editor.utils.InputUtils;
 import com.talosvfx.talos.runtime.vfx.serialization.ConnectionData;
 import com.talosvfx.talos.editor.serialization.EmitterData;
 import com.talosvfx.talos.editor.wrappers.*;
@@ -68,7 +69,6 @@ public class ModuleBoardWidget extends WidgetGroup {
     Vector2 tmp2 = new Vector2();
     Vector2 prev = new Vector2();
 
-
     private Curve activeCurve;
 
     private Bezier<Vector2> bezier = new Bezier<>();
@@ -81,6 +81,8 @@ public class ModuleBoardWidget extends WidgetGroup {
     private int ccFromSlot = 0;
     private boolean ccCurrentIsInput = false;
     public boolean ccCurrentlyRemoving = false;
+
+    private Image selectionRect;
 
     private Stage uiStage;
     public ModuleBoardWidget (ParticleNodeEditorApp app) {
@@ -99,6 +101,13 @@ public class ModuleBoardWidget extends WidgetGroup {
         addActor(moduleContainer);
 
         shapeRenderer = Render.instance().shapeRenderer();
+    }
+
+    public void init () {
+        selectionRect = new Image(SharedResources.skin.getDrawable("orange_row"));
+        selectionRect.setSize(0, 0);
+        selectionRect.setVisible(false);
+        addActor(selectionRect);
     }
 
     public Array<NodeConnection> getCurrentConnections () {
@@ -144,7 +153,7 @@ public class ModuleBoardWidget extends WidgetGroup {
         return nodeToFind;
     }
 
-    public void removeConnection (NodeConnection connection) {
+    public void removeConnection (NodeConnection connection, boolean shouldSave) {
         getCurrentConnections().removeValue(connection, true);
 
         connection.fromModule.setSlotInactive(connection.fromSlot, false);
@@ -153,7 +162,9 @@ public class ModuleBoardWidget extends WidgetGroup {
         currentEmitterGraph.removeNode(connection.fromModule.getModule(), connection.fromSlot, false);
         currentEmitterGraph.removeNode(connection.toModule.getModule(), connection.toSlot, true);
 
-        app.dataModified();
+        if (shouldSave) {
+            app.dataModified();
+        }
     }
 
     public void setCurrentEmitter (ParticleEmitterWrapper currentEmitterWrapper) {
@@ -284,8 +295,64 @@ public class ModuleBoardWidget extends WidgetGroup {
                 return false;
             }
         });
-    }
 
+        stage.addListener(new InputListener() {
+            boolean dragged = false;
+            final Vector2 startPos = new Vector2();
+            final Vector2 tmp = new Vector2();
+            final Rectangle rectangle = new Rectangle();
+
+            @Override
+            public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
+                dragged = false;
+                boolean shouldHandle = false;
+
+                if (button == 2 || InputUtils.ctrlPressed()) {
+                    selectionRect.setVisible(true);
+                    selectionRect.setSize(0, 0);
+                    startPos.set(x, y);
+                    shouldHandle = true;
+                }
+
+                return shouldHandle;
+            }
+
+            @Override
+            public void touchDragged (InputEvent event, float x, float y, int pointer) {
+                super.touchDragged(event, x, y, pointer);
+
+                dragged = true;
+
+                if(selectionRect.isVisible()) {
+                    tmp.set(x, y);
+                    tmp.sub(startPos);
+                    if(tmp.x < 0) {
+                        rectangle.setX(x);
+                    } else {
+                        rectangle.setX(startPos.x);
+                    }
+                    if(tmp.y < 0) {
+                        rectangle.setY(y);
+                    } else {
+                        rectangle.setY(startPos.y);
+                    }
+                    rectangle.setWidth(Math.abs(tmp.x));
+                    rectangle.setHeight(Math.abs(tmp.y));
+
+                    selectionRect.setPosition(rectangle.x, rectangle.y);
+                    selectionRect.setSize(rectangle.getWidth(), rectangle.getHeight());
+                }
+            }
+
+            @Override
+            public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
+                if (selectionRect.isVisible()) {
+                    userSelectionApply(rectangle);
+                    selectionRect.setVisible(false);
+                }
+            }
+        });
+    }
 
     public void sendInUIStage (Stage stage) {
         uiStage = stage;
@@ -324,6 +391,24 @@ public class ModuleBoardWidget extends WidgetGroup {
         Json json = new Json();
         String clipboard = json.toJson(payload);
         Gdx.app.getClipboard().setContents(clipboard);
+    }
+
+    public void cutSelectionModules () {
+        Array<NodeConnection> connections = getSelectedConnections();
+        ObjectSet<ModuleWrapper> wrappers = getSelectedWrappers();
+        Array<ModuleWrapperGroup> groups = getSelectedGroups();
+
+        ClipboardPayload payload = new ClipboardPayload(wrappers, connections, groups);
+
+        logger.info("copy select todo");
+//        Vector3 camPos = TalosMain.Instance().NodeStage().getStage().getCamera().position;
+//        payload.cameraPositionAtCopy.set(camPos.x, camPos.y);
+
+        Json json = new Json();
+        String clipboard = json.toJson(payload);
+        Gdx.app.getClipboard().setContents(clipboard);
+
+        deleteSelectedWrappers();
     }
 
     public void pasteFromClipboard () {
@@ -457,9 +542,7 @@ public class ModuleBoardWidget extends WidgetGroup {
 
     public void deleteSelectedWrappers () {
         try {
-            for (ModuleWrapper wrapper : getSelectedWrappers()) {
-                deleteWrapper(wrapper);
-            }
+            deleteWrappers(getSelectedWrappers());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -467,22 +550,28 @@ public class ModuleBoardWidget extends WidgetGroup {
         clearSelection();
     }
 
-    public void deleteWrapper (ModuleWrapper wrapper) {
-        getModuleWrappers().removeValue(wrapper, true);
-        for (int i = getCurrentConnections().size - 1; i >= 0; i--) {
-            if (getCurrentConnections().get(i).toModule == wrapper || getCurrentConnections().get(i).fromModule == wrapper) {
-                removeConnection(getCurrentConnections().get(i));
+    public void deleteWrappers (ObjectSet<ModuleWrapper> selectedWrappers) {
+        final Array<ModuleWrapper> moduleWrappers = getModuleWrappers();
+        final Array<NodeConnection> currentConnections = getCurrentConnections();
+
+        for (ModuleWrapper selectedWrapper : selectedWrappers) {
+            moduleWrappers.removeValue(selectedWrapper, true);
+
+            for (int i = currentConnections.size - 1; i >= 0; i--) {
+                if (currentConnections.get(i).toModule == selectedWrapper || currentConnections.get(i).fromModule == selectedWrapper) {
+                    removeConnection(currentConnections.get(i), false);
+                }
+            }
+
+            currentEmitterGraph.removeModule(selectedWrapper.getModule());
+            moduleContainer.removeActor(selectedWrapper);
+
+            for (ModuleWrapperGroup group : getGroups()) {
+                group.removeWrapper(selectedWrapper);
             }
         }
-        currentEmitterGraph.removeModule(wrapper.getModule());
-        moduleContainer.removeActor(wrapper);
-        for (ModuleWrapperGroup group : getGroups()) {
-            group.removeWrapper(wrapper);
-        }
-
 
         app.dataModified();
-        // TalosMain.Instance().UIStage().PreviewWidget().unregisterDragPoints();
     }
 
     public <T extends AbstractModule, U extends ModuleWrapper<T>> U createModule (Class<T> clazz, float screenX, float screenY) {

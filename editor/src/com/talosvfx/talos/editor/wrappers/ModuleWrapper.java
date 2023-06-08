@@ -347,7 +347,7 @@ public abstract class ModuleWrapper<T extends AbstractModule> extends VisWindow 
                 ModuleBoardWidget.NodeConnection connection = moduleBoardWidget.findConnection(ModuleWrapper.this, isInput, key);
 
                 if(isInput && connection!= null) {
-                    moduleBoardWidget.removeConnection(connection);
+                    moduleBoardWidget.removeConnection(connection, true);
                     moduleBoardWidget.ccCurrentlyRemoving = true;
 
                     connection.fromModule.getOutputSlotPos(connection.fromSlot, tmp2);

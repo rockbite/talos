@@ -27,7 +27,6 @@ import com.talosvfx.talos.editor.notifications.events.dynamicnodestage.NodeConne
 import com.talosvfx.talos.editor.notifications.events.dynamicnodestage.NodeConnectionRemovedEvent;
 import com.talosvfx.talos.editor.notifications.events.dynamicnodestage.NodeDataModifiedEvent;
 import com.talosvfx.talos.editor.notifications.events.dynamicnodestage.NodeRemovedEvent;
-import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.render.Render;
 import com.talosvfx.talos.runtime.vfx.Slot;
 import com.talosvfx.talos.runtime.vfx.modules.AbstractModule;
@@ -169,6 +168,19 @@ public class NodeBoard<T extends DynamicNodeStageData> extends WidgetGroup imple
 		batch.begin();
 
 		super.draw(batch, parentAlpha);
+	}
+
+
+	private boolean isHoldingNode;
+	@Override
+	public void act(float delta) {
+		super.act(delta);
+
+		if (activeCurve != null || isHoldingNode) {
+			nodeStage.shouldAutoMove = true;
+		} else {
+			nodeStage.shouldAutoMove = false;
+		}
 	}
 
 	private void drawCurves () {
@@ -816,6 +828,8 @@ public class NodeBoard<T extends DynamicNodeStageData> extends WidgetGroup imple
 	}
 
 	public void nodeClicked (NodeWidget node) {
+		isHoldingNode = true;
+
 		wasNodeDragged = null;
 		if (selectedNodes.contains(node)) {
 			wasNodeSelectedOnDown = node;
@@ -844,6 +858,7 @@ public class NodeBoard<T extends DynamicNodeStageData> extends WidgetGroup imple
 	}
 
 	public void nodeClickedUp (NodeWidget node, boolean hasMoved) {
+		isHoldingNode = false;
 
 		if (wasNodeDragged != null && hasMoved) {
 			updateSaveState();

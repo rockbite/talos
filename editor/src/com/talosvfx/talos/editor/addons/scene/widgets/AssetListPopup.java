@@ -167,6 +167,7 @@ public class AssetListPopup<T> extends VisWindow {
     private void traversePath(FileHandle path, int currDepth, int maxDepth, FilteredTree.Node<GameAsset<T>> node, Predicate<FilteredTree.Node<GameAsset<T>>> predicate) {
         if(path.isDirectory() && currDepth <= maxDepth) {
             FileHandle[] list = path.list(ProjectExplorerWidget.fileFilter);
+            int nextDepth = currDepth++;
             for(int i = 0; i < list.length; i++) {
                 FileHandle listItemHandle = list[i];
 
@@ -180,9 +181,11 @@ public class AssetListPopup<T> extends VisWindow {
                 }
                 if(listItemHandle.isDirectory()) {
                     node.add(newNode);
-                    traversePath(listItemHandle, currDepth++, maxDepth, newNode, predicate);
+                    traversePath(listItemHandle, nextDepth, maxDepth, newNode, predicate);
                 }
             }
+        } else {
+            System.out.println();
         }
     }
 }
