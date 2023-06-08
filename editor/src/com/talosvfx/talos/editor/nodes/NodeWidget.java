@@ -211,6 +211,8 @@ public abstract class NodeWidget extends EmptyWindow implements Json.Serializabl
                     if(NodeWidget.this.hit(x, y, true) != null) {
                         nodeBoard.nodeClickedUp(NodeWidget.this, hasMoved);
                     }
+
+                    nodeBoard.isHoldingNode = false;
                 }
                 event.cancel();
                 hasMoved = false;

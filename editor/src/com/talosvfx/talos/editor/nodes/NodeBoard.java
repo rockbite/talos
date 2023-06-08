@@ -170,8 +170,7 @@ public class NodeBoard<T extends DynamicNodeStageData> extends WidgetGroup imple
 		super.draw(batch, parentAlpha);
 	}
 
-
-	private boolean isHoldingNode;
+	boolean isHoldingNode;
 	@Override
 	public void act(float delta) {
 		super.act(delta);
@@ -858,7 +857,6 @@ public class NodeBoard<T extends DynamicNodeStageData> extends WidgetGroup imple
 	}
 
 	public void nodeClickedUp (NodeWidget node, boolean hasMoved) {
-		isHoldingNode = false;
 
 		if (wasNodeDragged != null && hasMoved) {
 			updateSaveState();

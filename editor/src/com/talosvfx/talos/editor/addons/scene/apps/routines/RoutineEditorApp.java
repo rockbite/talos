@@ -52,6 +52,9 @@ public class RoutineEditorApp extends AppManager.BaseApp<RoutineStageData> imple
 
             private Vector2 tmp = new Vector2();
 
+            private static final float DELAY_BEFORE_MOVE = 0.3f;
+            private float delayBeforeMove = DELAY_BEFORE_MOVE;
+
             @Override
             public void act(float delta) {
                 super.act(delta);
@@ -62,10 +65,19 @@ public class RoutineEditorApp extends AppManager.BaseApp<RoutineStageData> imple
                 float dt = Gdx.graphics.getDeltaTime();
                 OrthographicCamera camera = (OrthographicCamera) routineStageWrapper.getViewportViewSettings().getCurrentCamera();
 
-                if (routineStage.shouldAutoMove()) {
-                    tmp.set(Gdx.input.getX(), Gdx.input.getY());
-                    routineStageWrapper.screenToLocalCoordinates(tmp);
+                tmp.set(Gdx.input.getX(), Gdx.input.getY());
+                routineStageWrapper.screenToLocalCoordinates(tmp);
 
+                boolean shouldMove = routineStage.shouldAutoMove()
+                        && (isInTopZone(tmp) || isInBottomZone(tmp) || isInLeftZone(tmp) || isInRightZone(tmp));
+
+                if (shouldMove) {
+                    delayBeforeMove -= delta;
+                } else {
+                    delayBeforeMove = DELAY_BEFORE_MOVE;
+                }
+
+                if (delayBeforeMove < 0) {
                     if (isInTopZone(tmp)) {
                         camera.translate(0, camera.zoom * AUTO_SCROLL_SPEED * dt, 0);
                     } else if (isInBottomZone(tmp)) {
