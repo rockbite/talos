@@ -47,6 +47,7 @@ import com.talosvfx.talos.runtime.assets.meta.DirectoryMetadata;
 import com.talosvfx.talos.runtime.assets.meta.ScriptMetadata;
 import com.talosvfx.talos.runtime.assets.meta.SpineMetadata;
 import com.talosvfx.talos.runtime.assets.meta.SpriteMetadata;
+import com.talosvfx.talos.runtime.graphics.NineSlice;
 import com.talosvfx.talos.runtime.maps.TilePaletteData;
 import com.talosvfx.talos.runtime.scene.GameObjectContainer;
 import com.talosvfx.talos.runtime.scene.components.AComponent;
@@ -93,7 +94,7 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 
 	private ObjectMap<GameAssetType, ObjectMap<String, GameAsset<?>>> identifierGameAssetMap = new ObjectMap<>();
 	private ObjectMap<GameAssetType, ObjectMap<UUID, GameAsset<?>>> uniqueIdentifierGameAssetMap = new ObjectMap<>();
-	private ObjectMap<GameAsset<AtlasSprite>, NinePatch> patchCache = new ObjectMap<>();
+	private ObjectMap<GameAsset<AtlasSprite>, NineSlice> patchCache = new ObjectMap<>();
 	private ObjectSet<FileHandle> newFilesSeen = new ObjectSet<>();
 
 
@@ -122,12 +123,12 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 	}
 
 	@Override
-	public NinePatch obtainNinePatch (GameAsset<AtlasSprite> gameAsset) {
+	public NineSlice obtainNinePatch (GameAsset<AtlasSprite> gameAsset) {
 		if (patchCache.containsKey(gameAsset) && false) { //something better, maybe hash on pixel size + texture for this
 			return patchCache.get(gameAsset);
 		} else {
 			final SpriteMetadata metadata = (SpriteMetadata)gameAsset.getRootRawAsset().metaData;
-			final NinePatch patch = new NinePatch(gameAsset.getResource(), metadata.borderData[0], metadata.borderData[1], metadata.borderData[2], metadata.borderData[3]);
+			final NineSlice patch = new NineSlice(gameAsset.getResource(), metadata.borderData[0], metadata.borderData[1], metadata.borderData[2], metadata.borderData[3]);
 			patch.scale(1 / metadata.pixelsPerUnit, 1 / metadata.pixelsPerUnit); // fix this later
 			patchCache.put(gameAsset, patch);
 			return patch;
@@ -137,9 +138,9 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 	@EventHandler
 	public void onSpritePixelPerUnitUpdateEvent (SpritePixelPerUnitUpdateEvent event) {
 		final SpriteMetadata metadata = event.getSpriteMetadata();
-		for (ObjectMap.Entry<GameAsset<AtlasSprite>, NinePatch> gameAssetNinePatchEntry : patchCache) {
+		for (ObjectMap.Entry<GameAsset<AtlasSprite>, NineSlice> gameAssetNinePatchEntry : patchCache) {
 			if (gameAssetNinePatchEntry.key.getRootRawAsset().metaData.equals(metadata)) {
-				final NinePatch patch = new NinePatch(gameAssetNinePatchEntry.key.getResource(), metadata.borderData[0], metadata.borderData[1], metadata.borderData[2], metadata.borderData[3]);
+				final NineSlice patch = new NineSlice(gameAssetNinePatchEntry.key.getResource(), metadata.borderData[0], metadata.borderData[1], metadata.borderData[2], metadata.borderData[3]);
 				final float scale = 1 / metadata.pixelsPerUnit;
 				patch.scale(scale, scale);
 				patchCache.put(gameAssetNinePatchEntry.key, patch);

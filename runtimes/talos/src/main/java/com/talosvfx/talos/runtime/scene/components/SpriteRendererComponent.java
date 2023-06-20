@@ -14,6 +14,7 @@ import com.talosvfx.talos.runtime.RuntimeContext;
 import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.runtime.assets.GameAssetType;
 import com.talosvfx.talos.runtime.assets.GameResourceOwner;
+import com.talosvfx.talos.runtime.graphics.NineSlice;
 import com.talosvfx.talos.runtime.scene.GameObject;
 import com.talosvfx.talos.runtime.scene.IColorHolder;
 import com.talosvfx.talos.runtime.scene.ISizableComponent;
@@ -35,6 +36,7 @@ public class SpriteRendererComponent extends RendererComponent implements GameRe
     public boolean flipY;
     private boolean fixAspectRatio = true;
     public RenderMode renderMode = RenderMode.simple;
+    public NineSlice.RenderMode sliceMode = NineSlice.RenderMode.Simple;
 
     @ValueProperty(prefix = {"W", "H"})
     public Vector2 size = new Vector2(1, 1);
@@ -113,6 +115,7 @@ public class SpriteRendererComponent extends RendererComponent implements GameRe
         json.writeValue("flipY", flipY);
         json.writeValue("fixAspectRatio", fixAspectRatio);
         json.writeValue("renderMode", renderMode);
+        json.writeValue("sliceMode", sliceMode);
         json.writeValue("size", size);
         json.writeValue("tileSize", tileSize);
 
@@ -143,6 +146,7 @@ public class SpriteRendererComponent extends RendererComponent implements GameRe
         flipY = jsonData.getBoolean("flipY", false);
         fixAspectRatio = jsonData.getBoolean("fixAspectRatio", fixAspectRatio);
         renderMode = json.readValue(RenderMode.class, jsonData.get("renderMode"));
+        sliceMode = json.readValue(NineSlice.RenderMode.class, jsonData.get("sliceMode"));
         JsonValue size = jsonData.get("size");
         if (size != null) {
             this.size = json.readValue(Vector2.class, size);
@@ -153,6 +157,7 @@ public class SpriteRendererComponent extends RendererComponent implements GameRe
         }
 
         if(renderMode == null) renderMode = RenderMode.simple;
+        if(sliceMode == null) sliceMode = NineSlice.RenderMode.Simple;
 
         super.read(json, jsonData);
     }
@@ -182,6 +187,7 @@ public class SpriteRendererComponent extends RendererComponent implements GameRe
         flipY = false;
         fixAspectRatio = true;
         renderMode = RenderMode.simple;
+        sliceMode = NineSlice.RenderMode.Simple;
         if (defaultGameAsset != null) {
             setGameAsset(defaultGameAsset);
         }
