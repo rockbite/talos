@@ -7,6 +7,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.kotcrab.vis.ui.FocusManager;
+import com.kotcrab.vis.ui.widget.VisValidatableTextField;
 import com.talosvfx.talos.editor.notifications.Notifications;
 import com.talosvfx.talos.editor.notifications.TalosEvent;
 import com.talosvfx.talos.editor.notifications.commands.enums.Commands;
@@ -61,7 +62,7 @@ public class CommandsSystem extends InputAdapter {
 
     public boolean runCommand(ICommand command) {
         Actor keyboardFocus = SharedResources.inputHandling.keyboardFocus;
-        if (keyboardFocus instanceof TextField) {
+        if (keyboardFocus instanceof TextField || keyboardFocus instanceof VisValidatableTextField) {
             return false;
         }
 
