@@ -1052,7 +1052,7 @@ public class NodeBoard<T extends DynamicNodeStageData> extends WidgetGroup imple
 
 
 	public class AutoMoveUtil extends Actor {
-		private static final float AUTO_SCROLL_RANGE = 100.0f;
+		private static final float AUTO_SCROLL_RANGE = 45.0f;
 		private static final float AUTO_SCROLL_SPEED = 200.0f;
 		private static final float DELAY_BEFORE_MOVE = 0.3f;
 		private float delayBeforeMove = DELAY_BEFORE_MOVE;
