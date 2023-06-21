@@ -35,7 +35,6 @@ public abstract class NodeWidget extends EmptyWindow implements Json.Serializabl
     private String hoveredSlot = null;
     private boolean hoveredSlotIsInput = false;
     private Vector2 tmp = new Vector2();
-    private Vector2 tmp2 = new Vector2();
     private NodeWidget lastAttachedNode;
 
     protected Array<String> inputSlots = new Array();
@@ -171,16 +170,11 @@ public abstract class NodeWidget extends EmptyWindow implements Json.Serializabl
 
         addListener(new InputListener() {
 
-            Vector2 tmp = new Vector2();
-            Vector2 prev = new Vector2();
-
-            Vector2 start = new Vector2();
-            boolean hasMoved = false;
 
             public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
-                prev.set(x, y);
-                start.set(getX(), getY());
-                NodeWidget.this.localToStageCoordinates(prev);
+                touchDraggedPrev.set(x, y);
+                touchDraggedStart.set(getX(), getY());
+                NodeWidget.this.localToStageCoordinates(touchDraggedPrev);
                 if(nodeBoard != null) {
                     nodeBoard.nodeClicked(NodeWidget.this);
                 }
@@ -189,18 +183,7 @@ public abstract class NodeWidget extends EmptyWindow implements Json.Serializabl
 
             @Override
             public void touchDragged(InputEvent event, float x, float y, int pointer) {
-                tmp.set(x, y);
-                NodeWidget.this.localToStageCoordinates(tmp);
-                super.touchDragged(event, x, y, pointer);
-                if(nodeBoard != null) {
-                    nodeBoard.wrapperMovedBy(NodeWidget.this, tmp.x - prev.x, tmp.y - prev.y);
-                }
 
-                if (!(start.epsilonEquals(getX(), getY()))) {
-                    hasMoved = true;
-                }
-
-                prev.set(tmp);
             }
 
             @Override
@@ -212,7 +195,7 @@ public abstract class NodeWidget extends EmptyWindow implements Json.Serializabl
                         nodeBoard.nodeClickedUp(NodeWidget.this, hasMoved);
                     }
 
-                    nodeBoard.isHoldingNode = false;
+                    nodeBoard.holdingNode = null;
                 }
                 event.cancel();
                 hasMoved = false;
@@ -687,5 +670,28 @@ public abstract class NodeWidget extends EmptyWindow implements Json.Serializabl
     }
 
     //    public Array<PropertyWidget> getListOfProperties ();
+
+    private Vector2 touchDraggedPrev = new Vector2();
+    private Vector2 touchDraggedStart = new Vector2();
+    private boolean hasMoved = false;
+
+    @Override
+    public void touchDragged(float localX, float localY) {
+        tmp.set(localX, localY);
+        NodeWidget.this.localToStageCoordinates(tmp);
+
+        if (nodeBoard != null) {
+            nodeBoard.wrapperMovedBy(NodeWidget.this, tmp.x - touchDraggedPrev.x, tmp.y - touchDraggedPrev.y);
+        }
+
+        if (!(touchDraggedStart.epsilonEquals(getX(), getY()))) {
+            hasMoved = true;
+        }
+
+        touchDraggedPrev.set(tmp);
+
+        // move others, then itself, it just works:/
+        super.touchDragged(localX, localY);
+    }
 
 }

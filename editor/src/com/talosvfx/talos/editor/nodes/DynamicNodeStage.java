@@ -22,8 +22,6 @@ import com.talosvfx.talos.editor.project2.SharedResources;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static com.talosvfx.talos.editor.utils.InputUtils.ctrlPressed;
-
 public abstract class DynamicNodeStage<T extends DynamicNodeStageData> extends WorkplaceStage implements EventContextProvider<DynamicNodeStage<?>> {
 
     private static final Logger logger = LoggerFactory.getLogger(DynamicNodeStage.class);
@@ -38,8 +36,6 @@ public abstract class DynamicNodeStage<T extends DynamicNodeStageData> extends W
 
     public GameAsset<T> gameAsset;
     public T data;
-
-    public boolean shouldAutoMove;
 
     public DynamicNodeStage (Skin skin) {
         super();
@@ -235,9 +231,6 @@ public abstract class DynamicNodeStage<T extends DynamicNodeStageData> extends W
     protected abstract void onBaseStageSelected ();
 
     protected void initActors() {
-//        GridRendererWrapper gridRenderer = new GridRendererWrapper(stage);
-//        stage.addActor(gridRenderer);
-
         nodeBoard = new NodeBoard<T>(skin, this);
 
         getRootActor().addActor(nodeBoard);
@@ -279,7 +272,4 @@ public abstract class DynamicNodeStage<T extends DynamicNodeStageData> extends W
 
     public abstract void onNodeSelectionChange ();
 
-    public boolean shouldAutoMove() {
-        return shouldAutoMove;
-    }
 }

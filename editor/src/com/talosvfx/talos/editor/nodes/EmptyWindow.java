@@ -42,10 +42,6 @@ public abstract class EmptyWindow extends Table {
             }
         });
         this.addListener(new InputListener() {
-            float startX;
-            float startY;
-            float lastX;
-            float lastY;
 
             private void updateEdge(float x, float y) {
                 float border = (float)EmptyWindow.this.resizeBorder / 2.0F;
@@ -103,10 +99,10 @@ public abstract class EmptyWindow extends Table {
                 if (button == 0) {
                     this.updateEdge(x, y);
                     EmptyWindow.this.dragging = EmptyWindow.this.edge != 0;
-                    this.startX = x;
-                    this.startY = y;
-                    this.lastX = x - EmptyWindow.this.getWidth();
-                    this.lastY = y - EmptyWindow.this.getHeight();
+                    touchDraggedStartX = x;
+                    touchDraggedStartY = y;
+                    touchDraggedLastX = x - EmptyWindow.this.getWidth();
+                    touchDraggedLastY = y - EmptyWindow.this.getHeight();
                 }
 
                 return EmptyWindow.this.edge != 0 || EmptyWindow.this.isModal;
@@ -118,79 +114,7 @@ public abstract class EmptyWindow extends Table {
 
             public void touchDragged(InputEvent event, float x, float y, int pointer) {
                 if (EmptyWindow.this.dragging) {
-                    float width = EmptyWindow.this.getWidth();
-                    float height = EmptyWindow.this.getHeight();
-                    float windowX = EmptyWindow.this.getX();
-                    float windowY = EmptyWindow.this.getY();
-                    float minWidth = EmptyWindow.this.getMinWidth();
-                    float maxWidth = EmptyWindow.this.getMaxWidth();
-                    float minHeight = EmptyWindow.this.getMinHeight();
-                    float maxHeight = EmptyWindow.this.getMaxHeight();
-                    Stage stage = EmptyWindow.this.getStage();
-                    boolean clampPosition = stage != null && EmptyWindow.this.getParent() == stage.getRoot();
-                    float amountY;
-                    if ((EmptyWindow.this.edge & 32) != 0) {
-                        amountY = x - this.startX;
-                        float amountYx = y - this.startY;
-                        windowX += amountY;
-                        windowY += amountYx;
-                    }
-
-                    if ((EmptyWindow.this.edge & 8) != 0) {
-                        amountY = x - this.startX;
-                        if (width - amountY < minWidth) {
-                            amountY = -(minWidth - width);
-                        }
-
-                        if (clampPosition && windowX + amountY < 0.0F) {
-                            amountY = -windowX;
-                        }
-
-                        width -= amountY;
-                        windowX += amountY;
-                    }
-
-                    if ((EmptyWindow.this.edge & 4) != 0) {
-                        amountY = y - this.startY;
-                        if (height - amountY < minHeight) {
-                            amountY = -(minHeight - height);
-                        }
-
-                        if (clampPosition && windowY + amountY < 0.0F) {
-                            amountY = -windowY;
-                        }
-
-                        height -= amountY;
-                        windowY += amountY;
-                    }
-
-                    if ((EmptyWindow.this.edge & 16) != 0) {
-                        amountY = x - this.lastX - width;
-                        if (width + amountY < minWidth) {
-                            amountY = minWidth - width;
-                        }
-
-                        if (clampPosition && windowX + width + amountY > stage.getWidth()) {
-                            amountY = stage.getWidth() - windowX - width;
-                        }
-
-                        width += amountY;
-                    }
-
-                    if ((EmptyWindow.this.edge & 2) != 0) {
-                        amountY = y - this.lastY - height;
-                        if (height + amountY < minHeight) {
-                            amountY = minHeight - height;
-                        }
-
-                        if (clampPosition && windowY + height + amountY > stage.getHeight()) {
-                            amountY = stage.getHeight() - windowY - height;
-                        }
-
-                        height += amountY;
-                    }
-
-                    EmptyWindow.this.setBounds((float)Math.round(windowX), (float)Math.round(windowY), (float)Math.round(width), (float)Math.round(height));
+                    EmptyWindow.this.touchDragged(x, y);
                 }
             }
 
@@ -293,4 +217,85 @@ public abstract class EmptyWindow extends Table {
     public abstract float getTitlePrefWidth();
 
     public abstract float getDragPadTop();
+
+    private float touchDraggedStartX;
+    private float touchDraggedStartY;
+    private float touchDraggedLastX;
+    private float touchDraggedLastY;
+
+    public void touchDragged(float localX, float localY) {
+        float width = EmptyWindow.this.getWidth();
+        float height = EmptyWindow.this.getHeight();
+        float windowX = EmptyWindow.this.getX();
+        float windowY = EmptyWindow.this.getY();
+        float minWidth = EmptyWindow.this.getMinWidth();
+        float maxWidth = EmptyWindow.this.getMaxWidth();
+        float minHeight = EmptyWindow.this.getMinHeight();
+        float maxHeight = EmptyWindow.this.getMaxHeight();
+        Stage stage = EmptyWindow.this.getStage();
+        boolean clampPosition = stage != null && EmptyWindow.this.getParent() == stage.getRoot();
+        float amountY;
+        if ((EmptyWindow.this.edge & 32) != 0) {
+            amountY = localX - this.touchDraggedStartX;
+            float amountYx = localY - this.touchDraggedStartY;
+            windowX += amountY;
+            windowY += amountYx;
+        }
+
+        if ((EmptyWindow.this.edge & 8) != 0) {
+            amountY = localX - this.touchDraggedStartX;
+            if (width - amountY < minWidth) {
+                amountY = -(minWidth - width);
+            }
+
+            if (clampPosition && windowX + amountY < 0.0F) {
+                amountY = -windowX;
+            }
+
+            width -= amountY;
+            windowX += amountY;
+        }
+
+        if ((EmptyWindow.this.edge & 4) != 0) {
+            amountY = localY - this.touchDraggedStartY;
+            if (height - amountY < minHeight) {
+                amountY = -(minHeight - height);
+            }
+
+            if (clampPosition && windowY + amountY < 0.0F) {
+                amountY = -windowY;
+            }
+
+            height -= amountY;
+            windowY += amountY;
+        }
+
+        if ((EmptyWindow.this.edge & 16) != 0) {
+            amountY = localX - this.touchDraggedLastX - width;
+            if (width + amountY < minWidth) {
+                amountY = minWidth - width;
+            }
+
+            if (clampPosition && windowX + width + amountY > stage.getWidth()) {
+                amountY = stage.getWidth() - windowX - width;
+            }
+
+            width += amountY;
+        }
+
+        if ((EmptyWindow.this.edge & 2) != 0) {
+            amountY = localY - this.touchDraggedLastY - height;
+            if (height + amountY < minHeight) {
+                amountY = minHeight - height;
+            }
+
+            if (clampPosition && windowY + height + amountY > stage.getHeight()) {
+                amountY = stage.getHeight() - windowY - height;
+            }
+
+            height += amountY;
+        }
+
+        EmptyWindow.this.setBounds((float)Math.round(windowX), (float)Math.round(windowY), (float)Math.round(width), (float)Math.round(height));
+    }
 }
