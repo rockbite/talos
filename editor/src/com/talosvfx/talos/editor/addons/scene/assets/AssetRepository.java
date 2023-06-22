@@ -2074,7 +2074,11 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 
 		@Override
 		public boolean acceptChar (TextField textField, char c) {
-			return !(c == '/' || c == '?' || c == '<' || c == '>' || c == '\\' || c == ':' || c == '*' || c == '|' || c == '"');
+			return isLatinLetterOrDigit(c) || Character.isWhitespace(c) || c == '-' || c == '_' || c == '.';
+		}
+
+		private static boolean isLatinLetterOrDigit (char c) {
+			return (48 <= c && c <= 57) || (65 <= c && c <= 90) || (97 <= c && c <= 122); // check digit, upper case and lowercase
 		}
 	}
 }
