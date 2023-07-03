@@ -352,9 +352,6 @@ public class GameObject implements GameObjectContainer, RoutineEventListener, Js
     }
 
     public Array<GameObject> getChildrenByComponent (Class<?> clazz, Array<GameObject> list) {
-        if (hasComponentType(clazz)) { //Check self in case of prefab
-            list.add(this);
-        }
         for(GameObject gameObject: children) {
             if(gameObject.hasComponentType(clazz)) {
                 list.add(gameObject);
