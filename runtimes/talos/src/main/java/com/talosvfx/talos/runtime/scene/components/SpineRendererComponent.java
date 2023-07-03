@@ -189,8 +189,6 @@ public class SpineRendererComponent extends RendererComponent implements Json.Se
             return;
         }
 
-        System.out.println("Populating GameObjects for " + skeleton.getData().getName());
-
         // clear old bones in map
         boneGOs.clear();
         directChildrenOfRoot.clear();
