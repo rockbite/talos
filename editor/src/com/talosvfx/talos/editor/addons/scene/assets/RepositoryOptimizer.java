@@ -424,14 +424,18 @@ public class RepositoryOptimizer {
 		FileHandle jarLocation = getJarLocation();
 
 		Json json = new Json();
-		String payload = Base64Coder.encodeString(json.toJson(exportPayload));
+		String payload = json.toJson(exportPayload);
 
 		CompletableFuture<Void> objectCompletableFuture = new CompletableFuture<>();
 
 		try {
 			String absolutePathToJar = jarLocation.file().getAbsolutePath();
 
-			String args = "java -cp " + absolutePathToJar + " " + "com.talosvfx.talos.tools.ExportOptimizer" + " " + payload;
+			FileHandle packingConfig = FileHandle.tempFile("packingConfig" + exportPayload.packPayload.packFileName);
+			packingConfig.writeString(payload, false);
+
+			String args = "java -cp " + absolutePathToJar + " " + "com.talosvfx.talos.tools.ExportOptimizer" + " " + packingConfig.path();
+
 			Process process = Runtime.getRuntime().exec(args);
 
 
@@ -465,9 +469,7 @@ public class RepositoryOptimizer {
 			}
 			objectCompletableFuture.complete(null);
 
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		} catch (InterruptedException e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 

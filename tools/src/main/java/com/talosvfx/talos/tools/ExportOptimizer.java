@@ -10,6 +10,10 @@ import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+
 public class ExportOptimizer {
 
 	private static final Logger logger = LoggerFactory.getLogger(ExportOptimizer.class);
@@ -68,13 +72,15 @@ public class ExportOptimizer {
 		TexturePacker.process(packPayload.settings, packPayload.input, packPayload.output, packPayload.packFileName);
 	}
 
-	public static void main (String[] args) {
+	public static void main (String[] args) throws FileNotFoundException {
 		if (args.length == 1) {
 			Json json = new Json();
 
 			System.out.println("args: " + args[0]);
 			logger.info("Packing config {}", args[0]);
-			ExportPayload exportPayload = json.fromJson(ExportPayload.class, Base64Coder.decodeString(args[0]));
+			FileInputStream fileInputStream = new FileInputStream(args[0]);
+			ExportPayload exportPayload = json.fromJson(ExportPayload.class, fileInputStream);
+
 			try {
 				unpackAndPack(exportPayload);
 			} catch (Exception e) {
