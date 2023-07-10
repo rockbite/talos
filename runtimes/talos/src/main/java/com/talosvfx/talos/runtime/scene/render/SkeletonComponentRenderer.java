@@ -19,6 +19,9 @@ public class SkeletonComponentRenderer extends ComponentRenderer<SpineRendererCo
 
 	private final TalosSkeletonRenderer skeletonRenderer;
 
+	private Array<GameObject> allChildrenWithBones = new Array<>();
+
+
 	public SkeletonComponentRenderer (GameObjectRenderer gameObjectRenderer) {
 		super(gameObjectRenderer);
 		skeletonRenderer = new TalosSkeletonRenderer();
@@ -50,8 +53,8 @@ public class SkeletonComponentRenderer extends ComponentRenderer<SpineRendererCo
 		batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 
 		// update bone game objects
-		Array<GameObject> children = new Array<>();
-		Array<GameObject> boneGOs = gameObject.getChildrenByComponent(BoneComponent.class, children);
+		allChildrenWithBones.clear();
+		Array<GameObject> boneGOs = gameObject.getChildrenByComponent(BoneComponent.class, allChildrenWithBones);
 
 		for (GameObject boneGO : boneGOs) {
 			BoneComponent boneComponent = boneGO.getComponent(BoneComponent.class);
