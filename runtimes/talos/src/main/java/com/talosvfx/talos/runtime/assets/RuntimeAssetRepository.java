@@ -313,6 +313,21 @@ public class RuntimeAssetRepository extends BaseAssetRepository {
 	}
 
 	@Override
+	public boolean isAssetLoadedForIdentifier (String identifier, GameAssetType type) {
+		ObjectMap<String, GameAsset<?>> entries = identifierToGameAssetMap.get(type);
+		if (entries == null || entries.isEmpty()) {
+			return false;
+		}
+		return entries.containsKey(identifier);
+	}
+
+	@Override
+	public void unloadAsset (GameAsset<?> gameAsset) {
+		identifierToGameAssetMap.get(gameAsset.type).remove(gameAsset.nameIdentifier);
+		uuidGameAssetObjectMap.remove(gameAsset.getRootRawAsset().metaData.uuid);
+	}
+
+	@Override
 	public <U> GameAsset<U> getAssetForUniqueIdentifier (UUID uuid, GameAssetType type) {
 		return (GameAsset<U>)uuidGameAssetObjectMap.get(uuid);
 	}

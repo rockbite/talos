@@ -206,8 +206,43 @@ public class RepositoryOptimizer {
 
 		TexturePacker.Settings packSettings;
 
+		ObjectSet<GameAsset<?>> parentResourcesThatShareThisAtlas = new ObjectSet<>();
+		GameAsset<?> parentAsset = null;
 		boolean single;
 
+		public boolean hasAllGameResourcesToRequireAsset (GameAsset asset) {
+			if (parentAsset.nameIdentifier.equals(asset.nameIdentifier)) return true;
+			return false;
+		}
+
+		public boolean hasAllGameResourcesToRequireAsset (ObjectSet<GameAsset<?>> gameResourcesThatRequireMe) {
+			if (gameResourcesThatRequireMe.size != parentResourcesThatShareThisAtlas.size) return false;
+
+			for (GameAsset<?> gameAsset : gameResourcesThatRequireMe) {
+				if (!parentResourcesThatShareThisAtlas.contains(gameAsset)) {
+					return false;
+				}
+			}
+			return true;
+		}
+
+		public void debugLog (FileHandle handle) {
+			for (GameAsset<?> resourcesThatShareThisAtlas : parentResourcesThatShareThisAtlas) {
+				handle.writeString("Dep: " + resourcesThatShareThisAtlas.nameIdentifier +" " + resourcesThatShareThisAtlas.type+ "\n", true);
+				System.out.println("dep: " + resourcesThatShareThisAtlas.nameIdentifier);
+
+			}
+			System.out.println("Dep: " + parentAsset.nameIdentifier + " " + parentAsset.type);
+
+			for (GameAsset<AtlasSprite> atlasSpriteGameAsset : texturesToPack) {
+				System.out.println("\t" + atlasSpriteGameAsset.nameIdentifier  + " " + atlasSpriteGameAsset.type);
+				handle.writeString("\t" + atlasSpriteGameAsset.nameIdentifier + " " + atlasSpriteGameAsset.type + "\n", true);
+			}
+			for (GameAsset<TextureAtlas> atlasSpriteGameAsset : atlasesToUnpack) {
+				System.out.println("\t" + atlasSpriteGameAsset.nameIdentifier + " " + atlasSpriteGameAsset.type);
+
+				handle.writeString("\t" + atlasSpriteGameAsset.nameIdentifier + " " + atlasSpriteGameAsset.type + "\n", true);
+			}}
 	}
 
 	public static void process (ObjectSet<GameAsset<?>> gameAssetsToExport, GameAssetsExportStructure gameAssetExportStructure, BaseAssetRepository.AssetRepositoryCatalogueExportOptions settings, Runnable runnable) {
@@ -226,12 +261,12 @@ public class RepositoryOptimizer {
 
 		for (GameAsset<TextureAtlas> atlas : atlases) {
 			TextureAtlas resource = atlas.getResource();
-			TextureBucket bucket = findOrCreateBucket(resource, buckets);
+			TextureBucket bucket = findOrCreateBucket(atlas, resource, buckets);
 			bucket.atlasesToUnpack.add(atlas);
 		}
 		for (GameAsset<AtlasSprite> sprite : sprites) {
 			AtlasSprite resource = sprite.getResource();
-			TextureBucket bucket = findOrCreateBucket(resource.getTexture(), buckets, (SpriteMetadata)sprite.getRootRawAsset().metaData);
+			TextureBucket bucket = findOrCreateBucket(sprite, resource.getTexture(), buckets, (SpriteMetadata)sprite.getRootRawAsset().metaData);
 			bucket.texturesToPack.add(sprite);
 		}
 
@@ -260,6 +295,12 @@ public class RepositoryOptimizer {
 			} catch (SerializationException e) {
 				logger.warn("Bad old export, cannot skip packing ", e);
 			}
+		}
+
+		FileHandle local = Gdx.files.local("log.txt");
+		local.writeString("", false);
+		for (TextureBucket bucket : buckets) {
+			bucket.debugLog(local);
 		}
 
 		int i = 0;
@@ -478,7 +519,7 @@ public class RepositoryOptimizer {
 
 	;
 
-	private static TextureBucket findOrCreateBucket (Texture resource, ObjectSet<TextureBucket> buckets, SpriteMetadata metadata) {
+	private static TextureBucket findOrCreateBucket (GameAsset<AtlasSprite> gameAsset, Texture resource, ObjectSet<TextureBucket> buckets, SpriteMetadata metadata) {
 		if (metadata.dontPack) {
 			TextureBucket textureBucket = new TextureBucket();
 			textureBucket.minFilter = resource.getMinFilter();
@@ -486,27 +527,86 @@ public class RepositoryOptimizer {
 			textureBucket.identifier = "talos-pack-" + buckets.size;
 			textureBucket.packSettings = getSingleTexturePackSettings(textureBucket);
 			textureBucket.single = true;
+			textureBucket.parentAsset = gameAsset;
 			buckets.add(textureBucket);
 			return textureBucket;
 		}
+
+		return findOrCreateBucket(gameAsset, resource, buckets);
+	}
+
+	private static TextureBucket findOrCreateBucket (GameAsset<TextureAtlas> gameAsset, TextureAtlas resource, ObjectSet<TextureBucket> buckets) {
+		Texture texture = resource.getTextures().first();
+		return findOrCreateBucket(gameAsset, texture, buckets);
+	}
+
+
+	private static TextureBucket findOrCreateBucket (GameAsset<?> gameAsset, Texture resource, ObjectSet<TextureBucket> buckets) {
+
+		ObjectIntMap<GameAsset<?>> gameResourcesThatRequireMe1 = gameAsset.getGameResourcesThatRequireMe();
+
+		GameAsset<?> highest = null;
+		int highestValue =  0;
+		for (ObjectIntMap.Entry<GameAsset<?>> gameAssetEntry : gameResourcesThatRequireMe1) {
+			int value = gameAssetEntry.value;
+			GameAsset<?> key = gameAssetEntry.key;
+			if (value > highestValue) {
+				highest = key;
+				highestValue = value;
+			}
+		}
+
+
+		if (highest == null) {
+			System.out.println("Warning asset has no dependencies, this is not going to be optimized " + gameAsset.nameIdentifier);
+			highest = gameAsset;
+		}
+
+		//Make a hash out of this
+
+		ObjectSet<TextureBucket> filteredBuckets = new ObjectSet<>();
+
 		for (TextureBucket bucket : buckets) {
 			if (bucket.single) continue;
 
-			Texture.TextureFilter minFilter = bucket.minFilter;
-			Texture.TextureFilter magFilter = bucket.magFilter;
-
-			Texture.TextureFilter incomingMin = resource.getMinFilter();
-			Texture.TextureFilter incomingMag = resource.getMagFilter();
-
-			if (minFilter == incomingMin && magFilter == incomingMag) {
-				return bucket;
+			if (bucketMatchesTextureSettings(resource, bucket)) {
+				filteredBuckets.add(bucket);
 			}
 		}
+
+		for (TextureBucket filteredBucket : filteredBuckets) {
+			if (filteredBucket.hasAllGameResourcesToRequireAsset(highest)) {
+				return filteredBucket;
+			}
+		}
+
+
+
+		//Must create a new bucket
+		TextureBucket newBucketFromTextureSettings = createNewBucketFromTextureSettings(buckets, resource, highest);
+		return newBucketFromTextureSettings;
+	}
+
+	private static boolean bucketMatchesTextureSettings (Texture texture, TextureBucket bucket) {
+		Texture.TextureFilter minFilter = bucket.minFilter;
+		Texture.TextureFilter magFilter = bucket.magFilter;
+
+		Texture.TextureFilter incomingMin = texture.getMinFilter();
+		Texture.TextureFilter incomingMag = texture.getMagFilter();
+
+		if (minFilter == incomingMin && magFilter == incomingMag) {
+			return true;
+		}
+		return false;
+	}
+
+	private static RepositoryOptimizer.TextureBucket createNewBucketFromTextureSettings (ObjectSet<TextureBucket> buckets, Texture texture, GameAsset<?> highest) {
 		TextureBucket textureBucket = new TextureBucket();
-		textureBucket.minFilter = resource.getMinFilter();
-		textureBucket.magFilter = resource.getMagFilter();
+		textureBucket.minFilter = texture.getMinFilter();
+		textureBucket.magFilter = texture.getMagFilter();
 		textureBucket.identifier = "talos-pack-" + buckets.size;
 		textureBucket.packSettings = getDefaultPackSettings(textureBucket);
+		textureBucket.parentAsset = highest;
 		buckets.add(textureBucket);
 
 		return textureBucket;
@@ -544,26 +644,6 @@ public class RepositoryOptimizer {
 		return settings;
 	}
 
-	private static TextureBucket findOrCreateBucket (TextureAtlas resource, ObjectSet<TextureBucket> buckets) {
-		for (TextureBucket bucket : buckets) {
-			Texture.TextureFilter minFilter = bucket.minFilter;
-			Texture.TextureFilter magFilter = bucket.magFilter;
 
-			Texture.TextureFilter incomingMin = resource.getTextures().first().getMinFilter();
-			Texture.TextureFilter incomingMag = resource.getTextures().first().getMagFilter();
-
-			if (minFilter == incomingMin && magFilter == incomingMag) {
-				return bucket;
-			}
-		}
-		TextureBucket textureBucket = new TextureBucket();
-		textureBucket.minFilter = resource.getTextures().first().getMinFilter();
-		textureBucket.magFilter = resource.getTextures().first().getMagFilter();
-		textureBucket.identifier = "talos-pack-" + buckets.size;
-		textureBucket.packSettings = getDefaultPackSettings(textureBucket);
-		buckets.add(textureBucket);
-
-		return textureBucket;
-	}
 
 }

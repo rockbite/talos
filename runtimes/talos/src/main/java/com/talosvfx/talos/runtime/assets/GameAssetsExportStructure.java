@@ -11,6 +11,7 @@ public class GameAssetsExportStructure {
 	public SceneData sceneData = new SceneData();
 
 	private transient ObjectMap<String, GameAssetExportStructure> cache = new ObjectMap<>();
+	private transient ObjectMap<GameAssetType, ObjectMap<String, GameAssetExportStructure>> identifierCache = new ObjectMap<>();
 
 	private transient boolean cacheBuilt = false;
 
@@ -23,7 +24,14 @@ public class GameAssetsExportStructure {
 		return cache.get(uuid);
 	}
 
-	void buildLayerIndices() {
+	public GameAssetExportStructure findAsset (String identifier, GameAssetType type) {
+		if (!cacheBuilt){
+			buildCache();
+		}
+		return identifierCache.get(type).get(identifier);
+	}
+
+	public void buildLayerIndices() {
 		Array<SceneLayer> renderLayers = sceneData.getRenderLayers();
 		for (int i = 0; i < renderLayers.size; i++) {
 			SceneLayer sceneLayer = renderLayers.get(i);
@@ -34,6 +42,14 @@ public class GameAssetsExportStructure {
 	private void buildCache () {
 		for (GameAssetExportStructure gameAsset : gameAssets) {
 			cache.put(gameAsset.uuid, gameAsset);
+
+			if (!identifierCache.containsKey(gameAsset.type)) {
+				identifierCache.put(gameAsset.type, new ObjectMap<>());
+			}
+
+			identifierCache.get(gameAsset.type).put(gameAsset.identifier, gameAsset);
 		}
+
+		cacheBuilt = true;
 	}
 }

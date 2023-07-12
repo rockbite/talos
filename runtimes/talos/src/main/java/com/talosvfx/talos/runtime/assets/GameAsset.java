@@ -1,6 +1,9 @@
 package com.talosvfx.talos.runtime.assets;
 
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ObjectIntMap;
+import com.badlogic.gdx.utils.ObjectSet;
+import com.talosvfx.talos.runtime.scene.GameObjectContainer;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -19,6 +22,12 @@ public class GameAsset<T> {
 	public Array<RawAsset> dependentRawAssets = new Array<>();
 	public Array<GameAsset<?>> dependentGameAssets = new Array<>();
 
+
+	//Export only
+
+	@Getter
+	private ObjectIntMap<GameAsset<?>> gameResourcesThatRequireMe = new ObjectIntMap<>();
+
 	private T resourcePayload;
 
 	private boolean broken;
@@ -30,7 +39,15 @@ public class GameAsset<T> {
 	@Getter@Setter
 	private boolean dummy;
 
-
+	public void addDependency (GameAsset<?> containerAsset) {
+		addDependency(containerAsset, 1);
+	}
+	public void addDependency (GameAsset<?> containerAsset, int counter) {
+		gameResourcesThatRequireMe.getAndIncrement(containerAsset, 0, counter);
+		for (int i = 0; i < dependentGameAssets.size; i++) {
+			dependentGameAssets.get(i).addDependency(containerAsset, counter);
+		}
+	}
 
 	public interface GameAssetUpdateListener {
 		void onUpdate ();

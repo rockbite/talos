@@ -31,6 +31,10 @@ public abstract class BaseAssetRepository {
 
 	public abstract <U> GameAsset<U> getAssetForIdentifier (String identifier, GameAssetType type);
 
+	public abstract boolean isAssetLoadedForIdentifier (String identifier, GameAssetType type);
+
+	public abstract void unloadAsset (GameAsset<?> gameAsset);
+
 	public abstract <U> GameAsset<U> getAssetForUniqueIdentifier (UUID uuid, GameAssetType type);
 
 	public abstract NineSlice obtainNinePatch (GameAsset<AtlasSprite> gameAsset);

@@ -4,20 +4,17 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.*;
-import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasSprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.PixmapTextureData;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
-import com.badlogic.gdx.tools.texturepacker.TexturePacker;
 import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.esotericsoftware.spine.SkeletonBinary;
 import com.esotericsoftware.spine.SkeletonData;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.RoutineEditorApp;
-import com.talosvfx.talos.editor.addons.scene.apps.routines.RoutineStage;
 import com.talosvfx.talos.editor.addons.scene.events.*;
 import com.talosvfx.talos.editor.addons.scene.events.meta.MetaDataReloadedEvent;
 import com.talosvfx.talos.editor.addons.scene.events.explorer.DirectoryMovedEvent;
@@ -70,7 +67,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
@@ -78,8 +74,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.UUID;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
@@ -120,6 +114,22 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 		brokenAsset.setBroken(new Exception("No asset found"));
 		brokenAsset.setNonFound(true);
 		return brokenAsset;
+	}
+
+	@Override
+	public boolean isAssetLoadedForIdentifier (String identifier, GameAssetType type) {
+		if (identifierGameAssetMap.containsKey(type)) {
+			if (identifierGameAssetMap.get(type).containsKey(identifier)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	@Override
+	public void unloadAsset (GameAsset<?> gameAsset) {
+		identifierGameAssetMap.get(gameAsset.type).remove(gameAsset.nameIdentifier);
+		uniqueIdentifierGameAssetMap.get(gameAsset.type).remove(gameAsset.getRootRawAsset().metaData.uuid);
 	}
 
 	@Override
@@ -539,6 +549,35 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 		}
 	}
 
+	public static void collectGameResourcesForGameObject (GameAsset<? extends GameObjectContainer> containerAsset, GameObject selfObject, ObjectMap<String, GameAsset<?>> copiedUUIDMap) {
+		int counter = 1;
+		if (containerAsset.type == GameAssetType.SCENE) {
+			Scene resource = (Scene)containerAsset.getResource();
+			boolean optimized = resource.isOptimized();
+			if (optimized) {
+				counter = 100000;
+			}
+
+		}
+		for (AComponent component : selfObject.getComponents()) {
+			if (component instanceof GameResourceOwner) {
+				GameResourceOwner gameResourceOwner = (GameResourceOwner) component;
+				GameAsset gameResource = gameResourceOwner.getGameResource();
+				if (gameResource.isBroken()) {
+//					gameAssets.add(missingUUID.toString());
+				} else {
+					GameAsset copiedAssetThatIsRequiredForGameObject = copiedUUIDMap.get(gameResource.getRootRawAsset().metaData.uuid.toString());
+					containerAsset.dependentGameAssets.add(copiedAssetThatIsRequiredForGameObject);
+					copiedAssetThatIsRequiredForGameObject.addDependency(containerAsset, counter);
+				}
+			}
+		}
+		Array<GameObject> gameObjects = selfObject.getGameObjects();
+		for (int i = 0; i < gameObjects.size; i++) {
+			collectGameResourcesForGameObject(containerAsset, gameObjects.get(i), copiedUUIDMap);
+		}
+	}
+
 	//Export formats
 	public void exportToFile (AssetRepositoryCatalogueExportOptions settings, boolean isOptimized) { //todo
 		//Go over all entities, go over all components. If component has a game resource, we mark it for export
@@ -588,10 +627,113 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 		//Make deep copies
 		ObjectSet<GameAsset<?>> copiedAssets = new ObjectSet<>();
 		for (GameAsset<?> gameAsset : gameAssetsToExport) {
-			copiedAssets.add(gameAsset.copy());
+			GameAsset<?> copy = gameAsset.copy();
+			copiedAssets.add(copy);
 		}
+
+		ObjectMap<String, GameAsset<?>> copiedUUIDMap = new ObjectMap<>();
+		for (GameAsset<?> copiedAsset : copiedAssets) {
+			copiedUUIDMap.put(copiedAsset.getRootRawAsset().metaData.uuid.toString(), copiedAsset);
+		}
+
+		//Process copied assets. Collect all dependent game assets into the scenes and prefabs
+		for (GameAsset<?> copiedAsset : copiedAssets) {
+			if (copiedAsset.type == GameAssetType.PREFAB || copiedAsset.type == GameAssetType.SCENE) {
+				GameAsset<? extends GameObjectContainer> casted = ((GameAsset<? extends GameObjectContainer>)copiedAsset);
+
+				collectGameResourcesForGameObject(casted, casted.getResource().getSelfObject(), copiedUUIDMap);
+			}
+
+
+		}
+
+		//Force things routines are using
+		for (GameAsset<?> copiedAsset : copiedAssets) {
+			if (copiedAsset.type == GameAssetType.ROUTINE) {
+				GameAsset<RoutineStageData> routineStageDataGameAsset = (GameAsset<RoutineStageData>)copiedAsset;
+				Array<NodeWidget> nodes = routineStageDataGameAsset.getResource().getNodes();
+				if (nodes.size == 0) {
+					RoutineEditorApp routineEditorApp = new RoutineEditorApp();
+					routineEditorApp.updateForGameAsset(routineStageDataGameAsset);
+
+					routineEditorApp.onRemove();
+				}
+				for (NodeWidget node : nodes) {
+					ObjectMap<String, AbstractWidget> widgetMap = node.getWidgetMap();
+					for (ObjectMap.Entry<String, AbstractWidget> stringAbstractWidgetEntry : widgetMap) {
+						AbstractWidget widget = stringAbstractWidgetEntry.value;
+						if (widget instanceof GameAssetWidget) {
+							GameAssetWidget<?> gameAssetWidget = (GameAssetWidget<?>) widget;
+							GameAsset<?> value = gameAssetWidget.getValue();
+							if (value.type == GameAssetType.SCENE) {
+
+								//Skip scene dependencies...
+
+							} else {
+								copiedUUIDMap.get(value.getRootRawAsset().metaData.uuid.toString()).addDependency(copiedAsset);
+							}
+
+						}
+					}
+				}
+			}
+		}
+
+
+		//Force vfx exports
+		for (GameAsset<?> copiedAsset : copiedAssets) {
+			if (copiedAsset.type == GameAssetType.VFX) {
+				for (GameAsset<?> dependentGameAsset : copiedAsset.dependentGameAssets) {
+					copiedUUIDMap.get(dependentGameAsset.getRootRawAsset().metaData.uuid.toString()).addDependency(copiedAsset);
+				}
+			}
+		}
+
+		//Pass down all references
+		for (GameAsset<?> copiedAsset : copiedAssets) {
+			if (copiedAsset.type == GameAssetType.SCENE) {
+				passDependency(copiedAsset, copiedAsset, copiedUUIDMap);
+			}
+		}
+
+
+
+		//remove all pngs of sprites that are atlases
+		ObjectSet<String> atlases = new ObjectSet<>();
+		for (GameAsset<?> copiedAsset : copiedAssets) {
+			if (copiedAsset.type == GameAssetType.ATLAS) {
+				atlases.add(copiedAsset.nameIdentifier);
+			}
+		}
+		ObjectSet.ObjectSetIterator<GameAsset<?>> iterator1 = copiedAssets.iterator();
+		while (iterator1.hasNext()) {
+			GameAsset<?> next = iterator1.next();
+			if (next.type == GameAssetType.SPRITE) {
+				if (next.getGameResourcesThatRequireMe().size == 0) {
+					if (atlases.contains(next.nameIdentifier)) {
+						System.out.println("Removing unused sprite " + next.nameIdentifier);
+						iterator1.remove();
+					}
+				}
+			}
+		}
+
+		//Disabling remove
+		ObjectSet.ObjectSetIterator<GameAsset<?>> iterator = copiedAssets.iterator();
+		while (iterator.hasNext()) {
+			GameAsset<?> next = iterator.next();
+			if (next.type == GameAssetType.SKELETON || next.type == GameAssetType.SPRITE  || next.type == GameAssetType.ATLAS) {
+				if (next.getGameResourcesThatRequireMe().size == 0) {
+					iterator.remove();
+				}
+			}
+		}
+
+//		debug(copiedAssets);
+
 		gameAssetsToExport.clear();
 		gameAssetsToExport.addAll(copiedAssets);
+
 
 		if (isOptimized) {
 				startOptimizedExport(gameAssetsToExport, settings, gameAssetExportStructure, new Runnable(){
@@ -615,6 +757,51 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 		}
 
 
+	}
+
+	private void passDependency (GameAsset<?> copiedAsset, GameAsset<?> parent, ObjectMap<String, GameAsset<?>> copiedUUIDMap) {
+
+		for (int i = 0; i < parent.dependentGameAssets.size; i++) {
+
+			GameAsset<?> gameAsset = parent.dependentGameAssets.get(i);
+			String string = gameAsset.getRootRawAsset().metaData.uuid.toString();
+			GameAsset<?> copiedGameAsset = copiedUUIDMap.get(string);
+
+			copiedGameAsset.addDependency(copiedAsset);
+
+			passDependency(copiedAsset, copiedGameAsset, copiedUUIDMap);
+		}
+	}
+
+	private void debug (ObjectSet<GameAsset<?>> copiedAssets) {
+
+		IntIntMap countersBigBois = new IntIntMap();
+
+		for (GameAsset<?> copiedAsset : copiedAssets) {
+			if (copiedAsset.type == GameAssetType.SPRITE || copiedAsset.type == GameAssetType.ATLAS) {
+				ObjectIntMap<GameAsset<?>> gameResourcesThatRequireMe = copiedAsset.getGameResourcesThatRequireMe();
+				int size = gameResourcesThatRequireMe.size;
+				countersBigBois.getAndIncrement(size, 0, 1);
+				if (size > 1) {
+					System.out.println("\tIn multiple game resources: ");
+					for (ObjectIntMap.Entry<GameAsset<?>> gameAssetEntry : gameResourcesThatRequireMe) {
+						GameAsset<?> gameAsset = gameAssetEntry.key;
+						System.out.println("\t\t " + gameAsset.nameIdentifier);
+					}
+				}
+
+				if (size == 0) {
+					System.out.println("No parent " + copiedAsset.nameIdentifier);
+				}
+			}
+		}
+		int max = 100;
+		for (int i = 0; i < max; i++) {
+			if (countersBigBois.containsKey(i)) {
+				int value = countersBigBois.get(i, -1);
+				System.out.println("Assets with " + i + " parent references: " + value);
+			}
+		}
 	}
 
 	private void startOptimizedExport (ObjectSet<GameAsset<?>> gameAssetsToExport, AssetRepositoryCatalogueExportOptions settings, GameAssetsExportStructure gameAssetExportStructure, Runnable runnable) {
@@ -707,7 +894,7 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 		gameAssetExportStructure.gameAssets.add(value);
 	}
 
-	private ObjectSet<String> dependentGameAssetsToUUIDArray (GameAsset<?> gameAsset) {
+	public static ObjectSet<String> dependentGameAssetsToUUIDArray (GameAsset<?> gameAsset) {
 		ObjectSet<String> uuids = new ObjectSet<>();
 		for (GameAsset<?> dependentGameAsset : gameAsset.dependentGameAssets) {
 			uuids.add(dependentGameAsset.getRootRawAsset().metaData.uuid.toString());
@@ -747,7 +934,7 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 		return uuids;
 	}
 
-	private void collectDependentGameResources (GameObject selfObject, ObjectSet<String> uuids) {
+	public static void collectDependentGameResources (GameObject selfObject, ObjectSet<String> uuids) {
 		for (AComponent component : selfObject.getComponents()) {
 			if (component instanceof GameResourceOwner) {
 				GameResourceOwner gameResourceOwner = (GameResourceOwner) component;

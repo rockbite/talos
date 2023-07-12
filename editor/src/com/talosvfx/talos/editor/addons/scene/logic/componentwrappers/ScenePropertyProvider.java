@@ -4,7 +4,9 @@ import com.badlogic.gdx.utils.Array;
 import com.talosvfx.talos.editor.addons.scene.SceneUtils;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.project2.TalosProjectData;
+import com.talosvfx.talos.editor.widgets.propertyWidgets.CheckboxWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.SelectBoxWidget;
+import com.talosvfx.talos.editor.widgets.propertyWidgets.WidgetFactory;
 import com.talosvfx.talos.editor.widgets.ui.FilteredTree;
 import com.talosvfx.talos.runtime.scene.SceneData;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.DynamicItemListWidget;
@@ -40,6 +42,8 @@ public class ScenePropertyProvider implements IPropertyProvider {
 				return scene.getName();
 			}
 		}, scene);
+
+		PropertyWidget checkboxWidget = WidgetFactory.generate(scene, "optimized", "Optimizer scene");
 
 		Supplier<SceneLayerWrapper> newItemDataSupplier = new Supplier<SceneLayerWrapper>() {
 			@Override
@@ -145,6 +149,7 @@ public class ScenePropertyProvider implements IPropertyProvider {
 
 
 		properties.add(labelWidget);
+		properties.add(checkboxWidget);
 		properties.add(itemListWidget);
 
 		itemListWidget.list.addItemListener(new FilteredTree.ItemListener<SceneLayerWrapper>() {

@@ -47,6 +47,12 @@ public class GameAssetLoader extends AsynchronousAssetLoader<GameAsset, GameAsse
 
 		return dependencies;
 	}
+
+	public static AssetDescriptor<GameAsset> getAssetDescriptorForGameAsset (GameAssetsExportStructure gameAssetsExportStructure, String identifier, GameAssetType type, GdxAssetRepo assetRepo, FileHandle baseFolder) {
+		GameAssetExportStructure gameAsset = gameAssetsExportStructure.findAsset(identifier, type);
+		AssetDescriptor<GameAsset> value = new AssetDescriptor<GameAsset>(gameAsset.uuid, GameAsset.class, new GameAssetLoader.GameAssetLoaderParam(gameAsset, assetRepo, baseFolder, gameAssetsExportStructure));
+		return value;
+	}
 	public static AssetDescriptor<GameAsset> getAssetDescriptorForGameAsset (GameAssetsExportStructure gameAssetsExportStructure, String uuid, GdxAssetRepo assetRepo, FileHandle baseFolder) {
 		GameAssetExportStructure gameAsset = gameAssetsExportStructure.findAsset(uuid);
 		AssetDescriptor<GameAsset> value = new AssetDescriptor<GameAsset>(uuid, GameAsset.class, new GameAssetLoader.GameAssetLoaderParam(gameAsset, assetRepo, baseFolder, gameAssetsExportStructure));
