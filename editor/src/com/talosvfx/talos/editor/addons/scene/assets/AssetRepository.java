@@ -694,7 +694,11 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 			if (copiedAsset.type == GameAssetType.SCENE) {
 				passDependency(copiedAsset, copiedAsset, copiedUUIDMap);
 			}
+			if (copiedAsset.type == GameAssetType.VFX) {
+				passDependency(copiedAsset, copiedAsset, copiedUUIDMap);
+			}
 		}
+
 
 
 
@@ -818,13 +822,17 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 
 
 	private void exportToTargetDir (ObjectSet<GameAsset<?>> gameAssetsToExport, AssetRepositoryCatalogueExportOptions settings, GameAssetsExportStructure gameAssetExportStructure) {
+		FileHandle exportPathHandle = settings.getExportPathHandle();
+		if (exportPathHandle.exists()) {
+			exportPathHandle.deleteDirectory();
+		}
+
 		for (GameAsset<?> gameAsset : gameAssetsToExport) {
 
 			Array<RawAsset> dependentRawAssets = gameAsset.dependentRawAssets;
 
 			GameAssetType type = gameAsset.type;
 
-			FileHandle exportPathHandle = settings.getExportPathHandle();
 			FileHandle destinationForChildDirectory = exportPathHandle.child(type.name());
 
 			if (!destinationForChildDirectory.exists()) {

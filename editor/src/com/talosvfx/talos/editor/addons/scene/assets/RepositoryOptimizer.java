@@ -297,6 +297,8 @@ public class RepositoryOptimizer {
 			}
 		}
 
+		canSkipPacking = false; //disable this
+
 		FileHandle local = Gdx.files.local("log.txt");
 		local.writeString("", false);
 		for (TextureBucket bucket : buckets) {
@@ -640,6 +642,7 @@ public class RepositoryOptimizer {
 		settings.maxHeight = 2048;
 		settings.filterMag = bucket.magFilter;
 		settings.filterMin = bucket.minFilter;
+		settings.pot = false;
 		settings.scale = new float[]{Float.parseFloat(SharedResources.currentProject.getExportPackingScale())};
 		return settings;
 	}
