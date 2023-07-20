@@ -111,6 +111,7 @@ public class SaveSystem implements Observer {
 					}
 				} catch (IOException e) {
 					e.printStackTrace();
+					logger.error("Error when running processor", e);
 				}
 			}
 		}

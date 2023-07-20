@@ -715,7 +715,7 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 			if (next.type == GameAssetType.SPRITE) {
 				if (next.getGameResourcesThatRequireMe().size == 0) {
 					if (atlases.contains(next.nameIdentifier)) {
-						System.out.println("Removing unused sprite " + next.nameIdentifier);
+						logger.info("Removing unused sprite " + next.nameIdentifier);
 						iterator1.remove();
 					}
 				}
