@@ -77,9 +77,10 @@ public class RepositoryOptimizer {
 
 	private static void checkAndDownload (ObjectSet<GameAsset<?>> gameAssetsToExport, GameAssetsExportStructure gameAssetExportStructure, BaseAssetRepository.AssetRepositoryCatalogueExportOptions settings, Runnable runnable) {
 		if (hasToolsBinary()) {
+			logger.info("Has tools binary, processing");
 			process(gameAssetsToExport, gameAssetExportStructure, settings, runnable);
 		} else {
-
+			logger.info("Downloading tools");
 			CompletableFuture<Void> download = download();
 			download.whenComplete((unused, throwable) -> {
 				if (throwable == null) {
@@ -315,6 +316,7 @@ public class RepositoryOptimizer {
 		CompletableFuture.allOf(futures).whenComplete((unused, throwable) -> {
 			if (throwable != null) {
 				throwable.printStackTrace();
+				logger.error("Bucket failed", throwable);
 			} else {
 
 				try {
@@ -361,6 +363,7 @@ public class RepositoryOptimizer {
 					}
 				} catch (Exception e) {
 					e.printStackTrace();
+					logger.error("Exception reencoding buckets", e);
 				}
 
 				// mark the age of most recent file, to optimize on the next export
@@ -438,8 +441,10 @@ public class RepositoryOptimizer {
 					try {
 						completableFuture.get();
 					} catch (InterruptedException e) {
+						logger.error("Interrupt in packing", e);
 						throw new RuntimeException(e);
 					} catch (ExecutionException e) {
+						logger.error("Interrupt in packing", e);
 						throw new RuntimeException(e);
 					}
 				}
@@ -481,8 +486,6 @@ public class RepositoryOptimizer {
 
 			Process process = Runtime.getRuntime().exec(args);
 
-
-
 			InputStream inputStream = process.getInputStream();
 			InputStreamReader isr = new InputStreamReader(inputStream);
 			InputStream errorStream = process.getErrorStream();
@@ -494,7 +497,7 @@ public class RepositoryOptimizer {
 			while ((n1 = isr.read(c1)) > 0) {
 				stableOutput.append(c1, 0, n1);
 			}
-			System.out.println("Output: " + stableOutput.toString());
+			logger.info("Output: {}", stableOutput.toString());
 
 			int n2;
 			char[] c2 = new char[1024];
@@ -502,7 +505,7 @@ public class RepositoryOptimizer {
 			while ((n2 = esr.read(c2)) > 0) {
 				stableError.append(c2, 0, n2);
 			}
-			System.out.println("Error: " + stableError.toString());
+			logger.error("Error {}", stableError.toString());
 
 			int i = process.waitFor();
 
@@ -513,6 +516,7 @@ public class RepositoryOptimizer {
 			objectCompletableFuture.complete(null);
 
 		} catch (Exception e) {
+			logger.error("FAiluren invoking external tool", e);
 			throw new RuntimeException(e);
 		}
 

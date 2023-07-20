@@ -68,11 +68,14 @@ public class SaveSystem implements Observer {
 
 	@EventHandler
 	public void onExport (ExportRequest event) {
+		logger.info("On export");
+
 		TalosProjectData currentProject = SharedResources.currentProject;
 		Preferences projectPrefs = TalosLocalPrefs.Instance().getProjectPrefs();
 		String exportScript = projectPrefs.getString("project.general.exportScript", "");
 		String projectFilePath = projectPrefs.getString("project.general.exportPath", "");
 
+		logger.info("checking project path {}", projectFilePath);
 		if (projectFilePath.isEmpty()) {
 			Toasts.getInstance().showInfoToast("Provide export path to enable exporting");
 			SharedResources.ui.showPreferencesWindow();
