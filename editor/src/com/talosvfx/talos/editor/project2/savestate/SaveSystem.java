@@ -77,9 +77,13 @@ public class SaveSystem implements Observer {
 			Toasts.getInstance().showInfoToast("Provide export path to enable exporting");
 			SharedResources.ui.showPreferencesWindow();
 		} else {
-			BaseAssetRepository.AssetRepositoryCatalogueExportOptions settings = new BaseAssetRepository.AssetRepositoryCatalogueExportOptions();
-			settings.loadFromPrefs(projectPrefs);
-			AssetRepository.getInstance().exportToFile(settings, event.isOptimized());
+			try {
+				BaseAssetRepository.AssetRepositoryCatalogueExportOptions settings = new BaseAssetRepository.AssetRepositoryCatalogueExportOptions();
+				settings.loadFromPrefs(projectPrefs);
+				AssetRepository.getInstance().exportToFile(settings, event.isOptimized());
+			} catch (Exception e) {
+				logger.error("Error when exporting", e);
+			}
 		}
 
 		if(!exportScript.isEmpty()) {

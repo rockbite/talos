@@ -87,6 +87,8 @@ public class Toasts {
 			Actions.delay(LENGTH_LONG),
 			Actions.removeActor()
 		));
+
+		logger.info("Toast {}", message);
 	}
 
 }
