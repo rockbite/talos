@@ -300,17 +300,21 @@ public class RepositoryOptimizer {
 
 		canSkipPacking = false; //disable this
 
-		FileHandle local = Gdx.files.local("log.txt");
-		local.writeString("", false);
-		for (TextureBucket bucket : buckets) {
-			bucket.debugLog(local);
-		}
+//		FileHandle local = Gdx.files.local("log.txt");
+//		local.writeString("", false);
+//		for (TextureBucket bucket : buckets) {
+//			bucket.debugLog(local);
+//		}
+
+		logger.info("Ready to unpack");
 
 		int i = 0;
 		for (TextureBucket bucket : buckets) {
 			futures[i] = CompletableFuture.supplyAsync(createUnpackAndPackTask(bucket, canSkipPacking));
 			i++;
 		}
+
+		logger.info("Waiting for all futures");
 
 		//for buckets unpack then repack
 		CompletableFuture.allOf(futures).whenComplete((unused, throwable) -> {
