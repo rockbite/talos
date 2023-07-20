@@ -84,6 +84,9 @@ public class GameAsset<T> {
 	}
 
 	public RawAsset getRootRawAsset () {
+		if (dependentRawAssets.isEmpty()) {
+//			System.out.println("something is wrong");
+		}
 		return dependentRawAssets.first();
 	}
 
