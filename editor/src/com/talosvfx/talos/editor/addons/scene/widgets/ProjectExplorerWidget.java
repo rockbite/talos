@@ -393,8 +393,10 @@ public class ProjectExplorerWidget extends Table implements Observer {
                             newHandle.mkdirs();
                             loadDirectoryTree(rootNode.getObject());
                             FilteredTree.Node newNode = nodes.get(newHandle.path());
-                            expand(newHandle.path());
-                            select(newNode.getParent());
+
+                            if (newNode != null) { // possible that node is too deep and widget is not created
+                                expand(newHandle.path());
+                            }
                             // TODO: refactor directory view widget to update itself
                             select(getCurrentFolder().path());
 //                            directoryViewWidgetNew.startRenameFor(newHandle);
@@ -648,7 +650,7 @@ public class ProjectExplorerWidget extends Table implements Observer {
                 node.add(newNode);
                 nodes.put(listItemHandle.path(), newNode);
                 if(listItemHandle.isDirectory()) {
-                    traversePath(list[i], currDepth++, maxDepth, newNode);
+                    traversePath(list[i], currDepth + 1, maxDepth, newNode);
                 }
 
                 label.setListener(new EditableLabel.EditableLabelChangeListener() {
