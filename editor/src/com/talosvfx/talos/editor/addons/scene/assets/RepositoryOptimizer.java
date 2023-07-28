@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.util.Comparator;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -247,10 +248,12 @@ public class RepositoryOptimizer {
 	}
 
 	public static void process (ObjectSet<GameAsset<?>> gameAssetsToExport, GameAssetsExportStructure gameAssetExportStructure, BaseAssetRepository.AssetRepositoryCatalogueExportOptions settings, Runnable runnable) {
-		ObjectSet<TextureBucket> buckets = new ObjectSet<>();
+		OrderedSet<TextureBucket> buckets = new OrderedSet<>();
 
-		ObjectSet<GameAsset<TextureAtlas>> atlases = new ObjectSet<>();
-		ObjectSet<GameAsset<AtlasSprite>> sprites = new ObjectSet<>();
+		OrderedSet<GameAsset<TextureAtlas>> atlases = new OrderedSet<>();
+		OrderedSet<GameAsset<AtlasSprite>> sprites = new OrderedSet<>();
+
+
 		for (GameAsset<?> gameAsset : gameAssetsToExport) {
 			if (gameAsset.type == GameAssetType.ATLAS) {
 				atlases.add((GameAsset<TextureAtlas>)gameAsset);
@@ -259,6 +262,21 @@ public class RepositoryOptimizer {
 				sprites.add((GameAsset<AtlasSprite>)gameAsset);
 			}
 		}
+
+		atlases.orderedItems().sort(new Comparator<GameAsset<TextureAtlas>>() {
+			@Override
+			public int compare (GameAsset<TextureAtlas> o1, GameAsset<TextureAtlas> o2) {
+				return o1.nameIdentifier.compareTo(o2.nameIdentifier);
+			}
+		});
+		sprites.orderedItems().sort(new Comparator<GameAsset<AtlasSprite>>() {
+			@Override
+			public int compare (GameAsset<AtlasSprite> o1, GameAsset<AtlasSprite> o2) {
+				return o1.nameIdentifier.compareTo(o2.nameIdentifier);
+			}
+		});
+
+
 
 		for (GameAsset<TextureAtlas> atlas : atlases) {
 			TextureAtlas resource = atlas.getResource();
