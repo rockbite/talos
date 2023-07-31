@@ -22,7 +22,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -80,6 +83,7 @@ public class RepositoryOptimizer {
 		if (hasToolsBinary()) {
 			logger.info("Has tools binary, processing");
 			process(gameAssetsToExport, gameAssetExportStructure, settings, runnable);
+			logger.info("End tools processing");
 		} else {
 			logger.info("Downloading tools");
 			CompletableFuture<Void> download = download();
@@ -263,19 +267,35 @@ public class RepositoryOptimizer {
 			}
 		}
 
-		atlases.orderedItems().sort(new Comparator<GameAsset<TextureAtlas>>() {
+		ArrayList<GameAsset> tempArrayForSort = new ArrayList<>();
+		for (GameAsset<TextureAtlas> atlas : atlases) {
+			tempArrayForSort.add(atlas);
+		}
+		tempArrayForSort.sort(new Comparator<GameAsset>() {
 			@Override
-			public int compare (GameAsset<TextureAtlas> o1, GameAsset<TextureAtlas> o2) {
+			public int compare (GameAsset o1, GameAsset o2) {
 				return o1.nameIdentifier.compareTo(o2.nameIdentifier);
 			}
 		});
-		sprites.orderedItems().sort(new Comparator<GameAsset<AtlasSprite>>() {
-			@Override
-			public int compare (GameAsset<AtlasSprite> o1, GameAsset<AtlasSprite> o2) {
-				return o1.nameIdentifier.compareTo(o2.nameIdentifier);
-			}
-		});
+		atlases.clear();
+		for (GameAsset gameAsset : tempArrayForSort) {
+			atlases.add(gameAsset);
+		}
 
+		tempArrayForSort.clear();
+		for (GameAsset<AtlasSprite> sprite : sprites) {
+			tempArrayForSort.add(sprite);
+		}
+		tempArrayForSort.sort(new Comparator<GameAsset>() {
+			@Override
+			public int compare (GameAsset o1, GameAsset o2) {
+				return o1.nameIdentifier.compareTo(o2.nameIdentifier);
+			}
+		});
+		sprites.clear();
+		for (GameAsset gameAsset : tempArrayForSort) {
+			sprites.add(gameAsset);
+		}
 
 
 		for (GameAsset<TextureAtlas> atlas : atlases) {
