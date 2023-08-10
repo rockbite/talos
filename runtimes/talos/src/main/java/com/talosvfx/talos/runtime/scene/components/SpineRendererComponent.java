@@ -83,7 +83,9 @@ public class SpineRendererComponent extends RendererComponent implements Json.Se
                 }
             } else {
                 Skin skinToApply = skeleton.getData().getDefaultSkin();
-                setAndUpdateSkin(skinToApply.getName());
+                if (skinToApply != null) {
+                    setAndUpdateSkin(skinToApply.getName());
+                }
             }
 
 
