@@ -47,7 +47,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Locale;
-import java.util.function.Supplier;
+import com.talosvfx.talos.runtime.utils.Supplier;
 
 public abstract class PreviewWidget extends ViewportWidget {
 

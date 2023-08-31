@@ -5,7 +5,7 @@ import com.badlogic.gdx.utils.Align;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.ui.common.zoomWidgets.LabelWithZoom;
 
-import java.util.function.Supplier;
+import com.talosvfx.talos.runtime.utils.Supplier;
 
 public class LabelWidget extends PropertyWidget<String> {
 

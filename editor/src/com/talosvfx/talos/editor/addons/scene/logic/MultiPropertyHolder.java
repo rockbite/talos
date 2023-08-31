@@ -7,7 +7,7 @@ import com.talosvfx.talos.editor.addons.scene.logic.componentwrappers.SpriteRend
 import com.talosvfx.talos.editor.widgets.propertyWidgets.IPropertyProvider;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
 
-import java.util.function.Supplier;
+import com.talosvfx.talos.runtime.utils.Supplier;
 
 public class MultiPropertyHolder<T extends IPropertyHolder> implements IPropertyHolder {
 

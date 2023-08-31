@@ -17,7 +17,7 @@ import com.talosvfx.talos.editor.widgets.ui.FilteredTree;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 import com.talosvfx.talos.editor.widgets.ui.common.SquareButton;
 
-import java.util.function.Supplier;
+import com.talosvfx.talos.runtime.utils.Supplier;
 
 
 public class DynamicItemListWidget<T> extends PropertyWidget<Array<T>> {

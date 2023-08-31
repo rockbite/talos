@@ -7,7 +7,7 @@ import com.talosvfx.talos.editor.widgets.propertyWidgets.LabelWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
 import com.talosvfx.talos.runtime.scene.components.CurveComponent;
 
-import java.util.function.Supplier;
+import com.talosvfx.talos.runtime.utils.Supplier;
 
 public class CurveComponentProvider extends AComponentProvider<CurveComponent> {
 

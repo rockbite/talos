@@ -9,7 +9,7 @@ import com.talosvfx.talos.runtime.assets.GameAssetType;
 import com.talosvfx.talos.runtime.scene.components.ScriptComponent;
 import com.talosvfx.talos.runtime.scene.utils.propertyWrappers.PropertyWrapper;
 
-import java.util.function.Supplier;
+import com.talosvfx.talos.runtime.utils.Supplier;
 
 public class ScriptComponentProvider extends AComponentProvider<ScriptComponent> {
 

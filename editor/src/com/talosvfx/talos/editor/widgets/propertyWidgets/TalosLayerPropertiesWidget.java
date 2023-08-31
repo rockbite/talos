@@ -12,7 +12,7 @@ import com.talosvfx.talos.runtime.maps.TalosLayer;
 import com.talosvfx.talos.editor.addons.scene.widgets.property.PropertyPanelAssetSelectionWidget;
 import com.talosvfx.talos.runtime.maps.TilePaletteData;
 
-import java.util.function.Supplier;
+import com.talosvfx.talos.runtime.utils.Supplier;
 
 public class TalosLayerPropertiesWidget extends PropertyWidget<TalosLayer> {
 

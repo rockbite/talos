@@ -10,7 +10,7 @@ import com.talosvfx.talos.editor.widgets.propertyWidgets.WidgetFactory;
 import com.talosvfx.talos.runtime.assets.GameAssetType;
 import com.talosvfx.talos.runtime.assets.meta.SpineMetadata;
 
-import java.util.function.Supplier;
+import com.talosvfx.talos.runtime.utils.Supplier;
 
 public class SpineMetaDataProvider extends AMetaDataProvider<SpineMetadata> {
 

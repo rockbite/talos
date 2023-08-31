@@ -12,7 +12,7 @@ import com.talosvfx.talos.editor.widgets.ui.FilteredTree;
 import com.talosvfx.talos.runtime.maps.TalosLayer;
 import com.talosvfx.talos.runtime.scene.components.MapComponent;
 
-import java.util.function.Supplier;
+import com.talosvfx.talos.runtime.utils.Supplier;
 
 public class MapComponentProvider extends RendererComponentProvider<MapComponent> {
 

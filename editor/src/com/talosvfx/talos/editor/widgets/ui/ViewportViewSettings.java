@@ -14,7 +14,7 @@ import com.talosvfx.talos.editor.utils.CameraController;
 import lombok.Data;
 import lombok.Getter;
 
-import java.util.function.Supplier;
+import com.talosvfx.talos.runtime.utils.Supplier;
 
 @Data
 public class ViewportViewSettings {

@@ -15,7 +15,7 @@ import com.talosvfx.talos.runtime.assets.RawAsset;
 import com.talosvfx.talos.runtime.scene.components.ParticleComponent;
 import com.talosvfx.talos.runtime.vfx.serialization.BaseVFXProjectData;
 
-import java.util.function.Supplier;
+import com.talosvfx.talos.runtime.utils.Supplier;
 
 public class ParticleComponentProvider<T extends BaseVFXProjectData> extends RendererComponentProvider<ParticleComponent<T>> {
 

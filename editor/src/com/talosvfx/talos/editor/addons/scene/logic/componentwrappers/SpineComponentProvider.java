@@ -20,7 +20,7 @@ import com.talosvfx.talos.runtime.scene.GameObject;
 import com.talosvfx.talos.runtime.scene.GameObjectContainer;
 import com.talosvfx.talos.runtime.scene.components.SpineRendererComponent;
 
-import java.util.function.Supplier;
+import com.talosvfx.talos.runtime.utils.Supplier;
 
 public class SpineComponentProvider extends RendererComponentProvider<SpineRendererComponent> {
 

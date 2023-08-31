@@ -20,7 +20,7 @@ import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
 
 import java.io.File;
 import java.net.Socket;
-import java.util.function.Supplier;
+import com.talosvfx.talos.runtime.utils.Supplier;
 
 public class SettingsDialog extends VisWindow {
 

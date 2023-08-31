@@ -13,7 +13,7 @@ import com.talosvfx.talos.editor.nodes.widgets.ValueWidget;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.runtime.scene.ValueProperty;
 
-import java.util.function.Supplier;
+import com.talosvfx.talos.runtime.utils.Supplier;
 
 public class Vector2PropertyWidget extends PropertyWidget<Vector2>  {
 

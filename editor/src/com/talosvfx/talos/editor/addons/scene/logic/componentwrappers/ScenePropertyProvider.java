@@ -18,7 +18,7 @@ import com.talosvfx.talos.runtime.scene.Scene;
 import com.talosvfx.talos.runtime.scene.SceneLayer;
 import com.talosvfx.talos.runtime.scene.render.RenderStrategy;
 
-import java.util.function.Supplier;
+import com.talosvfx.talos.runtime.utils.Supplier;
 
 public class ScenePropertyProvider implements IPropertyProvider {
 

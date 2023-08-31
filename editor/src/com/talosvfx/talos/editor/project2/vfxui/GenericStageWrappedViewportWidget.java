@@ -18,7 +18,7 @@ import com.talosvfx.talos.editor.utils.grid.property_providers.DynamicGridProper
 import com.talosvfx.talos.editor.widgets.ui.ViewportWidget;
 import lombok.Getter;
 
-import java.util.function.Supplier;
+import com.talosvfx.talos.runtime.utils.Supplier;
 
 public class GenericStageWrappedViewportWidget extends ViewportWidget {
 

@@ -80,7 +80,7 @@ import org.slf4j.Logger;
 import java.io.File;
 import java.io.IOException;
 import java.util.Random;
-import java.util.function.Supplier;
+import com.talosvfx.talos.runtime.utils.Supplier;
 
 import static com.talosvfx.talos.editor.utils.InputUtils.ctrlPressed;
 

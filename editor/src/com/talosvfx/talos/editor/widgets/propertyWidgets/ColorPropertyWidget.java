@@ -13,7 +13,7 @@ import com.talosvfx.talos.editor.notifications.TalosEvent;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 
-import java.util.function.Supplier;
+import com.talosvfx.talos.runtime.utils.Supplier;
 
 public class ColorPropertyWidget extends PropertyWidget<Color> {
 

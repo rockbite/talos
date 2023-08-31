@@ -7,7 +7,7 @@ import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.ui.common.zoomWidgets.CheckboxWithZoom;
 
-import java.util.function.Supplier;
+import com.talosvfx.talos.runtime.utils.Supplier;
 
 public class CheckboxWidget extends PropertyWidget<Boolean> {
 

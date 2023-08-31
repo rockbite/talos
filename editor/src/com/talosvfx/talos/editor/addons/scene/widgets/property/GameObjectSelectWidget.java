@@ -21,7 +21,7 @@ import com.talosvfx.talos.runtime.scene.SavableContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.function.Supplier;
+import com.talosvfx.talos.runtime.utils.Supplier;
 
 public class GameObjectSelectWidget extends PropertyWidget<GameObject> {
 

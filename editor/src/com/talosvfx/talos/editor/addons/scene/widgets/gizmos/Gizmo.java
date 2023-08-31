@@ -23,7 +23,7 @@ import com.talosvfx.talos.runtime.scene.components.AComponent;
 import com.talosvfx.talos.runtime.scene.components.TransformComponent;
 import com.talosvfx.talos.runtime.scene.utils.TransformSettings;
 
-import java.util.function.Supplier;
+import com.talosvfx.talos.runtime.utils.Supplier;
 
 public abstract class Gizmo extends Actor implements Pool.Poolable {
 

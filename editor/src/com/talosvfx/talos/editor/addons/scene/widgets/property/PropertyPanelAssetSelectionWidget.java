@@ -19,7 +19,7 @@ import com.talosvfx.talos.editor.widgets.ui.common.SquareButton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.function.Supplier;
+import com.talosvfx.talos.runtime.utils.Supplier;
 
 public class PropertyPanelAssetSelectionWidget<T> extends PropertyWidget<GameAsset<T>> {
 

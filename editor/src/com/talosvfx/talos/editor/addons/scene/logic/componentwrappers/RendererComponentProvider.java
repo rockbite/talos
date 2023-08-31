@@ -11,7 +11,7 @@ import com.talosvfx.talos.runtime.scene.GameObject;
 import com.talosvfx.talos.runtime.scene.SceneLayer;
 import com.talosvfx.talos.runtime.scene.components.RendererComponent;
 
-import java.util.function.Supplier;
+import com.talosvfx.talos.runtime.utils.Supplier;
 
 public abstract class RendererComponentProvider<T extends RendererComponent> extends AComponentProvider<T> {
 

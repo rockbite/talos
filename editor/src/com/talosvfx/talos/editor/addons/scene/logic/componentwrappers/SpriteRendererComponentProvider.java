@@ -18,7 +18,7 @@ import com.talosvfx.talos.runtime.graphics.NineSlice;
 import com.talosvfx.talos.runtime.scene.GameObject;
 import com.talosvfx.talos.runtime.scene.components.SpriteRendererComponent;
 
-import java.util.function.Supplier;
+import com.talosvfx.talos.runtime.utils.Supplier;
 
 public final class SpriteRendererComponentProvider extends RendererComponentProvider<SpriteRendererComponent> {
 

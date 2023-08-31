@@ -17,7 +17,7 @@ import com.rockbite.bongo.engine.systems.RenderPassSystem;
 import com.talosvfx.talos.editor.wrappers.IDragPointProvider;
 import lombok.Getter;
 
-import java.util.function.Supplier;
+import com.talosvfx.talos.runtime.utils.Supplier;
 
 public class Preview3D extends PreviewWidget {
 

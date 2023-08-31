@@ -18,7 +18,7 @@ import com.talosvfx.talos.runtime.scene.GameObject;
 import com.talosvfx.talos.runtime.scene.GameObjectContainer;
 import com.talosvfx.talos.runtime.scene.components.PaintSurfaceComponent;
 
-import java.util.function.Supplier;
+import com.talosvfx.talos.runtime.utils.Supplier;
 
 public class PaintSurfaceComponentProvider extends AComponentProvider<PaintSurfaceComponent> {
 

@@ -14,7 +14,7 @@ import com.talosvfx.talos.runtime.scene.utils.propertyWrappers.PropertyGameAsset
 import com.talosvfx.talos.runtime.scene.utils.propertyWrappers.PropertyWrapper;
 import com.talosvfx.talos.editor.widgets.ui.common.zoomWidgets.LabelWithZoom;
 
-import java.util.function.Supplier;
+import com.talosvfx.talos.runtime.utils.Supplier;
 
 public class CustomAssetWidget extends ATypeWidget<GameAsset<?>> {
     private GenericAssetSelectionWidget<?> assetWidget;

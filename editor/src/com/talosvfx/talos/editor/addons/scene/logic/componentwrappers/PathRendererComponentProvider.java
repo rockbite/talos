@@ -12,7 +12,7 @@ import com.talosvfx.talos.runtime.assets.GameAssetType;
 import com.talosvfx.talos.runtime.scene.GameObject;
 import com.talosvfx.talos.runtime.scene.components.PathRendererComponent;
 
-import java.util.function.Supplier;
+import com.talosvfx.talos.runtime.utils.Supplier;
 
 public class PathRendererComponentProvider extends RendererComponentProvider<PathRendererComponent> {
     public PathRendererComponentProvider(PathRendererComponent component) {

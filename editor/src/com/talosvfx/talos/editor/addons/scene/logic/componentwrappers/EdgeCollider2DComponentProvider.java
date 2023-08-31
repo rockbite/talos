@@ -4,7 +4,7 @@ import com.badlogic.gdx.utils.Array;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.*;
 import com.talosvfx.talos.runtime.scene.components.EdgeCollider2DComponent;
 
-import java.util.function.Supplier;
+import com.talosvfx.talos.runtime.utils.Supplier;
 
 public class EdgeCollider2DComponentProvider extends AComponentProvider<EdgeCollider2DComponent> {
 

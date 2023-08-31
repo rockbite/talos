@@ -7,7 +7,7 @@ import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.bvb.AttachmentPoint;
 import com.talosvfx.talos.editor.project2.SharedResources;
 
-import java.util.function.Supplier;
+import com.talosvfx.talos.runtime.utils.Supplier;
 
 public class AttachmentPointWidget extends PropertyWidget<AttachmentPoint> {
 

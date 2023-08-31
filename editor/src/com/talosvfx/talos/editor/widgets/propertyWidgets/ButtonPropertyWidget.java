@@ -11,7 +11,7 @@ import com.talosvfx.talos.editor.widgets.ui.common.zoomWidgets.LabelWithZoom;
 import com.talosvfx.talos.editor.widgets.ui.common.SquareButton;
 import lombok.Setter;
 
-import java.util.function.Supplier;
+import com.talosvfx.talos.runtime.utils.Supplier;
 
 public class ButtonPropertyWidget<T> extends PropertyWidget<T> {
 

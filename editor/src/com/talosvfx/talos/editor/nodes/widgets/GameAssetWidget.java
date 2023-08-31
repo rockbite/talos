@@ -21,7 +21,7 @@ import com.talosvfx.talos.editor.widgets.ui.common.GenericAssetSelectionWidget;
 import lombok.Getter;
 
 import java.util.UUID;
-import java.util.function.Supplier;
+import com.talosvfx.talos.runtime.utils.Supplier;
 
 public class GameAssetWidget<T> extends AbstractWidget<GameAsset<T>> implements Observer {
 
