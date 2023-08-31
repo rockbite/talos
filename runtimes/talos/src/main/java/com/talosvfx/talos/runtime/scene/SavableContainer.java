@@ -7,6 +7,7 @@ import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.JsonWriter;
 import com.talosvfx.talos.runtime.scene.components.AComponent;
+import com.talosvfx.talos.runtime.utils.Supplier;
 import com.talosvfx.talos.runtime.utils.TempHackUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,7 +16,6 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.UUID;
-import java.util.function.Supplier;
 
 public abstract class SavableContainer implements GameObjectContainer, Json.Serializable {
 

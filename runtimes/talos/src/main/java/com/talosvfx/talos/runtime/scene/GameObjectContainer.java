@@ -2,10 +2,9 @@ package com.talosvfx.talos.runtime.scene;
 
 import com.badlogic.gdx.utils.Array;
 import com.talosvfx.talos.runtime.scene.components.AComponent;
+import com.talosvfx.talos.runtime.utils.Supplier;
 
 import java.util.Collection;
-import java.util.function.Supplier;
-
 public interface GameObjectContainer {
 
     String getName();

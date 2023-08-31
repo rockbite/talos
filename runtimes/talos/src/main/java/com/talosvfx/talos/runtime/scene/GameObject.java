@@ -11,12 +11,12 @@ import com.talosvfx.talos.runtime.routine.RoutineEventListener;
 import com.talosvfx.talos.runtime.scene.components.*;
 import com.talosvfx.talos.runtime.scene.utils.TransformSettings;
 import com.talosvfx.talos.runtime.scene.utils.propertyWrappers.PropertyWrapper;
+import com.talosvfx.talos.runtime.utils.Supplier;
 import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.UUID;
-import java.util.function.Supplier;
 
 public class GameObject implements GameObjectContainer, RoutineEventListener, Json.Serializable {
 

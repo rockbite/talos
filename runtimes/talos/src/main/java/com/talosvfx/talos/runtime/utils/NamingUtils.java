@@ -4,7 +4,6 @@ import com.badlogic.gdx.utils.GdxRuntimeException;
 
 import java.util.Collection;
 import java.util.function.Predicate;
-import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 

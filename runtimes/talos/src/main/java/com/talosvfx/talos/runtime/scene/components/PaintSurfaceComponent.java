@@ -17,7 +17,6 @@ import com.talosvfx.talos.runtime.assets.GameResourceOwner;
 import com.talosvfx.talos.runtime.scene.ValueProperty;
 
 import java.util.UUID;
-import java.util.function.Supplier;
 
 public class PaintSurfaceComponent extends AComponent implements GameResourceOwner<AtlasSprite>, Json.Serializable {
 

@@ -6,7 +6,6 @@ import com.badlogic.gdx.utils.Pools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.function.Supplier;
 
 public class CurveComponent extends AComponent {
 
