@@ -76,13 +76,15 @@ public class SaveSystem implements Observer {
 		String projectFilePath = projectPrefs.getString("project.general.exportPath", "");
 
 		logger.info("checking project path {}", projectFilePath);
+
+		BaseAssetRepository.AssetRepositoryCatalogueExportOptions settings = new BaseAssetRepository.AssetRepositoryCatalogueExportOptions();
+		settings.loadFromPrefs(projectPrefs);
+
 		if (projectFilePath.isEmpty()) {
 			Toasts.getInstance().showInfoToast("Provide export path to enable exporting");
 			SharedResources.ui.showPreferencesWindow();
 		} else {
 			try {
-				BaseAssetRepository.AssetRepositoryCatalogueExportOptions settings = new BaseAssetRepository.AssetRepositoryCatalogueExportOptions();
-				settings.loadFromPrefs(projectPrefs);
 				AssetRepository.getInstance().exportToFile(settings, event.isOptimized());
 			} catch (Exception e) {
 				logger.error("Error when exporting", e);
@@ -90,16 +92,15 @@ public class SaveSystem implements Observer {
 		}
 
 		if(!exportScript.isEmpty()) {
+			FileHandle exportScriptHandle = settings.getExportScriptHandle();
 			String projectPath = currentProject.rootProjectDir().path();
 
-			FileHandle handle = Gdx.files.absolute(projectPath + File.separator + exportScript);
-
-			if (handle.exists() && !handle.isDirectory()) {
+			if (exportScriptHandle.exists() && !exportScriptHandle.isDirectory()) {
 				Runtime rt = Runtime.getRuntime();
 
 				try {
 					String nodeCommand = "node";
-					String buildScriptPath = handle.path();
+					String buildScriptPath = exportScriptHandle.path();
 					String projectDirectoryPath = "\"" + projectPath  + "\"";
 					String projectFilePathComm = "\"" + projectFilePath + "\"";
 

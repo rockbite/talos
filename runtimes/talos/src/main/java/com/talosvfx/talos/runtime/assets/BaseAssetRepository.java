@@ -21,7 +21,10 @@ public abstract class BaseAssetRepository {
 		private FileHandle exportPathHandle;
 
 		public void loadFromPrefs (Preferences projectPrefs) {
-			exportScriptHandle = Gdx.files.absolute(projectPrefs.getString("project.general.exportScript", ""));
+			String exportScriptPath = projectPrefs.getString("project.general.exportScript", null);
+			if (exportScriptPath != null) {
+				exportScriptHandle = Gdx.files.absolute(exportScriptPath);
+			}
 			exportPathHandle = Gdx.files.absolute(projectPrefs.getString("project.general.exportPath", ""));
 		}
 	}
