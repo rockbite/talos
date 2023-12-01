@@ -142,6 +142,7 @@ public class ParticleEmitterInstance implements IEmitter {
 		isAdditive = emitterModule.isAdditive();
 		isBlendAdd = emitterModule.isBlendAdd();
 		isImmortal = emitterModule.isImmortal();
+		boolean youngestInBack = emitterModule.isYoungestInBack();
 
 		if (delayTimer > 0) {
 			delayTimer -= delta;
@@ -185,7 +186,11 @@ public class ParticleEmitterInstance implements IEmitter {
 					Particle particle = particlePool.obtain();
 					if (emitterGraph.getParticleModule() != null) {
 						particle.init(this);
-						activeParticles.add(particle);
+						if (youngestInBack) {
+							activeParticles.add(particle);
+						} else {
+							activeParticles.insert(0, particle);
+						}
 					}
 				}
 				particlesToEmmit -= count;

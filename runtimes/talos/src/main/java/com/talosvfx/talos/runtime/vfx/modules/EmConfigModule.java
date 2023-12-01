@@ -39,6 +39,7 @@ public class EmConfigModule extends AbstractModule {
         userValue.isBlendAdd = false;
         userValue.aligned = false;
         userValue.immortal = false;
+        userValue.youngestInBack = true;
     }
 
     @Override
@@ -65,6 +66,7 @@ public class EmConfigModule extends AbstractModule {
         json.writeValue("continuous", getUserValue().continuous);
         json.writeValue("aligned", getUserValue().aligned);
         json.writeValue("immortal", getUserValue().immortal);
+        json.writeValue("youngestInFront", getUserValue().youngestInBack);
     }
 
     @Override
@@ -76,6 +78,7 @@ public class EmConfigModule extends AbstractModule {
         getUserValue().continuous = jsonData.getBoolean("continuous");
         getUserValue().aligned = jsonData.getBoolean("aligned");
         getUserValue().immortal = jsonData.getBoolean("immortal", false);
+        getUserValue().youngestInBack = jsonData.getBoolean("youngestInFront", true);
 
         if(outputValue != null) {
             outputValue.set(getUserValue());

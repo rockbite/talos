@@ -34,6 +34,7 @@ public class EmConfigModuleWrapper extends ModuleWrapper<EmConfigModule> {
     CheckboxWithZoom continuousBox;
     CheckboxWithZoom alignedBox;
     CheckboxWithZoom immortalBox;
+    CheckboxWithZoom youngestInBackBox;
 
     boolean lockListeners = false;
 
@@ -47,6 +48,7 @@ public class EmConfigModuleWrapper extends ModuleWrapper<EmConfigModule> {
         continuousBox = new CheckboxWithZoom("continuous", VisUI.getSkin());
         alignedBox = new CheckboxWithZoom("aligned", VisUI.getSkin());
         immortalBox = new CheckboxWithZoom("immortal", VisUI.getSkin());
+        youngestInBackBox = new CheckboxWithZoom("youngestInBackBox", VisUI.getSkin());
 
         Table form = new Table();
 
@@ -61,6 +63,8 @@ public class EmConfigModuleWrapper extends ModuleWrapper<EmConfigModule> {
         form.add(alignedBox).left().padLeft(3);
         form.row();
         form.add(immortalBox).left().padLeft(3);
+        form.row();
+        form.add(youngestInBackBox).left().padLeft(3);
 
         contentWrapper.add(form).left();
         contentWrapper.add().expandX();
@@ -103,6 +107,12 @@ public class EmConfigModuleWrapper extends ModuleWrapper<EmConfigModule> {
                 fromUIToData();
             }
         });
+        youngestInBackBox.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                fromUIToData();
+            }
+        });
     }
 
     @Override
@@ -119,6 +129,8 @@ public class EmConfigModuleWrapper extends ModuleWrapper<EmConfigModule> {
             module.getUserValue().continuous = continuousBox.isChecked();
             module.getUserValue().aligned = alignedBox.isChecked();
             module.getUserValue().immortal = immortalBox.isChecked();
+            module.getUserValue().youngestInBack = youngestInBackBox.isChecked();
+
         }
     }
 
@@ -130,6 +142,7 @@ public class EmConfigModuleWrapper extends ModuleWrapper<EmConfigModule> {
         continuousBox.setChecked(module.getUserValue().continuous);
         alignedBox.setChecked(module.getUserValue().aligned);
         immortalBox.setChecked(module.getUserValue().immortal);
+        youngestInBackBox.setChecked(module.getUserValue().youngestInBack);
         lockListeners = false;
     }
 

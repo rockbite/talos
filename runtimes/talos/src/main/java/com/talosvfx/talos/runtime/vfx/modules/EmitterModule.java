@@ -127,6 +127,14 @@ public class EmitterModule extends AbstractModule {
         return config.additive;
     }
 
+    public boolean isYoungestInBack() {
+        fetchInputSlotValue(CONFIG);
+
+        if(config.isEmpty()) return true;
+
+        return config.youngestInBack;
+    }
+
 
     public boolean isBlendAdd () {
         fetchInputSlotValue(CONFIG);

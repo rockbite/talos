@@ -24,6 +24,7 @@ public class EmConfigValue extends Value {
     public boolean additive = true;
     public boolean isBlendAdd = false;
     public boolean immortal = false;
+    public boolean youngestInBack = true;
 
     @Override
     public void set(Value value) {
@@ -37,5 +38,6 @@ public class EmConfigValue extends Value {
         this.additive = from.additive;
         this.isBlendAdd = from.isBlendAdd;
         this.immortal = from.immortal;
+        this.youngestInBack = from.youngestInBack;
     }
 }
