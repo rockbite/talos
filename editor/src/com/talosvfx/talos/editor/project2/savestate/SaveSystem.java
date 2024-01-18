@@ -21,75 +21,90 @@ import com.talosvfx.talos.runtime.assets.BaseAssetRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 
 public class SaveSystem implements Observer {
 
-	private static final Logger logger = LoggerFactory.getLogger(SaveSystem.class);
+    private static final Logger logger = LoggerFactory.getLogger(SaveSystem.class);
 
-	public SaveSystem () {
-		Notifications.registerObserver(this);
-	}
+    public SaveSystem () {
+        Notifications.registerObserver(this);
+    }
 
-	@CommandEventHandler(commandType = Commands.CommandType.SAVE)
-	public void onSaveAction (CommandEvent actionEvent) {
-		Notifications.fireEvent(Notifications.obtainEvent(SaveRequest.class));
-	}
+    @CommandEventHandler(commandType = Commands.CommandType.SAVE)
+    public void onSaveAction (CommandEvent actionEvent) {
+        Notifications.fireEvent(Notifications.obtainEvent(SaveRequest.class));
+    }
 
 
-	@EventHandler
-	public void onSave (SaveRequest event) {
-		if (SharedResources.currentProject != null) {
-			TalosProjectData currentProject = SharedResources.currentProject;
-			try {
-				currentProject.save();
-				Toasts.getInstance().showInfoToast("Project saved");
-			} catch (Exception e) {
-				logger.error("Failure to save", e);
-				Toasts.getInstance().showErrorToast("Failure to save " + e.getMessage());
-			}
-		} else {
-			Toasts.getInstance().showInfoToast("No project to save");
-		}
-	}
+    @EventHandler
+    public void onSave (SaveRequest event) {
+        if (SharedResources.currentProject != null) {
+            TalosProjectData currentProject = SharedResources.currentProject;
+            try {
+                currentProject.save();
+                Toasts.getInstance().showInfoToast("Project saved");
+            } catch (Exception e) {
+                logger.error("Failure to save", e);
+                Toasts.getInstance().showErrorToast("Failure to save " + e.getMessage());
+            }
+        } else {
+            Toasts.getInstance().showInfoToast("No project to save");
+        }
+    }
 
-	@CommandEventHandler(commandType = Commands.CommandType.EXPORT)
-	public void onExportAction (CommandEvent actionEvent) {
-		Notifications.quickFire(ExportRequest.class);
-	}
+    @CommandEventHandler(commandType = Commands.CommandType.EXPORT)
+    public void onExportAction (CommandEvent actionEvent) {
+        Notifications.quickFire(ExportRequest.class);
+    }
 
-	@CommandEventHandler(commandType = Commands.CommandType.EXPORT_OPTIMIZED)
-	public void onExportOptimized (CommandEvent event) {
-		ExportRequest exportRequest = Notifications.obtainEvent(ExportRequest.class);
-		exportRequest.setOptimized(true);
-		Notifications.fireEvent(exportRequest);
-	}
+    @CommandEventHandler(commandType = Commands.CommandType.EXPORT_OPTIMIZED)
+    public void onExportOptimized (CommandEvent event) {
+        ExportRequest exportRequest = Notifications.obtainEvent(ExportRequest.class);
+        exportRequest.setOptimized(true);
+        Notifications.fireEvent(exportRequest);
+    }
 
-	@EventHandler
-	public void onExport (ExportRequest event) {
-		logger.info("On export");
+    public String getNodePath () {
+        String nodePath = "";
+        try {
+            Process process = Runtime.getRuntime().exec(new String[]{"/bin/bash", "-c", "which node"});
+            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            nodePath = reader.readLine();
+            reader.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return nodePath;
+    }
 
-		TalosProjectData currentProject = SharedResources.currentProject;
-		Preferences projectPrefs = TalosLocalPrefs.Instance().getProjectPrefs();
-		String exportScript = projectPrefs.getString("project.general.exportScript", "");
-		String projectFilePath = projectPrefs.getString("project.general.exportPath", "");
+    @EventHandler
+    public void onExport (ExportRequest event) {
+        logger.info("On export");
 
-		logger.info("checking project path {}", projectFilePath);
+        TalosProjectData currentProject = SharedResources.currentProject;
+        Preferences projectPrefs = TalosLocalPrefs.Instance().getProjectPrefs();
+        String exportScript = projectPrefs.getString("project.general.exportScript", "");
+        String projectFilePath = projectPrefs.getString("project.general.exportPath", "");
 
-		BaseAssetRepository.AssetRepositoryCatalogueExportOptions settings = new BaseAssetRepository.AssetRepositoryCatalogueExportOptions();
-		settings.loadFromPrefs(projectPrefs);
+        logger.info("checking project path {}", projectFilePath);
 
-		if (projectFilePath.isEmpty()) {
-			Toasts.getInstance().showInfoToast("Provide export path to enable exporting");
-			SharedResources.ui.showPreferencesWindow();
-		} else {
-			try {
-				AssetRepository.getInstance().exportToFile(settings, event.isOptimized());
-			} catch (Exception e) {
-				logger.error("Error when exporting", e);
-			}
-		}
+        BaseAssetRepository.AssetRepositoryCatalogueExportOptions settings = new BaseAssetRepository.AssetRepositoryCatalogueExportOptions();
+        settings.loadFromPrefs(projectPrefs);
+
+        if (projectFilePath.isEmpty()) {
+            Toasts.getInstance().showInfoToast("Provide export path to enable exporting");
+            SharedResources.ui.showPreferencesWindow();
+        } else {
+            try {
+                AssetRepository.getInstance().exportToFile(settings, event.isOptimized());
+            } catch (Exception e) {
+                logger.error("Error when exporting", e);
+            }
+        }
 
 		if(!exportScript.isEmpty()) {
 			Toasts.getInstance().showInfoToast("Export script defined, trying to run");
@@ -101,18 +116,14 @@ public class SaveSystem implements Observer {
 				Runtime rt = Runtime.getRuntime();
 				Toasts.getInstance().showInfoToast("Export script found in file system");
 
-				try {
-					String nodeCommand = "node";
-					String buildScriptPath = exportScriptHandle.path();
-					String projectDirectoryPath = "\"" + projectPath  + "\"";
-					String projectFilePathComm = "\"" + projectFilePath + "\"";
+                try {
+                    String nodeCommand = "node";
+                    String buildScriptPath = exportScriptHandle.path();
+                    String projectDirectoryPath = "\"" + projectPath + "\"";
+                    String projectFilePathComm = "\"" + projectFilePath + "\"";
 
 					if (TalosMain.Instance().isOsX()) {
-						File nodeBinary = new File(nodeCommand);
-						if(!nodeBinary.exists()) {
-							nodeCommand = "/opt/homebrew/bin/node";
-						}
-
+                        nodeCommand = getNodePath();
 						Toasts.getInstance().showInfoToast("Trying to launch build script runner for " + nodeCommand);
 
 						ProcessBuilder pb = new ProcessBuilder("bash", "-l", "-c", nodeCommand + " " + buildScriptPath + " " + projectDirectoryPath + " " + projectFilePathComm);
