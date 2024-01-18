@@ -124,7 +124,7 @@ public class SaveSystem implements Observer {
 
 					if (TalosMain.Instance().isOsX()) {
                         nodeCommand = getNodePath();
-                        if (nodeCommand == null) {
+                        if (nodeCommand == null || nodeCommand.isEmpty() || nodeCommand.equals("null")) {
                             nodeCommand = "node";
                         }
 						Toasts.getInstance().showInfoToast("Trying to launch build script runner for " + nodeCommand);
