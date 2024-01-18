@@ -106,15 +106,15 @@ public class SaveSystem implements Observer {
             }
         }
 
-		if(!exportScript.isEmpty()) {
-			Toasts.getInstance().showInfoToast("Export script defined, trying to run");
+        if (!exportScript.isEmpty()) {
+            Toasts.getInstance().showInfoToast("Export script defined, trying to run");
 
-			FileHandle exportScriptHandle = settings.getExportScriptHandle();
-			String projectPath = currentProject.rootProjectDir().path();
+            FileHandle exportScriptHandle = settings.getExportScriptHandle();
+            String projectPath = currentProject.rootProjectDir().path();
 
-			if (exportScriptHandle.exists() && !exportScriptHandle.isDirectory()) {
-				Runtime rt = Runtime.getRuntime();
-				Toasts.getInstance().showInfoToast("Export script found in file system");
+            if (exportScriptHandle.exists() && !exportScriptHandle.isDirectory()) {
+                Runtime rt = Runtime.getRuntime();
+                Toasts.getInstance().showInfoToast("Export script found in file system");
 
                 try {
                     String nodeCommand = "node";
@@ -122,31 +122,49 @@ public class SaveSystem implements Observer {
                     String projectDirectoryPath = "\"" + projectPath + "\"";
                     String projectFilePathComm = "\"" + projectFilePath + "\"";
 
-					if (TalosMain.Instance().isOsX()) {
+                    if (TalosMain.Instance().isOsX()) {
                         nodeCommand = getNodePath();
                         if (nodeCommand == null) {
                             nodeCommand = "node";
                         }
-						Toasts.getInstance().showInfoToast("Trying to launch build script runner for " + nodeCommand);
+                        Toasts.getInstance().showInfoToast("Trying to launch build script runner for " + nodeCommand);
 
-						ProcessBuilder pb = new ProcessBuilder("bash", "-l", "-c", nodeCommand + " " + buildScriptPath + " " + projectDirectoryPath + " " + projectFilePathComm);
-						pb.inheritIO();
-						pb.start();
-					} else {
-						ProcessBuilder pb = new ProcessBuilder(nodeCommand, buildScriptPath, projectDirectoryPath, projectFilePathComm);
-						pb.inheritIO();
-						pb.start();
-					}
-				} catch (IOException e) {
-					e.printStackTrace();
-					logger.error("Error when running processor", e);
-					Toasts.getInstance().showErrorToast("Error when running processor " + e.getMessage());
-				}
-			} else {
-				Toasts.getInstance().showInfoToast("Export script not found in file system");
-			}
-		} else {
-			Toasts.getInstance().showInfoToast("No export script defined");
-		}
-	}
+                        ProcessBuilder pb = new ProcessBuilder("bash", "-l", "-c", nodeCommand + " " + buildScriptPath + " " + projectDirectoryPath + " " + projectFilePathComm);
+                        pb.redirectErrorStream(true);
+
+
+                        Process process = pb.start();
+                        BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+
+
+                        String line;
+                        while ((line = reader.readLine()) != null) {
+                            logger.info(line);
+                        }
+
+                        int exitCode = process.waitFor();
+
+                        // Wait for the process to finish and get the exit code
+                        logger.info("Process exited with code " + exitCode);
+
+
+                    } else {
+                        ProcessBuilder pb = new ProcessBuilder(nodeCommand, buildScriptPath, projectDirectoryPath, projectFilePathComm);
+                        pb.inheritIO();
+                        pb.start();
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    logger.error("Error when running processor", e);
+                    Toasts.getInstance().showErrorToast("Error when running processor " + e.getMessage());
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            } else {
+                Toasts.getInstance().showInfoToast("Export script not found in file system");
+            }
+        } else {
+            Toasts.getInstance().showInfoToast("No export script defined");
+        }
+    }
 }
