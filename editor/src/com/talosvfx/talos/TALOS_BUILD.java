@@ -14,13 +14,13 @@ public final class TALOS_BUILD {
   private static final String version = "2.0.0-SNAPSHOT";
 
   @Getter
-  private static final String commit = "7085851";
+  private static final String commit = "0a1100a";
 
   @Getter
   private static final String branch = "talos-3d";
 
   @Getter
-  private static final Date buildDate = new Date(1683799528613l);
+  private static final Date buildDate = new Date(1705408205407l);
 
   private static void printHeader() {
     System.out.println("      ___           ___           ___       ___           ___     \n"

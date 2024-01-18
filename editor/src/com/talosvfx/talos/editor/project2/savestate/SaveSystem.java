@@ -92,11 +92,14 @@ public class SaveSystem implements Observer {
 		}
 
 		if(!exportScript.isEmpty()) {
+			Toasts.getInstance().showInfoToast("Export script defined, trying to run");
+
 			FileHandle exportScriptHandle = settings.getExportScriptHandle();
 			String projectPath = currentProject.rootProjectDir().path();
 
 			if (exportScriptHandle.exists() && !exportScriptHandle.isDirectory()) {
 				Runtime rt = Runtime.getRuntime();
+				Toasts.getInstance().showInfoToast("Export script found in file system");
 
 				try {
 					String nodeCommand = "node";
@@ -109,6 +112,9 @@ public class SaveSystem implements Observer {
 						if(!nodeBinary.exists()) {
 							nodeCommand = "/opt/homebrew/bin/node";
 						}
+
+						Toasts.getInstance().showInfoToast("Trying to launch build script runner for " + nodeCommand);
+
 						ProcessBuilder pb = new ProcessBuilder("bash", "-l", "-c", nodeCommand + " " + buildScriptPath + " " + projectDirectoryPath + " " + projectFilePathComm);
 						pb.inheritIO();
 						pb.start();
@@ -120,8 +126,13 @@ public class SaveSystem implements Observer {
 				} catch (IOException e) {
 					e.printStackTrace();
 					logger.error("Error when running processor", e);
+					Toasts.getInstance().showErrorToast("Error when running processor " + e.getMessage());
 				}
+			} else {
+				Toasts.getInstance().showInfoToast("Export script not found in file system");
 			}
+		} else {
+			Toasts.getInstance().showInfoToast("No export script defined");
 		}
 	}
 }
