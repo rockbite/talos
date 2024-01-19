@@ -116,24 +116,26 @@ public class SaveSystem implements Observer {
 				Runtime rt = Runtime.getRuntime();
 				Toasts.getInstance().showInfoToast("Export script found in file system");
 
+                FileHandle scriptBinaryHandle = settings.getScriptBinaryHandle();
+                if (scriptBinaryHandle == null) {
+                    Toasts.getInstance().showErrorToast("Script binary not found, make sure to set it in preferences");
+                    return;
+                }
+
                 try {
-                    String nodeCommand = "node";
+                    String scriptCommandBinaryPath = scriptBinaryHandle.file().getAbsolutePath();
                     String buildScriptPath = exportScriptHandle.path();
                     String projectDirectoryPath = "\"" + projectPath + "\"";
                     String projectFilePathComm = "\"" + projectFilePath + "\"";
 
 					if (TalosMain.Instance().isOsX()) {
-                        nodeCommand = getNodePath();
-                        if (nodeCommand == null || nodeCommand.isEmpty() || nodeCommand.equals("null")) {
-                            nodeCommand = "node";
-                        }
-						Toasts.getInstance().showInfoToast("Trying to launch build script runner for " + nodeCommand);
+						Toasts.getInstance().showInfoToast("Trying to launch build script runner for " + scriptCommandBinaryPath);
 
-						ProcessBuilder pb = new ProcessBuilder("bash", "-l", "-c", nodeCommand + " " + buildScriptPath + " " + projectDirectoryPath + " " + projectFilePathComm);
+						ProcessBuilder pb = new ProcessBuilder("bash", "-l", "-c", scriptCommandBinaryPath + " " + buildScriptPath + " " + projectDirectoryPath + " " + projectFilePathComm);
 						pb.inheritIO();
 						pb.start();
 					} else {
-						ProcessBuilder pb = new ProcessBuilder(nodeCommand, buildScriptPath, projectDirectoryPath, projectFilePathComm);
+						ProcessBuilder pb = new ProcessBuilder(scriptCommandBinaryPath, buildScriptPath, projectDirectoryPath, projectFilePathComm);
 						pb.inheritIO();
 						pb.start();
 					}

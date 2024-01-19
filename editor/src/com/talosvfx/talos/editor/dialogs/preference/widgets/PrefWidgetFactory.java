@@ -397,8 +397,8 @@ public class PrefWidgetFactory {
             Label label = new LabelWithZoom(xml.getText(), SharedResources.skin);
             leftContent.add(label).right().expandX();
 
-            widget = new TextValueWidget(SharedResources.skin);
-            rightContent.add(widget).left().expandX().padLeft(7).padBottom(5);
+            widget = new TextValueWidget(SharedResources.skin, true);
+            rightContent.add(widget).left().growX().padLeft(7).padBottom(5);
         }
 
         @Override

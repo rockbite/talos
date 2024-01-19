@@ -18,6 +18,7 @@ public abstract class BaseAssetRepository {
 	public static class AssetRepositoryCatalogueExportOptions {
 		boolean forceExportAll = true;
 		private FileHandle exportScriptHandle;
+		private FileHandle scriptBinaryHandle;
 		private FileHandle exportPathHandle;
 
 		public void loadFromPrefs (Preferences projectPrefs) {
@@ -26,6 +27,10 @@ public abstract class BaseAssetRepository {
 				exportScriptHandle = Gdx.files.absolute(exportScriptPath);
 			}
 			exportPathHandle = Gdx.files.absolute(projectPrefs.getString("project.general.exportPath", ""));
+			String binaryPath = projectPrefs.getString("project.general.scriptBinary", null);
+			if (binaryPath != null) {
+				scriptBinaryHandle = Gdx.files.absolute(binaryPath);
+			}
 		}
 	}
 	public abstract void reloadGameAssetForRawFile (RawAsset link);
