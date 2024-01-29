@@ -55,6 +55,10 @@ public class RoutineRenderer {
 
     public void render(Batch batch, Camera camera, GameObject gameObject, RoutineRendererComponent<?> routineRendererComponent) {
         RoutineInstance routineInstance = routineRendererComponent.routineInstance;
+        if (routineInstance == null) {
+            System.out.println("Routine instance null error");
+            return;
+        }
         boolean configured = routineInstance.checkConfigured();
 
         Vector2 viewportSize = routineRendererComponent.viewportSize;

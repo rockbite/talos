@@ -174,8 +174,12 @@ public abstract class SavableContainer implements GameObjectContainer, Json.Seri
 		root = new GameObject();
 		root.setGameObjectContainer(this);
 		for (JsonValue gameObjectJson : gameObjectsJson) {
-			GameObject gameObject = json.readValue(GameObject.class, gameObjectJson);
-			root.addGameObject(gameObject);
+			try {
+				GameObject gameObject = json.readValue(GameObject.class, gameObjectJson);
+				root.addGameObject(gameObject);
+			} catch (NullPointerException e) {
+
+			}
 		}
 	}
 

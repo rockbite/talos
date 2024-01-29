@@ -153,7 +153,10 @@ public class GameObject implements GameObjectContainer, RoutineEventListener, Js
 
     @Override
     public void read (Json json, JsonValue jsonData) {
-        name = jsonData.getString("name");
+        name = jsonData.getString("name", null);
+        if (name == null) {
+            throw new NullPointerException("beep");
+        }
         if (jsonData.has("uuid")) {
             uuid = UUID.fromString(jsonData.getString("uuid"));
         } else {
@@ -187,8 +190,12 @@ public class GameObject implements GameObjectContainer, RoutineEventListener, Js
         JsonValue childrenJson = jsonData.get("children");
         if(childrenJson != null) {
             for (JsonValue childJson : childrenJson) {
-                GameObject childObject = json.readValue(GameObject.class, childJson);
-                addGameObject(childObject);
+                try {
+                    GameObject childObject = json.readValue(GameObject.class, childJson);
+                    addGameObject(childObject);
+                } catch (NullPointerException e) {
+                    continue;
+                }
             }
         }
     }

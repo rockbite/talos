@@ -114,6 +114,7 @@ public class SpineComponentProvider extends RendererComponentProvider<SpineRende
 				for (Skin skin : component.skeleton.getData().getSkins()) {
 					names.add(skin.getName());
 				}
+				names.sort();
 
 				return names;
 			}

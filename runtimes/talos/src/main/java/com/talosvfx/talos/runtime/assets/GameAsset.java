@@ -86,8 +86,10 @@ public class GameAsset<T> {
 	public RawAsset getRootRawAsset () {
 		if (dependentRawAssets.isEmpty()) {
 
-//			System.out.println("something is wrong");
+			System.out.println("something is wrong");
+			return null;
 		}
+
 		return dependentRawAssets.first();
 	}
 
@@ -110,6 +112,8 @@ public class GameAsset<T> {
 		if (this == o) return true;
 		if (!(o instanceof GameAsset)) return false;
 		GameAsset<?> other = (GameAsset<?>) o;
+
+		if (isBroken()) return false;
 		return Objects.equals(getRootRawAsset().metaData.uuid, other.getRootRawAsset().metaData.uuid);
 	}
 
