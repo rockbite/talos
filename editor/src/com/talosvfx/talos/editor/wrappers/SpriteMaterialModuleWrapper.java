@@ -16,14 +16,15 @@
 
 package com.talosvfx.talos.editor.wrappers;
 
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasSprite;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
+import com.badlogic.gdx.utils.Scaling;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.runtime.assets.GameAssetType;
@@ -37,8 +38,9 @@ public class SpriteMaterialModuleWrapper extends ModuleWrapper<SpriteMaterialMod
     private GenericAssetSelectionWidget<AtlasSprite> selector;
 
     private GameAsset<AtlasSprite> asset;
+    private Image texturePreview;
 
-    public SpriteMaterialModuleWrapper() {
+    public SpriteMaterialModuleWrapper () {
         super();
     }
 
@@ -48,12 +50,12 @@ public class SpriteMaterialModuleWrapper extends ModuleWrapper<SpriteMaterialMod
     }
 
     @Override
-    protected float reportPrefWidth() {
-        return 150;
+    protected float reportPrefWidth () {
+        return 250;
     }
 
     @Override
-    protected void configureSlots() {
+    protected void configureSlots () {
 
         addOutputSlot("", MaterialModule.MATERIAL_MODULE);
 
@@ -62,12 +64,24 @@ public class SpriteMaterialModuleWrapper extends ModuleWrapper<SpriteMaterialMod
         selector = new GenericAssetSelectionWidget<>(GameAssetType.SPRITE);
         selector.setValue(asset);
         contentWrapper.add(selector).growX().right().expandX();
+        contentWrapper.row();
+
+        texturePreview = new Image();
+        texturePreview.setScaling(Scaling.fit);
+        contentWrapper.add(texturePreview).size(200);
+
+        if (asset.getResource() != null) {
+            texturePreview.setDrawable(new TextureRegionDrawable(asset.getResource()));
+        }
 
         selector.addListener(new ChangeListener() {
             @Override
-            public void changed(ChangeEvent event, Actor actor) {
+            public void changed (ChangeEvent event, Actor actor) {
                 asset = selector.getValue();
                 module.setGameAsset(asset);
+                if (asset.getResource() != null) {
+                    texturePreview.setDrawable(new TextureRegionDrawable(asset.getResource()));
+                }
             }
         });
     }
@@ -84,6 +98,12 @@ public class SpriteMaterialModuleWrapper extends ModuleWrapper<SpriteMaterialMod
         super.read(json, jsonData);
         String identifier = jsonData.getString("asset", "white");
         asset = AssetRepository.getInstance().getAssetForIdentifier(identifier, GameAssetType.SPRITE);
+        selector.setValue(asset);
+
+
+        if (asset.getResource() != null) {
+            texturePreview.setDrawable(new TextureRegionDrawable(asset.getResource()));
+        }
     }
 
 }
