@@ -82,6 +82,7 @@ public class SpriteMaterialModuleWrapper extends ModuleWrapper<SpriteMaterialMod
                 if (asset.getResource() != null) {
                     texturePreview.setDrawable(new TextureRegionDrawable(asset.getResource()));
                 }
+                moduleBoardWidget.app.dataModified();
             }
         });
     }
