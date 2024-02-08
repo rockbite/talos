@@ -173,6 +173,19 @@ public class GameObject implements GameObjectContainer, RoutineEventListener, Js
         JsonValue componentsJson = jsonData.get("components");
         for(JsonValue componentJson : componentsJson) {
             AComponent component = json.readValue(AComponent.class, componentJson);
+
+            if (component instanceof SpineRendererComponent) {
+                if (!((SpineRendererComponent) component).generateGameObjectBones) {
+                    //Check if we have boneAttachedGOs
+                    //If we do, we should set this flag to true
+                    JsonValue childrenJson = jsonData.get("boneAttachedGOs");
+                    if (childrenJson != null && childrenJson.size > 0) {
+                        ((SpineRendererComponent) component).generateGameObjectBones = true;
+                    }
+                }
+            }
+
+            //This is the part where bones are created
             addComponent(component);
         }
 
