@@ -1,23 +1,37 @@
 package com.talosvfx.talos.editor.addons.scene.logic.componentwrappers;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectSet;
 import com.esotericsoftware.spine.Animation;
 import com.esotericsoftware.spine.SkeletonData;
 import com.esotericsoftware.spine.Skin;
+import com.talosvfx.talos.TalosMain;
+import com.talosvfx.talos.TalosMain2;
 import com.talosvfx.talos.editor.addons.scene.SceneUtils;
+import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.events.GameObjectCreated;
 import com.talosvfx.talos.editor.addons.scene.events.GameObjectDeleted;
 import com.talosvfx.talos.editor.addons.scene.events.GameObjectsRestructured;
+import com.talosvfx.talos.editor.addons.scene.widgets.HierarchyWidget;
 import com.talosvfx.talos.editor.addons.scene.widgets.property.PropertyPanelAssetSelectionWidget;
 import com.talosvfx.talos.editor.notifications.Notifications;
+import com.talosvfx.talos.editor.project2.SharedResources;
+import com.talosvfx.talos.editor.project2.apps.ProjectExplorerApp;
+import com.talosvfx.talos.editor.project2.apps.SceneEditorApp;
+import com.talosvfx.talos.editor.project2.apps.SceneHierarchyApp;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.SelectBoxWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.WidgetFactory;
 import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.runtime.assets.GameAssetType;
+import com.talosvfx.talos.runtime.maps.TileGameObjectProxy;
 import com.talosvfx.talos.runtime.scene.GameObject;
 import com.talosvfx.talos.runtime.scene.GameObjectContainer;
+import com.talosvfx.talos.runtime.scene.SavableContainer;
+import com.talosvfx.talos.runtime.scene.Scene;
 import com.talosvfx.talos.runtime.scene.components.SpineRendererComponent;
 
 import com.talosvfx.talos.runtime.utils.Supplier;
@@ -83,6 +97,28 @@ public class SpineComponentProvider extends RendererComponentProvider<SpineRende
 		PropertyWidget inheritParentColorWidget = WidgetFactory.generate(component, "shouldInheritParentColor", "Inherit Parent Color");
 		properties.add(inheritParentColorWidget);
 
+		PropertyWidget bonesWidget = WidgetFactory.generate(component, "generateGameObjectBones", "Game Object Bones");
+		bonesWidget.addListener(new ChangeListener() {
+			@Override
+			public void changed (ChangeEvent event, Actor actor) {
+				Gdx.app.postRunnable(new Runnable() {
+					@Override
+					public void run () {
+						component.removeAllBoneGameObjects();
+						component.populateBoneGameObjects();
+
+						GameObjectContainer gameObjectContainerRoot = component.getGameObject().getGameObjectContainerRoot();
+
+						GameAsset<SavableContainer> assetForResource = AssetRepository.getInstance().getAssetForResource((SavableContainer) gameObjectContainerRoot);
+
+						SceneHierarchyApp appIfOpened = SharedResources.appManager.getAppIfOpened(assetForResource, SceneHierarchyApp.class);
+						appIfOpened.updateForGameAsset(assetForResource);
+
+					}
+				});
+			}
+		});
+		properties.add(bonesWidget);
 		properties.add(WidgetFactory.generate(component, "applyAnimation", "Apply Animation"));
 
 		SelectBoxWidget skinSelectWidget = new SelectBoxWidget("Skin", new Supplier<String>() {

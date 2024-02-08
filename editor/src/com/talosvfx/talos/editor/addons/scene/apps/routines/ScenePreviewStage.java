@@ -126,7 +126,7 @@ public class ScenePreviewStage extends ViewportWidget implements Observer {
 		gridPropertyProvider.getBackgroundColor().set(Color.BLACK);
 	}
 
-	public void setFromGameAsset(GameAsset<Scene> gameAsset) {
+	public void setFromGameAsset(GameAsset<SavableContainer> gameAsset) {
 		if (gameAsset != null && ((GameAsset)gameAsset) != AppManager.dummyAsset) {
 			SavableContainer currentContainer = gameAsset.getResource();
 			Scene scene = new Scene();

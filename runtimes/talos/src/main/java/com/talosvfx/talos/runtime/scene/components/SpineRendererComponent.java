@@ -36,6 +36,7 @@ public class SpineRendererComponent extends RendererComponent implements Json.Se
     private String skin;
 
     public boolean applyAnimation = true;
+    public boolean generateGameObjectBones = false;
 
     private ObjectMap<String, GameObject> boneGOs = new OrderedMap<>();
     private ObjectSet<GameObject> directChildrenOfRoot = new ObjectSet<>();
@@ -60,6 +61,7 @@ public class SpineRendererComponent extends RendererComponent implements Json.Se
         json.writeValue("animation", currAnimation);
         json.writeValue("applyAnimation", applyAnimation);
         json.writeValue("skin", skin);
+        json.writeValue("generateGameObjectBones", generateGameObjectBones);
         super.write(json);
     }
 
@@ -72,6 +74,7 @@ public class SpineRendererComponent extends RendererComponent implements Json.Se
         applyAnimation = jsonData.getBoolean("applyAnimation", true);
         shouldInheritParentColor = jsonData.getBoolean("shouldInheritParentColor", true);
         skin = jsonData.getString("skin", null);
+        generateGameObjectBones = jsonData.getBoolean("generateGameObjectBones", false);
 
         loadSkeletonFromIdentifier(gameResourceIdentifier);
 
@@ -178,12 +181,29 @@ public class SpineRendererComponent extends RendererComponent implements Json.Se
         populateBoneGameObjects();
     }
 
+    public void removeAllBoneGameObjects () {
+       boolean hasSkeletonData = skeleton != null;
+        boolean isAttachedToGameObject = getGameObject() != null;
+
+        if (!(hasSkeletonData && isAttachedToGameObject)) {
+            return;
+        }
+
+        for (ObjectMap.Entry<String, GameObject> boneGO : boneGOs) {
+            boneGO.value.getParent().removeObject(boneGO.value);
+        }
+        boneGOs.clear();
+        directChildrenOfRoot.clear();
+
+    }
+
     /**
      * Two conditions must be met to populate bone game objects.
      * Condition1 = should have a skeleton data
      * Condition2 = should be attached to game object
      */
-    private void populateBoneGameObjects () {
+    public void populateBoneGameObjects () {
+        if (!generateGameObjectBones) return;
         boolean hasSkeletonData = skeleton != null;
         boolean isAttachedToGameObject = getGameObject() != null;
 
@@ -289,4 +309,6 @@ public class SpineRendererComponent extends RendererComponent implements Json.Se
     public ObjectSet<GameObject> getDirectChildrenOfRoot() {
         return new ObjectSet<>(directChildrenOfRoot);
     }
+
+
 }

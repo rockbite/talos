@@ -41,6 +41,8 @@ public class GameObject implements GameObjectContainer, RoutineEventListener, Js
 
     public boolean isPlacing;
 
+    public boolean hierarchyDirty = true;
+
     //ready only
     private transient String readBoneName;
 
@@ -206,6 +208,9 @@ public class GameObject implements GameObjectContainer, RoutineEventListener, Js
         childrenMap.put(gameObject.name, gameObject);
 
         gameObject.setParent(this);
+
+        gameObjectDirty();
+        getTopParent(null).hierarchyDirty = true;
     }
 
     @Override
@@ -232,6 +237,9 @@ public class GameObject implements GameObjectContainer, RoutineEventListener, Js
             childrenMap.remove(name);
         }
         children.removeValue(gameObject, true);
+
+        gameObjectDirty();
+        getTopParent(null).hierarchyDirty = true;
     }
 
     @Override
@@ -244,6 +252,9 @@ public class GameObject implements GameObjectContainer, RoutineEventListener, Js
 
         children.clear();
         childrenMap.clear();
+
+        gameObjectDirty();
+        getTopParent(null).hierarchyDirty = true;
     }
 
     @Override
@@ -291,12 +302,20 @@ public class GameObject implements GameObjectContainer, RoutineEventListener, Js
         components.add(component);
         component.setGameObject(this);
         componentClasses.put(component.getClass(), component);
+
+        gameObjectDirty();
+    }
+
+    private void gameObjectDirty () {
+        calculatedBoneChildren = false;
     }
 
     @Override
     public void removeComponent (AComponent component) {
         components.remove(component);
         componentClasses.remove(component.getClass());
+
+        gameObjectDirty();
     }
 
     @Override
@@ -357,6 +376,23 @@ public class GameObject implements GameObjectContainer, RoutineEventListener, Js
         childrenMap.remove(oldName);
         childrenMap.put(name, gameObject);
     }
+
+    private Array<GameObject> boneChildren;
+    private boolean calculatedBoneChildren = false;
+    public Array<GameObject> getChildrenWithBoneComponent () {
+        if (!calculatedBoneChildren) {
+            if (boneChildren == null) {
+                boneChildren = new Array<>();
+            }
+
+            getChildrenByComponent(BoneComponent.class, boneChildren);
+
+            calculatedBoneChildren = true;
+        }
+
+        return boneChildren;
+    }
+
 
     public Array<GameObject> getChildrenByComponent (Class<?> clazz, Array<GameObject> list) {
         for(GameObject gameObject: children) {

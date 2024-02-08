@@ -17,57 +17,59 @@ import com.talosvfx.talos.runtime.scene.components.TransformComponent;
 
 public class SkeletonComponentRenderer extends ComponentRenderer<SpineRendererComponent> {
 
-	private final TalosSkeletonRenderer skeletonRenderer;
-
-	private Array<GameObject> allChildrenWithBones = new Array<>();
+    private final TalosSkeletonRenderer skeletonRenderer;
 
 
-	public SkeletonComponentRenderer (GameObjectRenderer gameObjectRenderer) {
-		super(gameObjectRenderer);
-		skeletonRenderer = new TalosSkeletonRenderer();
-	}
-	@Override
-	public void render (Batch batch, Camera camera, GameObject gameObject, SpineRendererComponent rendererComponent) {
-		TransformComponent parentTransform = gameObject.getComponent(TransformComponent.class);
-		SpineRendererComponent spineRendererComponent = gameObject.getComponent(SpineRendererComponent.class);
+    public SkeletonComponentRenderer (GameObjectRenderer gameObjectRenderer) {
+        super(gameObjectRenderer);
+        skeletonRenderer = new TalosSkeletonRenderer();
+    }
 
-		GameAsset<SkeletonData> gameResource = rendererComponent.getGameResource();
-		if (gameResource.isBroken()) {
-			GameObjectRenderer.renderBrokenComponent(batch, gameObject, parentTransform);
-			return;
-		}
+    @Override
+    public void render (Batch batch, Camera camera, GameObject gameObject, SpineRendererComponent rendererComponent) {
+        TransformComponent parentTransform = gameObject.getComponent(TransformComponent.class);
+        SpineRendererComponent spineRendererComponent = gameObject.getComponent(SpineRendererComponent.class);
 
-		spineRendererComponent.skeleton.setPosition(parentTransform.worldPosition.x, parentTransform.worldPosition.y);
-		spineRendererComponent.skeleton.setScale(parentTransform.worldScale.x * spineRendererComponent.scale, parentTransform.worldScale.y * spineRendererComponent.scale);
-		spineRendererComponent.skeleton.getRootBone().setRotation(parentTransform.rotation);
+        GameAsset<SkeletonData> gameResource = rendererComponent.getGameResource();
+        if (gameResource.isBroken()) {
+            GameObjectRenderer.renderBrokenComponent(batch, gameObject, parentTransform);
+            return;
+        }
 
-		if (!gameObjectRenderer.isSkipUpdates()) {
-			spineRendererComponent.animationState.update(Gdx.graphics.getDeltaTime());
-			spineRendererComponent.animationState.apply(spineRendererComponent.skeleton);
-		}
-		spineRendererComponent.skeleton.updateWorldTransform();
+        spineRendererComponent.skeleton.setPosition(parentTransform.worldPosition.x, parentTransform.worldPosition.y);
+        spineRendererComponent.skeleton.setScale(parentTransform.worldScale.x * spineRendererComponent.scale, parentTransform.worldScale.y * spineRendererComponent.scale);
+        spineRendererComponent.skeleton.getRootBone().setRotation(parentTransform.rotation);
 
-		spineRendererComponent.skeleton.getColor().set(spineRendererComponent.finalColor);
-		skeletonRenderer.draw(batch, spineRendererComponent.skeleton);
+        if (!gameObjectRenderer.isSkipUpdates()) {
+            spineRendererComponent.animationState.update(Gdx.graphics.getDeltaTime());
+            spineRendererComponent.animationState.apply(spineRendererComponent.skeleton);
+        }
+        spineRendererComponent.skeleton.updateWorldTransform();
 
-		batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+        spineRendererComponent.skeleton.getColor().set(spineRendererComponent.finalColor);
+        skeletonRenderer.draw(batch, spineRendererComponent.skeleton);
 
-		// update bone game objects
-		allChildrenWithBones.clear();
-		Array<GameObject> boneGOs = gameObject.getChildrenByComponent(BoneComponent.class, allChildrenWithBones);
+        batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 
-		for (GameObject boneGO : boneGOs) {
-			BoneComponent boneComponent = boneGO.getComponent(BoneComponent.class);
-			Bone bone =  boneComponent.getBone();
-			TransformComponent transform = boneGO.getComponent(TransformComponent.class);
 
-			transform.worldScale.set(bone.getWorldScaleX(), bone.getWorldScaleY());
-			transform.worldRotation = bone.localToWorldRotation(bone.getRotation());
-			transform.worldPosition.set(bone.getWorldX(), bone.getWorldY());
+        // update bone game objects
+        if (spineRendererComponent.generateGameObjectBones) {
+            Array<GameObject> boneGOs = gameObject.getChildrenWithBoneComponent();
 
-			transform.position.set(bone.getX(), bone.getY());
-			transform.rotation = bone.getRotation();
-			transform.scale.set(bone.getScaleX(), bone.getScaleY());
-		}
-	}
+            for (GameObject boneGO : boneGOs) {
+                BoneComponent boneComponent = boneGO.getComponent(BoneComponent.class);
+                Bone bone = boneComponent.getBone();
+                TransformComponent transform = boneGO.getComponent(TransformComponent.class);
+
+                transform.worldScale.set(bone.getWorldScaleX(), bone.getWorldScaleY());
+                transform.worldRotation = bone.localToWorldRotation(bone.getRotation());
+                transform.worldPosition.set(bone.getWorldX(), bone.getWorldY());
+
+                transform.position.set(bone.getX(), bone.getY());
+                transform.rotation = bone.getRotation();
+                transform.scale.set(bone.getScaleX(), bone.getScaleY());
+            }
+        }
+
+    }
 }

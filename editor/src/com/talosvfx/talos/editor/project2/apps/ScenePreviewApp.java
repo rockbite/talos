@@ -11,12 +11,13 @@ import com.talosvfx.talos.editor.project2.apps.preferences.ContainerOfPrefs;
 import com.talosvfx.talos.editor.project2.apps.preferences.ViewportPreferences;
 import com.talosvfx.talos.editor.project2.localprefs.TalosLocalPrefs;
 import com.talosvfx.talos.runtime.assets.GameAsset;
+import com.talosvfx.talos.runtime.scene.SavableContainer;
 import com.talosvfx.talos.runtime.scene.Scene;
 import lombok.Getter;
 
 
 @SingletonApp
-public class ScenePreviewApp extends AppManager.BaseApp<Scene> implements GameAsset.GameAssetUpdateListener, Observer, ContainerOfPrefs<ViewportPreferences> {
+public class ScenePreviewApp extends AppManager.BaseApp<SavableContainer> implements GameAsset.GameAssetUpdateListener, Observer, ContainerOfPrefs<ViewportPreferences> {
 
     @Getter
     private final ScenePreviewStage workspaceWidget;
@@ -27,7 +28,7 @@ public class ScenePreviewApp extends AppManager.BaseApp<Scene> implements GameAs
         workspaceWidget = new ScenePreviewStage();
         workspaceWidget.disableListeners();
 
-        DummyLayoutApp<Scene> sceneEditorWorkspaceApp = new DummyLayoutApp<Scene>(SharedResources.skin, this, getAppName()) {
+        DummyLayoutApp<SavableContainer> sceneEditorWorkspaceApp = new DummyLayoutApp<SavableContainer>(SharedResources.skin, this, getAppName()) {
             @Override
             public Actor getMainContent () {
                 return workspaceWidget;
@@ -51,7 +52,7 @@ public class ScenePreviewApp extends AppManager.BaseApp<Scene> implements GameAs
     }
 
     @Override
-    public void updateForGameAsset(GameAsset<Scene> gameAsset) {
+    public void updateForGameAsset(GameAsset<SavableContainer> gameAsset) {
         super.updateForGameAsset(gameAsset);
 
         // TODO: 23.02.23 dummy refactor

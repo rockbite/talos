@@ -18,11 +18,12 @@ import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.project2.apps.preferences.ContainerOfPrefs;
 import com.talosvfx.talos.editor.project2.apps.preferences.HierarchyPreference;
 import com.talosvfx.talos.editor.project2.localprefs.TalosLocalPrefs;
+import com.talosvfx.talos.runtime.scene.SavableContainer;
 import com.talosvfx.talos.runtime.scene.Scene;
 import lombok.Getter;
 
 @SingletonApp
-public class SceneHierarchyApp extends AppManager.BaseApp<Scene> implements GameAsset.GameAssetUpdateListener, ContainerOfPrefs<HierarchyPreference>, Observer {
+public class SceneHierarchyApp extends AppManager.BaseApp<SavableContainer> implements GameAsset.GameAssetUpdateListener, ContainerOfPrefs<HierarchyPreference>, Observer {
 
 	@Getter
 	private final HierarchyWidget hierarchyWidget;
@@ -30,7 +31,7 @@ public class SceneHierarchyApp extends AppManager.BaseApp<Scene> implements Game
 	public SceneHierarchyApp () {
 		Notifications.registerObserver(this);
 		hierarchyWidget = new HierarchyWidget();
-		DummyLayoutApp<Scene> hierarchyApp = new DummyLayoutApp<Scene>(SharedResources.skin, this, getAppName()) {
+		DummyLayoutApp<SavableContainer> hierarchyApp = new DummyLayoutApp<SavableContainer>(SharedResources.skin, this, getAppName()) {
 			@Override
 			public Actor getMainContent () {
 				return hierarchyWidget;
@@ -57,7 +58,7 @@ public class SceneHierarchyApp extends AppManager.BaseApp<Scene> implements Game
 	}
 
 	@Override
-	public void updateForGameAsset (GameAsset<Scene> gameAsset) {
+	public void updateForGameAsset (GameAsset<SavableContainer> gameAsset) {
 		super.updateForGameAsset(gameAsset);
 
 		if (gameAsset.getResource() != null) {

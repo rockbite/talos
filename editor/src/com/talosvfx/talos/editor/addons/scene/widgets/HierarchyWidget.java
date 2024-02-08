@@ -31,8 +31,7 @@ import com.talosvfx.talos.editor.addons.scene.events.scene.DeSelectGameObjectExt
 import com.talosvfx.talos.editor.addons.scene.events.scene.RemoveFromSelectionEvent;
 import com.talosvfx.talos.editor.addons.scene.events.scene.RequestSelectionClearEvent;
 import com.talosvfx.talos.editor.addons.scene.events.scene.SelectGameObjectExternallyEvent;
-import com.talosvfx.talos.runtime.scene.GameObject;
-import com.talosvfx.talos.runtime.scene.GameObjectContainer;
+import com.talosvfx.talos.runtime.scene.*;
 import com.talosvfx.talos.editor.notifications.EventContextProvider;
 import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
@@ -42,8 +41,6 @@ import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.ui.ContextualMenu;
 import com.talosvfx.talos.editor.widgets.ui.EditableLabel;
 import com.talosvfx.talos.editor.widgets.ui.FilteredTree;
-import com.talosvfx.talos.runtime.scene.Prefab;
-import com.talosvfx.talos.runtime.scene.Scene;
 import com.talosvfx.talos.runtime.scene.components.BoneComponent;
 import lombok.Getter;
 import org.slf4j.Logger;
@@ -63,7 +60,7 @@ public class HierarchyWidget extends Table implements Observer, EventContextProv
 
     private ContextualMenu contextualMenu;
 
-    private GameAsset<Scene> gameAsset;
+    private GameAsset<SavableContainer> gameAsset;
 
     private GameObject smartSelection;
 
@@ -707,7 +704,7 @@ public class HierarchyWidget extends Table implements Observer, EventContextProv
         }
     }
 
-    public void loadEntityContainer (GameAsset<Scene> gameAsset) {
+    public void loadEntityContainer (GameAsset<SavableContainer> gameAsset) {
         this.gameAsset = gameAsset;
 
         currentContainer = gameAsset.getResource();
@@ -881,7 +878,7 @@ public class HierarchyWidget extends Table implements Observer, EventContextProv
     public void onGameAssetOpen (GameAssetOpenEvent gameAssetOpenEvent) {
         GameAsset<?> gameAsset = gameAssetOpenEvent.getGameAsset();
         if (gameAsset.type == GameAssetType.SCENE) {
-            loadEntityContainer((GameAsset<Scene>) gameAsset);
+            loadEntityContainer((GameAsset<SavableContainer>) gameAsset);
         }
     }
 }

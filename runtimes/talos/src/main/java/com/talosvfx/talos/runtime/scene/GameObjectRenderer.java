@@ -287,15 +287,21 @@ public class GameObjectRenderer {
 
 	Array<GameObject> temp = new Array<>();
 
-	public void buildRenderState (PolygonBatch batch, RenderState state, GameObject root) {
-		temp.clear();
-		temp.add(root);
-		buildRenderState(batch, state, temp);
-	}
 
 	public void buildRenderState (PolygonBatch batch, RenderState state, Array<GameObject> rootObjects) {
-		state.list.clear();
-		fillRenderableEntities(rootObjects, state.list);
+		boolean hiearchyDirty = false;
+		for (GameObject rootObject : rootObjects) {
+			if (rootObject.hierarchyDirty) {
+				hiearchyDirty = true;
+
+				//reset it because we gonna sort it this pass
+				rootObject.hierarchyDirty = false;
+			}
+		}
+		if (hiearchyDirty) {
+			state.list.clear();
+			fillRenderableEntities(rootObjects, state.list);
+		}
 		sort(state.list);
 	}
 

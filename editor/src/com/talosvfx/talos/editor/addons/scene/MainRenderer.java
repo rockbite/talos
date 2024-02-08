@@ -148,6 +148,10 @@ public class MainRenderer implements Observer {
         gameObjectRenderer.setCamera(this.camera);
         gameObjectRenderer.setSkipUpdates(skipUpdates);
         //fill entities
+
+        for (GameObject rootObject : rootObjects) {
+            rootObject.hierarchyDirty = true;//Force the dirty
+        }
         gameObjectRenderer.buildRenderState(batch, state, rootObjects);
 
 

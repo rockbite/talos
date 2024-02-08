@@ -69,7 +69,7 @@ public class RoutineExecuteNodeWidget extends AbstractRoutineNodeWidget {
         nodeStage.resetNodes();
 
         GameAssetWidget assetWidget = (GameAssetWidget)getWidget("scene");
-        GameAsset<Scene> sceneAsset = assetWidget.getValue();
+        GameAsset<SavableContainer> sceneAsset = assetWidget.getValue();
 
         GameObject cameraGO = null;
 

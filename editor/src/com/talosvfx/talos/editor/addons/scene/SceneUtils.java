@@ -312,15 +312,15 @@ public class SceneUtils {
 		markContainerChanged(gameObjectContainer);
 	}
 
-	public static void copy (GameAsset<Scene> gameAsset, OrderedSet<GameObject> selection) {
+	public static void copy (GameAsset<SavableContainer> gameAsset, OrderedSet<GameObject> selection) {
 		storeToClipboard(gameAsset, selection, false);
 	}
 
-	public static void cut (GameAsset<Scene> gameAsset, OrderedSet<GameObject> selection) {
+	public static void cut (GameAsset<SavableContainer> gameAsset, OrderedSet<GameObject> selection) {
 		storeToClipboard(gameAsset, selection, true);
 	}
 
-	private static void storeToClipboard(GameAsset<Scene> gameAsset, OrderedSet<GameObject> selection, boolean cut) {
+	private static void storeToClipboard(GameAsset<SavableContainer> gameAsset, OrderedSet<GameObject> selection, boolean cut) {
 		final GameObjectContainer currentContainer = gameAsset.getResource();
 
 		final Vector3 camPos = getCameraPosForScene(gameAsset);
@@ -359,7 +359,7 @@ public class SceneUtils {
 	}
 
 
-	public static void paste (GameAsset<Scene> gameAsset) {
+	public static void paste (GameAsset<SavableContainer> gameAsset) {
 		final SavableContainer currentContainer = gameAsset.getResource();
 
 		final Vector3 camPosAtPaste = getCameraPosForScene(gameAsset);
@@ -417,7 +417,7 @@ public class SceneUtils {
 	 * @param gameAsset scene game asset
 	 * @return scene camera position if scene open else a zero vector
 	 */
-	private static Vector3 getCameraPosForScene (GameAsset<Scene> gameAsset) {
+	private static Vector3 getCameraPosForScene (GameAsset<SavableContainer> gameAsset) {
 		final SceneEditorApp currentApp = SharedResources.appManager.getAppForAsset(SceneEditorApp.class, gameAsset);
 		Vector3 camPos = new Vector3();
 		if (currentApp != null) {

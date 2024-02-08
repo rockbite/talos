@@ -93,7 +93,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 	private String projectPath;
 
 	private SavableContainer currentContainer;
-	private GameAsset<Scene> gameAsset;
+	private GameAsset<SavableContainer> gameAsset;
 
 	private AligningToolsPane aligningToolsPane;
 
@@ -1267,7 +1267,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		}
 	}
 
-	public void loadFromScene (GameAsset<Scene> scene) {
+	public void loadFromScene (GameAsset<SavableContainer> scene) {
 		gameAsset = scene;
 		openSavableContainer(scene.getResource());
 	}
@@ -1484,7 +1484,7 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 	public void onGameAssetOpened (GameAssetOpenEvent gameAssetOpenEvent) {
 		GameAsset<?> gameAsset = gameAssetOpenEvent.getGameAsset();
 		if (gameAsset.type == GameAssetType.SCENE) {
-			this.gameAsset = (GameAsset<Scene>) gameAsset;
+			this.gameAsset = (GameAsset<SavableContainer>) gameAsset;
 		}
 	}
 }

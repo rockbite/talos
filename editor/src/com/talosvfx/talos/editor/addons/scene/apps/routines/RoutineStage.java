@@ -30,6 +30,7 @@ import com.talosvfx.talos.editor.notifications.events.dynamicnodestage.*;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.project2.apps.ScenePreviewApp;
 import com.talosvfx.talos.runtime.routine.RoutineNode;
+import com.talosvfx.talos.runtime.scene.SavableContainer;
 import com.talosvfx.talos.runtime.scene.Scene;
 import com.talosvfx.talos.runtime.scene.utils.propertyWrappers.PropertyWrapper;
 import lombok.Getter;
@@ -363,7 +364,7 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
         data.getRoutineInstance().tick(getDelta());
     }
 
-    public ScenePreviewApp openPreviewWindow(GameAsset<Scene> gameAsset) {
+    public ScenePreviewApp openPreviewWindow(GameAsset<SavableContainer> gameAsset) {
         return SharedResources.appManager.openAppIfNotOpened(gameAsset, ScenePreviewApp.class);
     }
 
