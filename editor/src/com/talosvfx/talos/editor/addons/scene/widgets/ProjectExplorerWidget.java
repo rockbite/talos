@@ -5,19 +5,20 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.PixmapIO;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
-import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Selection;
-import com.badlogic.gdx.utils.*;
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonWriter;
+import com.badlogic.gdx.utils.ObjectMap;
 import com.kotcrab.vis.ui.widget.MenuItem;
 import com.kotcrab.vis.ui.widget.PopupMenu;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.editor.addons.scene.events.AssetColorFillEvent;
-import com.talosvfx.talos.editor.addons.scene.events.explorer.DirectoryMovedEvent;
 import com.talosvfx.talos.editor.addons.scene.events.AssetResolutionChanged;
+import com.talosvfx.talos.editor.addons.scene.events.explorer.DirectoryMovedEvent;
 import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
 import com.talosvfx.talos.editor.addons.scene.widgets.directoryview.DirectoryViewWidget;
 import com.talosvfx.talos.editor.addons.scene.widgets.directoryview.KeepStopReplaceDialog;
@@ -30,23 +31,21 @@ import com.talosvfx.talos.editor.notifications.events.ProjectLoadedEvent;
 import com.talosvfx.talos.editor.notifications.events.assets.AssetChangeDirectoryEvent;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.project2.TalosProjectData;
-import com.talosvfx.talos.runtime.maps.TilePaletteData;
-import com.talosvfx.talos.runtime.utils.NamingUtils;
 import com.talosvfx.talos.editor.widgets.ui.ActorCloneable;
 import com.talosvfx.talos.editor.widgets.ui.ContextualMenu;
 import com.talosvfx.talos.editor.widgets.ui.EditableLabel;
 import com.talosvfx.talos.editor.widgets.ui.FilteredTree;
-import info.debatty.java.stringsimilarity.JaroWinkler;
-import info.debatty.java.stringsimilarity.interfaces.StringSimilarity;
+import com.talosvfx.talos.runtime.maps.TilePaletteData;
+import com.talosvfx.talos.runtime.utils.NamingUtils;
+import com.talosvfx.talos.runtime.utils.Supplier;
 import lombok.Getter;
-import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileFilter;
 import java.util.ArrayList;
 import java.util.Collection;
-import com.talosvfx.talos.runtime.utils.Supplier;
 
 import static com.talosvfx.talos.editor.utils.InputUtils.ctrlPressed;
 
@@ -78,44 +77,9 @@ public class ProjectExplorerWidget extends Table implements Observer {
         horizontalPanel.setBackground(SharedResources.skin.newDrawable("white", Color.valueOf("#505050ff")));
         add(horizontalPanel).growX().row();
 
-        SearchWidget searchWidget = new SearchWidget();
+        directoryViewWidget = new DirectoryViewWidget(this);
+        SearchWidget searchWidget = new SearchWidget(directoryViewWidget);
         horizontalPanel.add(searchWidget).pad(2).expandX().right();
-
-        TextField searchField = searchWidget.getTextField();
-        searchField.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                String text = searchField.getText().toLowerCase();
-                if (text.length() == 0) {
-                    directoryViewWidget.openDirectory(getCurrentFolder().path());
-                    return;
-                }
-                FileHandle root = SharedResources.currentProject.rootProjectDir();
-                Array<FileHandle> stack = new Array<>();
-                Array<FileHandle> similarFiles = new Array<>();
-                StringSimilarity similar = new JaroWinkler();
-
-                for (FileHandle fileHandle : root.list()) {
-                    stack.add(fileHandle);
-                }
-
-                while (!stack.isEmpty()) {
-                    FileHandle file = stack.pop();
-                    if (file.name().toLowerCase().contains(text)) {
-                        similarFiles.add(file);
-                    } else if (similar.similarity(text, file.nameWithoutExtension().toLowerCase()) > 0.9) {
-                        similarFiles.add(file);
-                    }
-
-                    if (file.isDirectory()) {
-                        for (FileHandle child : file.list()) {
-                            stack.add(child);
-                        }
-                    }
-                }
-                directoryViewWidget.fillItems(similarFiles);
-            }
-        });
 
         contextualMenu = new ContextualMenu();
 
@@ -135,7 +99,6 @@ public class ProjectExplorerWidget extends Table implements Observer {
 
         scrollPaneTable.add(scrollPane).height(0).grow();
 
-        directoryViewWidget = new DirectoryViewWidget(this);
         splitPane = new SplitPane(scrollPaneTable, directoryViewWidget, false, SharedResources.skin);
         splitPane.setSplitAmount(0.35f);
 
