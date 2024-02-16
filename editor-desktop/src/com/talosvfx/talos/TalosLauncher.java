@@ -61,7 +61,8 @@ public class TalosLauncher implements ILauncher {
 		Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
 		config.setWindowedMode(1200, 900);
 		config.setMaximized(false);
-		config.useVsync(true);
+		config.useVsync(false);
+		config.setForegroundFPS(Lwjgl3ApplicationConfiguration.getDisplayMode().refreshRate);
 		config.setHdpiMode(HdpiMode.Logical);
 		config.setBackBufferConfig(1,1,1,1,8,8, 0);
 		config.setWindowIcon("icon/talos-64x64.png");
