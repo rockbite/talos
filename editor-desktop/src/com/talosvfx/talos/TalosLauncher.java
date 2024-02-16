@@ -70,6 +70,7 @@ public class TalosLauncher implements ILauncher {
 
 		boolean gl3 = false;
 
+
 		if (gl3) {
 			config.setOpenGLEmulation(Lwjgl3ApplicationConfiguration.GLEmulation.GL30, 3, 2);
 
