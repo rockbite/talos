@@ -1,4 +1,4 @@
-package com.talosvfx.talos.editor.addons.shader.workspace;
+package com.talosvfx.talos.editor.addons.scene.apps.shader.workspace;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
@@ -11,11 +11,13 @@ import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.rockbite.bongo.engine.render.PolygonSpriteBatchMultiTextureMULTIBIND;
-import com.talosvfx.talos.editor.addons.scene.events.PropertyHolderSelected;
-import com.talosvfx.talos.editor.addons.scene.logic.PropertyWrapperProviders;
-import com.talosvfx.talos.editor.notifications.Observer;
-import com.talosvfx.talos.runtime.vfx.shaders.ShaderBuilder;
+import com.talosvfx.talos.editor.addons.scene.apps.shader.ShaderEditorApp;
 import com.talosvfx.talos.editor.addons.shader.nodes.ColorOutput;
+import com.talosvfx.talos.editor.data.ShaderStageData;
+import com.talosvfx.talos.editor.notifications.Observer;
+import com.talosvfx.talos.runtime.assets.GameAsset;
+import com.talosvfx.talos.runtime.shader.ShaderInstance;
+import com.talosvfx.talos.runtime.vfx.shaders.ShaderBuilder;
 import com.talosvfx.talos.editor.nodes.DynamicNodeStage;
 import com.talosvfx.talos.editor.nodes.NodeWidget;
 import com.talosvfx.talos.editor.notifications.EventHandler;
@@ -26,14 +28,49 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
 
-public class ShaderNodeStage extends DynamicNodeStage implements Observer {
+public class ShaderNodeStage extends DynamicNodeStage<ShaderStageData> implements Observer {
 
+    private final ShaderEditorApp shaderEditorApp;
     private ColorOutput colorOutput;
 
     FrameBuffer frameBuffer;
     PolygonBatch spriteBatch;
     Viewport viewport;
 
+    private boolean loading = false;
+
+    public void loadFrom (GameAsset<ShaderStageData> asset) {
+        loading = true;
+        if (asset == null || asset.getResource() == null) return;
+
+        setFromData(asset);
+
+        reset();
+
+        asset.getResource().constructForUI(this);
+
+        loading = false;
+    }
+
+    public void cacheFullShader () {
+        ShaderBuilder shaderBuilder = new ShaderBuilder();
+
+        for (NodeWidget node : nodeBoard.getNodes()) {
+            if (node instanceof ColorOutput) {
+                ColorOutput colorOutput = (ColorOutput) node;
+                colorOutput.buildFragmentShader(shaderBuilder);
+                ShaderStageData resource = gameAsset.getResource();
+
+                resource.setVertString(shaderBuilder.getVertexString());
+                resource.setFragString(shaderBuilder.getFragmentString());
+
+                resource.setShaderInstanceFromVertFrag();
+
+            }
+        }
+
+
+    }
 
 
     class ExportSequencePayload {
@@ -50,8 +87,9 @@ public class ShaderNodeStage extends DynamicNodeStage implements Observer {
 
     ExportSequencePayload exportSequencePayload = null;
 
-    public ShaderNodeStage (Skin skin) {
+    public ShaderNodeStage (ShaderEditorApp shaderEditorApp, Skin skin) {
         super(skin);
+        this.shaderEditorApp = shaderEditorApp;
 
         frameBuffer = new FrameBuffer(Pixmap.Format.RGBA8888, 240, 240, false);
         spriteBatch = new PolygonSpriteBatchMultiTextureMULTIBIND();
@@ -71,14 +109,13 @@ public class ShaderNodeStage extends DynamicNodeStage implements Observer {
     }
 
 
-
     @Override
     public NodeWidget createNode (String nodeName, float screenX, float y) {
 
-        if(!nodeName.equals("ColorOutput")) {
+        if (!nodeName.equals("ColorOutput")) {
             return super.createNode(nodeName, screenX, y);
         } else {
-            if(colorOutput == null) {
+            if (colorOutput == null) {
                 NodeWidget node = super.createNode(nodeName, screenX, y);
                 colorOutput = (ColorOutput) node;
                 return node;
@@ -100,31 +137,38 @@ public class ShaderNodeStage extends DynamicNodeStage implements Observer {
     }
 
     @Override
+    public void markAssetChanged () {
+        if (!loading) {
+            super.markAssetChanged();
+        }
+    }
+
+    @Override
     public void onNodeSelectionChange () {
 
     }
 
     @EventHandler
-    public void onNodeRemoved(NodeRemovedEvent event) {
+    public void onNodeRemoved (NodeRemovedEvent event) {
      /*  if (event.getNode() == colorOutput) {
            colorOutput = null;
        }*/
     }
 
-    public String getFragShader() {
+    public String getFragShader () {
         ShaderBuilder builder = new ShaderBuilder();
 
-        if(colorOutput == null) return "";
+        if (colorOutput == null) return "";
 
         colorOutput.buildFragmentShader(builder);
 
         return builder.getFragmentString();
     }
 
-    public String getShaderData() {
+    public String getShaderData () {
         ShaderBuilder builder = new ShaderBuilder();
 
-        if(colorOutput == null) return "";
+        if (colorOutput == null) return "";
 
         colorOutput.buildFragmentShader(builder);
 
@@ -139,14 +183,14 @@ public class ShaderNodeStage extends DynamicNodeStage implements Observer {
             XmlWriter uniforms = shader.element("uniforms");
 
             ObjectMap<String, ShaderBuilder.UniformData> declaredUniforms = builder.getDeclaredUniforms();
-            for(String uniformName: declaredUniforms.keys()) {
+            for (String uniformName : declaredUniforms.keys()) {
                 XmlWriter uniform = uniforms.element("uniform");
 
                 uniform.attribute("name", uniformName);
                 uniform.attribute("type", declaredUniforms.get(uniformName).type.getTypeString());
                 ShaderBuilder.UniformData uniformData = declaredUniforms.get(uniformName);
 
-                if(uniformData.type == ShaderBuilder.Type.TEXTURE) {
+                if (uniformData.type == ShaderBuilder.Type.TEXTURE) {
                     uniform.text(uniformData.payload.getValueDescriptor());
                 }
 
@@ -169,7 +213,7 @@ public class ShaderNodeStage extends DynamicNodeStage implements Observer {
         }
     }
 
-    public Pixmap exportPixmap() {
+    public Pixmap exportPixmap () {
         if (colorOutput == null) return null;
 
         frameBuffer.begin();
@@ -194,7 +238,7 @@ public class ShaderNodeStage extends DynamicNodeStage implements Observer {
 //
 //        }
 
-        viewport.update((int)targetSize.x, (int)targetSize.y);
+        viewport.update((int) targetSize.x, (int) targetSize.y);
         spriteBatch.setProjectionMatrix(viewport.getCamera().combined);
 
         tmp.set(colorOutput.getShaderBox().getX(), colorOutput.getShaderBox().getY());
@@ -204,14 +248,14 @@ public class ShaderNodeStage extends DynamicNodeStage implements Observer {
 
         spriteBatch.end();
 
-        Pixmap pixmap = ScreenUtils.getFrameBufferPixmap(0, 0, (int)targetSize.x, (int)targetSize.y);
+        Pixmap pixmap = ScreenUtils.getFrameBufferPixmap(0, 0, (int) targetSize.x, (int) targetSize.y);
 
         frameBuffer.end();
 
         return pixmap;
     }
 
-    public void exportSequence(String name, String path, int width, int height, float duration, int fps) {
+    public void exportSequence (String name, String path, int width, int height, float duration, int fps) {
         exportSequencePayload = new ExportSequencePayload();
         exportSequencePayload.width = width;
         exportSequencePayload.height = height;
@@ -225,15 +269,15 @@ public class ShaderNodeStage extends DynamicNodeStage implements Observer {
     }
 
     @Override
-    public void act() {
+    public void act () {
         super.act();
 
-        if(exportSequencePayload != null) {
+        if (exportSequencePayload != null) {
             float delta = Gdx.graphics.getDeltaTime();
             exportSequencePayload.timer += delta;
             exportSequencePayload.totalTimer += delta;
 
-            if(exportSequencePayload.totalTimer >= exportSequencePayload.duration) {
+            if (exportSequencePayload.totalTimer >= exportSequencePayload.duration) {
                 // then we are finished
                 finishSequenceExport();
                 return;
@@ -241,7 +285,7 @@ public class ShaderNodeStage extends DynamicNodeStage implements Observer {
 
             float frameLength = exportSequencePayload.duration / exportSequencePayload.fps;
 
-            if(exportSequencePayload.timer > frameLength) {
+            if (exportSequencePayload.timer > frameLength) {
                 exportSequencePayload.timer = frameLength - exportSequencePayload.timer;
                 // time to snap a frame
                 snapFrameToSequence();
@@ -249,7 +293,7 @@ public class ShaderNodeStage extends DynamicNodeStage implements Observer {
         }
     }
 
-    private void snapFrameToSequence() {
+    private void snapFrameToSequence () {
         if (colorOutput == null) return;
 
         frameBuffer.begin();
@@ -261,7 +305,7 @@ public class ShaderNodeStage extends DynamicNodeStage implements Observer {
         Vector2 targetSize = new Vector2(exportSequencePayload.width, exportSequencePayload.height);
 
 
-        viewport.update((int)targetSize.x, (int)targetSize.y);
+        viewport.update((int) targetSize.x, (int) targetSize.y);
         spriteBatch.setProjectionMatrix(viewport.getCamera().combined);
 
         tmp.set(colorOutput.getShaderBox().getX(), colorOutput.getShaderBox().getY());
@@ -271,7 +315,7 @@ public class ShaderNodeStage extends DynamicNodeStage implements Observer {
 
         spriteBatch.end();
 
-        Pixmap pixmap = ScreenUtils.getFrameBufferPixmap(0, 0, (int)targetSize.x, (int)targetSize.y);
+        Pixmap pixmap = ScreenUtils.getFrameBufferPixmap(0, 0, (int) targetSize.x, (int) targetSize.y);
 
         frameBuffer.end();
 
@@ -280,7 +324,7 @@ public class ShaderNodeStage extends DynamicNodeStage implements Observer {
         exportSequencePayload.frames.add(pixmap);
     }
 
-    private Pixmap flipPixmap(Pixmap src) {
+    private Pixmap flipPixmap (Pixmap src) {
         final int width = src.getWidth();
         final int height = src.getHeight();
         Pixmap flipped = new Pixmap(width, height, src.getFormat());
@@ -295,11 +339,11 @@ public class ShaderNodeStage extends DynamicNodeStage implements Observer {
         return flipped;
     }
 
-    private void finishSequenceExport() {
+    private void finishSequenceExport () {
         int frameIndex = 9;
-        for(Pixmap pixmap : exportSequencePayload.frames) {
+        for (Pixmap pixmap : exportSequencePayload.frames) {
             frameIndex++;
-            if(pixmap != null) {
+            if (pixmap != null) {
                 FileHandle file = Gdx.files.absolute(exportSequencePayload.path + File.separator + exportSequencePayload.name + frameIndex + ".png");
 //                PixmapIO.writePNG(file, pixmap);
                 pixmap.dispose();

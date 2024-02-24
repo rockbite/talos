@@ -6,6 +6,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.*;
+import com.talosvfx.talos.editor.nodes.DynamicNodeStage;
+import com.talosvfx.talos.editor.notifications.EventContextProvider;
 import com.talosvfx.talos.editor.notifications.Observer;
 import com.talosvfx.talos.runtime.vfx.shaders.ShaderBuilder;
 import com.talosvfx.talos.editor.addons.shader.widgets.ShaderBox;
@@ -21,7 +23,7 @@ import com.talosvfx.talos.editor.notifications.events.dynamicnodestage.NodeDataM
 import com.talosvfx.talos.editor.notifications.events.dynamicnodestage.NodeRemovedEvent;
 import com.talosvfx.talos.editor.utils.HeightAction;
 
-public abstract class AbstractShaderNode extends NodeWidget implements Observer {
+public abstract class AbstractShaderNode extends NodeWidget implements Observer, EventContextProvider<DynamicNodeStage<?>> {
 
     protected ShaderBuilder previewBuilder = new ShaderBuilder();
 
@@ -51,6 +53,11 @@ public abstract class AbstractShaderNode extends NodeWidget implements Observer 
         sizeMap.put(ShaderBuilder.Type.VEC4.getTypeString(), 4);
 
         Notifications.registerObserver(this);
+    }
+
+    @Override
+    public DynamicNodeStage<?> getContext () {
+        return nodeBoard.getNodeStage();
     }
 
     @EventHandler

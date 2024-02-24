@@ -34,6 +34,7 @@
     </category>
     <category name = "Materials">
         <module name = "SpriteMaterial" wrapper = "SpriteMaterialModuleWrapper">SpriteMaterialModule</module>
+        <module name = "ShaderMaterial" wrapper = "ShaderMaterialModuleWrapper">ShaderMaterialModule</module>
     </category>
     <category name = "Randomness">
         <module name = "Random Range" wrapper = "RandomRangeModuleWrapper">RandomRangeModule</module>

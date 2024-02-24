@@ -104,6 +104,8 @@ public class ModuleListPopup extends VisWindow {
                         if(WrapperRegistry.map.containsKey(clazz)) {
                             moduleBoardWidget.createModule(clazz, createLocationScreen.x, createLocationScreen.y);
                             remove();
+                        } else {
+                            logger.error("No module found in registry");
                         }
                     } catch (ReflectionException e) {
                         e.printStackTrace();

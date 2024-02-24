@@ -67,7 +67,7 @@ public class ProjectExplorerWidget extends Table implements Observer {
     @Getter
     private SplitPane splitPane;
 
-    public ProjectExplorerWidget() {
+    public ProjectExplorerWidget () {
         Skin skin = SharedResources.skin;
         Notifications.registerObserver(this);
 
@@ -111,10 +111,10 @@ public class ProjectExplorerWidget extends Table implements Observer {
             @Override
             public boolean accept (File pathname) {
 
-                if(pathname.getAbsolutePath().endsWith(".tse")) return false;
-                if(pathname.getName().equals(".DS_Store")) return false;
-                if(pathname.getAbsolutePath().endsWith(".meta")) return false;
-                if(pathname.getAbsolutePath().endsWith(".p")) return false;
+                if (pathname.getAbsolutePath().endsWith(".tse")) return false;
+                if (pathname.getName().equals(".DS_Store")) return false;
+                if (pathname.getAbsolutePath().endsWith(".meta")) return false;
+                if (pathname.getAbsolutePath().endsWith(".p")) return false;
 
                 return true;
             }
@@ -124,7 +124,7 @@ public class ProjectExplorerWidget extends Table implements Observer {
 
             @Override
             public void onNodeMove (FilteredTree.Node<String> parentToMoveTo, FilteredTree.Node<String> childThatHasMoved, int indexInParent, int indexOfPayloadInPayloadBefore) {
-                if(parentToMoveTo != null) {
+                if (parentToMoveTo != null) {
                     String parentPath = parentToMoveTo.getObject();
                     String childPath = childThatHasMoved.getObject();
 
@@ -155,7 +155,7 @@ public class ProjectExplorerWidget extends Table implements Observer {
 
             @Override
             public void rightClick (FilteredTree.Node<String> node) {
-                if(node != null) {
+                if (node != null) {
                     //select(node);
                     Array<FileHandle> contextualFile = new Array<>();
                     contextualFile.add(Gdx.files.absolute(node.getObject()));
@@ -178,9 +178,9 @@ public class ProjectExplorerWidget extends Table implements Observer {
         directoryTree.expandAll();
     }
 
-    private String getCurrSelectedPath() {
+    private String getCurrSelectedPath () {
         Selection<FilteredTree.Node<String>> selection = directoryTree.getSelection();
-        if(selection.size() > 0) {
+        if (selection.size() > 0) {
             return (String) selection.first().getObject();
         }
 
@@ -188,7 +188,7 @@ public class ProjectExplorerWidget extends Table implements Observer {
     }
 
 
-    public void deletePath(Array<String> paths) {
+    public void deletePath (Array<String> paths) {
         Runnable runnable = new Runnable() {
             @Override
             public void run () {
@@ -208,7 +208,7 @@ public class ProjectExplorerWidget extends Table implements Observer {
 
                 loadDirectoryTree(rootNode.getObject());
 
-                if(!parent.path().equals(parent)) {
+                if (!parent.path().equals(parent)) {
                     expand(parent.path());
                     select(parent.path());
                 }
@@ -217,9 +217,9 @@ public class ProjectExplorerWidget extends Table implements Observer {
 
         String[] message = new String[paths.size + 1];
         message[0] = "Are you sure you want to delete the paths:";
-		for (int i = 0; i < paths.size; i++) {
+        for (int i = 0; i < paths.size; i++) {
             message[i + 1] = paths.get(i);
-		}
+        }
 
         showYesNoDialog("Delete files?", message, runnable, new Runnable() {
             @Override
@@ -229,14 +229,14 @@ public class ProjectExplorerWidget extends Table implements Observer {
         });
     }
 
-    public  ObjectMap<String, FilteredTree.Node<String>> getNodes(){
+    public ObjectMap<String, FilteredTree.Node<String>> getNodes () {
         return nodes;
     }
 
     public void showContextMenu (boolean directoryView) {
         Array<FileHandle> list = new Array<>();
         Array<FilteredTree.Node<String>> nodes = directoryTree.getSelection().toArray();
-        for (FilteredTree.Node<String> node: nodes) {
+        for (FilteredTree.Node<String> node : nodes) {
             String path = node.getObject();
             FileHandle handle = Gdx.files.absolute(path);
             list.add(handle);
@@ -270,7 +270,7 @@ public class ProjectExplorerWidget extends Table implements Observer {
         if (canDelete) {
             contextualMenu.addItem("Cut", new ClickListener() {
                 @Override
-                public void clicked(InputEvent event, float x, float y) {
+                public void clicked (InputEvent event, float x, float y) {
                     invokeCut(files);
                 }
             });
@@ -296,7 +296,7 @@ public class ProjectExplorerWidget extends Table implements Observer {
         if (canRename) {
             contextualMenu.addItem("Rename", new ClickListener() {
                 @Override
-                public void clicked(InputEvent event, float x, float y) {
+                public void clicked (InputEvent event, float x, float y) {
                     String path = files.first().path();
                     if (path != null) {
                         FileHandle handle = Gdx.files.absolute(path);
@@ -318,7 +318,7 @@ public class ProjectExplorerWidget extends Table implements Observer {
         if (canDelete) {
             contextualMenu.addItem("Delete", new ClickListener() {
                 @Override
-                public void clicked(InputEvent event, float x, float y) {
+                public void clicked (InputEvent event, float x, float y) {
                     Array<String> paths = new Array<>();
                     for (FileHandle file : files) {
                         paths.add(file.path());
@@ -328,7 +328,7 @@ public class ProjectExplorerWidget extends Table implements Observer {
             });
         }
 
-        if(files.size == 1 && files.first().isDirectory()) {
+        if (files.size == 1 && files.first().isDirectory()) {
             contextualMenu.addSeparator();
 
             PopupMenu popupMenu = new PopupMenu();
@@ -388,7 +388,7 @@ public class ProjectExplorerWidget extends Table implements Observer {
 
                     Gdx.app.postRunnable(new Runnable() {
                         @Override
-                        public void run() {
+                        public void run () {
                             directoryViewWidget.scrollTo(sceneFileHandle);
                         }
                     });
@@ -466,6 +466,30 @@ public class ProjectExplorerWidget extends Table implements Observer {
                 }
             });
 
+            createSubMenuItem(popupMenu, "Shader", new ClickListener() {
+                @Override
+                public void clicked (InputEvent event, float x, float y) {
+
+                    FileHandle currentFolder = getCurrentFolder();
+
+                    FileHandle newShaderDestination = AssetImporter.suggestNewNameForFileHandle(currentFolder.path(), "NewShader", "shader");
+                    newShaderDestination.writeString("{}", false);
+
+                    AssetRepository.getInstance().rawAssetCreated(newShaderDestination, true);
+
+
+                    // TODO: refactor directory view widget to update itself
+                    select(getCurrentFolder().path());
+
+                    Gdx.app.postRunnable(new Runnable() {
+                        @Override
+                        public void run () {
+                            directoryViewWidget.scrollTo(newShaderDestination);
+                        }
+                    });
+                }
+            });
+
             createSubMenuItem(popupMenu, "Palette", new ClickListener() {
                 @Override
                 public void clicked (InputEvent event, float x, float y) {
@@ -514,7 +538,6 @@ public class ProjectExplorerWidget extends Table implements Observer {
             });
 
 
-
             MenuItem createMenu = contextualMenu.addItem("Create", new ClickListener() {
                 @Override
                 public void clicked (InputEvent event, float x, float y) {
@@ -529,16 +552,16 @@ public class ProjectExplorerWidget extends Table implements Observer {
         contextualMenu.show(getStage());
     }
 
-    private void createSubMenuItem(PopupMenu popupMenu, String name, ClickListener listener) {
+    private void createSubMenuItem (PopupMenu popupMenu, String name, ClickListener listener) {
         MenuItem item = new MenuItem(name);
         item.addListener(listener);
         popupMenu.addItem(item);
     }
 
     public void select (FilteredTree.Node node) {
-        if (ctrlPressed()){
+        if (ctrlPressed()) {
             directoryTree.getSelection().add(node);
-        }else {
+        } else {
             directoryTree.getSelection().clear();
             directoryTree.getSelection().add(node);
             directoryViewWidget.openDirectory((String) node.getObject());
@@ -550,7 +573,7 @@ public class ProjectExplorerWidget extends Table implements Observer {
             directoryTree.getSelection().clear();
             directoryTree.getSelection().add(nodes.get(path));
             expand(path);
-            String pathToSet = (String)nodes.get(path).getObject();
+            String pathToSet = (String) nodes.get(path).getObject();
             directoryViewWidget.openDirectory(pathToSet);
         } else {
             directoryTree.getSelection().clear();
@@ -560,15 +583,15 @@ public class ProjectExplorerWidget extends Table implements Observer {
         }
     }
 
-    public void expand() {
+    public void expand () {
         directoryTree.expandAll();
     }
 
-    public void expand(String path) {
-        if(nodes.containsKey(path)) {
+    public void expand (String path) {
+        if (nodes.containsKey(path)) {
             nodes.get(path).setExpanded(true);
             FilteredTree.Node parent = nodes.get(path).getParent();
-            while(parent != null) {
+            while (parent != null) {
                 parent.setExpanded(true);
                 parent = parent.getParent();
             }
@@ -582,7 +605,7 @@ public class ProjectExplorerWidget extends Table implements Observer {
 
         RowWidget widget = new RowWidget(root, false);
         widget.getLabel().setText("Project");
-        rootNode = new FilteredTree.Node("project",  widget);
+        rootNode = new FilteredTree.Node("project", widget);
         rootNode.setObject(path); // project path
         nodes.put(root.path(), rootNode);
         traversePath(root, 0, 10, rootNode);
@@ -595,24 +618,24 @@ public class ProjectExplorerWidget extends Table implements Observer {
         rootNode.expandAll();
     }
 
-    private void traversePath(FileHandle path, int currDepth, int maxDepth, FilteredTree.Node node) {
-        if(path.isDirectory() && currDepth <= maxDepth) {
+    private void traversePath (FileHandle path, int currDepth, int maxDepth, FilteredTree.Node node) {
+        if (path.isDirectory() && currDepth <= maxDepth) {
             FileHandle[] list = path.list(fileFilter);
             for (int i = 0; i < list.length; i++) {
                 FileHandle listItemHandle = list[i];
 
-                if(!listItemHandle.isDirectory()) continue;
+                if (!listItemHandle.isDirectory()) continue;
 
                 RowWidget widget = new RowWidget(listItemHandle);
                 EditableLabel label = widget.getLabel();
                 label.getTextField().setTextFieldFilter(AssetRepository.ASSET_NAME_FIELD_FILTER);
-                final FilteredTree.Node newNode = new FilteredTree.Node(listItemHandle.path(),  widget);
+                final FilteredTree.Node newNode = new FilteredTree.Node(listItemHandle.path(), widget);
 
                 newNode.setObject(listItemHandle.path());
                 newNode.draggable = true;
                 node.add(newNode);
                 nodes.put(listItemHandle.path(), newNode);
-                if(listItemHandle.isDirectory()) {
+                if (listItemHandle.isDirectory()) {
                     traversePath(list[i], currDepth + 1, maxDepth, newNode);
                 }
 
@@ -627,7 +650,7 @@ public class ProjectExplorerWidget extends Table implements Observer {
                         String path = (String) newNode.getObject();
                         FileHandle fileHandle = Gdx.files.absolute(path);
 
-                        if(newText.isEmpty()) {
+                        if (newText.isEmpty()) {
                             newText = fileHandle.nameWithoutExtension();
                         }
 
@@ -640,9 +663,9 @@ public class ProjectExplorerWidget extends Table implements Observer {
         }
     }
 
-    public void notifyRename(FileHandle old, FileHandle newFile) {
+    public void notifyRename (FileHandle old, FileHandle newFile) {
         FilteredTree.Node node = nodes.get(old.path());
-        if(node != null) {
+        if (node != null) {
             node.setObject(newFile.path());
             nodes.remove(old.path());
             nodes.put(newFile.path(), node);
@@ -666,15 +689,15 @@ public class ProjectExplorerWidget extends Table implements Observer {
         private FileHandle fileHandle;
         private final boolean editable;
 
-        public RowWidget(FileHandle fileHandle) {
+        public RowWidget (FileHandle fileHandle) {
             this(fileHandle, true);
         }
 
-        public RowWidget(FileHandle fileHandle, boolean editable) {
+        public RowWidget (FileHandle fileHandle, boolean editable) {
             this.fileHandle = fileHandle;
             this.editable = editable;
             Image icon;
-            if(fileHandle.isDirectory()) {
+            if (fileHandle.isDirectory()) {
                 icon = new Image(SharedResources.skin.getDrawable("ic-folder"));
             } else {
                 icon = new Image(SharedResources.skin.getDrawable("ic-file-blank"));
@@ -687,43 +710,43 @@ public class ProjectExplorerWidget extends Table implements Observer {
             add(label).growX().padLeft(5).width(250);
         }
 
-        public void set(FileHandle fileHandle) {
+        public void set (FileHandle fileHandle) {
             this.fileHandle = fileHandle;
             label.setText(fileHandle.name());
         }
 
-        public FileHandle getFileHandle(){
+        public FileHandle getFileHandle () {
             return fileHandle;
         }
 
-        public EditableLabel getLabel() {
+        public EditableLabel getLabel () {
             return label;
         }
 
         @Override
-        public RowWidget copyActor(RowWidget copyFrom) {
+        public RowWidget copyActor (RowWidget copyFrom) {
             RowWidget widget = new RowWidget(fileHandle, editable);
             return widget;
         }
     }
 
 
-    public void invokeCut(Array<FileHandle> files) {
+    public void invokeCut (Array<FileHandle> files) {
         filesToManipulate.clear();
         filesToManipulate.addAll(files);
         isCutting = true;
     }
 
-    public void invokeCopy(Array<FileHandle> files) {
+    public void invokeCopy (Array<FileHandle> files) {
         filesToManipulate.clear();
         filesToManipulate.addAll(files);
         isCutting = false;
     }
 
-    public void invokePaste(FileHandle destination) {
-        if(destination.isDirectory()) {
-            for(FileHandle file: filesToManipulate) {
-                if(isCutting) {
+    public void invokePaste (FileHandle destination) {
+        if (destination.isDirectory()) {
+            for (FileHandle file : filesToManipulate) {
+                if (isCutting) {
                     AssetImporter.moveFile(file, destination, false);
                 } else {
                     AssetImporter.copyFile(file, destination);
@@ -737,7 +760,7 @@ public class ProjectExplorerWidget extends Table implements Observer {
         select(destination.path());
     }
 
-    public DirectoryViewWidget getDirectoryViewWidget() {
+    public DirectoryViewWidget getDirectoryViewWidget () {
         return directoryViewWidget;
     }
 
@@ -749,7 +772,7 @@ public class ProjectExplorerWidget extends Table implements Observer {
 
     @EventHandler
     public void onDirectoryContentsChanged (DirectoryChangedEvent event) {
-        if(getCurrentFolder() != null && getCurrentFolder().path().equals(event.getDirectoryPath())) {
+        if (getCurrentFolder() != null && getCurrentFolder().path().equals(event.getDirectoryPath())) {
             reload();
         }
     }
@@ -775,13 +798,17 @@ public class ProjectExplorerWidget extends Table implements Observer {
         select(event.getNewHandle().path());
     }
 
-    /** Use for short messages. */
+    /**
+     * Use for short messages.
+     */
     public void showYesNoDialog (String title, String message, Runnable yes, Runnable no) {
-		YesNoDialog yesNoDialog = new YesNoDialog(title, message, yes, no);
-		getStage().addActor(yesNoDialog.fadeIn());
-	}
+        YesNoDialog yesNoDialog = new YesNoDialog(title, message, yes, no);
+        getStage().addActor(yesNoDialog.fadeIn());
+    }
 
-    /** Use for long messages. */
+    /**
+     * Use for long messages.
+     */
     public void showYesNoDialog (String title, String[] message, Runnable yes, Runnable no) {
         YesNoDialog yesNoDialog = new YesNoDialog(title, message, yes, no);
         getStage().addActor(yesNoDialog.fadeIn());

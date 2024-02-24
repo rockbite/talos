@@ -84,11 +84,19 @@ public class ShaderBox extends Actor {
                 }
                 if(data.type == ShaderBuilder.Type.FLOAT && data.payload instanceof ShaderBuilder.IValueProvider) {
                     ShaderBuilder.IValueProvider provider = data.payload;
-                    shaderProgram.setUniformf(data.variableName, (float)provider.getValue());
+                    if (shaderProgram.hasUniform(data.variableName)) {
+                        shaderProgram.setUniformf(data.variableName, (float) provider.getValue());
+                    } else {
+                        System.out.println("no uniform");
+                    }
                 }
                 if(data.type == ShaderBuilder.Type.VEC4 && data.payload instanceof ShaderBuilder.IValueProvider) {
                     ShaderBuilder.IValueProvider provider = data.payload;
-                    shaderProgram.setUniformf(data.variableName, (Color) provider.getValue());
+                    if (shaderProgram.hasUniform(data.variableName)) {
+                        shaderProgram.setUniformf(data.variableName, (Color) provider.getValue());
+                    } else {
+                        System.out.println("no uniform");
+                    }
                 }
             }
 

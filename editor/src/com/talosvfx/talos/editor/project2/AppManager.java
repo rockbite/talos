@@ -9,6 +9,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.*;
 import com.kotcrab.vis.ui.util.dialog.Dialogs;
 import com.kotcrab.vis.ui.util.dialog.OptionDialogListener;
+import com.talosvfx.talos.editor.addons.scene.apps.shader.ShaderEditorApp;
 import com.talosvfx.talos.editor.addons.scene.apps.spriteeditor.SpriteEditorApp;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.RoutineEditorApp;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
@@ -313,6 +314,7 @@ public class AppManager extends InputAdapter implements Observer {
 		appRegistry.registerAppsForAssetType(GameAssetType.VFX, ParticleNodeEditorApp.class, ParticlePreviewApp.class, EmitterTimelineApp.class);
 		appRegistry.registerAppsForAssetType(GameAssetType.SPRITE, SpriteEditorApp.class);
 		appRegistry.registerAppsForAssetType(GameAssetType.ROUTINE, RoutineEditorApp.class);
+		appRegistry.registerAppsForAssetType(GameAssetType.SHADER, ShaderEditorApp.class);
 
 		Notifications.registerObserver(this);
 	}
@@ -515,6 +517,7 @@ public class AppManager extends InputAdapter implements Observer {
 		if (gameAssetType == GameAssetType.ROUTINE && appToCreateType == GameAssetType.SCENE) return true;
 		if (gameAssetType == GameAssetType.ROUTINE && appToCreateType == GameAssetType.PREFAB) return true;
 		if (gameAssetType == GameAssetType.SCENE && appToCreateType == GameAssetType.ROUTINE) return true;
+		if (gameAssetType == GameAssetType.SCENE && appToCreateType == GameAssetType.SHADER) return true;
 		if (gameAssetType == GameAssetType.SCENE && appToCreateType == GameAssetType.PREFAB) return true;
 		if (gameAssetType == GameAssetType.PREFAB && appToCreateType == GameAssetType.ROUTINE) return true;
 		if (gameAssetType == GameAssetType.PREFAB && appToCreateType == GameAssetType.SCENE) return true;

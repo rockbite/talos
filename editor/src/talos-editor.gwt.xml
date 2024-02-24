@@ -4,7 +4,7 @@
 	<source path="com/talosvfx/talos" />
 	<source path="info/debatty/java" />
 
-	<extend-configuration-property name="gdx.reflect.include" value="com.talosvfx.talos.editor.addons.shader.workspace.ShaderNodeStage" />
+	<extend-configuration-property name="gdx.reflect.include" value="com.talosvfx.talos.editor.addons.scene.apps.shader.workspace.ShaderNodeStage" />
 	<extend-configuration-property name="gdx.reflect.include" value="com.talosvfx.talos.editor.nodes.DynamicNodeStage" />
 	<extend-configuration-property name="gdx.reflect.include" value="com.talosvfx.talos.editor.WorkplaceStage" />
 	<extend-configuration-property name="gdx.reflect.include" value="com.talosvfx.talos.editor.nodes.NodeBoard" />

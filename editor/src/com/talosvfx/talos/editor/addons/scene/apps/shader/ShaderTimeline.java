@@ -1,4 +1,4 @@
-package com.talosvfx.talos.editor.addons.shader;
+package com.talosvfx.talos.editor.addons.scene.apps.shader;
 
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.talosvfx.talos.editor.widgets.ui.timeline.TimelineWidget;

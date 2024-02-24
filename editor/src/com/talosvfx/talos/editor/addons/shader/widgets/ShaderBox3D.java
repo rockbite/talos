@@ -60,14 +60,21 @@ public class ShaderBox3D extends ShaderBox {
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
-        a+= Gdx.graphics.getDeltaTime();
-        cam.position.set(MathUtils.cos(a) * 1f, MathUtils.sin(a) *1f, 1f);
-        cam.lookAt(0,0,0);
+        a += Gdx.graphics.getDeltaTime();
+        cam.position.set(MathUtils.cos(a) * 1f, MathUtils.sin(a) * 1f, 1f);
+        cam.lookAt(0, 0, 0);
         cam.near = 0.01f;
         cam.far = 100f;
         cam.update();
 
-        super.draw(batch, parentAlpha);
+        try {
+            super.draw(batch, parentAlpha);
+        } catch (Exception e) {
+            e.printStackTrace();
+            if (!batch.isDrawing()) {
+                batch.begin();
+            }
+        }
     }
 
     @Override

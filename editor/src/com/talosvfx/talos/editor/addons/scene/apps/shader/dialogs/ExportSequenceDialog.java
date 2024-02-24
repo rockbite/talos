@@ -1,4 +1,4 @@
-package com.talosvfx.talos.editor.addons.shader.dialogs;
+package com.talosvfx.talos.editor.addons.scene.apps.shader.dialogs;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -7,7 +7,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
 import com.kotcrab.vis.ui.widget.VisWindow;
-import com.talosvfx.talos.editor.addons.shader.workspace.ShaderNodeStage;
+import com.talosvfx.talos.editor.addons.scene.apps.shader.workspace.ShaderNodeStage;
 import com.talosvfx.talos.editor.filesystem.FileChooserListener;
 import com.talosvfx.talos.editor.filesystem.FileSystemInteraction;
 
