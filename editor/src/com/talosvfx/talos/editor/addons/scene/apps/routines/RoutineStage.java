@@ -66,6 +66,7 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
     protected void initActors () {
         super.initActors();
         nodeBoard.setTouchable(Touchable.enabled);
+        nodeBoard.getAutoMoveUtil().setViewportWidget(routineEditorApp.routineStageWrapper);
     }
 
     public void loadFrom (GameAsset<RoutineStageData> asset) {

@@ -11,14 +11,11 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.WidgetGroup;
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
-import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.Curve;
 import com.talosvfx.talos.editor.addons.shader.nodes.ColorOutput;
 import com.talosvfx.talos.editor.data.DynamicNodeStageData;
@@ -28,6 +25,7 @@ import com.talosvfx.talos.editor.notifications.events.dynamicnodestage.NodeConne
 import com.talosvfx.talos.editor.notifications.events.dynamicnodestage.NodeDataModifiedEvent;
 import com.talosvfx.talos.editor.notifications.events.dynamicnodestage.NodeRemovedEvent;
 import com.talosvfx.talos.editor.render.Render;
+import com.talosvfx.talos.editor.widgets.ui.ViewportWidget;
 import com.talosvfx.talos.runtime.vfx.Slot;
 import com.talosvfx.talos.runtime.vfx.modules.AbstractModule;
 import lombok.Getter;
@@ -72,6 +70,9 @@ public class NodeBoard<T extends DynamicNodeStageData> extends WidgetGroup imple
 	private Color tmpColor = new Color();
 	private NodeConnection hoveredConnection = null;
 	private ObjectMap<Integer, NodeWidget> nodeMap = new ObjectMap<>();
+
+	@Getter
+	private final AutoMoveUtil autoMoveUtil;
 
 	public void reset () {
 		nodeCounter = new ObjectIntMap<>();
@@ -153,6 +154,9 @@ public class NodeBoard<T extends DynamicNodeStageData> extends WidgetGroup imple
 
 		addActor(groupContainer);
 		addActor(mainContainer);
+
+		autoMoveUtil = new AutoMoveUtil();
+		addActor(autoMoveUtil);
 	}
 
 
@@ -170,16 +174,13 @@ public class NodeBoard<T extends DynamicNodeStageData> extends WidgetGroup imple
 		super.draw(batch, parentAlpha);
 	}
 
-	boolean isHoldingNode;
+	NodeWidget holdingNode;
+
 	@Override
 	public void act(float delta) {
 		super.act(delta);
 
-		if (activeCurve != null || isHoldingNode) {
-			nodeStage.shouldAutoMove = true;
-		} else {
-			nodeStage.shouldAutoMove = false;
-		}
+
 	}
 
 	private void drawCurves () {
@@ -827,7 +828,7 @@ public class NodeBoard<T extends DynamicNodeStageData> extends WidgetGroup imple
 	}
 
 	public void nodeClicked (NodeWidget node) {
-		isHoldingNode = true;
+		holdingNode = node;
 
 		wasNodeDragged = null;
 		if (selectedNodes.contains(node)) {
@@ -1049,4 +1050,120 @@ public class NodeBoard<T extends DynamicNodeStageData> extends WidgetGroup imple
 		return nodeMap.get(uniqueId);
 	}
 
+
+	public class AutoMoveUtil extends Actor {
+		private static final float AUTO_SCROLL_RANGE = 45.0f;
+		private static final float AUTO_SCROLL_SPEED = 200.0f;
+		private static final float DELAY_BEFORE_MOVE = 0.3f;
+		private float delayBeforeMove = DELAY_BEFORE_MOVE;
+
+		private boolean shouldAutoMove;
+
+		private Vector2 tmp = new Vector2();
+		private Vector2 tmp2 = new Vector2();
+		private Vector2 tmp3 = new Vector2();
+
+		private ViewportWidget wrapper;
+
+		private AutoMoveUtil () {
+			// only for node board use
+		}
+
+		@Override
+		public void act(float delta) {
+			super.act(delta);
+
+			if (wrapper == null) {
+				return;
+			}
+
+			tmp.set(Gdx.input.getX(), Gdx.input.getY());
+			wrapper.screenToLocalCoordinates(tmp);
+
+			boolean shouldMove = shouldAutoMove
+					&& (isInTopZone(tmp) || isInBottomZone(tmp) || isInLeftZone(tmp) || isInRightZone(tmp));
+
+			if (shouldMove) {
+				delayBeforeMove -= delta;
+			} else {
+				delayBeforeMove = DELAY_BEFORE_MOVE;
+			}
+
+			if (activeCurve != null || holdingNode != null) {
+				shouldAutoMove = true;
+			} else {
+				shouldAutoMove = false;
+			}
+
+			if (shouldAutoMove()) {
+				Vector2 displacement = autoMoveUtil.displacement();
+				Camera camera = getStage().getCamera();
+				camera.translate(displacement.x, displacement.y, 0);
+
+				if (holdingNode != null) {
+					tmp3.set(Gdx.input.getX(), Gdx.input.getY());
+					holdingNode.screenToLocalCoordinates(tmp3);
+					holdingNode.touchDragged(tmp3.x, tmp3.y);
+				}
+			}
+		}
+
+		public boolean shouldAutoMove () {
+			return delayBeforeMove < 0;
+		}
+
+		public Vector2 displacement () {
+			if (wrapper == null) {
+				return tmp2.setZero();
+			}
+
+			float dt = Gdx.graphics.getDeltaTime();
+
+			tmp.set(Gdx.input.getX(), Gdx.input.getY());
+			wrapper.screenToLocalCoordinates(tmp);
+
+			final float displacement = AUTO_SCROLL_SPEED * dt;
+			tmp2.setZero();
+			if (autoMoveUtil.isInTopZone(tmp)) {
+				tmp2.set(0, displacement);
+			} else if (autoMoveUtil.isInBottomZone(tmp)) {
+				tmp2.set(0, -displacement);
+			}
+
+			if (autoMoveUtil.isInLeftZone(tmp)) {
+				tmp2.set(-displacement, 0);
+			} else if (autoMoveUtil.isInRightZone(tmp)) {
+				tmp2.set(displacement, 0);
+			}
+
+			// make displacement relative
+			Camera camera = NodeBoard.this.getStage().getCamera();
+			if (camera instanceof OrthographicCamera) {
+				OrthographicCamera orthoCamera = (OrthographicCamera) camera;
+				tmp2.scl(orthoCamera.zoom);
+			}
+
+			return tmp2;
+		}
+
+		private boolean isInRightZone(Vector2 mouse) {
+			return mouse.x > wrapper.getWidth() - AUTO_SCROLL_RANGE && mouse.x < wrapper.getWidth();
+		}
+
+		private boolean isInLeftZone(Vector2 mouse) {
+			return mouse.x > 0 && mouse.x < AUTO_SCROLL_RANGE;
+		}
+
+		private boolean isInBottomZone(Vector2 mouse) {
+			return mouse.y > 0 && mouse.y < AUTO_SCROLL_RANGE;
+		}
+
+		private boolean isInTopZone(Vector2 mouse) {
+			return mouse.y > wrapper.getHeight() - AUTO_SCROLL_RANGE && mouse.y < wrapper.getHeight();
+		}
+
+		public void setViewportWidget(ViewportWidget stageWrapper) {
+			wrapper = stageWrapper;
+		}
+	}
 }
