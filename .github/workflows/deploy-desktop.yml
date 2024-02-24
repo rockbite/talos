@@ -2,7 +2,7 @@ name: Deploy Desktop
 on:
   push:
     branches:
-      - talos-3d
+      - master
 jobs:
   Build-Desktop-And-Snapshot:
     runs-on: ubuntu-latest

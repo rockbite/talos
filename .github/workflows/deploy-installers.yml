@@ -2,7 +2,7 @@ name: Deploy Installers
 on:
   push:
     branches:
-      - talos-3d
+      - master
 jobs:
   installer-matrix:
     strategy:
