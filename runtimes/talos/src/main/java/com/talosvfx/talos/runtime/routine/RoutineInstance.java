@@ -5,6 +5,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
+import com.talosvfx.talos.runtime.assets.TalosContextProvider;
 import com.talosvfx.talos.runtime.routine.draw.DrawableQuad;
 import com.talosvfx.talos.runtime.routine.nodes.OnEventNode;
 import com.talosvfx.talos.runtime.routine.serialization.BaseRoutineData;
@@ -17,7 +18,7 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
 
-public class RoutineInstance implements Pool.Poolable, RoutineEventListener {
+public class RoutineInstance implements Pool.Poolable, RoutineEventListener, TalosContextProvider {
 
     private static final Logger logger = LoggerFactory.getLogger(RoutineInstance.class);
 
@@ -68,6 +69,7 @@ public class RoutineInstance implements Pool.Poolable, RoutineEventListener {
     private boolean paused = false;
 
     private Array<RoutineEventInterface> routineEventListeners = new Array<>();
+    private transient String talosIdentifier;
 
     @Override
     public void reset() {
@@ -136,6 +138,16 @@ public class RoutineInstance implements Pool.Poolable, RoutineEventListener {
         routineEventListeners.add(routineEventInterface);
     }
 
+    @Override
+    public String getTalosIdentifier () {
+        return talosIdentifier;
+    }
+
+    @Override
+    public void setTalosIdentifier (String identifier) {
+        this.talosIdentifier = identifier;
+    }
+
     public static class RoutineListenerAdapter implements RoutineListener {
 
         @Getter
@@ -198,6 +210,7 @@ public class RoutineInstance implements Pool.Poolable, RoutineEventListener {
             try {
                 clazz = ClassReflection.forName(nodePackageName + nodeName);
                 RoutineNode routineNode = (RoutineNode) ClassReflection.newInstance(clazz);
+                routineNode.setTalosIdentifier(talosIdentifier);
                 routineNode.loadFrom(this, nodeData);
                 lowLevelLookup.put(routineNode.uniqueId, routineNode);
 

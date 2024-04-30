@@ -27,13 +27,8 @@ public class ParticleComponent<T extends BaseVFXProjectData> extends RendererCom
 
     @Override
     public void read (Json json, JsonValue jsonData) {
-        UUID gameResourceUUID = GameResourceOwner.readGameResourceUUIDFromComponent(jsonData);
-        if (gameResourceUUID == null) {
-            String gameResourceIdentifier = GameResourceOwner.readGameResourceFromComponent(jsonData);
-            loadDescriptorFromIdentifier(gameResourceIdentifier);
-        } else {
-            loadDescriptorFromUniqueIdentifier(gameResourceUUID);
-        }
+        GameAsset<T> newGameAsset = GameResourceOwner.readAsset(json, jsonData);
+        setGameAsset(newGameAsset);
 
         super.read(json, jsonData);
     }
@@ -55,15 +50,7 @@ public class ParticleComponent<T extends BaseVFXProjectData> extends RendererCom
         }
     };
 
-    private void loadDescriptorFromIdentifier (String gameResourceIdentifier) {
-        GameAsset<T> assetForIdentifier = RuntimeContext.getInstance().AssetRepository.getAssetForIdentifier(gameResourceIdentifier, GameAssetType.VFX);
-        setGameAsset(assetForIdentifier);
-    }
 
-    private void loadDescriptorFromUniqueIdentifier (UUID gameResourceUUID) {
-        GameAsset<T> assetForUniqueIdentifier = RuntimeContext.getInstance().AssetRepository.getAssetForUniqueIdentifier(gameResourceUUID, GameAssetType.VFX);
-        setGameAsset(assetForUniqueIdentifier);
-    }
 
     @Override
     public GameAssetType getGameAssetType () {

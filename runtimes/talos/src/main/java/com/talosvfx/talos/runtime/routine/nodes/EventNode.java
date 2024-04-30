@@ -51,7 +51,7 @@ public class EventNode extends RoutineNode {
             }
         }
 
-        RuntimeContext.getInstance().routineEventInterface.onEventFromRoutines(eventName, new Array<>(propertyWrappers));
+        getRoutineEventInterface().onEventFromRoutines(eventName, new Array<>(propertyWrappers));
     }
 
     @Override

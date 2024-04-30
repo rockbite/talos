@@ -120,7 +120,7 @@ public class LegacyCompareTest extends ApplicationAdapter {
 
 		public TalosActor (FileHandle effect, TextureAtlas atlas, ParticleRenderer renderer) {
 			this.renderer = renderer;
-			particleEffectDescriptor.load(effect);
+//			particleEffectDescriptor.load(effect);
 			particleEffect = particleEffectDescriptor.createEffectInstance();
 			particleEffect.setScope(scope);
 		}

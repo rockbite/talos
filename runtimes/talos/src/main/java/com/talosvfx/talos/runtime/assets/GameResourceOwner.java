@@ -1,5 +1,6 @@
 package com.talosvfx.talos.runtime.assets;
 
+import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.talosvfx.talos.runtime.RuntimeContext;
@@ -41,11 +42,25 @@ public interface GameResourceOwner<U> {
         String identifier = readGameResourceFromComponent(jsonValue);
         GameAssetType type = readAssetType(json, jsonValue);
         UUID uuid = readGameResourceUUIDFromComponent(jsonValue);
+        String talosIdentifier = readTalosIdentifier(jsonValue);
+        RuntimeContext.TalosContext talosContext = RuntimeContext.getInstance().getTalosContext(talosIdentifier);
+        if (talosContext == null) {
+            throw new GdxRuntimeException("No asset repository found for " + talosIdentifier);
+        }
+        BaseAssetRepository baseAssetRepository = talosContext.getBaseAssetRepository();
 
         if (uuid == null) {
-            return RuntimeContext.getInstance().AssetRepository.getAssetForIdentifier(identifier, type);
+            GameAsset<U> asset = baseAssetRepository.getAssetForIdentifier(identifier, type);
+            if (asset == null) {
+                System.out.println("Asset not found for identifier " + identifier + " and type " + type);
+            }
+            return asset;
         } else {
-            return RuntimeContext.getInstance().AssetRepository.getAssetForUniqueIdentifier(uuid, type);
+            GameAsset<U> assetForUniqueIdentifier = baseAssetRepository.getAssetForUniqueIdentifier(uuid, type);
+            if (assetForUniqueIdentifier == null) {
+                System.out.println("Asset not found for uuid " + uuid + " and type " + type);
+            }
+            return assetForUniqueIdentifier;
         }
     }
 
@@ -53,6 +68,9 @@ public interface GameResourceOwner<U> {
         GameAssetType type = json.readValue("type", GameAssetType.class, jsonValue);
         if(type == null) return GameAssetType.SPRITE;
         return type;
+    }
+    static String readTalosIdentifier (JsonValue value) {
+        return value.getString("talosIdentifier", "default");
     }
 
     static String readGameResourceFromComponent (JsonValue component) {

@@ -1,6 +1,7 @@
 package com.talosvfx.talos.runtime.scene.components;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.collision.BoundingBox;
 import com.badlogic.gdx.utils.*;
@@ -67,8 +68,7 @@ public class SpineRendererComponent extends RendererComponent implements Json.Se
 
     @Override
     public void read (Json json, JsonValue jsonData) {
-        String gameResourceIdentifier = GameResourceOwner.readGameResourceFromComponent(jsonData);
-
+        super.read(json, jsonData);
         scale = jsonData.getFloat("scale", 1/128f);
         currAnimation = jsonData.getString("animation", "");
         applyAnimation = jsonData.getBoolean("applyAnimation", true);
@@ -76,7 +76,8 @@ public class SpineRendererComponent extends RendererComponent implements Json.Se
         skin = jsonData.getString("skin", null);
         generateGameObjectBones = jsonData.getBoolean("generateGameObjectBones", false);
 
-        loadSkeletonFromIdentifier(gameResourceIdentifier);
+        GameAsset<SkeletonData> asset = GameResourceOwner.readAsset(json, jsonData);
+        setGameAsset(asset);
 
         if (skeleton != null) {
             if (skin != null) {
@@ -102,12 +103,6 @@ public class SpineRendererComponent extends RendererComponent implements Json.Se
             }
         }
 
-        super.read(json, jsonData);
-    }
-
-    private void loadSkeletonFromIdentifier (String gameResourceIdentifier) {
-        GameAsset<SkeletonData> assetForIdentifier = RuntimeContext.getInstance().AssetRepository.getAssetForIdentifier(gameResourceIdentifier, GameAssetType.SKELETON);
-        setGameAsset(assetForIdentifier);
     }
 
     @Override

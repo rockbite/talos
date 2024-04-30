@@ -17,10 +17,7 @@
 package com.talosvfx.talos.runtime.vfx;
 
 import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.GdxRuntimeException;
-import com.badlogic.gdx.utils.IntMap;
-import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.*;
 import com.talosvfx.talos.runtime.assets.BaseAssetRepository;
 import com.talosvfx.talos.runtime.vfx.modules.AbstractModule;
 import com.talosvfx.talos.runtime.vfx.modules.DrawableModule;
@@ -45,7 +42,7 @@ public class ParticleEffectDescriptor {
 	}
 
 	public ParticleEffectDescriptor (FileHandle fileHandle, BaseAssetRepository assetRepository) {
-		load(fileHandle);
+		load(fileHandle, assetRepository.getTalosContext().getIdentifier());
 	}
 
 	public void addEmitter (ParticleEmitterDescriptor emitter) {
@@ -60,19 +57,21 @@ public class ParticleEffectDescriptor {
 		return new ParticleEmitterDescriptor(this);
 	}
 
-	public void load (FileHandle fileHandle) {
-		final ExportData exportData = getExportData(fileHandle);
+	public void load (FileHandle fileHandle, String talosIdentifier) {
+		final ExportData exportData = getExportData(fileHandle, talosIdentifier);
 		load(exportData);
 	}
 
-	public static ExportData getExportData (FileHandle fileHandle) {
+	public static ExportData getExportData (FileHandle fileHandle, String talosIdentifier) {
 		Json json = new Json();
 		ParticleEmitterDescriptor.registerModules();
 		for (Class clazz : ParticleEmitterDescriptor.registeredModules) {
 			json.addClassTag(clazz.getSimpleName(), clazz);
 		}
 
-		final ExportData exportData = json.fromJson(ExportData.class, fileHandle.readString());
+		JsonValue jsonValue = new JsonReader().parse(fileHandle.readString());
+		jsonValue.addChild("talosIdentifier", new JsonValue(talosIdentifier));
+		final ExportData exportData = json.readValue(ExportData.class, jsonValue);
 		return exportData;
 	}
 

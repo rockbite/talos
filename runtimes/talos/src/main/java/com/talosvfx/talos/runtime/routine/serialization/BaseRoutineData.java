@@ -12,5 +12,5 @@ public interface BaseRoutineData {
 
 	JsonValue getJsonConnections ();
 
-	RoutineInstance createInstance (boolean external);
+	RoutineInstance createInstance (boolean external, String talosIdentifier);
 }

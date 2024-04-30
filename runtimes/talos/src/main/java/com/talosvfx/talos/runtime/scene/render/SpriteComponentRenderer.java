@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.talosvfx.talos.runtime.RuntimeContext;
 import com.talosvfx.talos.runtime.assets.AMetadata;
+import com.talosvfx.talos.runtime.assets.BaseAssetRepository;
 import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.runtime.assets.RawAsset;
 import com.talosvfx.talos.runtime.assets.meta.SpriteMetadata;
@@ -71,7 +72,9 @@ public class SpriteComponentRenderer extends ComponentRenderer<SpriteRendererCom
                 final float height = spriteRenderer.size.y;
 
                 if (metadata != null && metadata.borderData != null && spriteRenderer.renderMode == SpriteRendererComponent.RenderMode.sliced) {
-                    NineSlice patch = RuntimeContext.getInstance().AssetRepository.obtainNinePatch(gameResource);// todo: this has to be done better
+                    RuntimeContext.TalosContext talosContext = RuntimeContext.getInstance().getTalosContext(gameObject.getTalosIdentifier());
+                    BaseAssetRepository baseAssetRepository = talosContext.getBaseAssetRepository();
+                    NineSlice patch = baseAssetRepository.obtainNinePatch(gameResource);// todo: this has to be done better
                     float tileWidth = spriteRenderer.tileSize.x;
                     float tileHeight = spriteRenderer.tileSize.y;
                     patch.setTileWidth(tileWidth);

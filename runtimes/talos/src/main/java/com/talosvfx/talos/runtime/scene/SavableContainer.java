@@ -170,12 +170,18 @@ public abstract class SavableContainer implements GameObjectContainer, Json.Seri
 	public void load (String data) {
 		JsonValue jsonValue = new JsonReader().parse(data);
 		Json json = new Json();
+		json.setIgnoreUnknownFields(true);
 		JsonValue gameObjectsJson = jsonValue.get("gameObjects");
 		root = new GameObject();
 		root.setGameObjectContainer(this);
 		for (JsonValue gameObjectJson : gameObjectsJson) {
 			try {
+				gameObjectJson.addChild("talosIdentifier", new JsonValue(getTalosIdentifier()));
 				GameObject gameObject = json.readValue(GameObject.class, gameObjectJson);
+				if (gameObject.getName() == null) {
+					logger.error("Game object was null for json value {}", gameObjectJson);
+					continue;
+				};
 				root.addGameObject(gameObject);
 			} catch (NullPointerException e) {
 				e.printStackTrace();

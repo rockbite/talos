@@ -18,6 +18,7 @@ import com.talosvfx.talos.runtime.assets.GameAssetType;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.SelectBoxWidget;
 import com.talosvfx.talos.editor.widgets.ui.common.GenericAssetSelectionWidget;
+import com.talosvfx.talos.runtime.assets.GameResourceOwner;
 import lombok.Getter;
 
 import java.util.UUID;
@@ -111,13 +112,18 @@ public class GameAssetWidget<T> extends AbstractWidget<GameAsset<T>> implements 
     @Override
     public void read (Json json, JsonValue jsonValue) {
         try {
-            GameAssetType type = json.readValue("type", GameAssetType.class, jsonValue);
-            UUID uuid = readGameAssetUniqueIdentifier(jsonValue);
-            if (uuid == null) {
-                String id = readGameAssetIdentifier(jsonValue);
-                gameAsset = AssetRepository.getInstance().getAssetForIdentifier(id, type);
-            } else {
-                gameAsset = AssetRepository.getInstance().getAssetForUniqueIdentifier(uuid, type);
+
+            gameAsset = GameResourceOwner.readAsset(json, jsonValue);
+
+            if (gameAsset.isBroken()) {
+                GameAssetType type = json.readValue("type", GameAssetType.class, jsonValue);
+                UUID uuid = readGameAssetUniqueIdentifier(jsonValue);
+                if (uuid == null) {
+                    String id = readGameAssetIdentifier(jsonValue);
+                    gameAsset = AssetRepository.getInstance().getAssetForIdentifier(id, type);
+                } else {
+                    gameAsset = AssetRepository.getInstance().getAssetForUniqueIdentifier(uuid, type);
+                }
             }
 
             this.type = type;
@@ -148,6 +154,8 @@ public class GameAssetWidget<T> extends AbstractWidget<GameAsset<T>> implements 
             json.writeValue("type", type);
             json.writeValue("id", gameAsset.nameIdentifier);
             json.writeValue("uuid", gameAsset.getRootRawAsset().metaData.uuid.toString());
+
+            GameResourceOwner.writeGameAsset("gameResource", json, gameAsset);
         }
         json.writeObjectEnd();
     }

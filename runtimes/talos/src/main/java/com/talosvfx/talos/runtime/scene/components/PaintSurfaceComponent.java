@@ -102,13 +102,8 @@ public class PaintSurfaceComponent extends AComponent implements GameResourceOwn
 
     @Override
     public void read(Json json, JsonValue jsonData) {
-        UUID gameResourceUUID = GameResourceOwner.readGameResourceUUIDFromComponent(jsonData);
-        if (gameResourceUUID == null) {
-            String gameResourceIdentifier = GameResourceOwner.readGameResourceFromComponent(jsonData);
-            loadTextureFromIdentifier(gameResourceIdentifier);
-        } else {
-            loadTextureFromUniqueIdentifier(gameResourceUUID);
-        }
+        GameAsset<AtlasSprite> objectGameAsset = GameResourceOwner.readAsset(json, jsonData);
+        setGameAsset(objectGameAsset);
 
         overlay = jsonData.getFloat("overlay", 0.5f);
         size = json.readValue( "size", Vector2.class, jsonData);
@@ -118,13 +113,5 @@ public class PaintSurfaceComponent extends AComponent implements GameResourceOwn
         alphaChannel = jsonData.getBoolean("alphaChannel", true);
     }
 
-    private void loadTextureFromIdentifier (String gameResourceIdentifier) {
-        GameAsset<AtlasSprite> assetForIdentifier = RuntimeContext.getInstance().AssetRepository.getAssetForIdentifier(gameResourceIdentifier, GameAssetType.SPRITE);
-        setGameAsset(assetForIdentifier);
-    }
 
-    private void loadTextureFromUniqueIdentifier (UUID gameResourceUUID) {
-        GameAsset<AtlasSprite> assetForUniqueIdentifier = RuntimeContext.getInstance().AssetRepository.getAssetForUniqueIdentifier(gameResourceUUID, GameAssetType.SPRITE);
-        setGameAsset(assetForUniqueIdentifier);
-    }
 }

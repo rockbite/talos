@@ -16,6 +16,8 @@ import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.UUID;
+
 public class TalosProjectData implements Json.Serializable {
 	public static final String TALOS_PROJECT_EXTENSION = "tlsprj";
 	private static final Logger logger = LoggerFactory.getLogger(TalosProjectData.class);
@@ -41,6 +43,9 @@ public class TalosProjectData implements Json.Serializable {
 	@Getter
 	private String gridColor = "ffffff";
 	private String thicknessFactor = "1";
+
+	@Getter
+	private String talosProjectIdentifier;
 
 	public TalosProjectData () {
 		layoutGrid = new LayoutGrid(SharedResources.skin);
@@ -107,6 +112,7 @@ public class TalosProjectData implements Json.Serializable {
 		json.writeValue("exportPackingScale", exportPackingScale);
 		json.writeValue("gridColor", gridColor);
 		json.writeValue("thicknessFactor", thicknessFactor);
+		json.writeValue("talosProjectIdentifier", talosProjectIdentifier);
 	}
 
 	@Override
@@ -125,6 +131,7 @@ public class TalosProjectData implements Json.Serializable {
 		exportPackingScale = jsonData.getString("exportPackingScale", "1");
 		gridColor = jsonData.getString("gridColor", "ffffffff");
 		setThicknessFactor(jsonData.getString("thicknessFactor", "1"));
+		talosProjectIdentifier = jsonData.getString("talosProjectIdentifier", UUID.randomUUID().toString());
 	}
 
 	public void setThicknessFactor(String thicknessFactor) {

@@ -93,26 +93,11 @@ public class PathRendererComponent extends RendererComponent implements GameReso
         super.write(json);
     }
 
-    private void loadTextureFromIdentifier(String gameResourceIdentifier) {
-        GameAsset<AtlasSprite> assetForIdentifier = RuntimeContext.getInstance().AssetRepository.getAssetForIdentifier(gameResourceIdentifier, GameAssetType.SPRITE);
-        setGameAsset(assetForIdentifier);
-    }
-
-    private void loadTextureFromUniqueIdentifier(UUID gameResourceIdentifier) {
-        GameAsset<AtlasSprite> assetForUniqueIdentifier = RuntimeContext.getInstance().AssetRepository.getAssetForUniqueIdentifier(gameResourceIdentifier, GameAssetType.SPRITE);
-        setGameAsset(assetForUniqueIdentifier);
-    }
 
     @Override
     public void read(Json json, JsonValue jsonData) {
-        UUID gameResourceUUID = GameResourceOwner.readGameResourceUUIDFromComponent(jsonData);
-        if (gameResourceUUID == null) {
-            String gameResourceIdentifier = GameResourceOwner.readGameResourceFromComponent(jsonData);
-            loadTextureFromIdentifier(gameResourceIdentifier);
-        } else {
-            loadTextureFromUniqueIdentifier(gameResourceUUID);
-        }
-
+        GameAsset<AtlasSprite> objectGameAsset = GameResourceOwner.readAsset(json, jsonData);
+        setGameAsset(objectGameAsset);
 
         thickness = jsonData.getFloat("thickness", 3f);
         repeatCount = jsonData.getFloat("repeatCount", 5f);

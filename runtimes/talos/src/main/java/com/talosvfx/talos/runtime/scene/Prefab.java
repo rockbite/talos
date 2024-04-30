@@ -9,9 +9,9 @@ public class Prefab extends SavableContainer {
     public static String PREFIX = "Prefab_";
 
     public transient String name;
+    private transient String talosIdentifier;
 
-    public Prefab (FileHandle fileHandle) {
-        loadFromHandle(fileHandle);
+    public Prefab () {
     }
 
     public Prefab (String jsonContent, String name) {
@@ -33,7 +33,10 @@ public class Prefab extends SavableContainer {
     public void load(String data) {
         JsonValue jsonValue = new JsonReader().parse(data);
         Json json = new Json();
-        root = json.readValue(GameObject.class, jsonValue.get("root"));
+        json.setIgnoreUnknownFields(true);
+        JsonValue jsonRoot = jsonValue.get("root");
+        jsonRoot.addChild("talosIdentifier", new JsonValue(talosIdentifier));
+        root = json.readValue(GameObject.class, jsonRoot);
         root.setGameObjectContainer(this);
 
         //Lets add a fake root
@@ -52,5 +55,15 @@ public class Prefab extends SavableContainer {
             this.name = PREFIX + name;
         }
         this.root.setName(this.name);
+    }
+
+    @Override
+    public String getTalosIdentifier () {
+        return talosIdentifier;
+    }
+
+    @Override
+    public void setTalosIdentifier (String identifier) {
+        talosIdentifier = identifier;
     }
 }

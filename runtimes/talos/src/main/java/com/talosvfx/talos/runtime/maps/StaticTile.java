@@ -5,6 +5,7 @@ import com.badlogic.gdx.utils.JsonValue;
 import com.talosvfx.talos.runtime.RuntimeContext;
 import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.runtime.assets.GameAssetType;
+import com.talosvfx.talos.runtime.assets.GameResourceOwner;
 
 public class StaticTile implements Json.Serializable {
 
@@ -39,7 +40,8 @@ public class StaticTile implements Json.Serializable {
 		String nameIdentifier = jsonData.getString("nameIdentifier");
 		GameAssetType type = json.readValue(GameAssetType.class, jsonData.get("type"));
 
-		staticTilesAsset = RuntimeContext.getInstance().AssetRepository.getAssetForIdentifier(nameIdentifier, type);
+		GameAsset<Object> objectGameAsset = GameResourceOwner.readAsset(json, jsonData);
+		staticTilesAsset = objectGameAsset;
 
 		float gridPosX = jsonData.getFloat("gridPositionX");
 		float gridPosY = jsonData.getFloat("gridPositionY");

@@ -37,12 +37,12 @@ public class VFXProjectSerializer {
      * @param data
      */
 
-    public static VFXProjectData readTalosTLSProject (FileHandle fileHandle) {
+    public static VFXProjectData readTalosTLSProject (FileHandle fileHandle, String talosIdentifier) {
         if(!fileHandle.exists()) return null;
-        return readTalosTLSProject(TempHackUtil.hackIt(fileHandle.readString()));
+        return readTalosTLSProject(TempHackUtil.hackIt(fileHandle.readString()), talosIdentifier);
     }
 
-    public static VFXProjectData readTalosTLSProject (String data) {
+    public static VFXProjectData readTalosTLSProject (String data, String talosIdentifier) {
         Json json = new Json();
         json.setIgnoreUnknownFields(true);
         ParticleEmitterDescriptor.registerModules();
@@ -52,7 +52,10 @@ public class VFXProjectSerializer {
         for (Class clazz: ParticleEmitterDescriptor.registeredModules) {
             json.addClassTag(clazz.getSimpleName(), clazz);
         }
-        return json.fromJson(VFXProjectData.class, data);
+        JsonReader reader = new JsonReader();
+        JsonValue parse = reader.parse(data);
+        parse.addChild("talosIdentifier", new JsonValue(talosIdentifier));
+        return json.readValue(VFXProjectData.class, parse);
     }
 
     public void write (FileHandle fileHandle, VFXProjectData VFXProjectData) {

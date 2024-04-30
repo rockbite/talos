@@ -75,7 +75,8 @@ public class TalosMain2 extends ApplicationAdapter {
 		};
 
 		RuntimeContext instance = RuntimeContext.getInstance();
-		instance.AssetRepository = AssetRepository.getInstance();
+
+//		instance.AssetRepository = AssetRepository.getInstance();
 
 		SaveSystem saveSystem = new SaveSystem();
 
@@ -121,12 +122,14 @@ public class TalosMain2 extends ApplicationAdapter {
 
 		openProjectExplorer();
 
-		RuntimeContext.getInstance().routineEventInterface = new RoutineEventInterface() {
-            @Override
-            public void onEventFromRoutines(String eventName, Array<PropertyWrapper<?>> properties) {
-                Toasts.getInstance().showInfoToast(eventName + " event fired!");
-            }
-        };
+		//todo hook thsi up again
+		System.out.println("HOOK UP ROUTINE PLZ");
+//		RuntimeContext.getInstance().routineEventInterface = new RoutineEventInterface() {
+//            @Override
+//            public void onEventFromRoutines(String eventName, Array<PropertyWrapper<?>> properties) {
+//                Toasts.getInstance().showInfoToast(eventName + " event fired!");
+//            }
+//        };
 	}
 
 	private void openProjectExplorer () {

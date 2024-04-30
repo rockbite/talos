@@ -9,6 +9,7 @@ import com.badlogic.gdx.utils.OrderedMap;
 import com.talosvfx.talos.runtime.RuntimeContext;
 import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.runtime.assets.GameAssetType;
+import com.talosvfx.talos.runtime.assets.GameResourceOwner;
 import com.talosvfx.talos.runtime.scene.GameObject;
 import com.talosvfx.talos.runtime.scene.components.TileDataComponent;
 import org.slf4j.Logger;
@@ -93,6 +94,7 @@ public class TilePaletteData implements Json.Serializable {
             GameAsset<?> reference = references.get(uuid);
 
             json.writeObjectStart();
+            //TODO write the actual game resource properly through GAmeResourceOwner
             json.writeValue("gameIdentifier", reference.nameIdentifier);
             json.writeValue("type", reference.type);
             TileOrEntity tileOrEntity = getTileOrEntity(reference);
@@ -135,7 +137,7 @@ public class TilePaletteData implements Json.Serializable {
             String identifier = reference.getString("gameIdentifier");
             JsonValue typeVal = reference.get("type");
             GameAssetType type = json.readValue(GameAssetType.class, typeVal);
-            assetForIdentifier = RuntimeContext.getInstance().AssetRepository.getAssetForIdentifier(identifier, type);
+            assetForIdentifier = GameResourceOwner.readAsset(json, jsonData);
 
             TileOrEntity tileOrEntity = json.readValue(TileOrEntity.class, reference.get("tileOrEntity"));
 

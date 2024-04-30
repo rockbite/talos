@@ -42,6 +42,7 @@ import com.talosvfx.talos.editor.widgets.ui.ContextualMenu;
 import com.talosvfx.talos.editor.widgets.ui.EditableLabel;
 import com.talosvfx.talos.editor.widgets.ui.FilteredTree;
 import com.talosvfx.talos.runtime.scene.components.BoneComponent;
+import com.talosvfx.talos.runtime.utils.ConfigData;
 import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -497,7 +498,9 @@ public class HierarchyWidget extends Table implements Observer, EventContextProv
 
         PopupMenu popupMenu = new PopupMenu();
 
-        ObjectMap<String, XmlReader.Element> confMap = RuntimeContext.getInstance().configData.getGameObjectConfigurationMap();
+        RuntimeContext.TalosContext editorContext = RuntimeContext.getInstance().getEditorContext();
+        ConfigData configData = editorContext.getConfigData();
+        ObjectMap<String, XmlReader.Element> confMap = configData.getGameObjectConfigurationMap();
         for(String key: confMap.keys()) {
             XmlReader.Element element = confMap.get(key);
 

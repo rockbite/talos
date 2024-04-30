@@ -6,6 +6,7 @@ import com.badlogic.gdx.utils.*;
 import com.esotericsoftware.spine.Bone;
 import com.esotericsoftware.spine.Skeleton;
 import com.talosvfx.talos.runtime.assets.GameResourceOwner;
+import com.talosvfx.talos.runtime.assets.TalosContextProvider;
 import com.talosvfx.talos.runtime.routine.RoutineEventInterface;
 import com.talosvfx.talos.runtime.routine.RoutineEventListener;
 import com.talosvfx.talos.runtime.scene.components.*;
@@ -19,6 +20,8 @@ import java.util.Collection;
 import java.util.UUID;
 
 public class GameObject implements GameObjectContainer, RoutineEventListener, Json.Serializable {
+
+    private transient String talosContextIdentifier;
 
     private String name = "gameObject";
     public UUID uuid;
@@ -157,8 +160,10 @@ public class GameObject implements GameObjectContainer, RoutineEventListener, Js
     public void read (Json json, JsonValue jsonData) {
         name = jsonData.getString("name", null);
         if (name == null) {
-            throw new NullPointerException("beep");
+            return;
         }
+        setTalosIdentifier(GameResourceOwner.readTalosIdentifier(jsonData));
+
         if (jsonData.has("uuid")) {
             uuid = UUID.fromString(jsonData.getString("uuid"));
         } else {
@@ -172,6 +177,7 @@ public class GameObject implements GameObjectContainer, RoutineEventListener, Js
 
         JsonValue componentsJson = jsonData.get("components");
         for(JsonValue componentJson : componentsJson) {
+            componentJson.addChild("talosIdentifier", new JsonValue(talosContextIdentifier));
             AComponent component = json.readValue(AComponent.class, componentJson);
 
             if (component instanceof SpineRendererComponent) {
@@ -195,6 +201,7 @@ public class GameObject implements GameObjectContainer, RoutineEventListener, Js
             JsonValue childrenJson = jsonData.get("boneAttachedGOs");
             if(childrenJson != null) {
                 for (JsonValue childJson : childrenJson) {
+                    childJson.addChild("talosIdentifier", new JsonValue(talosContextIdentifier));
                     GameObject childObject = json.readValue(GameObject.class, childJson);
                     GameObject boneGo = component.getParentBoneGameObjectFor(childObject.readBoneName);
                     boneGo.addGameObject(childObject);
@@ -206,6 +213,7 @@ public class GameObject implements GameObjectContainer, RoutineEventListener, Js
         if(childrenJson != null) {
             for (JsonValue childJson : childrenJson) {
                 try {
+                    childJson.addChild("talosIdentifier", new JsonValue(talosContextIdentifier));
                     GameObject childObject = json.readValue(GameObject.class, childJson);
                     addGameObject(childObject);
                 } catch (NullPointerException e) {
@@ -609,5 +617,15 @@ public class GameObject implements GameObjectContainer, RoutineEventListener, Js
     @Override
     public void addNodeEventListener(RoutineEventInterface routineEventInterface) {
         routineEventListeners.add(routineEventInterface);
+    }
+
+    @Override
+    public String getTalosIdentifier () {
+        return talosContextIdentifier;
+    }
+
+    @Override
+    public void setTalosIdentifier (String identifier) {
+        this.talosContextIdentifier = identifier;
     }
 }

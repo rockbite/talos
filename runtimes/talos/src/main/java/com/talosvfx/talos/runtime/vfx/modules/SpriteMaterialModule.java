@@ -74,19 +74,12 @@ public class SpriteMaterialModule extends MaterialModule implements GameResource
 		assetIdentifier = jsonData.getString("asset", "white");
 
 		GameAsset<AtlasSprite> asset = GameResourceOwner.readAsset(json, jsonData);
-
-		if (asset != null) {
-			if (asset.isBroken()) {
-				asset = RuntimeContext.getInstance().AssetRepository.getAssetForIdentifier(assetIdentifier, GameAssetType.SPRITE);
-			}
-			setGameAsset(asset);
-		} else {
-			setGameAsset(RuntimeContext.getInstance().AssetRepository.getAssetForIdentifier(assetIdentifier, GameAssetType.SPRITE));
-		}
+		setGameAsset(asset);
 	}
 
 	public void setToDefault () {
-		GameAsset<AtlasSprite> defaultValue = RuntimeContext.getInstance().AssetRepository.getAssetForIdentifier("white", GameAssetType.SPRITE);
+		BaseAssetRepository baseAssetRepository = RuntimeContext.getInstance().getEditorContext().getBaseAssetRepository();
+		GameAsset<AtlasSprite> defaultValue = baseAssetRepository.getAssetForIdentifier("white", GameAssetType.SPRITE);
 		setGameAsset(defaultValue);
 	}
 
@@ -127,6 +120,8 @@ public class SpriteMaterialModule extends MaterialModule implements GameResource
 
 		if (asset != null && !asset.isBroken()) {
 			region = new TextureRegion(asset.getResource());
+		} else {
+			System.out.println("Sprite material asset broken " + asset.nameIdentifier);
 		}
 	}
 

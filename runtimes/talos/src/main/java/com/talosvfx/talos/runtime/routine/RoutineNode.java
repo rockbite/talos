@@ -5,14 +5,13 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.*;
 import com.talosvfx.talos.runtime.RuntimeContext;
-import com.talosvfx.talos.runtime.assets.GameAsset;
-import com.talosvfx.talos.runtime.assets.GameAssetType;
+import com.talosvfx.talos.runtime.assets.*;
 import com.talosvfx.talos.runtime.scene.GameObject;
 import lombok.Getter;
 
 import java.util.UUID;
 
-public abstract class RoutineNode implements Pool.Poolable {
+public abstract class RoutineNode implements Pool.Poolable, TalosContextProvider {
 
     protected RoutineInstance routineInstanceRef;
 
@@ -213,14 +212,25 @@ public abstract class RoutineNode implements Pool.Poolable {
             } else if(port.dataType == DataType.ASSET) {
                 Json json = new Json();
                 try {
-                    GameAssetType type = json.readValue("type", GameAssetType.class, jsonValue);
-                    GameAsset gameAsset;
-                    UUID uuid = readUUIDFromData(jsonValue);
-                    if (uuid == null) {
-                        String id = jsonValue.getString("id", "broken");
-                        gameAsset = RuntimeContext.getInstance().AssetRepository.getAssetForIdentifier(id, type);
-                    } else {
-                        gameAsset = RuntimeContext.getInstance().AssetRepository.getAssetForUniqueIdentifier(uuid, type);
+                    jsonValue.addChild("talosIdentifier", new JsonValue(talosIdentifier));
+                    GameAsset<?> gameAsset;
+
+                    //new way
+                    gameAsset = GameResourceOwner.readAsset(json, jsonValue);
+
+                    //legacy
+                    if (gameAsset.isBroken()) {
+                        GameAssetType type = json.readValue("type", GameAssetType.class, jsonValue);
+
+                        BaseAssetRepository baseAssetRepository = RuntimeContext.getInstance().getTalosContext(talosIdentifier).getBaseAssetRepository();
+
+                        UUID uuid = readUUIDFromData(jsonValue);
+                        if (uuid == null) {
+                            String id = jsonValue.getString("id", "broken");
+                            gameAsset = baseAssetRepository.getAssetForIdentifier(id, type);
+                        } else {
+                            gameAsset = baseAssetRepository.getAssetForUniqueIdentifier(uuid, type);
+                        }
                     }
                     port.setValue(gameAsset);
 
@@ -491,6 +501,22 @@ public abstract class RoutineNode implements Pool.Poolable {
         } else {
             return UUID.fromString(uuidString);
         }
+    }
+
+    protected transient String talosIdentifier;
+
+    @Override
+    public void setTalosIdentifier (String identifier) {
+        this.talosIdentifier = identifier;
+    }
+
+    @Override
+    public String getTalosIdentifier () {
+       return talosIdentifier;
+    }
+
+    public RoutineEventInterface getRoutineEventInterface () {
+        return RuntimeContext.getInstance().getTalosContext(talosIdentifier).getRoutineDefaultEventInterface();
     }
 
 }

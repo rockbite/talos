@@ -10,6 +10,7 @@ import lombok.Getter;
 public class Scene extends SavableContainer  {
 
     protected transient String name;
+    private transient String talosIdentifier;
 
     @Getter
     private boolean optimized;
@@ -45,5 +46,15 @@ public class Scene extends SavableContainer  {
         JsonValue jsonValue = new JsonReader().parse(TempHackUtil.hackIt(handle.readString()));
         optimized = jsonValue.getBoolean("optimized", false);
 
+    }
+
+    @Override
+    public String getTalosIdentifier () {
+       return talosIdentifier;
+    }
+
+    @Override
+    public void setTalosIdentifier (String identifier) {
+        this.talosIdentifier = identifier;
     }
 }

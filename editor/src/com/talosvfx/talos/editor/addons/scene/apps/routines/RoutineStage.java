@@ -229,7 +229,7 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
             }
 
             if (!isFastChange) {
-                data.setRoutineInstance(data.createInstance(true));
+                data.setRoutineInstance(data.createInstance(true, RuntimeContext.getInstance().getEditorContext().getIdentifier()));
 
                 gameAsset.setUpdated();
 

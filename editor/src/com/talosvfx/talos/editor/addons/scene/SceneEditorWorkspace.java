@@ -64,6 +64,7 @@ import com.talosvfx.talos.editor.project2.apps.SceneEditorApp;
 import com.talosvfx.talos.runtime.scene.SceneData;
 import com.talosvfx.talos.editor.serialization.VFXProjectData;
 import com.talosvfx.talos.runtime.scene.render.RenderState;
+import com.talosvfx.talos.runtime.utils.ConfigData;
 import com.talosvfx.talos.runtime.utils.NamingUtils;
 import com.talosvfx.talos.editor.notifications.EventHandler;
 import com.talosvfx.talos.editor.notifications.Notifications;
@@ -206,9 +207,12 @@ public class SceneEditorWorkspace extends ViewportWidget implements Json.Seriali
 		aligningToolsPane = new AligningToolsPane(groupSelectionGizmo.getViewportWidget().selection);
 
 
-		GizmoRegister.init(RuntimeContext.getInstance().configData.getGameObjectConfigurationXMLRoot());
+		RuntimeContext.TalosContext editorContext = RuntimeContext.getInstance().getEditorContext();
+		ConfigData configData = editorContext.getConfigData();
 
-		templateListPopup = new TemplateListPopup(RuntimeContext.getInstance().configData.getGameObjectConfigurationXMLRoot());
+		GizmoRegister.init(configData.getGameObjectConfigurationXMLRoot());
+
+		templateListPopup = new TemplateListPopup(configData.getGameObjectConfigurationXMLRoot());
 		templateListPopup.setListener(new TemplateListPopup.ListListener() {
 			@Override
 			public void chosen (XmlReader.Element template, float x, float y) {

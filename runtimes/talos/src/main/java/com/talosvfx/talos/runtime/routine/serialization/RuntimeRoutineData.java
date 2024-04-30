@@ -4,6 +4,7 @@ import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.talosvfx.talos.runtime.RuntimeContext;
+import com.talosvfx.talos.runtime.assets.GameResourceOwner;
 import com.talosvfx.talos.runtime.routine.RoutineInstance;
 import com.talosvfx.talos.runtime.routine.misc.PropertyTypeWrapperMapper;
 import com.talosvfx.talos.runtime.scene.utils.propertyWrappers.PropertyType;
@@ -32,6 +33,8 @@ public class RuntimeRoutineData implements BaseRoutineData, Json.Serializable {
 
 	@Override
 	public void read (Json json, JsonValue root) {
+		String talosIdentifier = GameResourceOwner.readTalosIdentifier(root);
+
 		jsonNodes = root.get("list");
 		jsonConnections = root.get("connections");
 		jsonGroups = root.get("groups");
@@ -57,7 +60,7 @@ public class RuntimeRoutineData implements BaseRoutineData, Json.Serializable {
 
 		exposedPropertyIndex = root.getInt("propertyWrapperIndex", 0);
 		//Construct the routine instance from data
-		routineInstance = createInstance(false);
+		routineInstance = createInstance(false, talosIdentifier);
 	}
 
 
@@ -100,16 +103,21 @@ public class RuntimeRoutineData implements BaseRoutineData, Json.Serializable {
 		return jsonConnections;
 	}
 
-	public RoutineInstance createInstance (boolean external) {
+	@Override
+	public RoutineInstance createInstance (boolean external, String talosIdentifier) {
 		RoutineInstance routine = new RoutineInstance();
+		routine.setTalosIdentifier(talosIdentifier);
 		if (external && canWrite) {
 			Json json = new Json();
 			String jsonData = json.prettyPrint(this);
 			JsonReader jsonReader = new JsonReader();
 			JsonValue parse = jsonReader.parse(jsonData);
+			parse.addChild("talosIdentifier", new JsonValue(talosIdentifier));
 			read(json, parse);
 		}
-		routine.loadFrom(this, RuntimeContext.getInstance().configData.getRoutineConfigMap());
+
+		//TODO ROUTINE UHOH
+		routine.loadFrom(this, RuntimeContext.getInstance().getTalosContext(talosIdentifier).getConfigData().getRoutineConfigMap());
 		return routine;
 	}
 }

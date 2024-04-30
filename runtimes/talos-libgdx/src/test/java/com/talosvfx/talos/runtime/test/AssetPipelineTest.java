@@ -36,15 +36,8 @@ public class AssetPipelineTest extends ApplicationAdapter {
 	public void create () {
 		RuntimeContext instance = RuntimeContext.getInstance();
 
-		instance.routineEventInterface = new RoutineEventInterface() {
-			@Override
-			public void onEventFromRoutines (String eventName, Array<PropertyWrapper<?>> properties) {
-				System.out.println("Event: " +eventName + " " + properties);
-			}
-		};
 
 		GdxAssetRepo gdxAssetRepo = new GdxAssetRepo();
-		instance.setAssetRepository(gdxAssetRepo);
 		gdxAssetRepo.loadBundleFromFile(Gdx.files.internal("testproject/assetExport.json"));
 
 		gameObjectRenderer = new GameObjectRenderer();
@@ -53,7 +46,7 @@ public class AssetPipelineTest extends ApplicationAdapter {
 
 		GameAsset<RuntimeRoutineData> routine = gdxAssetRepo.getAssetForIdentifier("Routine", GameAssetType.ROUTINE);
 
-		RoutineInstance routineInstance = routine.getResource().createInstance(true);
+		RoutineInstance routineInstance = routine.getResource().createInstance(true, "default");
 		routineInstance.setContainer(scene.getResource());
 
 		Array<RoutineExecutorNode> nodesByClass = routineInstance.getNodesByClass(RoutineExecutorNode.class);

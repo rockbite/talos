@@ -17,10 +17,12 @@
 package com.talosvfx.talos.editor.serialization;
 
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonValue;
 import com.talosvfx.talos.editor.wrappers.ModuleWrapper;
 import com.talosvfx.talos.runtime.vfx.serialization.ConnectionData;
 
-public class EmitterData {
+public class EmitterData implements Json.Serializable {
 
 	public String name;
 	public int sortPosition;
@@ -34,4 +36,35 @@ public class EmitterData {
 	}
 
 
+	@Override
+	public void write (Json json) {
+		json.writeValue("name", name);
+		json.writeValue("sortPosition", sortPosition);
+		json.writeValue("isMuted", isMuted);
+		json.writeValue("modules", modules);
+		json.writeValue("connections", connections);
+		json.writeValue("groups", groups);
+	}
+
+	@Override
+	public void read (Json json, JsonValue jsonData) {
+		String talosIdentifier = jsonData.getString("talosIdentifier", "default");
+
+		name = jsonData.getString("name");
+		sortPosition = jsonData.getInt("sortPosition", 0);
+		isMuted = jsonData.getBoolean("isMuted", false);
+
+		JsonValue modlesJson = jsonData.get("modules");
+		for (int i = 0; i < modlesJson.size; i++) {
+			JsonValue moduleJson = modlesJson.get(i);
+			moduleJson.addChild("talosIdentifier", new JsonValue(talosIdentifier));
+			modules.add(json.readValue(ModuleWrapper.class, moduleJson));
+		}
+
+		connections = json.readValue("connections", Array.class, ConnectionData.class, jsonData);
+
+		if (jsonData.has("groups")) {
+			groups = json.readValue("groups", Array.class, GroupData.class, jsonData);
+		}
+	}
 }

@@ -691,12 +691,17 @@ public abstract class ModuleWrapper<T extends AbstractModule> extends VisWindow 
 
     @Override
     public void read (Json json, JsonValue jsonData) {
+        String talosIdentifier = jsonData.getString("talosIdentifier", "default");
+
 		setId(jsonData.getInt("id"));
 		setX(jsonData.getFloat("x"));
  		setY(jsonData.getFloat("y"));
  		titleOverride = jsonData.getString("titleOverride", "");
 
-        module = (T)json.readValue(AbstractModule.class, jsonData.get("module").get("data"));
+        JsonValue moduleData = jsonData.get("module").get("data");
+        moduleData.addChild("talosIdentifier", new JsonValue(talosIdentifier));
+
+        module = (T)json.readValue(AbstractModule.class, moduleData);
         //TODO: this has to be create through module graph to go with properr creation channels
 
         setModule(module);

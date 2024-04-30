@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.talosvfx.talos.runtime.RuntimeContext;
+import com.talosvfx.talos.runtime.assets.BaseAssetRepository;
 import com.talosvfx.talos.runtime.routine.draw.DrawableQuad;
 import com.talosvfx.talos.runtime.routine.nodes.RenderRoutineNode;
 import com.talosvfx.talos.runtime.scene.GameObject;
@@ -134,7 +135,7 @@ public class RoutineRenderer {
 
             for (DrawableQuad drawableQuad : routineInstance.drawableQuads) {
                 if(drawableQuad.renderMode == SpriteRendererComponent.RenderMode.sliced) {
-                    drawSliced(batch, drawableQuad);
+                    drawSliced(gameObject, batch, drawableQuad);
                 } else {
                     boolean aspect = drawableQuad.aspect;
                     float scl = (float) drawableQuad.gameAsset.getResource().getRegionWidth() / drawableQuad.gameAsset.getResource().getRegionHeight();
@@ -176,8 +177,11 @@ public class RoutineRenderer {
 
     }
 
-    private void drawSliced (Batch batch, DrawableQuad drawableQuad) {
-        final NinePatch patch = RuntimeContext.getInstance().AssetRepository.obtainNinePatch(drawableQuad.gameAsset);// todo: this has to be done better
+    private void drawSliced (GameObject gameObject, Batch batch, DrawableQuad drawableQuad) {
+        String talosIdentifier = gameObject.getTalosIdentifier();
+        RuntimeContext.TalosContext talosContext = RuntimeContext.getInstance().getTalosContext(talosIdentifier);
+        BaseAssetRepository baseAssetRepository = talosContext.getBaseAssetRepository();
+        final NinePatch patch = baseAssetRepository.obtainNinePatch(drawableQuad.gameAsset);// todo: this has to be done better
 
         float width = drawableQuad.size.x;
         float height = drawableQuad.size.y;

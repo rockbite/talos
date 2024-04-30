@@ -17,6 +17,8 @@
 package com.talosvfx.talos.editor.serialization;
 
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.talosvfx.talos.editor.ParticleEmitterWrapper;
 import com.talosvfx.talos.editor.data.ModuleWrapperGroup;
@@ -30,7 +32,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 
-public class VFXProjectData extends BaseVFXProjectData {
+public class VFXProjectData extends BaseVFXProjectData implements Json.Serializable {
 
 
 	private Array<EmitterData> emitters = new Array<>();
@@ -91,5 +93,23 @@ public class VFXProjectData extends BaseVFXProjectData {
 
 	public Array<EmitterData> getEmitters() {
 		return emitters;
+	}
+
+	@Override
+	public void write (Json json) {
+		json.writeValue("emitters", emitters);
+	}
+
+	@Override
+	public void read (Json json, JsonValue jsonData) {
+		String talosIdentifier = jsonData.getString("talosIdentifier", "default");
+
+		JsonValue emittersJson = jsonData.get("emitters");
+		for (int i = 0; i < emittersJson.size; i++) {
+			JsonValue emitterJsonValue = emittersJson.get(i);
+			emitterJsonValue.addChild("talosIdentifier", new JsonValue(talosIdentifier));
+			EmitterData value = json.readValue(EmitterData.class, emitterJsonValue);
+			emitters.add(value);
+		}
 	}
 }

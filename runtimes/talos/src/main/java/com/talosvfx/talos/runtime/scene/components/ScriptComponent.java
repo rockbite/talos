@@ -8,6 +8,7 @@ import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.runtime.assets.GameAssetType;
 import com.talosvfx.talos.runtime.assets.GameResourceOwner;
 import com.talosvfx.talos.runtime.assets.meta.ScriptMetadata;
+import com.talosvfx.talos.runtime.scene.GameObject;
 import com.talosvfx.talos.runtime.scene.utils.propertyWrappers.PropertyWrapper;
 import lombok.Getter;
 
@@ -47,13 +48,8 @@ public class ScriptComponent extends AComponent implements Json.Serializable, Ga
 
     @Override
     public void read (Json json, JsonValue jsonData) {
-        UUID gameResourceUUID = GameResourceOwner.readGameResourceUUIDFromComponent(jsonData);
-        if (gameResourceUUID == null) {
-            String gameResourceIdentifier = GameResourceOwner.readGameResourceFromComponent(jsonData);
-            loadScriptFromIdentifier(gameResourceIdentifier);
-        } else {
-            loadScriptFromUniqueIdentifier(gameResourceUUID);
-        }
+        GameAsset<String> objectGameAsset = GameResourceOwner.readAsset(json, jsonData);
+        setGameAsset(objectGameAsset);
 
         scriptProperties.clear();
         JsonValue propertiesJson = jsonData.get("properties");
@@ -64,15 +60,7 @@ public class ScriptComponent extends AComponent implements Json.Serializable, Ga
         }
     }
 
-    private void loadScriptFromIdentifier (String gameResourceIdentifier) {
-        GameAsset<String> assetForIdentifier = RuntimeContext.getInstance().AssetRepository.getAssetForIdentifier(gameResourceIdentifier, GameAssetType.SCRIPT);
-        setGameAsset(assetForIdentifier);
-    }
 
-    private void loadScriptFromUniqueIdentifier (UUID gameResourceUUID) {
-        GameAsset<String> assetForUniqueIdentifier = RuntimeContext.getInstance().AssetRepository.getAssetForUniqueIdentifier(gameResourceUUID, GameAssetType.SCRIPT);
-        setGameAsset(assetForUniqueIdentifier);
-    }
 
     public void importScriptPropertiesFromMeta (boolean tryToMerge) {
         Array<PropertyWrapper<?>> copyWrappers = new Array<>();

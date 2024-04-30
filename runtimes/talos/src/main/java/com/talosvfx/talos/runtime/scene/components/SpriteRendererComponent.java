@@ -95,16 +95,6 @@ public class SpriteRendererComponent extends RendererComponent implements GameRe
         }
     };
 
-    private void loadTextureFromIdentifier (String gameResourceIdentifier) {
-        GameAsset<AtlasSprite> assetForIdentifier = RuntimeContext.getInstance().AssetRepository.getAssetForIdentifier(gameResourceIdentifier, GameAssetType.SPRITE);
-        setGameAsset(assetForIdentifier);
-    }
-
-    private void loadTextureFromUniqueIdentifier (UUID gameResourceIdentifier) {
-        GameAsset<AtlasSprite> assetForUniqueIdentifier = RuntimeContext.getInstance().AssetRepository.getAssetForUniqueIdentifier(gameResourceIdentifier, GameAssetType.SPRITE);
-        setGameAsset(assetForUniqueIdentifier);
-    }
-
     @Override
     public void write (Json json) {
         GameResourceOwner.writeGameAsset(json, this);
@@ -125,18 +115,8 @@ public class SpriteRendererComponent extends RendererComponent implements GameRe
 
     @Override
     public void read (Json json, JsonValue jsonData) {
-        UUID gameResourceUUID = GameResourceOwner.readGameResourceUUIDFromComponent(jsonData);
-        if (gameResourceUUID == null) {
-            String gameResourceIdentifier = GameResourceOwner.readGameResourceFromComponent(jsonData);
-            loadTextureFromIdentifier(gameResourceIdentifier);
-        } else {
-            loadTextureFromUniqueIdentifier(gameResourceUUID);
-            if (gameAsset.isBroken()) {
-                //fallback
-                String gameResourceIdentifier = GameResourceOwner.readGameResourceFromComponent(jsonData);
-                loadTextureFromIdentifier(gameResourceIdentifier);
-            }
-        }
+        GameAsset<AtlasSprite> asset = GameResourceOwner.readAsset(json, jsonData);
+        setGameAsset(asset);
 
         color = json.readValue(Color.class, jsonData.get("color"));
         shouldInheritParentColor = jsonData.getBoolean("shouldInheritParentColor", true);

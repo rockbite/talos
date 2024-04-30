@@ -4,6 +4,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.XmlReader;
 import com.talosvfx.talos.runtime.RuntimeContext;
+import com.talosvfx.talos.runtime.assets.BaseAssetRepository;
 import com.talosvfx.talos.runtime.routine.serialization.BaseRoutineData;
 import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.runtime.assets.GameAssetType;
@@ -35,7 +36,12 @@ public class CallRoutineNode extends RoutineNode implements TickableNode, GameAs
                 String name = item.name;
                 String routineAssetId = item.getString("id");
                 //TODO: this needs to be done in a "runtime" friendly way, leaving this task for another time
-                asset = RuntimeContext.getInstance().AssetRepository.getAssetForIdentifier(routineAssetId, GameAssetType.ROUTINE);
+
+                //OK WE NEED TO DO SOMETHING HERE
+                BaseAssetRepository baseAssetRepository = RuntimeContext.getInstance().getTalosContext(getTalosIdentifier()).getBaseAssetRepository();
+                asset = baseAssetRepository.getAssetForIdentifier(routineAssetId, GameAssetType.ROUTINE);
+
+                //TODO HOOK IT UP TOM
                 if(asset != null) {
                     customConstruction(asset);
                 }
@@ -83,7 +89,7 @@ public class CallRoutineNode extends RoutineNode implements TickableNode, GameAs
         inputs.put( port.name, port);
 
         // now create that routine
-        targetInstance = asset.getResource().createInstance(false);
+        targetInstance = asset.getResource().createInstance(false, getTalosIdentifier());
         currentSelectedAsset = asset;
         currentSelectedAsset.listeners.add(this);
     }
@@ -158,7 +164,7 @@ public class CallRoutineNode extends RoutineNode implements TickableNode, GameAs
     @Override
     public void onUpdate() {
         if (!currentSelectedAsset.isBroken()) {
-            targetInstance = currentSelectedAsset.getResource().createInstance(false);
+            targetInstance = currentSelectedAsset.getResource().createInstance(false, getTalosIdentifier());
         }
     }
 }

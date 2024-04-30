@@ -8,11 +8,7 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasSprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.GdxRuntimeException;
-import com.badlogic.gdx.utils.Json;
-import com.badlogic.gdx.utils.ObjectMap;
-import com.badlogic.gdx.utils.ObjectSet;
+import com.badlogic.gdx.utils.*;
 import com.esotericsoftware.spine.SkeletonBinary;
 import com.esotericsoftware.spine.SkeletonData;
 import com.talosvfx.talos.runtime.RuntimeContext;
@@ -202,7 +198,7 @@ public class RuntimeAssetRepository extends BaseAssetRepository {
 
 		FileHandle vfxPFile = baseFolder.child(exportStructure.type.name()).child(exportStructure.relativePathsOfRawFiles.first());
 
-		ExportData vfxExportData = ParticleEffectDescriptor.getExportData(vfxPFile);
+		ExportData vfxExportData = ParticleEffectDescriptor.getExportData(vfxPFile, getTalosContext().getIdentifier());
 
 		ParticleEffectDescriptor particleEffectDescriptor = new ParticleEffectDescriptor();
 
@@ -223,7 +219,10 @@ public class RuntimeAssetRepository extends BaseAssetRepository {
 		FileHandle routineFile = baseFolder.child(exportStructure.type.name()).child(exportStructure.relativePathsOfRawFiles.first());
 
 		Json json = new Json();
-		RuntimeRoutineData runtimeRoutineData = json.fromJson(RuntimeRoutineData.class, routineFile);
+		JsonReader routineJsonReader = new JsonReader();
+		JsonValue parse = routineJsonReader.parse(routineFile);
+		parse.addChild("talosIdentifier", new JsonValue(getTalosContext().getIdentifier()));
+		RuntimeRoutineData runtimeRoutineData = json.readValue(RuntimeRoutineData.class, parse);
 		gameAsset.setResourcePayload(runtimeRoutineData);
 		gameAsset.dependentRawAssets.add(fakeMeta(routineFile, EmptyMetadata.class));
 
@@ -233,7 +232,9 @@ public class RuntimeAssetRepository extends BaseAssetRepository {
 		GameAsset<Prefab> gameAsset = new GameAsset<>(exportStructure.identifier, exportStructure.type);
 		FileHandle prefabFile = baseFolder.child(exportStructure.type.name()).child(exportStructure.relativePathsOfRawFiles.first());
 
-		Prefab prefab = new Prefab(prefabFile);
+		Prefab prefab = new Prefab();
+		prefab.setTalosIdentifier(getTalosContext().getIdentifier());
+		prefab.loadFromHandle(prefabFile);
 
 		gameAsset.setResourcePayload(prefab);
 
@@ -248,6 +249,7 @@ public class RuntimeAssetRepository extends BaseAssetRepository {
 		FileHandle sceneFile = baseFolder.child(exportStructure.type.name()).child(exportStructure.relativePathsOfRawFiles.first());
 
 		Scene scene = new Scene();
+		scene.setTalosIdentifier(getTalosContext().getIdentifier());
 		scene.loadFromHandle(sceneFile);
 
 		gameAsset.setResourcePayload(scene);

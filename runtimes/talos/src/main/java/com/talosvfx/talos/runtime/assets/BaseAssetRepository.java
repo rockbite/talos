@@ -4,8 +4,10 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
+import com.talosvfx.talos.runtime.RuntimeContext;
 import com.talosvfx.talos.runtime.graphics.NineSlice;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.util.UUID;
 
@@ -13,6 +15,9 @@ import static com.badlogic.gdx.graphics.g2d.TextureAtlas.*;
 
 public abstract class BaseAssetRepository {
 	public static final UUID missingUUID = new UUID(-1, -1);
+
+	@Getter@Setter
+	private RuntimeContext.TalosContext talosContext;
 
 	@Getter
 	public static class AssetRepositoryCatalogueExportOptions {

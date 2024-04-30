@@ -11,6 +11,7 @@ import com.talosvfx.talos.editor.project2.localprefs.TalosLocalPrefs;
 import com.talosvfx.talos.editor.utils.Toasts;
 import com.talosvfx.talos.editor.addons.scene.events.save.SaveRequest;
 import com.talosvfx.talos.editor.addons.scene.events.save.ExportRequest;
+import com.talosvfx.talos.runtime.RuntimeContext;
 import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.runtime.assets.GameAssetType;
 import com.talosvfx.talos.editor.addons.scene.utils.importers.AssetImporter;
@@ -26,6 +27,8 @@ import com.talosvfx.talos.editor.notifications.events.assets.GameAssetOpenEvent;
 import com.talosvfx.talos.editor.notifications.events.assets.MenuItemClickedEvent;
 import com.talosvfx.talos.editor.widgets.ui.menu.MainMenu;
 import com.talosvfx.talos.runtime.maps.TilePaletteData;
+import com.talosvfx.talos.runtime.routine.RoutineDefaultEventInterface;
+import com.talosvfx.talos.runtime.scene.utils.propertyWrappers.PropertyWrapper;
 
 import java.util.function.Consumer;
 
@@ -402,6 +405,23 @@ public class TalosControl implements Observer {
         try {
             // unload old project, before loading new one
             SharedResources.projectLoader.unloadProject();
+
+            String talosProjectIdentifier = talosProjectData.getTalosProjectIdentifier();
+            RuntimeContext.TalosContext editorContext = new RuntimeContext.TalosContext(talosProjectIdentifier);
+            editorContext.setBaseAssetRepository(AssetRepository.getInstance());
+            editorContext.setRoutineDefaultEventInterface(new RoutineDefaultEventInterface() {
+                @Override
+                public void onEventFromRoutines (String eventName, Array<PropertyWrapper<?>> properties) {
+                    System.out.println("On event from routines " + eventName + " " + properties);
+                }
+            });
+
+            RuntimeContext.getInstance().registerContext(talosProjectIdentifier, editorContext);
+
+            //Map the default for backwards compatibity, after save it should overwrite with proper uuid
+            RuntimeContext.getInstance().registerContext("default", editorContext);
+
+            RuntimeContext.getInstance().setEditorContext(editorContext);
 
             SharedResources.projectLoader.loadProject(talosProjectData);
             return true;

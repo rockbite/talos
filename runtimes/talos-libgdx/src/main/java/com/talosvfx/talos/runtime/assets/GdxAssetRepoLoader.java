@@ -30,14 +30,19 @@ public class GdxAssetRepoLoader extends AsynchronousAssetLoader<GdxAssetRepo, Gd
 
 		assetRepo = new GdxAssetRepo();
 		RuntimeContext instance = RuntimeContext.getInstance();
-		instance.setAssetRepository(assetRepo);
 
 		baseFolder = parameter.exportFile.parent();
 
 		gameAssetsExportStructure = new Json().fromJson(GameAssetsExportStructure.class, parameter.exportFile);
+		String talosIdentifier = gameAssetsExportStructure.talosIdentifier;
+
+		RuntimeContext.TalosContext talosContext = new RuntimeContext.TalosContext(talosIdentifier);
+		talosContext.setBaseAssetRepository(assetRepo);
+
 		gameAssetsExportStructure.buildLayerIndices();
 
 		instance.setSceneData(gameAssetsExportStructure.sceneData);
+		RuntimeContext.getInstance().registerContext(talosContext.getIdentifier(), talosContext);
 
 		for (GameAssetExportStructure gameAsset : gameAssetsExportStructure.gameAssets) {
 			AssetDescriptor<GameAsset> assetDescriptorForGameAsset = getAssetDescriptorForGameAsset(gameAssetsExportStructure, gameAsset, assetRepo, baseFolder);

@@ -44,11 +44,14 @@ public class RoutineRendererComponent<T extends BaseRoutineData> extends Rendere
     @Setter@Getter
     private boolean requiresWrite;
 
+    @Getter
+    private String talosIdentifier;
+
     public RoutineRendererComponent() {
         updateListener = new GameAsset.GameAssetUpdateListener() {
             @Override
             public void onUpdate() {
-                RoutineInstance instance = RoutineRendererComponent.this.routineResource.getResource().createInstance(true);
+                RoutineInstance instance = RoutineRendererComponent.this.routineResource.getResource().createInstance(true, getTalosIdentifier());
                 routineInstance = instance;
                 updatePropertyWrappers(true);
             }
@@ -67,15 +70,7 @@ public class RoutineRendererComponent<T extends BaseRoutineData> extends Rendere
         requiresWrite = false;
     }
 
-    private void loadRoutineFromIdentifier (String gameResourceIdentifier) {
-        GameAsset<T> assetForIdentifier = RuntimeContext.getInstance().AssetRepository.getAssetForIdentifier(gameResourceIdentifier, GameAssetType.ROUTINE);
-        setGameAsset(assetForIdentifier);
-    }
 
-    private void loadRoutineFromUniqueIdentifier (UUID gameResourceUUID) {
-        GameAsset<T> assetForUniqueIdentifier = RuntimeContext.getInstance().AssetRepository.getAssetForUniqueIdentifier(gameResourceUUID, GameAssetType.ROUTINE);
-        setGameAsset(assetForUniqueIdentifier);
-    }
 
     @Override
     public void read (Json json, JsonValue jsonData) {
@@ -89,13 +84,10 @@ public class RoutineRendererComponent<T extends BaseRoutineData> extends Rendere
             }
         }
 
-        UUID gameResourceUUID = GameResourceOwner.readGameResourceUUIDFromComponent(jsonData);
-        if (gameResourceUUID == null) {
-            String gameResourceIdentifier = GameResourceOwner.readGameResourceFromComponent(jsonData);
-            loadRoutineFromIdentifier(gameResourceIdentifier);
-        } else {
-            loadRoutineFromUniqueIdentifier(gameResourceUUID);
-        }
+        talosIdentifier = GameResourceOwner.readTalosIdentifier(jsonData);
+
+        GameAsset<T> objectGameAsset = GameResourceOwner.readAsset(json, jsonData);
+        setGameAsset(objectGameAsset);
 
 
         viewportSize = json.readValue(Vector2.class, jsonData.get("size"));
@@ -212,7 +204,7 @@ public class RoutineRendererComponent<T extends BaseRoutineData> extends Rendere
         gameAsset.listeners.add(updateListener);
 
         if (!routineResource.isBroken()) {
-            routineInstance = routineResource.getResource().createInstance(true);
+            routineInstance = routineResource.getResource().createInstance(true, getTalosIdentifier());
             updatePropertyWrappers(true);
         }
     }

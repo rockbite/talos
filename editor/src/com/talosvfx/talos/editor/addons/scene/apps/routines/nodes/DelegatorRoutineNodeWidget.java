@@ -6,6 +6,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.talosvfx.talos.editor.widgets.ui.FilteredTree;
+import com.talosvfx.talos.runtime.RuntimeContext;
 import com.talosvfx.talos.runtime.routine.RoutineInstance;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
 import com.talosvfx.talos.runtime.assets.GameAsset;
@@ -91,7 +92,7 @@ public class DelegatorRoutineNodeWidget extends RoutineNodeWidget {
             Array<String> titles = new Array<>();
             if (!routineAsset.isBroken()) {
                 RoutineStageData resource = routineAsset.getResource();
-                RoutineInstance instance = resource.createInstance(true);
+                RoutineInstance instance = resource.createInstance(true, RuntimeContext.getInstance().getEditorContext().getIdentifier());
                 Array<RoutineExecutorNode> executors = instance.getNodesByClass(RoutineExecutorNode.class);
                 for (RoutineExecutorNode executor : executors) {
                     String title = executor.getTitle();

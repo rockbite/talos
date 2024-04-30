@@ -588,6 +588,7 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 
         ObjectSet<GameAsset<?>> gameAssetsToExport = new ObjectSet<>();
         GameAssetsExportStructure gameAssetExportStructure = new GameAssetsExportStructure();
+        gameAssetExportStructure.talosIdentifier = RuntimeContext.getInstance().getEditorContext().getIdentifier();
 
         gameAssetExportStructure.sceneData = RuntimeContext.getInstance().sceneData;
 
@@ -1236,7 +1237,7 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
                         RawAsset rawAssetPFile = dataMaps.fileHandleRawAssetMap.get(value.handle);
 
                         try {
-                            particleEffectDescriptor.load(rawAssetPFile.handle);
+                            particleEffectDescriptor.load(rawAssetPFile.handle, getTalosContext().getIdentifier());
                         } catch (Exception e) {
                             System.out.println("Failure to load particle effect");
                             throw e;
@@ -1255,7 +1256,7 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
                         try {
                             RawAsset rawAssetPFile = dataMaps.fileHandleRawAssetMap.get(value.handle);
 
-                            particleEffectDescriptor.load(rawAssetPFile.handle);
+                            particleEffectDescriptor.load(rawAssetPFile.handle, getTalosContext().getIdentifier());
                         } catch (Exception e) {
                             System.out.println("Failure to load particle effect");
                             throw e;
@@ -1283,7 +1284,7 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
                         }
                     }
 
-                    VFXProjectData projectData = VFXProjectSerializer.readTalosTLSProject(value.handle);
+                    VFXProjectData projectData = VFXProjectSerializer.readTalosTLSProject(value.handle, getTalosContext().getIdentifier());
                     ((GameAsset<VFXProjectData>) gameAssetOut).setResourcePayload(projectData);
 
                     //This is mega hack. Only because we will be making it into DynamicNodeStage later
@@ -1324,8 +1325,11 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
                         }
                     }
 
-                    RoutineStageData routineStageData = json.fromJson(RoutineStageData.class, TempHackUtil.hackIt(value.handle.readString()));
+                    JsonReader routineJsonReader = new JsonReader();
+                    JsonValue parse = routineJsonReader.parse(TempHackUtil.hackIt(value.handle.readString()));
+                    parse.addChild("talosIdentifier", new JsonValue(getTalosContext().getIdentifier()));
 
+                    RoutineStageData routineStageData = json.readValue(RoutineStageData.class, parse);
                     routineStageData.setName(value.handle.nameWithoutExtension());
 
                     ((GameAsset<RoutineStageData>) gameAssetOut).setResourcePayload(routineStageData);
@@ -1375,7 +1379,9 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
                             prefabGameAsset.dependentRawAssets.add(value);
                         }
                     }
-                    Prefab prefab = new Prefab(value.handle);
+                    Prefab prefab = new Prefab();
+                    prefab.setTalosIdentifier(getTalosContext().getIdentifier());
+                    prefab.loadFromHandle(value.handle);
 
                     ((GameAsset<Prefab>) gameAssetOut).setResourcePayload(prefab);
 
@@ -1677,7 +1683,7 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 
     public void createPForTLSIfNotExist (RawAsset tlsRawAsset, boolean checkGameResources) {
         if (checkGameResources) {
-            VFXProjectData projectData = VFXProjectSerializer.readTalosTLSProject(tlsRawAsset.handle);
+            VFXProjectData projectData = VFXProjectSerializer.readTalosTLSProject(tlsRawAsset.handle, getTalosContext().getIdentifier());
             ExportData exportData = VFXProjectSerializer.exportTLSDataToP(projectData);
             String exportDataJson = VFXProjectSerializer.writeTalosPExport(exportData);
 

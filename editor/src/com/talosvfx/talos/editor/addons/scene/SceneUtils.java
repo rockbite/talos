@@ -33,6 +33,7 @@ import com.talosvfx.talos.editor.project2.apps.SceneEditorApp;
 import com.talosvfx.talos.editor.serialization.VFXProjectData;
 import com.talosvfx.talos.runtime.scene.components.*;
 import com.talosvfx.talos.runtime.scene.*;
+import com.talosvfx.talos.runtime.utils.ConfigData;
 import com.talosvfx.talos.runtime.utils.NamingUtils;
 import com.talosvfx.talos.editor.utils.Toasts;
 import com.talosvfx.talos.runtime.scene.GameObject;
@@ -118,7 +119,9 @@ public class SceneUtils {
 
 	public static GameObject createFromPrefab (GameObjectContainer gameObjectContainer, GameAsset<Prefab> prefabToCopy, Vector2 position, GameObject parent) {
 
-		Prefab prefab = new Prefab(prefabToCopy.getRootRawAsset().handle);
+		Prefab prefab = new Prefab();
+		prefab.setTalosIdentifier(RuntimeContext.getInstance().getEditorContext().getIdentifier());
+		prefab.loadFromHandle(prefabToCopy.getRootRawAsset().handle);
 
 		GameObject gameObject = prefab.root;
 		TransformComponent transformComponent = gameObject.getComponent(TransformComponent.class);
@@ -151,7 +154,9 @@ public class SceneUtils {
 	public static GameObject createObjectByTypeName (GameObjectContainer gameObjectContainer, String idName, Vector2 position, GameObject parent, String nameHint) {
 		GameObject gameObject = new GameObject();
 
-		XmlReader.Element template = RuntimeContext.getInstance().configData.getGameObjectConfigurationMap().get(idName);
+		RuntimeContext.TalosContext editorContext = RuntimeContext.getInstance().getEditorContext();
+		ConfigData configData = editorContext.getConfigData();
+		XmlReader.Element template = configData.getGameObjectConfigurationMap().get(idName);
 
 		String nameAttribute = template.getAttribute("nameTemplate", "gameObject");
 
@@ -176,7 +181,9 @@ public class SceneUtils {
 		Array<XmlReader.Element> componentsXMLArray = container.getChildrenByName("component");
 		for (XmlReader.Element componentXML : componentsXMLArray) {
 			String className = componentXML.getAttribute("className");
-			String classPath = RuntimeContext.getInstance().configData.getComponentClassPath();
+			RuntimeContext.TalosContext editorContext = RuntimeContext.getInstance().getEditorContext();
+			ConfigData configData = editorContext.getConfigData();
+			String classPath = configData.getComponentClassPath();
 
 			try {
 				Class clazz = ClassReflection.forName(classPath + "." + className);

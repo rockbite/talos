@@ -39,7 +39,7 @@ public class AssetManagerPipelineTest extends ApplicationAdapter {
 		assetManager.setLoader(GameAsset.class, new GameAssetLoader(assetManager.getFileHandleResolver()));
 
 		GdxAssetRepoLoader.GdxAssetRepoLoaderParam parameter = new GdxAssetRepoLoader.GdxAssetRepoLoaderParam();
-		parameter.exportFile = Gdx.files.internal("testproject/assetExport.json");
+		parameter.exportFile = Gdx.files.internal("talos/assetExport.json");
 
 		assetManager.load("testProject", GdxAssetRepo.class, parameter);
 
@@ -49,7 +49,7 @@ public class AssetManagerPipelineTest extends ApplicationAdapter {
 
 		batch = new PolygonSpriteBatch();
 
-		camera = new OrthographicCamera(10, 10);
+		camera = new OrthographicCamera(20, 20);
 		camera.update();
 
 		renderState = new RenderState();
@@ -57,7 +57,7 @@ public class AssetManagerPipelineTest extends ApplicationAdapter {
 
 	private void loaded () {
 		GdxAssetRepo assetRepo = assetManager.get("testProject", GdxAssetRepo.class);
-		scene = assetRepo.getAssetForIdentifier("New Scene", GameAssetType.SCENE);
+		scene = assetRepo.getAssetForIdentifier("school-bus", GameAssetType.SCENE);
 	}
 	@Override
 	public void render () {
@@ -65,7 +65,7 @@ public class AssetManagerPipelineTest extends ApplicationAdapter {
 
 
 
-		boolean update = assetManager.update(16);
+		boolean update = assetManager.update(1000);
 		if (update && !loaded) {
 			System.out.println("Finished");
 			loaded = true;

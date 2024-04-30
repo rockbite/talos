@@ -6,6 +6,8 @@ import com.talosvfx.talos.runtime.scene.SceneData;
 import com.talosvfx.talos.runtime.scene.SceneLayer;
 
 public class GameAssetsExportStructure {
+
+	public String talosIdentifier;
 	public Array<GameAssetExportStructure> gameAssets = new Array<>();
 
 	public SceneData sceneData = new SceneData();

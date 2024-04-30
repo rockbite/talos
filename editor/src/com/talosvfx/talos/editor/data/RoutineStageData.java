@@ -6,6 +6,7 @@ import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.nodes.RoutineExposedVariableNodeWidget;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.ui.types.PropertyTypeWidgetMapper;
 import com.talosvfx.talos.runtime.RuntimeContext;
+import com.talosvfx.talos.runtime.assets.GameResourceOwner;
 import com.talosvfx.talos.runtime.routine.RoutineInstance;
 import com.talosvfx.talos.editor.nodes.DynamicNodeStage;
 import com.talosvfx.talos.editor.nodes.NodeWidget;
@@ -29,10 +30,12 @@ public class RoutineStageData extends DynamicNodeStageData implements BaseRoutin
 	private Array<PropertyWrapper<?>> propertyWrappers = new Array<>();
 
 	private transient boolean canWrite;
+	private String talosIdentifier;
 
 	@Override
 	public void read (Json json, JsonValue root) {
 		super.read(json, root);
+		talosIdentifier = GameResourceOwner.readTalosIdentifier(root);
 		propertyWrappers.clear();
 		JsonValue propertiesJson = root.get("propertyWrappers");
 		if (propertiesJson != null) {
@@ -54,7 +57,7 @@ public class RoutineStageData extends DynamicNodeStageData implements BaseRoutin
 
 		exposedPropertyIndex = root.getInt("propertyWrapperIndex", 0);
 		//Construct the routine instance from data
-		routineInstance = createInstance(false);
+		routineInstance = createInstance(false, talosIdentifier);
 	}
 
 	@Override
@@ -140,16 +143,18 @@ public class RoutineStageData extends DynamicNodeStageData implements BaseRoutin
 		}
 	}
 
-	public RoutineInstance createInstance (boolean external) {
+	public RoutineInstance createInstance (boolean external, String talosIdentifier) {
 		RoutineInstance routine = new RoutineInstance();
+		routine.setTalosIdentifier(talosIdentifier);
 		if (external && canWrite) {
 			Json json = new Json();
 			String jsonData = json.prettyPrint(this);
 			JsonReader jsonReader = new JsonReader();
 			JsonValue parse = jsonReader.parse(jsonData);
+			parse.addChild("talosIdentifier", new JsonValue(talosIdentifier));
 			read(json, parse);
 		}
-		routine.loadFrom(this, RuntimeContext.getInstance().configData.getRoutineConfigMap());
+		routine.loadFrom(this, RuntimeContext.getInstance().getTalosContext(talosIdentifier).getConfigData().getRoutineConfigMap());
 		return routine;
 	}
 }
