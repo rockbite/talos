@@ -671,6 +671,7 @@ public class SceneUtils {
 	public static void duplicate (GameObjectContainer container, ObjectSet<GameObject> toDuplicate) {
 		// hacky way to clone game object
 		Json json = new Json();
+		json.setIgnoreUnknownFields(true);
 		String toDuplicateData = json.toJson(toDuplicate);
 
 		try {
