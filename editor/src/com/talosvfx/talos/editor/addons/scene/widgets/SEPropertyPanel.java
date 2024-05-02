@@ -264,7 +264,13 @@ public class SEPropertyPanel extends PropertyPanel {
             FilteredTree.Node<Object> pathComponentNode = new FilteredTree.Node<>("newpathcomponent", pathComponent);
             tree.add(pathComponentNode);
 
+            Label transformComponent = new Label("new Transform Component", getSkin());
+            FilteredTree.Node<Object> transformCompoenntNode = new FilteredTree.Node<>("newtransformcomponent", transformComponent);
+            tree.add(transformCompoenntNode);
 
+            Label spineComponent = new Label("new Spine Component", getSkin());
+            FilteredTree.Node<Object> spineComponentNode = new FilteredTree.Node<>("newspinecomponent", spineComponent);
+            tree.add(spineComponentNode);
 
             setToTree();
 
@@ -457,6 +463,23 @@ public class SEPropertyPanel extends PropertyPanel {
                             DataComponent dataComponent = new DataComponent();
                             gameObject.addComponent(dataComponent);
                             SceneUtils.componentAdded(gameObject.getGameObjectContainerRoot(), gameObject, dataComponent);
+                            remove();
+                            return;
+                        }
+
+
+                        if (name.equals("newtransformcomponent")) {
+                            TransformComponent transformComponent = new TransformComponent();
+                            gameObject.addComponent(transformComponent);
+                            SceneUtils.componentAdded(gameObject.getGameObjectContainerRoot(), gameObject, transformComponent);
+                            remove();
+                            return;
+                        }
+
+                       if (name.equals("newspinecomponent")) {
+                            SpineRendererComponent spineRendererComponent = new SpineRendererComponent();
+                            gameObject.addComponent(spineRendererComponent);
+                            SceneUtils.componentAdded(gameObject.getGameObjectContainerRoot(), gameObject, spineRendererComponent);
                             remove();
                             return;
                         }

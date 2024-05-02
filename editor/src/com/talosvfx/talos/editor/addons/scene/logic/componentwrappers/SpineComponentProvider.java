@@ -146,6 +146,7 @@ public class SpineComponentProvider extends RendererComponentProvider<SpineRende
 			public Array<String> get () {
 
 				Array<String> names = new Array<>();
+				if (component.skeleton == null) return names;
 
 				for (Skin skin : component.skeleton.getData().getSkins()) {
 					names.add(skin.getName());
