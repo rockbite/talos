@@ -101,6 +101,8 @@ public class QuadMeshGeneratorModule extends MeshGeneratorModule {
 
 		if (materialModule instanceof SpriteMaterialModule) {
 			TextureRegion textureRegion = ((SpriteMaterialModule)materialModule).getTextureRegion();
+			if (textureRegion == null) return;
+
 			U = textureRegion.getU();
 			U2 = textureRegion.getU2();
 			V = textureRegion.getV();
