@@ -155,6 +155,7 @@ public class SceneUtils {
 		GameObject gameObject = new GameObject();
 
 		RuntimeContext.TalosContext editorContext = RuntimeContext.getInstance().getEditorContext();
+		gameObject.setTalosIdentifier(editorContext.getIdentifier());
 		ConfigData configData = editorContext.getConfigData();
 		XmlReader.Element template = configData.getGameObjectConfigurationMap().get(idName);
 
