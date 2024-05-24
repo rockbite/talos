@@ -3,7 +3,6 @@ package com.talosvfx.talos.runtime.utils;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 
 import java.util.Collection;
-import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -29,8 +28,12 @@ public class NamingUtils {
 		}
 		Pattern duplicatePattern = Pattern.compile(newNameAttempt + "\\([0-9]*\\)$");
 
-		Predicate<String> predicate = duplicatePattern.asPredicate();
-		long count = potentialConflicts.stream().filter(predicate).count();
+		long count = 0;
+		for (String potentialConflict : potentialConflicts) {
+			if (duplicatePattern.matcher(potentialConflict).find()) {
+				count++;
+			}
+		}
 
 		if (count > 0) {
 			//We have things that match our regex
