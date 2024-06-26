@@ -58,6 +58,14 @@ public interface GameResourceOwner<U> {
         } else {
             GameAsset<U> assetForUniqueIdentifier = baseAssetRepository.getAssetForUniqueIdentifier(uuid, type);
             if (assetForUniqueIdentifier == null) {
+                if (identifier != null) {
+                    GameAsset<U> asset = baseAssetRepository.getAssetForIdentifier(identifier, type);
+                    if (asset == null) {
+                        System.out.println("Asset not found even with identifier fallback");
+                    } else {
+                        return asset;
+                    }
+                }
                 System.out.println("Asset not found for uuid " + uuid + " and type " + type);
             }
             return assetForUniqueIdentifier;

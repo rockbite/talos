@@ -1,7 +1,10 @@
 {
 "emitters": [
 	{
+		"class": "com.talosvfx.talos.editor.serialization.EmitterData",
 		"name": "default_emitter",
+		"sortPosition": 0,
+		"isMuted": false,
 		"modules": [
 			{
 				"class": "com.talosvfx.talos.editor.wrappers.ParticleModuleWrapper",
@@ -38,7 +41,8 @@
 						"index": 2,
 						"delay": 0,
 						"duration": 2,
-						"rate": 50
+						"rate": 50,
+						"maxParticles": -1
 					}
 				}
 			},
@@ -81,24 +85,27 @@
 						"attached": false,
 						"continuous": true,
 						"aligned": false,
-						"immortal": false
+						"immortal": false,
+						"youngestInFront": true
 					}
 				}
 			},
 			{
 				"class": "com.talosvfx.talos.editor.wrappers.SpriteMaterialModuleWrapper",
 				"id": 7,
-				"x": -191,
-				"y": 345,
+				"x": -212,
+				"y": 359,
 				"module": {
 					"data": {
 						"class": "com.talosvfx.talos.runtime.vfx.modules.SpriteMaterialModule",
 						"index": 7,
-						"regionName": "white"
+						"gameResource": "white",
+						"gameResourceExtension": "png",
+						"type": "SPRITE",
+						"gameResourceUUID": "8c86fe39-f734-4c5c-8b4e-5320f4dc700b"
 					}
 				},
-				"filePath": null,
-				"regionName": "white"
+				"asset": "white"
 			},
 			{
 				"class": "com.talosvfx.talos.editor.wrappers.RadToCartModuleWrapper",
@@ -197,51 +204,62 @@
 		],
 		"connections": [
 			{
+				"class": "com.talosvfx.talos.runtime.vfx.serialization.ConnectionData",
 				"moduleFrom": 5,
 				"moduleTo": 1,
 				"slotTo": 3
 			},
 			{
+				"class": "com.talosvfx.talos.runtime.vfx.serialization.ConnectionData",
 				"moduleFrom": 4,
 				"moduleTo": 1,
 				"slotTo": 2
 			},
 			{
+				"class": "com.talosvfx.talos.runtime.vfx.serialization.ConnectionData",
 				"moduleFrom": 6,
 				"moduleTo": 2,
 				"slotTo": 3
 			},
 			{
+				"class": "com.talosvfx.talos.runtime.vfx.serialization.ConnectionData",
 				"moduleFrom": 7,
 				"moduleTo": 1
 			},
 			{
+				"class": "com.talosvfx.talos.runtime.vfx.serialization.ConnectionData",
 				"moduleFrom": 10,
 				"slotTo": 18
 			},
 			{
+				"class": "com.talosvfx.talos.runtime.vfx.serialization.ConnectionData",
 				"moduleFrom": 12,
 				"moduleTo": 10,
 				"slotTo": 1
 			},
 			{
+				"class": "com.talosvfx.talos.runtime.vfx.serialization.ConnectionData",
 				"moduleFrom": 13,
 				"moduleTo": 10
 			},
 			{
+				"class": "com.talosvfx.talos.runtime.vfx.serialization.ConnectionData",
 				"moduleFrom": 14,
 				"moduleTo": 5,
 				"slotTo": 1
 			},
 			{
+				"class": "com.talosvfx.talos.runtime.vfx.serialization.ConnectionData",
 				"moduleFrom": 15,
 				"slotTo": 10
 			},
 			{
+				"class": "com.talosvfx.talos.runtime.vfx.serialization.ConnectionData",
 				"moduleFrom": 16,
 				"slotTo": 4
 			}
-		]
+		],
+		"groups": []
 	}
 ]
 }
