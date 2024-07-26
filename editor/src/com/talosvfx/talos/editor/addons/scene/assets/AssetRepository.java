@@ -14,6 +14,7 @@ import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.esotericsoftware.spine.SkeletonBinary;
 import com.esotericsoftware.spine.SkeletonData;
+import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.RoutineEditorApp;
 import com.talosvfx.talos.editor.addons.scene.events.*;
 import com.talosvfx.talos.editor.addons.scene.events.meta.MetaDataReloadedEvent;
@@ -1009,7 +1010,13 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 
             if (acceptancePredicate.evaluate(objectGameAsset)) {
                 assetsToExportSet.add(objectGameAsset);
-                assetsToExportSet.addAll(objectGameAsset.dependentGameAssets);
+                for (GameAsset<?> dependentGameAsset : objectGameAsset.dependentGameAssets) {
+                    try {
+                        assetsToExportSet.add(dependentGameAsset);
+                    } catch (Exception e) {
+                        Toasts.getInstance().showErrorToast("Dependency Asset is broken - " + dependentGameAsset.nameIdentifier + " for game asset " + objectGameAsset.nameIdentifier);
+                    }
+                }
             }
         }
 
