@@ -677,7 +677,12 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
                                 //Skip scene dependencies...
 
                             } else {
-                                copiedUUIDMap.get(value.getRootRawAsset().metaData.uuid.toString()).addDependency(copiedAsset);
+                                try {
+                                    copiedUUIDMap.get(value.getRootRawAsset().metaData.uuid.toString()).addDependency(copiedAsset);
+                                } catch (Exception e) {
+                                    Toasts.getInstance().showErrorToast("Error exporting routine: " + copiedAsset.nameIdentifier +" for rotuine ");
+                                    throw e;
+                                }
                             }
 
                         }
@@ -1009,7 +1014,11 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
             }
 
             if (acceptancePredicate.evaluate(objectGameAsset)) {
-                assetsToExportSet.add(objectGameAsset);
+                try {
+                    assetsToExportSet.add(objectGameAsset);
+                } catch (Exception e) {
+                    Toasts.getInstance().showErrorToast("Asset is broken - " + objectGameAsset.nameIdentifier);
+                }
                 for (GameAsset<?> dependentGameAsset : objectGameAsset.dependentGameAssets) {
                     try {
                         assetsToExportSet.add(dependentGameAsset);
