@@ -28,7 +28,7 @@ dependencyResolutionManagement {
             version("spark", "2.9.4")
             version("javapoet", "1.13.0")
             version("lombokPlugin", "6.4.1")
-            version("grgit", "3.1.1")
+            version("grgit", "5.0.0-rc.3")
             version("classpathscanner", "4.8.154")
             version("update4j", "1.5.9")
             version("jmetro", "11.6.14")

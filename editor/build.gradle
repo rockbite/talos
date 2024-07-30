@@ -10,7 +10,6 @@ buildscript {
         classpath libs.libgdx
         classpath libs.libgdx.tools
         classpath libs.lombok
-        classpath libs.grgit
     }
 }
 
