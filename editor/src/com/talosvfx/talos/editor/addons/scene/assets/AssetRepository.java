@@ -569,6 +569,7 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
                 GameResourceOwner gameResourceOwner = (GameResourceOwner) component;
                 GameAsset gameResource = gameResourceOwner.getGameResource();
                 if (gameResource.isBroken()) {
+                    Toasts.getInstance().showErrorToast("GameObject in scene/prefab " + containerAsset.nameIdentifier + " is broken. Broken asset = " + gameResource.nameIdentifier);
 //					gameAssets.add(missingUUID.toString());
                 } else {
                     GameAsset copiedAssetThatIsRequiredForGameObject = copiedUUIDMap.get(gameResource.getRootRawAsset().metaData.uuid.toString());
@@ -1021,6 +1022,9 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
                 }
                 for (GameAsset<?> dependentGameAsset : objectGameAsset.dependentGameAssets) {
                     try {
+                        if (dependentGameAsset.isBroken()) {
+                            Toasts.getInstance().showErrorToast("Dependency Asset is broken - " + dependentGameAsset.nameIdentifier + " for game asset " + objectGameAsset.nameIdentifier);
+                        }
                         assetsToExportSet.add(dependentGameAsset);
                     } catch (Exception e) {
                         Toasts.getInstance().showErrorToast("Dependency Asset is broken - " + dependentGameAsset.nameIdentifier + " for game asset " + objectGameAsset.nameIdentifier);
