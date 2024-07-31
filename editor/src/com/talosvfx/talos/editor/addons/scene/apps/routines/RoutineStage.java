@@ -6,6 +6,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.*;
+import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.nodes.*;
 import com.talosvfx.talos.editor.addons.scene.events.PropertyHolderSelected;
 import com.talosvfx.talos.editor.addons.scene.logic.IPropertyHolder;
@@ -210,8 +211,11 @@ public class RoutineStage extends DynamicNodeStage<RoutineStageData> implements 
 
     public ScenePreviewApp getPreviewAppIfOpened(int uniqueId){
         GameAsset asset = getAssetIfExist(uniqueId);
-        if (asset != null) {
+        if (asset != null && !asset.isBroken()) {
             return SharedResources.appManager.getAppIfOpened(asset, ScenePreviewApp.class);
+        } else {
+            String assetName = asset != null ? asset.nameIdentifier : "null";
+           Toasts.getInstance().showErrorToast("Skipping opening of app, asset is broken or null " + assetName);
         }
         return null;
     }
