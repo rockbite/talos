@@ -383,6 +383,11 @@ public class ParticleEmitterInstance implements IEmitter {
 	}
 
 	@Override
+	public float getWorldRotation () {
+		return getEffect().rotation;
+	}
+
+	@Override
 	public int getEffectUniqueID () {
 		return uniqueID;
 	}

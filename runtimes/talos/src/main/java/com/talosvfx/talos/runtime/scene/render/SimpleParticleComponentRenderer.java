@@ -48,7 +48,12 @@ public class SimpleParticleComponentRenderer<T extends BaseVFXProjectData> exten
 
 		if (descriptor == null) return;
 
-		ParticleEffectInstance instance = obtainParticle(gameObject, descriptor);
+		ParticleEffectInstance instance = particleComponent.getEffectRef();
+		if (instance == null) {
+			instance = descriptor.createEffectInstance();
+			particleComponent.setEffectRef(instance);
+		}
+		instance.setWorldRotation(transformComponent.worldRotation);
 		instance.setPosition(transformComponent.worldPosition.x, transformComponent.worldPosition.y, 0);
 		if (!gameObjectRenderer.isSkipUpdates()) {
 			instance.update(Gdx.graphics.getDeltaTime());
@@ -57,21 +62,4 @@ public class SimpleParticleComponentRenderer<T extends BaseVFXProjectData> exten
 		renderer.render(instance);
 	}
 
-	//todo needs to be done properly for runtime
-	private static final ObjectMap<ParticleComponent, ParticleEffectInstance> particleCache = new ObjectMap<>();
-
-	private ParticleEffectInstance obtainParticle (GameObject gameObject, ParticleEffectDescriptor descriptor) {
-		ParticleComponent component = gameObject.getComponent(ParticleComponent.class);
-
-		if(particleCache.containsKey(component)) {
-			ParticleEffectInstance particleEffectInstance = particleCache.get(component);
-			component.setEffectRef(particleEffectInstance);
-			return particleEffectInstance;
-		} else {
-			ParticleEffectInstance instance = descriptor.createEffectInstance();
-			component.setEffectRef(instance);
-			particleCache.put(component, instance);
-			return instance;
-		}
-	}
 }

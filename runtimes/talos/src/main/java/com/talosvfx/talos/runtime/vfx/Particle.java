@@ -146,6 +146,7 @@ public class Particle implements Pool.Poolable {
                 //Velocity is driven by velocity over time
                 final Vector3 velocityOverTime = particleModule.getVelocityOverTime();
                 velocity.set(velocityOverTime);
+                velocity.rotate(emitterReference.getWorldRotation(), 0, 0, 1);
             } else {
                 //Acceleration mutate by forces
 
@@ -194,6 +195,7 @@ public class Particle implements Pool.Poolable {
                 }
 
                 velocity.set(vx, vy, vz);
+                velocity.rotate(emitterReference.getWorldRotation(), 0, 0, 1);
 
             }
 
@@ -234,6 +236,7 @@ public class Particle implements Pool.Poolable {
 
 
     }
+
 
     public float getAttachedPositionX () {
         return emitterReference.getEffectPosition().x + position.x;

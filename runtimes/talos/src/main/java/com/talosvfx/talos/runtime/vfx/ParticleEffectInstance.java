@@ -30,6 +30,8 @@ public class ParticleEffectInstance {
 
     Vector3 position = new Vector3();
 
+	float rotation;
+
     ScopePayload scopePayload = new ScopePayload();
 
     public boolean loopable = false;
@@ -224,6 +226,9 @@ public class ParticleEffectInstance {
     	return null;
 	}
 
+	public void setWorldRotation(float rotation) {
+		this.rotation = rotation;
+	}
 
 	public void setPosition(float x, float y, float z) {
 		position.set(x, y, z);

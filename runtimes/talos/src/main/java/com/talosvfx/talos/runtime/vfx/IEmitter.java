@@ -18,6 +18,7 @@ public interface IEmitter {
     EmitterModule getEmitterModule();
     DrawableModule getDrawableModule();
     Vector3 getEffectPosition();
+    float getWorldRotation();
 
     int getEffectUniqueID ();
     ScopePayload getScope();
