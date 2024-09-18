@@ -41,6 +41,7 @@ public class Particle implements Pool.Poolable {
     public float life;
 
     public Vector3 rotation = new Vector3();
+    public Vector3 rotationChanged = new Vector3();
     public Vector2 size = new Vector2();
 
     public Vector2 pivot = new Vector2();
@@ -213,6 +214,7 @@ public class Particle implements Pool.Poolable {
 
         if (particleModule.hasRotationOverride()) {
             rotation.set(particleModule.getSpawnRotation());
+            rotation.add(emitterReference.getWorldRotation());
             rotation.add(particleModule.getRotationOverride());
         } else {
             if (particleModule.hasSpinVelocityOverTime()) {
@@ -223,9 +225,14 @@ public class Particle implements Pool.Poolable {
                 //drag probably
             }
 
-            rotation.x += spinVelocity.x * delta;
-            rotation.y += spinVelocity.y * delta;
-            rotation.z += spinVelocity.z * delta;
+            rotationChanged.x += spinVelocity.x * delta;
+            rotationChanged.y += spinVelocity.y * delta;
+            rotationChanged.z += spinVelocity.z * delta;
+
+            rotation.set(particleModule.getSpawnRotation());
+            rotation.add(emitterReference.getWorldRotation());
+            rotation.add(rotationChanged);
+
         }
 
         if (emitterReference.getEmitterModule().isAligned()) {
