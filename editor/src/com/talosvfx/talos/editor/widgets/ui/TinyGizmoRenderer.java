@@ -6,13 +6,7 @@ import com.asidik.tinygizmo.TinyGizmo;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputAdapter;
-import com.badlogic.gdx.graphics.Camera;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Mesh;
-import com.badlogic.gdx.graphics.PerspectiveCamera;
-import com.badlogic.gdx.graphics.VertexAttribute;
-import com.badlogic.gdx.graphics.VertexAttributes;
+import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Intersector;
@@ -168,6 +162,12 @@ public class TinyGizmoRenderer {
 
 		final Ray pickRay = camera.getPickRay(temp.x, temp.y, vec.x, vec.y, w, h);
 
+		float viewportHeight = camera.viewportHeight;
+		if (camera instanceof OrthographicCamera) {
+			viewportHeight *= ((OrthographicCamera) camera).zoom;
+		}
+
+		tinyGizmo.setScreenSpaceScale(viewportHeight * 0.05f);
 		tinyGizmo.updateWindow(w, h);
 		tinyGizmo.updateRay(pickRay.direction.x, pickRay.direction.y, pickRay.direction.z);
 
