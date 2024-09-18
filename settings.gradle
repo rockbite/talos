@@ -57,6 +57,7 @@ dependencyResolutionManagement {
             library("snakeyaml", "org.yaml", "snakeyaml").versionRef("snakeyaml")
 
             library("tiny-gizmo", "com.asidik", "jtinygizmo").versionRef("tiny-gizmo")
+            library("tiny-gizmo-platform", "com.asidik", "jtinygizmo-platform").versionRef("tiny-gizmo")
 
             library("logback-core", "ch.qos.logback", "logback-core").versionRef("logback")
             library("logback-classic", "ch.qos.logback", "logback-classic").versionRef("logback")

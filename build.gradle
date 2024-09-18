@@ -3,6 +3,11 @@ allprojects {
     apply plugin: "java-library"
 
 
+    //Force gradle snapshot resolution to be now
+    configurations.all {
+        resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+    }
+
     ext {
         appName = "talos"
 

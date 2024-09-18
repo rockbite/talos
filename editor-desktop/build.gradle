@@ -19,7 +19,7 @@ dependencies {
     implementation libs.logback.core
     implementation libs.logback.classic
 
-    implementation variantOf(libs.tiny.gizmo) { classifier("natives-desktop") }
+    implementation variantOf(libs.tiny.gizmo.platform) { classifier("natives-desktop") }
 
     implementation variantOf(libs.libgdx.freetype.platform) { classifier("natives-desktop")}
 
