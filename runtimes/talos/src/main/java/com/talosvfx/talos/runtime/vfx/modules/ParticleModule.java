@@ -256,14 +256,14 @@ public class ParticleModule extends AbstractModule {
     public Vector2 getPivot() {
         fetchInputSlotValue(PIVOT);
         if(pivot.isEmpty()) {
-            pivot.set(0.5f, 0.5f);
+            pivot.set(0f, 0f);
         }
         tmpVec.set(pivot.get(0), pivot.get(1));
 
-        if(tmpVec.x > 1f) tmpVec.x = 1f;
-        if(tmpVec.y> 1f) tmpVec.y = 1f;
-        if(tmpVec.x < 0f) tmpVec.x = 0f;
-        if(tmpVec.y < 0f) tmpVec.y = 0f;
+//        if(tmpVec.x > 1f) tmpVec.x = 1f;
+//        if(tmpVec.y> 1f) tmpVec.y = 1f;
+//        if(tmpVec.x < 0f) tmpVec.x = 0f;
+//        if(tmpVec.y < 0f) tmpVec.y = 0f;
 
         return tmpVec;
     }

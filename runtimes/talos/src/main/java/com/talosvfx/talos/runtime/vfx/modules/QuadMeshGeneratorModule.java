@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
@@ -99,6 +100,8 @@ public class QuadMeshGeneratorModule extends MeshGeneratorModule {
 		float V = 0f;
 		float V2 = 1f;
 
+
+
 		if (materialModule instanceof SpriteMaterialModule) {
 			TextureRegion textureRegion = ((SpriteMaterialModule)materialModule).getTextureRegion();
 			if (textureRegion == null) return;
@@ -145,6 +148,7 @@ public class QuadMeshGeneratorModule extends MeshGeneratorModule {
 				Vector3 rotation = reference.rotation;
 				float transparency = particleModule.getTransparency();
 				Color color = particleModule.getColor();
+				Vector2 pivot = particleModule.getPivot();
 
 				this.color.set(color);
 				this.color.a = transparency;
@@ -202,6 +206,13 @@ public class QuadMeshGeneratorModule extends MeshGeneratorModule {
 						p3.rotate(a, 0, 0, 1);
 						p4.rotate(a, 0, 0, 1);
 					} else {
+
+
+						p1.sub(pivot.x * width, pivot.y * height, 0);
+						p2.sub(pivot.x * width, pivot.y * height, 0);
+						p3.sub(pivot.x * width, pivot.y * height, 0);
+						p4.sub(pivot.x * width, pivot.y * height, 0);
+
 						p1.rotate(rotation.x, 0, 0, 1);
 						p2.rotate(rotation.x, 0, 0, 1);
 						p3.rotate(rotation.x, 0, 0, 1);
