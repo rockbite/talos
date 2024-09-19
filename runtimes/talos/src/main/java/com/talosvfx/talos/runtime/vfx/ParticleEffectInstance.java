@@ -16,6 +16,7 @@
 
 package com.talosvfx.talos.runtime.vfx;
 
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.talosvfx.talos.runtime.vfx.render.ParticleRenderer;
@@ -30,7 +31,8 @@ public class ParticleEffectInstance {
 
     Vector3 position = new Vector3();
 
-	float rotation;
+    float worldRotation;
+    Vector2 worldScale = new Vector2(1f, 1f);
 
     ScopePayload scopePayload = new ScopePayload();
 
@@ -47,78 +49,78 @@ public class ParticleEffectInstance {
 
     private boolean paused = false;
 
-	public void init () {
-		for (int i = 0; i < emitters.size; i++) {
-			emitters.get(i).init();
-		}
-	}
+    public void init () {
+        for (int i = 0; i < emitters.size; i++) {
+            emitters.get(i).init();
+        }
+    }
 
-	public float getTotalTime () {
-		return totalTime;
-	}
+    public float getTotalTime () {
+        return totalTime;
+    }
 
-	public boolean isPaused () {
-		return paused;
-	}
+    public boolean isPaused () {
+        return paused;
+    }
 
-	public static class EmitterComparator implements Comparator<IEmitter> {
+    public static class EmitterComparator implements Comparator<IEmitter> {
 
-		@Override
-		public int compare(IEmitter o1, IEmitter o2) {
-			return o1.getEmitterGraph().getSortPosition() - o2.getEmitterGraph().getSortPosition();
-		}
-	}
+        @Override
+        public int compare (IEmitter o1, IEmitter o2) {
+            return o1.getEmitterGraph().getSortPosition() - o2.getEmitterGraph().getSortPosition();
+        }
+    }
 
     public ParticleEffectInstance (ParticleEffectDescriptor particleEffectDescriptor) {
         this.descriptor = particleEffectDescriptor;
     }
 
-	public void setScope (ScopePayload scope) {
+    public void setScope (ScopePayload scope) {
         this.scopePayload = scope;
-		for (int i = 0; i < emitters.size; i++) {
-			emitters.get(i).setScope(scope);
-		}
-	}
+        for (int i = 0; i < emitters.size; i++) {
+            emitters.get(i).setScope(scope);
+        }
+    }
 
-	public ScopePayload getScope() {
-    	return scopePayload;
-	}
+    public ScopePayload getScope () {
+        return scopePayload;
+    }
 
-	public void update (float delta) {
-		if(paused) return;
+    public void update (float delta) {
+        if (paused) return;
 
-		if(isComplete() && !loopable) return;
+        if (isComplete() && !loopable) return;
 
-    	descriptor.setEffectReference(this);
+        descriptor.setEffectReference(this);
 
-		if(totalTime > 3600) totalTime = 0; //TODO: maybe just supple TimeUtils time now instead...
-		totalTime += delta;
+        if (totalTime > 3600) totalTime = 0; //TODO: maybe just supple TimeUtils time now instead...
+        totalTime += delta;
 
-		if(scopePayload != null) {
-			scopePayload.set(ScopePayload.TOTAL_TIME, totalTime);
-		}
+        if (scopePayload != null) {
+            scopePayload.set(ScopePayload.TOTAL_TIME, totalTime);
+        }
 
-		particleCount = 0;
-		nodeCalls = 0;
-		for (int i = 0; i < emitters.size; i++) {
-			emitters.get(i).update(delta);
-			particleCount += emitters.get(i).getActiveParticleCount();
-		}
+        particleCount = 0;
+        nodeCalls = 0;
+        for (int i = 0; i < emitters.size; i++) {
+            emitters.get(i).update(delta);
+            particleCount += emitters.get(i).getActiveParticleCount();
+        }
 
-		if(particleCount == 0 && loopable) {
-			for (int i = 0; i < emitters.size; i++) {
-				if(!emitters.get(i).isContinuous()) {
-					if(emitters.get(i).getDelayRemaining() == 0) {
-						emitters.get(i).restart();
-					}
-				}
-			}
-		}
-	}
+        if (particleCount == 0 && loopable) {
+            for (int i = 0; i < emitters.size; i++) {
+                if (!emitters.get(i).isContinuous()) {
+                    if (emitters.get(i).getDelayRemaining() == 0) {
+                        emitters.get(i).restart();
+                    }
+                }
+            }
+        }
+    }
 
-	public void render (ParticleRenderer particleRenderer) {
-		particleRenderer.render(this);
-	}
+    public void render (ParticleRenderer particleRenderer) {
+        particleRenderer.render(this);
+    }
 
     public void addEmitter (ParticleEmitterDescriptor particleEmitterDescriptor) {
         final ParticleEmitterInstance particleEmitterInstance = new ParticleEmitterInstance(particleEmitterDescriptor, this);
@@ -126,134 +128,136 @@ public class ParticleEffectInstance {
     }
 
 
-	public void removeEmitterForEmitterDescriptor (ParticleEmitterDescriptor emitter) {
-		for (int i = emitters.size - 1; i >= 0; i--) {
-			if (emitters.get(i).getEmitterGraph() == emitter) {
-				emitters.removeIndex(i);
-			}
-		}
-	}
+    public void removeEmitterForEmitterDescriptor (ParticleEmitterDescriptor emitter) {
+        for (int i = emitters.size - 1; i >= 0; i--) {
+            if (emitters.get(i).getEmitterGraph() == emitter) {
+                emitters.removeIndex(i);
+            }
+        }
+    }
 
 
-	public boolean isContinuous() {
-		for (ParticleEmitterDescriptor emitterDescriptor: descriptor.emitterModuleGraphs) {
-			if (emitterDescriptor.isContinuous()) {
-				return true;
-			}
-		}
+    public boolean isContinuous () {
+        for (ParticleEmitterDescriptor emitterDescriptor : descriptor.emitterModuleGraphs) {
+            if (emitterDescriptor.isContinuous()) {
+                return true;
+            }
+        }
 
-		return false;
-	}
+        return false;
+    }
 
-	public boolean isComplete() {
-    	if(loopable) return false;
+    public boolean isComplete () {
+        if (loopable) return false;
 
-		boolean allEmittersContinuous = true;
-		for (int i = 0; i < emitters.size; i++) {
-			if (!emitters.get(i).isContinuous()) {
-				allEmittersContinuous = false;
-				break;
-			}
-		}
-		
-		if (allEmittersContinuous) {
-			return false;
-		}
+        boolean allEmittersContinuous = true;
+        for (int i = 0; i < emitters.size; i++) {
+            if (!emitters.get(i).isContinuous()) {
+                allEmittersContinuous = false;
+                break;
+            }
+        }
 
-
-		for (int i = 0; i < emitters.size; i++) {
-			if (!emitters.get(i).isComplete()) {
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	public void allowCompletion() {
-    	loopable = false;
-		for (int i = 0; i < emitters.size; i++) {
-			emitters.get(i).stop();
-		}
-	}
-
-	public void pause() {
-		for (int i = 0; i < emitters.size; i++) {
-			emitters.get(i).pause();
-		}
-		paused = true;
-	}
-
-	public void resume() {
-		for (int i = 0; i < emitters.size; i++) {
-			emitters.get(i).resume();
-		}
-		paused = false;
-	}
+        if (allEmittersContinuous) {
+            return false;
+        }
 
 
-	public void restart () {
-		for (int i = 0; i < emitters.size; i++) {
-			emitters.get(i).restart();
-		}
-		paused = false;
-		totalTime = 0;
-	}
+        for (int i = 0; i < emitters.size; i++) {
+            if (!emitters.get(i).isComplete()) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public void allowCompletion () {
+        loopable = false;
+        for (int i = 0; i < emitters.size; i++) {
+            emitters.get(i).stop();
+        }
+    }
+
+    public void pause () {
+        for (int i = 0; i < emitters.size; i++) {
+            emitters.get(i).pause();
+        }
+        paused = true;
+    }
+
+    public void resume () {
+        for (int i = 0; i < emitters.size; i++) {
+            emitters.get(i).resume();
+        }
+        paused = false;
+    }
 
 
-	public void reset () {
-		for (int i = 0; i < emitters.size; i++) {
-			emitters.get(i).reset();
-		}
-		paused = true;
-		totalTime = 0;
-	}
+    public void restart () {
+        for (int i = 0; i < emitters.size; i++) {
+            emitters.get(i).restart();
+        }
+        paused = false;
+        totalTime = 0;
+    }
 
 
+    public void reset () {
+        for (int i = 0; i < emitters.size; i++) {
+            emitters.get(i).reset();
+        }
+        paused = true;
+        totalTime = 0;
+    }
 
 
-	public Array<IEmitter> getEmitters () {
+    public Array<IEmitter> getEmitters () {
         return emitters;
     }
 
-    public IEmitter getEmitter(ParticleEmitterDescriptor descriptor) {
-    	for(IEmitter instance: emitters) {
-    		if(instance.getEmitterGraph() == descriptor) {
-    			return instance;
-			}
-		}
+    public IEmitter getEmitter (ParticleEmitterDescriptor descriptor) {
+        for (IEmitter instance : emitters) {
+            if (instance.getEmitterGraph() == descriptor) {
+                return instance;
+            }
+        }
 
-    	return null;
-	}
+        return null;
+    }
 
-	public void setWorldRotation(float rotation) {
-		this.rotation = rotation;
-	}
+    public void setWorldRotation (float worldRotation) {
+        this.worldRotation = worldRotation;
+    }
 
-	public void setPosition(float x, float y, float z) {
-		position.set(x, y, z);
-	}
+    public void setWorldScale (Vector2 worldScale) {
+        this.worldScale.set(worldScale);
+    }
 
-	public Vector3 getPosition() {
-		return position;
-	}
+    public void setPosition (float x, float y, float z) {
+        position.set(x, y, z);
+    }
 
-	public int getParticleCount() {
-		return particleCount;
-	}
+    public Vector3 getPosition () {
+        return position;
+    }
 
-	public int getNodeCalls() {
-		return nodeCalls;
-	}
+    public int getParticleCount () {
+        return particleCount;
+    }
 
-	public void reportNodeCall() {
-		nodeCalls++;
-	}
+    public int getNodeCalls () {
+        return nodeCalls;
+    }
 
-	public void sortEmitters() {
-		emitters.sort(emitterComparator);
-		for(int i = 0; i < emitters.size; i++) {
-			emitters.get(i).getEmitterGraph().setSortPosition(i);
-		}
-	}
+    public void reportNodeCall () {
+        nodeCalls++;
+    }
+
+    public void sortEmitters () {
+        emitters.sort(emitterComparator);
+        for (int i = 0; i < emitters.size; i++) {
+            emitters.get(i).getEmitterGraph().setSortPosition(i);
+        }
+    }
 }

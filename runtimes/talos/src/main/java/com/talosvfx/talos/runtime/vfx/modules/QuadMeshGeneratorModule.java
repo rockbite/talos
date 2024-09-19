@@ -148,7 +148,9 @@ public class QuadMeshGeneratorModule extends MeshGeneratorModule {
 				Vector3 rotation = reference.rotation;
 				float transparency = particleModule.getTransparency();
 				Color color = particleModule.getColor();
-				Vector2 pivot = particleModule.getPivot();
+				Vector2 pivot = reference.pivot;
+
+				Vector2 worldScale = particlePointData.reference.getEmitter().getWorldScale();
 
 				this.color.set(color);
 				this.color.a = transparency;
@@ -205,6 +207,13 @@ public class QuadMeshGeneratorModule extends MeshGeneratorModule {
 						p2.rotate(a, 0, 0, 1);
 						p3.rotate(a, 0, 0, 1);
 						p4.rotate(a, 0, 0, 1);
+
+						p1.scl(worldScale.x);
+						p2.scl(worldScale.x);
+						p3.scl(worldScale.x);
+						p4.scl(worldScale.x);
+
+
 					} else {
 
 
@@ -213,10 +222,16 @@ public class QuadMeshGeneratorModule extends MeshGeneratorModule {
 						p3.sub(pivot.x * width, pivot.y * height, 0);
 						p4.sub(pivot.x * width, pivot.y * height, 0);
 
+						p1.scl(worldScale.x);
+						p2.scl(worldScale.x);
+						p3.scl(worldScale.x);
+						p4.scl(worldScale.x);
+
 						p1.rotate(rotation.x, 0, 0, 1);
 						p2.rotate(rotation.x, 0, 0, 1);
 						p3.rotate(rotation.x, 0, 0, 1);
 						p4.rotate(rotation.x, 0, 0, 1);
+
 					}
 				}
 

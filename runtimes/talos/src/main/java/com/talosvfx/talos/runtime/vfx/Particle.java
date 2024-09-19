@@ -134,9 +134,16 @@ public class Particle implements Pool.Poolable {
 
         //Step teh particle data
 
+        Vector2 worldScale = emitterReference.getWorldScale();
         if (particleModule.hasPositionOverride()) {
-            position.set(particleModule.getSpawnPosition());
-            position.add(particleModule.getPositionOverride());
+            Vector3 temp = new Vector3();
+            temp.set(particleModule.getSpawnPosition()).scl(worldScale.x, worldScale.y, 1f);
+
+            position.set(temp);
+
+            temp.set(particleModule.getPositionOverride()).scl(worldScale.x, worldScale.y, 1f);
+            position.add(temp);
+
         } else {
             final Vector3 drag = particleModule.getDrag();
             float dragX = drag.x;
@@ -148,6 +155,7 @@ public class Particle implements Pool.Poolable {
                 final Vector3 velocityOverTime = particleModule.getVelocityOverTime();
                 velocity.set(velocityOverTime);
                 velocity.rotate(emitterReference.getWorldRotation(), 0, 0, 1);
+                velocity.scl(emitterReference.getWorldScale().x);
             } else {
                 //Acceleration mutate by forces
 
@@ -197,6 +205,7 @@ public class Particle implements Pool.Poolable {
 
                 velocity.set(vx, vy, vz);
                 velocity.rotate(emitterReference.getWorldRotation(), 0, 0, 1);
+                velocity.scl(worldScale.x, worldScale.y, 1f);
 
             }
 

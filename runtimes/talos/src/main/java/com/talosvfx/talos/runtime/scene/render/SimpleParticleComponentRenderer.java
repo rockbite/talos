@@ -54,6 +54,7 @@ public class SimpleParticleComponentRenderer<T extends BaseVFXProjectData> exten
 			particleComponent.setEffectRef(instance);
 		}
 		instance.setWorldRotation(transformComponent.worldRotation);
+		instance.setWorldScale(transformComponent.worldScale);
 		instance.setPosition(transformComponent.worldPosition.x, transformComponent.worldPosition.y, 0);
 		if (!gameObjectRenderer.isSkipUpdates()) {
 			instance.update(Gdx.graphics.getDeltaTime());

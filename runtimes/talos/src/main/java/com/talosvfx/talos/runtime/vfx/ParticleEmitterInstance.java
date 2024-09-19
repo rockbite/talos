@@ -384,7 +384,12 @@ public class ParticleEmitterInstance implements IEmitter {
 
 	@Override
 	public float getWorldRotation () {
-		return getEffect().rotation;
+		return getEffect().worldRotation;
+	}
+
+	@Override
+	public Vector2 getWorldScale () {
+		return getEffect().worldScale;
 	}
 
 	@Override
