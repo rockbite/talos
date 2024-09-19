@@ -158,7 +158,15 @@ public class RepositoryOptimizer {
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
+				} else {
+					Gdx.app.postRunnable(new Runnable() {
+						@Override
+						public void run () {
+							Toasts.getInstance().showErrorToast("Error downloading tools, " + status.getStatusCode());
+						}
+					});
 				}
+
 			}
 
 			@Override
