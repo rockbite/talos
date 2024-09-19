@@ -134,14 +134,15 @@ public class Particle implements Pool.Poolable {
 
         //Step teh particle data
 
+        float worldRotation = emitterReference.getWorldRotation();
         Vector2 worldScale = emitterReference.getWorldScale();
         if (particleModule.hasPositionOverride()) {
             Vector3 temp = new Vector3();
-            temp.set(particleModule.getSpawnPosition()).scl(worldScale.x, worldScale.y, 1f);
+            temp.set(particleModule.getSpawnPosition()).scl(worldScale.x, worldScale.y, 1f).rotate(worldRotation, 0, 0, 1);
 
             position.set(temp);
 
-            temp.set(particleModule.getPositionOverride()).scl(worldScale.x, worldScale.y, 1f);
+            temp.set(particleModule.getPositionOverride()).scl(worldScale.x, worldScale.y, 1f).rotate(worldRotation, 0, 0,  1);
             position.add(temp);
 
         } else {
@@ -154,7 +155,7 @@ public class Particle implements Pool.Poolable {
                 //Velocity is driven by velocity over time
                 final Vector3 velocityOverTime = particleModule.getVelocityOverTime();
                 velocity.set(velocityOverTime);
-                velocity.rotate(emitterReference.getWorldRotation(), 0, 0, 1);
+                velocity.rotate(worldRotation, 0, 0, 1);
                 velocity.scl(emitterReference.getWorldScale().x);
             } else {
                 //Acceleration mutate by forces
@@ -204,7 +205,7 @@ public class Particle implements Pool.Poolable {
                 }
 
                 velocity.set(vx, vy, vz);
-                velocity.rotate(emitterReference.getWorldRotation(), 0, 0, 1);
+                velocity.rotate(worldRotation, 0, 0, 1);
                 velocity.scl(worldScale.x, worldScale.y, 1f);
 
             }
@@ -223,7 +224,7 @@ public class Particle implements Pool.Poolable {
 
         if (particleModule.hasRotationOverride()) {
             rotation.set(particleModule.getSpawnRotation());
-            rotation.add(emitterReference.getWorldRotation());
+            rotation.add(worldRotation);
             rotation.add(particleModule.getRotationOverride());
         } else {
             if (particleModule.hasSpinVelocityOverTime()) {
@@ -239,7 +240,7 @@ public class Particle implements Pool.Poolable {
             rotationChanged.z += spinVelocity.z * delta;
 
             rotation.set(particleModule.getSpawnRotation());
-            rotation.add(emitterReference.getWorldRotation());
+            rotation.add(worldRotation);
             rotation.add(rotationChanged);
 
         }
