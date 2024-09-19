@@ -163,11 +163,19 @@ public class TinyGizmoRenderer {
 		final Ray pickRay = camera.getPickRay(temp.x, temp.y, vec.x, vec.y, w, h);
 
 		float viewportHeight = camera.viewportHeight;
+		float viewportWidth = camera.viewportWidth;
 		if (camera instanceof OrthographicCamera) {
 			viewportHeight *= ((OrthographicCamera) camera).zoom;
+			viewportWidth *= ((OrthographicCamera) camera).zoom;
 		}
 
-		tinyGizmo.setScreenSpaceScale(viewportHeight * 0.05f);
+		//Find the smallest, width or height
+		float min = Math.max(viewportWidth, viewportHeight);
+
+		float calculatedSize = min * 0.05f;
+
+
+		tinyGizmo.setScreenSpaceScale(calculatedSize);
 		tinyGizmo.updateWindow(w, h);
 		tinyGizmo.updateRay(pickRay.direction.x, pickRay.direction.y, pickRay.direction.z);
 
