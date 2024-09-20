@@ -20,7 +20,6 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool;
 import com.talosvfx.talos.runtime.vfx.modules.DrawableModule;
 import com.talosvfx.talos.runtime.vfx.modules.HistoryParticlePointDataGeneratorModule;
@@ -33,7 +32,8 @@ public class Particle implements Pool.Poolable {
 
     public Vector3 spawnPosition = new Vector3();
 
-    public Vector3 position = new Vector3();
+    public Vector3 localPosition = new Vector3();
+    public Vector3 worldPosition = new Vector3();
     public Vector3 velocity = new Vector3();
     public Vector3 spinVelocity = new Vector3();
     public Vector3 acceleration = new Vector3();
@@ -79,7 +79,7 @@ public class Particle implements Pool.Poolable {
 
         //Starting values
         life = particleModule.getLife();
-        position.set(particleModule.getSpawnPosition());
+        localPosition.set(particleModule.getSpawnPosition());
         rotation.set(particleModule.getSpawnRotation());
         acceleration.set(0, 0, 0);
         velocity.set(particleModule.getInitialVelocity());
@@ -138,12 +138,12 @@ public class Particle implements Pool.Poolable {
         Vector2 worldScale = emitterReference.getWorldScale();
         if (particleModule.hasPositionOverride()) {
             Vector3 temp = new Vector3();
-            temp.set(particleModule.getSpawnPosition()).scl(worldScale.x, worldScale.y, 1f).rotate(worldRotation, 0, 0, 1);
+            temp.set(particleModule.getSpawnPosition());
 
-            position.set(temp);
+            localPosition.set(temp);
 
-            temp.set(particleModule.getPositionOverride()).scl(worldScale.x, worldScale.y, 1f).rotate(worldRotation, 0, 0,  1);
-            position.add(temp);
+            temp.set(particleModule.getPositionOverride());
+            localPosition.add(temp);
 
         } else {
             final Vector3 drag = particleModule.getDrag();
@@ -155,8 +155,6 @@ public class Particle implements Pool.Poolable {
                 //Velocity is driven by velocity over time
                 final Vector3 velocityOverTime = particleModule.getVelocityOverTime();
                 velocity.set(velocityOverTime);
-                velocity.rotate(worldRotation, 0, 0, 1);
-                velocity.scl(emitterReference.getWorldScale().x);
             } else {
                 //Acceleration mutate by forces
 
@@ -205,20 +203,19 @@ public class Particle implements Pool.Poolable {
                 }
 
                 velocity.set(vx, vy, vz);
-                velocity.rotate(worldRotation, 0, 0, 1);
-                velocity.scl(worldScale.x, worldScale.y, 1f);
 
             }
 
-            float posX = position.x;
-            float posY = position.y;
-            float posZ = position.z;
+            float posX = localPosition.x;
+            float posY = localPosition.y;
+            float posZ = localPosition.z;
 
             posX += velocity.x * delta;
             posY += velocity.y * delta;
             posZ += velocity.z * delta;
 
-            position.set(posX, posY, posZ);
+            localPosition.set(posX, posY, posZ);
+            worldPosition.set(localPosition).rotate(Vector3.Z, worldRotation).scl(worldScale.x);
 
         }
 
@@ -256,22 +253,22 @@ public class Particle implements Pool.Poolable {
 
 
     public float getAttachedPositionX () {
-        return emitterReference.getEffectPosition().x + position.x;
+        return emitterReference.getEffectPosition().x + worldPosition.x;
     }
 
     public float getAttachedPositionY () {
-        return emitterReference.getEffectPosition().y + position.y;
+        return emitterReference.getEffectPosition().y + worldPosition.y;
     }
 
     public float getAttachedPositionZ () {
-        return emitterReference.getEffectPosition().z + position.z;
+        return emitterReference.getEffectPosition().z + worldPosition.z;
     }
 
     public float getX() {
         if(emitterReference.getEmitterModule().isAttached()) {
             return getAttachedPositionX();
         } else {
-            return spawnPosition.x + position.x;
+            return spawnPosition.x + worldPosition.x;
         }
     }
 
@@ -279,7 +276,7 @@ public class Particle implements Pool.Poolable {
         if(emitterReference.getEmitterModule().isAttached()) {
             return getAttachedPositionY();
         } else {
-            return spawnPosition.y + position.y;
+            return spawnPosition.y + worldPosition.y;
         }
     }
 
@@ -287,13 +284,14 @@ public class Particle implements Pool.Poolable {
         if(emitterReference.getEmitterModule().isAttached()) {
             return getAttachedPositionZ();
         } else {
-            return spawnPosition.z + position.z;
+            return spawnPosition.z + worldPosition.z;
         }
     }
 
     @Override
     public void reset() {
-        position.setZero();
+        localPosition.setZero();
+        worldPosition.setZero();
         requesterID = -1;
     }
 
