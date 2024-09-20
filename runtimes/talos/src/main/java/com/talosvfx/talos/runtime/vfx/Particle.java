@@ -144,6 +144,7 @@ public class Particle implements Pool.Poolable {
 
             temp.set(particleModule.getPositionOverride());
             localPosition.add(temp);
+            worldPosition.set(localPosition).rotate(Vector3.Z, worldRotation).scl(worldScale.x);
 
         } else {
             final Vector3 drag = particleModule.getDrag();
