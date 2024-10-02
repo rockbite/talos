@@ -102,6 +102,9 @@ public class ParticleEffectInstance {
 
         particleCount = 0;
         nodeCalls = 0;
+
+        sortEmitters();
+
         for (int i = 0; i < emitters.size; i++) {
             emitters.get(i).update(delta);
             particleCount += emitters.get(i).getActiveParticleCount();

@@ -164,6 +164,16 @@ public class EmitterList extends TimelineWidget<ParticleEmitterWrapper> {
             activeWrappers.reverse();
             setData(activeWrappers);
             setSelected(selectedItem);
+
+            for (EmitterData emitter : editorApp.getGameAsset().getResource().getEmitters()) {
+                for (ParticleEmitterWrapper activeWrapper : activeWrappers) {
+                    if (activeWrapper.getName().equals(emitter.name)) {
+                        emitter.sortPosition = activeWrapper.getEmitter().getSortPosition();
+                    }
+                }
+            }
+
+            AssetRepository.getInstance().assetChanged(editorApp.getGameAsset());
         }
     }
 
@@ -195,6 +205,12 @@ public class EmitterList extends TimelineWidget<ParticleEmitterWrapper> {
     }
 
     public void setEmitters(Array<ParticleEmitterWrapper> emitterWrappers) {
+        emitterWrappers.sort(new Comparator<ParticleEmitterWrapper>() {
+            @Override
+            public int compare (ParticleEmitterWrapper o1, ParticleEmitterWrapper o2) {
+               return o1.getEmitter().getSortPosition() - o2.getEmitter().getSortPosition();
+            }
+        });
         if(emitterWrappers.size > 0) {
             setData(emitterWrappers);
             setSelected(emitterWrappers.first());

@@ -31,6 +31,8 @@ import com.talosvfx.talos.runtime.vfx.serialization.ConnectionData;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Comparator;
+
 
 public class VFXProjectData extends BaseVFXProjectData implements Json.Serializable {
 
@@ -97,6 +99,12 @@ public class VFXProjectData extends BaseVFXProjectData implements Json.Serializa
 
 	@Override
 	public void write (Json json) {
+		emitters.sort(new Comparator<EmitterData>() {
+			@Override
+			public int compare (EmitterData o1, EmitterData o2) {
+				return o1.sortPosition - o2.sortPosition;
+			}
+		});
 		json.writeValue("emitters", emitters);
 	}
 

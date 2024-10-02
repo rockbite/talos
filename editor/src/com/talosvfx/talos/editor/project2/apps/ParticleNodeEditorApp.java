@@ -60,6 +60,7 @@ public class ParticleNodeEditorApp extends AppManager.BaseApp<VFXProjectData> im
 		}
 	};
 
+	@Getter
 	ParticleEffectDescriptor particleEffectDescriptor;
 	ParticleEffectInstance particleEffect;
 	@Getter
