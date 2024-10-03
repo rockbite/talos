@@ -2,6 +2,7 @@ package com.talosvfx.talos.runtime.vfx.modules;
 
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
@@ -100,16 +101,40 @@ public class QuadMeshGeneratorModule extends MeshGeneratorModule {
 		float V = 0f;
 		float V2 = 1f;
 
+        float offsetXNormalized = 0f;
+        float offsetYNormalized = 0f;
+
+        float atlasOffsetScaleX = 1f;
+        float atlasOffsetScaleY = 1f;
 
 
 		if (materialModule instanceof SpriteMaterialModule) {
-			TextureRegion textureRegion = ((SpriteMaterialModule)materialModule).getTextureRegion();
-			if (textureRegion == null) return;
+			TextureAtlas.AtlasSprite atlasSprite = ((SpriteMaterialModule)materialModule).getTextureRegion();
+			if (atlasSprite == null) return;
 
-			U = textureRegion.getU();
-			U2 = textureRegion.getU2();
-			V = textureRegion.getV();
-			V2 = textureRegion.getV2();
+            TextureAtlas.AtlasRegion atlasRegion = atlasSprite.getAtlasRegion();
+
+            float offsetX = atlasRegion.getRegionX();
+            float offsetY = atlasRegion.offsetY;
+
+            int regionWidth = atlasRegion.getRegionWidth();
+            int regionHeight = atlasRegion.getRegionHeight();
+
+            int originalWidth = atlasRegion.originalWidth;
+            int originalHeight = atlasRegion.originalHeight;
+
+            atlasOffsetScaleX = originalWidth / (float) regionWidth;
+            atlasOffsetScaleY = originalHeight / (float) regionHeight;
+
+            // Calculate the normalized offset
+            offsetXNormalized = offsetX / (float) originalWidth;
+            offsetYNormalized = offsetY / (float) originalHeight;
+
+
+			U = atlasSprite.getU();
+			U2 = atlasSprite.getU2();
+			V = atlasSprite.getV();
+			V2 = atlasSprite.getV2();
 		}
 
 		rightWorldSpace.set(viewValues[0], viewValues[4], viewValues[8]);
@@ -159,6 +184,9 @@ public class QuadMeshGeneratorModule extends MeshGeneratorModule {
 
 				float halfWidth = width / 2f;
 				float halfHeight = height / 2f;
+
+                halfWidth /= atlasOffsetScaleX;
+                halfHeight /= atlasOffsetScaleY;
 
 				p1.set(-halfWidth, -halfHeight, 0);
 				p2.set(halfWidth, -halfHeight, 0);
@@ -243,6 +271,17 @@ public class QuadMeshGeneratorModule extends MeshGeneratorModule {
 				//get uvs from material
 
 
+//                p1.x = (p1.x + offsetXNormalized) * atlasOffsetScaleX;
+//                p1.y = (p1.y + offsetYNormalized) * atlasOffsetScaleY;
+//
+//                p2.x = (p2.x + offsetXNormalized) * atlasOffsetScaleX;
+//                p2.y = (p2.y + offsetYNormalized) * atlasOffsetScaleY;
+//
+//                p3.x = (p3.x + offsetXNormalized) * atlasOffsetScaleX;
+//                p3.y = (p3.y + offsetYNormalized) * atlasOffsetScaleY;
+//
+//                p4.x = (p4.x + offsetXNormalized) * atlasOffsetScaleX;
+//                p4.y = (p4.y + offsetYNormalized) * atlasOffsetScaleY;
 
 				verts[idx++] = p1.x; // x1
 				verts[idx++] = p1.y; // y1

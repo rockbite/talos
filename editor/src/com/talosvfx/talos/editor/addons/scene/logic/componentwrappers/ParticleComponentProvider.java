@@ -1,6 +1,8 @@
 package com.talosvfx.talos.editor.addons.scene.logic.componentwrappers;
 
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Array;
 import com.talosvfx.talos.editor.addons.scene.apps.spriteeditor.SpriteEditorApp;
 import com.talosvfx.talos.editor.addons.scene.assets.AssetRepository;
@@ -33,6 +35,12 @@ public class ParticleComponentProvider<T extends BaseVFXProjectData> extends Ren
 		//		}
 
 		PropertyWidget descriptorWidget = WidgetFactory.generateForGameAsset(component, "gameAsset", null, "Effect", GameAssetType.VFX);
+		descriptorWidget.addListener(new ChangeListener() {
+			@Override
+			public void changed (ChangeEvent event, Actor actor) {
+				component.setEffectRef(null);
+			}
+		});
 
 		ButtonPropertyWidget<String> linkedToWidget = new ButtonPropertyWidget<String>("Effect Project", "Edit", new ButtonPropertyWidget.ButtonListener<String>() {
 			@Override

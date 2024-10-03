@@ -29,14 +29,13 @@ import com.talosvfx.talos.runtime.assets.BaseAssetRepository;
 import com.talosvfx.talos.runtime.assets.GameAsset;
 import com.talosvfx.talos.runtime.assets.GameAssetType;
 import com.talosvfx.talos.runtime.assets.GameResourceOwner;
-import com.talosvfx.talos.runtime.vfx.ParticleEmitterDescriptor;
 import com.talosvfx.talos.runtime.vfx.values.ModuleValue;
 
 
 public class SpriteMaterialModule extends MaterialModule implements GameResourceOwner<AtlasSprite>, GameAsset.GameAssetUpdateListener {
 
 
-	private transient TextureRegion region;
+	private transient TextureAtlas.AtlasSprite region;
 
 	public GameAsset<AtlasSprite> asset;
 
@@ -86,7 +85,7 @@ public class SpriteMaterialModule extends MaterialModule implements GameResource
 	@Override
 	public void onUpdate () {
 		if (asset != null && !asset.isBroken()) {
-			region = new TextureRegion(asset.getResource());
+			region = new TextureAtlas.AtlasSprite(asset.getResource());
 		}
 	}
 
@@ -119,13 +118,13 @@ public class SpriteMaterialModule extends MaterialModule implements GameResource
 		asset.listeners.add(this);
 
 		if (asset != null && !asset.isBroken()) {
-			region = new TextureRegion(asset.getResource());
+			region = new TextureAtlas.AtlasSprite(asset.getResource());
 		} else {
 			System.out.println("Sprite material asset broken " + asset.nameIdentifier);
 		}
 	}
 
-	public TextureRegion getTextureRegion () {
+	public TextureAtlas.AtlasSprite getTextureRegion () {
 		return region;
 	}
 

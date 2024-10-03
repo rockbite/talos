@@ -169,7 +169,12 @@ public class ProjectSplash extends Table {
 			if(iter++ > 5) break;
 
 			FileHandle handle = Gdx.files.absolute(recentProject.getProjectPath());
-			ButtonLabel recentProjectLabel = new ButtonLabel(SharedResources.skin.getDrawable("ic-file-blank"), handle.name());
+			String pathEnd = handle.path();
+			//Show maximum of 40 characters of path end
+			if(pathEnd.length() > 40) {
+				pathEnd = "..." + pathEnd.substring(pathEnd.length() - 40);
+			}
+			ButtonLabel recentProjectLabel = new ButtonLabel(SharedResources.skin.getDrawable("ic-file-blank"), handle.name() + " (" + pathEnd + ")");
 			recentProjectLabel.addListener(new ClickListener() {
 				@Override
 				public void clicked (InputEvent event, float x, float y) {

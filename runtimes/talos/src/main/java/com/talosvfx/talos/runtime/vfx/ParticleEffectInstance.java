@@ -20,6 +20,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.talosvfx.talos.runtime.vfx.render.ParticleRenderer;
+import lombok.Getter;
 
 import java.util.Comparator;
 
@@ -31,7 +32,10 @@ public class ParticleEffectInstance {
 
     Vector3 position = new Vector3();
 
+    @Getter
     float worldRotation;
+
+    @Getter
     Vector2 worldScale = new Vector2(1f, 1f);
 
     ScopePayload scopePayload = new ScopePayload();

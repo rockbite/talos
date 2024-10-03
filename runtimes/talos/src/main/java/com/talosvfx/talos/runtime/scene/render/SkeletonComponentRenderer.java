@@ -26,6 +26,22 @@ public class SkeletonComponentRenderer extends ComponentRenderer<SpineRendererCo
     }
 
     @Override
+    public void update (GameObject gameObject, SpineRendererComponent spineRendererComponent, float delta) {
+        TransformComponent parentTransform = gameObject.getComponent(TransformComponent.class);
+
+        spineRendererComponent.skeleton.setPosition(parentTransform.worldPosition.x, parentTransform.worldPosition.y);
+        spineRendererComponent.skeleton.setScale(parentTransform.worldScale.x * spineRendererComponent.scale, parentTransform.worldScale.y * spineRendererComponent.scale);
+        spineRendererComponent.skeleton.getRootBone().setRotation(parentTransform.rotation);
+
+        if (!gameObjectRenderer.isSkipUpdates()) {
+            spineRendererComponent.animationState.update(Gdx.graphics.getDeltaTime());
+            spineRendererComponent.animationState.apply(spineRendererComponent.skeleton);
+        }
+
+        spineRendererComponent.skeleton.updateWorldTransform();
+    }
+
+    @Override
     public void render (Batch batch, Camera camera, GameObject gameObject, SpineRendererComponent rendererComponent) {
         TransformComponent parentTransform = gameObject.getComponent(TransformComponent.class);
         SpineRendererComponent spineRendererComponent = gameObject.getComponent(SpineRendererComponent.class);
@@ -36,15 +52,6 @@ public class SkeletonComponentRenderer extends ComponentRenderer<SpineRendererCo
             return;
         }
 
-        spineRendererComponent.skeleton.setPosition(parentTransform.worldPosition.x, parentTransform.worldPosition.y);
-        spineRendererComponent.skeleton.setScale(parentTransform.worldScale.x * spineRendererComponent.scale, parentTransform.worldScale.y * spineRendererComponent.scale);
-        spineRendererComponent.skeleton.getRootBone().setRotation(parentTransform.rotation);
-
-        if (!gameObjectRenderer.isSkipUpdates()) {
-            spineRendererComponent.animationState.update(Gdx.graphics.getDeltaTime());
-            spineRendererComponent.animationState.apply(spineRendererComponent.skeleton);
-        }
-        spineRendererComponent.skeleton.updateWorldTransform();
 
         spineRendererComponent.skeleton.getColor().set(spineRendererComponent.finalColor);
         skeletonRenderer.draw(batch, spineRendererComponent.skeleton);
@@ -52,24 +59,7 @@ public class SkeletonComponentRenderer extends ComponentRenderer<SpineRendererCo
         batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 
 
-        // update bone game objects
-        if (spineRendererComponent.generateGameObjectBones) {
-            Array<GameObject> boneGOs = gameObject.getChildrenWithBoneComponent();
 
-            for (GameObject boneGO : boneGOs) {
-                BoneComponent boneComponent = boneGO.getComponent(BoneComponent.class);
-                Bone bone = boneComponent.getBone();
-                TransformComponent transform = boneGO.getComponent(TransformComponent.class);
-
-                transform.worldScale.set(bone.getWorldScaleX(), bone.getWorldScaleY());
-                transform.worldRotation = bone.localToWorldRotation(bone.getRotation());
-                transform.worldPosition.set(bone.getWorldX(), bone.getWorldY());
-
-                transform.position.set(bone.getX(), bone.getY());
-                transform.rotation = bone.getRotation();
-                transform.scale.set(bone.getScaleX(), bone.getScaleY());
-            }
-        }
 
     }
 }

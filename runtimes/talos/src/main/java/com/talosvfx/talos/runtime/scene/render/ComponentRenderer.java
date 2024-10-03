@@ -15,4 +15,8 @@ public abstract class ComponentRenderer <T extends RendererComponent> {
 	}
 
 	public abstract void render (Batch batch, Camera camera, GameObject parent, T rendererComponent);
+
+	public void update (GameObject gameObject, T component, float delta) {
+
+	}
 }
