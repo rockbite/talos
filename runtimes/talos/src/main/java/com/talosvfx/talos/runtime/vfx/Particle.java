@@ -82,7 +82,17 @@ public class Particle implements Pool.Poolable {
         localPosition.set(particleModule.getSpawnPosition());
         rotation.set(particleModule.getSpawnRotation());
         acceleration.set(0, 0, 0);
+
         velocity.set(particleModule.getInitialVelocity());
+
+        //rotate it by origin rotation
+        float worldRotation = emitterReference.getWorldRotation();
+        Vector2 worldScale = emitterReference.getWorldScale();
+
+
+        velocity.rotate(worldRotation, 0, 0, 1).scl(worldScale.x, worldScale.y, 0);
+
+
         spinVelocity.set(particleModule.getInitialSpinVelocity());
 
 

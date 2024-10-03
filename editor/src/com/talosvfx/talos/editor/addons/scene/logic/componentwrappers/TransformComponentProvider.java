@@ -3,6 +3,7 @@ package com.talosvfx.talos.editor.addons.scene.logic.componentwrappers;
 import com.badlogic.gdx.utils.Array;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.PropertyWidget;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.WidgetFactory;
+import com.talosvfx.talos.runtime.scene.components.BoneComponent;
 import com.talosvfx.talos.runtime.scene.components.TransformComponent;
 
 public class TransformComponentProvider extends AComponentProvider<TransformComponent> {
@@ -18,6 +19,12 @@ public class TransformComponentProvider extends AComponentProvider<TransformComp
 		PropertyWidget positionWidget = WidgetFactory.generate(component, "position", "Position");
 		PropertyWidget rotationWidget = WidgetFactory.generate(component, "rotation", "Rotation");
 		PropertyWidget scaleWidget = WidgetFactory.generate(component, "scale", "Scale");
+
+		if (component.getGameObject().hasComponent(BoneComponent.class)) {
+			positionWidget.setReadOnly();
+			rotationWidget.setReadOnly();
+			scaleWidget.setReadOnly();
+		}
 
 		properties.add(positionWidget);
 		properties.add(rotationWidget);

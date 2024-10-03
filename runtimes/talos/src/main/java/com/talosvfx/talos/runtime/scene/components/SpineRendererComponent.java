@@ -33,6 +33,9 @@ public class SpineRendererComponent extends RendererComponent implements Json.Se
     @ValueProperty(prefix = {"scale"})
     public float scale = 1f;
 
+    @ValueProperty(prefix = {"x"}, min = 0, step = 0.01f, max = 10)
+    public float editorAnimationSpeed = 1f;
+
     @Getter@Setter
     private String skin;
 

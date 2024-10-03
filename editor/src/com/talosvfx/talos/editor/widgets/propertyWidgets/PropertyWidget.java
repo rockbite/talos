@@ -54,6 +54,8 @@ public abstract class PropertyWidget<T> extends Table {
 	@Setter
 	public ChangeListener injectedChangeListener;
 
+	protected boolean readOnly;
+
 	public void toggleHide (boolean hidden) {
 		//Check if we are in a cell
 		if (getParent() instanceof Table) {
@@ -79,6 +81,11 @@ public abstract class PropertyWidget<T> extends Table {
 	public Object getParentObject () {
 		return parent;
 	}
+
+	public void setReadOnly () {
+		readOnly = true;
+	};
+
 
 	public interface ValueChanged<T> {
 		void report(T value);
@@ -137,6 +144,14 @@ public abstract class PropertyWidget<T> extends Table {
 	public void updateValue() {
 		this.value = supplier.get();
 		updateWidget(value);
+	}
+
+	@Override
+	public void act (float delta) {
+		super.act(delta);
+		if (readOnly) {
+			updateValue();
+		}
 	}
 
 	public abstract void updateWidget(T value);

@@ -90,6 +90,14 @@ public class SpineComponentProvider extends RendererComponentProvider<SpineRende
 		properties.add(atlasWidget);
 
 		properties.add(WidgetFactory.generate(component, "scale", "Scale"));
+		PropertyWidget generate = WidgetFactory.generate(component, "editorAnimationSpeed", "Editor Anim Speed");
+		generate.addListener(new ChangeListener() {
+			@Override
+			public void changed (ChangeEvent event, Actor actor) {
+				component.animationState.setTimeScale(((float) generate.getValue()));
+			}
+		});
+		properties.add(generate);
 
 		PropertyWidget colorWidget = WidgetFactory.generate(component, "color", "Color");
 		properties.add(colorWidget);

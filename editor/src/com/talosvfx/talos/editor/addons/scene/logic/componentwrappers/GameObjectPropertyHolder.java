@@ -9,32 +9,30 @@ import com.talosvfx.talos.runtime.scene.components.BoneComponent;
 import lombok.Getter;
 
 public class GameObjectPropertyHolder extends PropertyWrapperProviders.ObjectPropertyHolder<GameObject> {
-	@Getter
-	private final GameObject gameObject;
-	private final GameObjectPropertyProvider gameObjectPropertyProvider;
+    @Getter
+    private final GameObject gameObject;
+    private final GameObjectPropertyProvider gameObjectPropertyProvider;
 
-	public GameObjectPropertyHolder (GameObject gameObject) {
-		this.gameObject = gameObject;
-		gameObjectPropertyProvider = new GameObjectPropertyProvider(gameObject);
-	}
+    public GameObjectPropertyHolder (GameObject gameObject) {
+        this.gameObject = gameObject;
+        gameObjectPropertyProvider = new GameObjectPropertyProvider(gameObject);
+    }
 
-	@Override
-	public Iterable<IPropertyProvider> getPropertyProviders () {
-		Array<IPropertyProvider> list = new Array<>();
+    @Override
+    public Iterable<IPropertyProvider> getPropertyProviders () {
+        Array<IPropertyProvider> list = new Array<>();
 
-		if (!gameObject.hasComponent(BoneComponent.class)) {
-			list.add(gameObjectPropertyProvider);
+        list.add(gameObjectPropertyProvider);
 
-			for (AComponent component : gameObject.getComponents()) {
-				list.add(PropertyWrapperProviders.getOrCreateProvider(component));
-			}
-		}
+        for (AComponent component : gameObject.getComponents()) {
+            list.add(PropertyWrapperProviders.getOrCreateProvider(component));
+        }
 
-		return list;
-	}
+        return list;
+    }
 
-	@Override
-	public String getName () {
-		return gameObject.getName();
-	}
+    @Override
+    public String getName () {
+        return gameObject.getName();
+    }
 }
