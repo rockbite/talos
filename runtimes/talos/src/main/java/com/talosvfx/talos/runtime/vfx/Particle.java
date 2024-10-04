@@ -70,6 +70,9 @@ public class Particle implements Pool.Poolable {
         this.emitterReference = emitterReference;
         ParticleModule particleModule = emitterReference.getParticleModule();
 
+        float worldRotation = emitterReference.getWorldRotation();
+        Vector2 worldScale = emitterReference.getWorldScale();
+
         this.seed = seed;
 
         // inner variable defaults
@@ -80,14 +83,14 @@ public class Particle implements Pool.Poolable {
         //Starting values
         life = particleModule.getLife();
         localPosition.set(particleModule.getSpawnPosition());
+
+        localPosition.scl(worldScale.x, worldScale.y, 0);
+
         rotation.set(particleModule.getSpawnRotation());
         acceleration.set(0, 0, 0);
 
         velocity.set(particleModule.getInitialVelocity());
 
-        //rotate it by origin rotation
-        float worldRotation = emitterReference.getWorldRotation();
-        Vector2 worldScale = emitterReference.getWorldScale();
 
         if (!emitterReference.getEmitterModule().isAttached()) {
             velocity.rotate(worldRotation, 0, 0, 1).scl(worldScale.x, worldScale.y, 0);
