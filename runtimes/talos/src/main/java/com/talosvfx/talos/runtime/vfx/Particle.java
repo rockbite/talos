@@ -54,6 +54,7 @@ public class Particle implements Pool.Poolable {
     public int requesterID;
 
     public float durationAtInit;
+    private float initialWorldRotation;
 
 
     public Particle() {
@@ -70,8 +71,9 @@ public class Particle implements Pool.Poolable {
         this.emitterReference = emitterReference;
         ParticleModule particleModule = emitterReference.getParticleModule();
 
-        float worldRotation = emitterReference.getWorldRotation();
+        initialWorldRotation = emitterReference.getWorldRotation();
         Vector2 worldScale = emitterReference.getWorldScale();
+
 
         this.seed = seed;
 
@@ -83,8 +85,9 @@ public class Particle implements Pool.Poolable {
         //Starting values
         life = particleModule.getLife();
         localPosition.set(particleModule.getSpawnPosition());
-
-        localPosition.scl(worldScale.x, worldScale.y, 0);
+        if (!emitterReference.getEmitterModule().isAttached()) {
+            localPosition.rotate(initialWorldRotation, 0, 0, 1);
+        }
 
         rotation.set(particleModule.getSpawnRotation());
         acceleration.set(0, 0, 0);
@@ -93,9 +96,8 @@ public class Particle implements Pool.Poolable {
 
 
         if (!emitterReference.getEmitterModule().isAttached()) {
-            velocity.rotate(worldRotation, 0, 0, 1).scl(worldScale.x, worldScale.y, 0);
+            velocity.rotate(initialWorldRotation, 0, 0, 1).scl(worldScale.x, worldScale.y, 0);
         }
-
 
 
         spinVelocity.set(particleModule.getInitialSpinVelocity());
@@ -180,6 +182,7 @@ public class Particle implements Pool.Poolable {
                 //Velocity is driven by velocity over time
                 final Vector3 velocityOverTime = particleModule.getVelocityOverTime();
                 velocity.set(velocityOverTime);
+                velocity.rotate(initialWorldRotation, 0, 0, 1);
             } else {
                 //Acceleration mutate by forces
 
