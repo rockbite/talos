@@ -89,8 +89,10 @@ public class Particle implements Pool.Poolable {
         float worldRotation = emitterReference.getWorldRotation();
         Vector2 worldScale = emitterReference.getWorldScale();
 
+        if (!emitterReference.getEmitterModule().isAttached()) {
+            velocity.rotate(worldRotation, 0, 0, 1).scl(worldScale.x, worldScale.y, 0);
+        }
 
-        velocity.rotate(worldRotation, 0, 0, 1).scl(worldScale.x, worldScale.y, 0);
 
 
         spinVelocity.set(particleModule.getInitialSpinVelocity());
@@ -145,6 +147,12 @@ public class Particle implements Pool.Poolable {
         //Step teh particle data
 
         float worldRotation = emitterReference.getWorldRotation();
+        //world rotation of 0 if not in attached mode
+        if (!emitterReference.getEmitterModule().isAttached()) {
+            worldRotation = 0;
+        }
+
+
         Vector2 worldScale = emitterReference.getWorldScale();
         if (particleModule.hasPositionOverride()) {
             Vector3 temp = new Vector3();
