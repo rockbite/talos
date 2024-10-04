@@ -86,7 +86,7 @@ public class Particle implements Pool.Poolable {
         life = particleModule.getLife();
         localPosition.set(particleModule.getSpawnPosition());
         if (!emitterReference.getEmitterModule().isAttached()) {
-            localPosition.rotate(initialWorldRotation, 0, 0, 1);
+            localPosition.rotate(initialWorldRotation, 0, 0, 1).scl(worldScale.x, worldScale.y, 0);
         }
 
         rotation.set(particleModule.getSpawnRotation());
@@ -104,6 +104,9 @@ public class Particle implements Pool.Poolable {
 
 
         spawnPosition.set(emitterReference.getEffectPosition());
+        if (!emitterReference.getEmitterModule().isAttached()) {
+//            spawnPosition.rotate(Vector3.Z, initialWorldRotation).scl(worldScale.x);
+        }
 
         durationAtInit = emitterReference.getAlpha();
     }
@@ -183,6 +186,9 @@ public class Particle implements Pool.Poolable {
                 final Vector3 velocityOverTime = particleModule.getVelocityOverTime();
                 velocity.set(velocityOverTime);
                 velocity.rotate(initialWorldRotation, 0, 0, 1);
+                if (!emitterReference.getEmitterModule().isAttached()) {
+                    velocity.scl(worldScale.x, worldScale.y, 0);
+                }
             } else {
                 //Acceleration mutate by forces
 
