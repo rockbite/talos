@@ -542,6 +542,7 @@ public class DirectoryViewWidget extends Table {
 		}
 
 		if (!files.isEmpty()) {
+			AssetRepository.dragAndDropping = true;
 			asyncHandleFiles(files, targetDir, copy, 0);
 		}
 	}
@@ -571,6 +572,8 @@ public class DirectoryViewWidget extends Table {
 						// Note: fileHandle is current directory open in view
 						projectExplorerWidget.expand(fileHandle.path());
 						projectExplorerWidget.select(fileHandle.path());
+
+						AssetRepository.dragAndDropping = false;
 					});
 				} else {
 					moveFileHandle(source, targetDir, () -> {

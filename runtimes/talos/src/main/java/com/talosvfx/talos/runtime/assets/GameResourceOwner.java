@@ -57,7 +57,7 @@ public interface GameResourceOwner<U> {
             return asset;
         } else {
             GameAsset<U> assetForUniqueIdentifier = baseAssetRepository.getAssetForUniqueIdentifier(uuid, type);
-            if (assetForUniqueIdentifier == null) {
+            if (assetForUniqueIdentifier == null || assetForUniqueIdentifier.isNonFound()) {
                 if (identifier != null) {
                     GameAsset<U> asset = baseAssetRepository.getAssetForIdentifier(identifier, type);
                     if (asset == null) {

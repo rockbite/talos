@@ -96,6 +96,8 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
     private ObjectSet<FileHandle> newFilesSeen = new ObjectSet<>();
 
 
+    public static boolean dragAndDropping = false;
+
     public <T> GameAsset<T> getAssetForUniqueIdentifier (UUID uuid, GameAssetType type) {
         if (uniqueIdentifierGameAssetMap.containsKey(type)) {
             if (uniqueIdentifierGameAssetMap.get(type).containsKey(uuid)) {
@@ -1305,7 +1307,14 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
                     }
 
                     VFXProjectData projectData = VFXProjectSerializer.readTalosTLSProject(value.handle, getTalosContext().getIdentifier());
+
+
                     ((GameAsset<VFXProjectData>) gameAssetOut).setResourcePayload(projectData);
+
+                   if (dragAndDropping) {
+                        Toasts.getInstance().showInfoToast("Auto saved imported VFX " + value.handle.name());;
+                        AssetRepository.getInstance().saveGameAssetResourceJsonToFile(gameAssetOut);
+                    }
 
                     //This is mega hack. Only because we will be making it into DynamicNodeStage later
                     ParticleNodeEditorApp app = new ParticleNodeEditorApp();
