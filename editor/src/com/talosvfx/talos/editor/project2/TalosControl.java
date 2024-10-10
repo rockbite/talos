@@ -401,7 +401,7 @@ public class TalosControl implements Observer {
 
     }
 
-    private boolean validateAndOpenProject (TalosProjectData talosProjectData) {
+    public static boolean validateAndOpenProject (TalosProjectData talosProjectData) {
         try {
             // unload old project, before loading new one
             SharedResources.projectLoader.unloadProject();

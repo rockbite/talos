@@ -39,6 +39,7 @@ import com.talosvfx.talos.editor.widgets.ui.common.RoundedFlatButton;
 
 import java.io.File;
 
+import static com.talosvfx.talos.editor.project2.TalosControl.validateAndOpenProject;
 import static com.talosvfx.talos.editor.project2.TalosProjectData.TALOS_PROJECT_EXTENSION;
 
 public class ProjectSplash extends Table {
@@ -148,7 +149,7 @@ public class ProjectSplash extends Table {
 		}
 
 		TalosProjectData talosProjectData = TalosProjectData.newDefaultProject(name, dirHandle);
-		SharedResources.projectLoader.loadProject(talosProjectData);
+		validateAndOpenProject(talosProjectData);
 		talosProjectData.save();
 		hide();
 	}
