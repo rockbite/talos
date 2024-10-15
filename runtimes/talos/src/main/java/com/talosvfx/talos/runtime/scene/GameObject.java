@@ -54,6 +54,179 @@ public class GameObject implements GameObjectContainer, RoutineEventListener, Js
 
     private Array<RoutineEventInterface> routineEventListeners;
 
+    int componentBitMask = 0;
+    boolean maskDirty = true;
+
+//BoneComponent (com.talosvfx.talos.runtime.scene.components)
+//CameraComponent (com.talosvfx.talos.runtime.scene.components)
+//CurveComponent (com.talosvfx.talos.runtime.scene.components)
+//DataComponent (com.talosvfx.talos.runtime.scene.components)
+//EdgeCollider2DComponent (com.talosvfx.talos.runtime.scene.components)
+//PaintSurfaceComponent (com.talosvfx.talos.runtime.scene.components)
+//RendererComponent (com.talosvfx.talos.runtime.scene.components)
+//MapComponent (com.talosvfx.talos.runtime.scene.components)
+//ParticleComponent (com.talosvfx.talos.runtime.scene.components)
+//PathRendererComponent (com.talosvfx.talos.runtime.scene.components)
+//RoutineRendererComponent (com.talosvfx.talos.runtime.scene.components)
+//SpineRendererComponent (com.talosvfx.talos.runtime.scene.components)
+//SpriteRendererComponent (com.talosvfx.talos.runtime.scene.components)
+//ScriptComponent (com.talosvfx.talos.runtime.scene.components)
+//TileDataComponent (com.talosvfx.talos.runtime.scene.components)
+//TransformComponent (com.talosvfx.talos.runtime.scene.components)
+
+
+    private static final int BONE_COMPONENT_BIT = 1 << 0;
+    private static final int CAMERA_COMPONENT_BIT = 1 << 1;
+    private static final int CURVE_COMPONENT_BIT = 1 << 2;
+    private static final int DATA_COMPONENT_BIT = 1 << 3;
+    private static final int EDGE_COLLIDER_2D_COMPONENT_BIT = 1 << 4;
+    private static final int PAINT_SURFACE_COMPONENT_BIT = 1 << 5;
+    private static final int RENDERER_COMPONENT_BIT = 1 << 6;
+    private static final int MAP_COMPONENT_BIT = 1 << 7;
+    private static final int PARTICLE_COMPONENT_BIT = 1 << 8;
+    private static final int PATH_RENDERER_COMPONENT_BIT = 1 << 9;
+    private static final int ROUTINE_RENDERER_COMPONENT_BIT = 1 << 10;
+    private static final int SPINE_RENDERER_COMPONENT_BIT = 1 << 11;
+    private static final int SPRITE_RENDERER_COMPONENT_BIT = 1 << 12;
+    private static final int SCRIPT_COMPONENT_BIT = 1 << 13;
+    private static final int TILE_DATA_COMPONENT_BIT = 1 << 14;
+    private static final int TRANSFORM_COMPONENT_BIT = 1 << 15;
+
+
+
+
+    private transient TransformComponent transformComponentCache;
+    private transient SpineRendererComponent spineComponentCache;
+    private transient BoneComponent boneComponentCache;
+    private transient SpriteRendererComponent spriteComponentCache;
+    private transient ParticleComponent particleComponentCache;
+    private transient RoutineRendererComponent routineRendererComponentCache;
+
+    private void recalculateBitMask () {
+        if (maskDirty) {
+
+            transformComponentCache = null;
+            spineComponentCache = null;
+            boneComponentCache = null;
+            spriteComponentCache = null;
+            particleComponentCache = null;
+            routineRendererComponentCache = null;
+
+            for (AComponent component : components) {
+                Class<? extends AComponent> aClass = component.getClass();
+                if (aClass == BoneComponent.class) {
+                    componentBitMask |= BONE_COMPONENT_BIT;
+                    boneComponentCache = (BoneComponent) component;
+                } else if (aClass == CameraComponent.class) {
+                    componentBitMask |= CAMERA_COMPONENT_BIT;
+                } else if (aClass == CurveComponent.class) {
+                    componentBitMask |= CURVE_COMPONENT_BIT;
+                } else if (aClass == DataComponent.class) {
+                    componentBitMask |= DATA_COMPONENT_BIT;
+                } else if (aClass == EdgeCollider2DComponent.class) {
+                    componentBitMask |= EDGE_COLLIDER_2D_COMPONENT_BIT;
+                } else if (aClass == PaintSurfaceComponent.class) {
+                    componentBitMask |= PAINT_SURFACE_COMPONENT_BIT;
+                }else if (aClass == MapComponent.class) {
+                    componentBitMask |= MAP_COMPONENT_BIT;
+                } else if (aClass == ParticleComponent.class) {
+                    componentBitMask |= PARTICLE_COMPONENT_BIT;
+                    particleComponentCache = (ParticleComponent) component;
+                } else if (aClass == PathRendererComponent.class) {
+                    componentBitMask |= PATH_RENDERER_COMPONENT_BIT;
+                } else if (aClass == RoutineRendererComponent.class) {
+                    routineRendererComponentCache = (RoutineRendererComponent) component;
+                    componentBitMask |= ROUTINE_RENDERER_COMPONENT_BIT;
+                } else if (aClass == SpineRendererComponent.class) {
+                    spineComponentCache = (SpineRendererComponent) component;
+                    componentBitMask |= SPINE_RENDERER_COMPONENT_BIT;
+                } else if (aClass == SpriteRendererComponent.class) {
+                    spriteComponentCache = (SpriteRendererComponent) component;
+                    componentBitMask |= SPRITE_RENDERER_COMPONENT_BIT;
+                } else if (aClass == ScriptComponent.class) {
+                    componentBitMask |= SCRIPT_COMPONENT_BIT;
+                } else if (aClass == TileDataComponent.class) {
+                    componentBitMask |= TILE_DATA_COMPONENT_BIT;
+                } else if (aClass == TransformComponent.class) {
+                    componentBitMask |= TRANSFORM_COMPONENT_BIT;
+                    transformComponentCache = (TransformComponent) component;
+                }
+
+                if (aClass.isAssignableFrom(RendererComponent.class)) {
+                    componentBitMask |= RENDERER_COMPONENT_BIT;
+                }
+
+            }
+            maskDirty = false;
+        }
+    }
+
+    public boolean hasTransformComponent () {
+        //check bitmask
+        recalculateBitMask();
+        return (componentBitMask & TRANSFORM_COMPONENT_BIT) != 0;
+    }
+
+    public TransformComponent getTransformComponent () {
+        recalculateBitMask();
+        return transformComponentCache;
+    }
+
+    public boolean hasSpineComponent () {
+        //check bitmask
+        recalculateBitMask();
+        return (componentBitMask & SPINE_RENDERER_COMPONENT_BIT) != 0;
+    }
+
+    public SpineRendererComponent getSpineComponent () {
+        recalculateBitMask();
+        return spineComponentCache;
+    }
+
+    public boolean hasBoneComponent ()  {
+        //check bitmask
+        recalculateBitMask();
+        return (componentBitMask & BONE_COMPONENT_BIT) != 0;
+    }
+    public BoneComponent getBoneComponent () {
+        recalculateBitMask();
+        return boneComponentCache;
+    }
+
+    public boolean hasSpriteComponent () {
+        //check bitmask
+        recalculateBitMask();
+        return (componentBitMask & SPRITE_RENDERER_COMPONENT_BIT) != 0;
+    }
+
+    public SpriteRendererComponent getSpriteComponent () {
+        recalculateBitMask();
+        return spriteComponentCache;
+    }
+
+    public boolean hasParticleComponent () {
+        //check bitmask
+        recalculateBitMask();
+        return (componentBitMask & PARTICLE_COMPONENT_BIT) != 0;
+    }
+
+    public ParticleComponent getParticleComponent () {
+        recalculateBitMask();
+        return particleComponentCache;
+    }
+
+    public boolean hasRoutineRendererComponent () {
+        //check bitmask
+        recalculateBitMask();
+        return (componentBitMask & ROUTINE_RENDERER_COMPONENT_BIT) != 0;
+    }
+
+    public RoutineRendererComponent getRoutineRendererComponent () {
+        recalculateBitMask();
+        return routineRendererComponentCache;
+    }
+
+
     public GameObject () {
         uuid = UUID.randomUUID();
         routineEventListeners = new Array<>();
@@ -132,8 +305,8 @@ public class GameObject implements GameObjectContainer, RoutineEventListener, Js
 
     public Bone getAttachedSpineBoneOrNull () {
         if (parent != null) {
-            if (parent.hasComponent(BoneComponent.class)) {
-                return parent.getComponent(BoneComponent.class).getBone();
+            if (parent.hasBoneComponent()) {
+                return parent.getBoneComponent().getBone();
             }
         }
         return null;
@@ -145,7 +318,7 @@ public class GameObject implements GameObjectContainer, RoutineEventListener, Js
         if (attachedSpineBoneOrNull != null) {
             if (bones.contains(attachedSpineBoneOrNull, true)) {
 
-                if (!parent.hasComponent(BoneComponent.class)) {
+                if (!parent.hasBoneComponent()) {
                     out.add(parent);
                     return;
                 }
@@ -329,6 +502,7 @@ public class GameObject implements GameObjectContainer, RoutineEventListener, Js
 
     private void gameObjectDirty () {
         calculatedBoneChildren = false;
+        maskDirty = true;
     }
 
     @Override
@@ -426,7 +600,7 @@ public class GameObject implements GameObjectContainer, RoutineEventListener, Js
                 if (amountOfChildren == 1) {
                     GameObject child = boneChildGO.getGameObjects().get(0);
                     //if it has a bone, we remove it, we do not care about single bone childs
-                    if (child.hasComponent(BoneComponent.class)) {
+                    if (child.hasBoneComponent()) {
                         boneChildren.removeIndex(i);
                         continue;
                     }
@@ -442,7 +616,7 @@ public class GameObject implements GameObjectContainer, RoutineEventListener, Js
                         continue;//not interesting
                     }
 
-                    if (!potentialInterestingGameObject.hasComponent(BoneComponent.class)) {
+                    if (!potentialInterestingGameObject.hasBoneComponent()) {
                         foundInteresting = true;
                         break;
                     }
@@ -530,8 +704,8 @@ public class GameObject implements GameObjectContainer, RoutineEventListener, Js
         if (childThatHasMoved.hasComponent(TransformComponent.class)) {
             TransformComponent childPositionComponent = childThatHasMoved.getComponent(TransformComponent.class);
             TransformComponent parentPositionComponent = new TransformComponent();
-            if (parentToMoveTo.hasComponent(TransformComponent.class)) {
-                parentPositionComponent = parentToMoveTo.getComponent(TransformComponent.class);
+            if (parentToMoveTo.hasTransformComponent()) {
+                parentPositionComponent = parentToMoveTo.getTransformComponent();
             }
 
             Vector2 tmp = TransformComponent.vec;

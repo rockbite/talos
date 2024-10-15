@@ -125,8 +125,8 @@ public class GameObjectRenderer {
             return y;
 
         } else {
-            if (gameObject.hasComponent(TransformComponent.class)) {
-                TransformComponent component = gameObject.getComponent(TransformComponent.class);
+            if (gameObject.hasTransformComponent()) {
+                TransformComponent component = gameObject.getTransformComponent();
                 return component.worldPosition.y;
             }
         }
@@ -252,8 +252,8 @@ public class GameObjectRenderer {
             return;
 
         //If we are a skeleton, we update it now
-        if (gameObject.hasComponent(SpineRendererComponent.class)) {
-            SpineRendererComponent spineRendererComponent = gameObject.getComponent(SpineRendererComponent.class);
+        if (gameObject.hasSpineComponent()) {
+            SpineRendererComponent spineRendererComponent = gameObject.getSpineComponent();
             spineRenderer.update(gameObject, spineRendererComponent, delta);
 
             // update bone game objects
@@ -261,9 +261,9 @@ public class GameObjectRenderer {
                 Array<GameObject> boneGOs = gameObject.getChildrenWithBoneComponent();
 
                 for (GameObject boneGO : boneGOs) {
-                    BoneComponent boneComponent = boneGO.getComponent(BoneComponent.class);
+                    BoneComponent boneComponent = boneGO.getBoneComponent();
                     Bone bone = boneComponent.getBone();
-                    TransformComponent transform = boneGO.getComponent(TransformComponent.class);
+                    TransformComponent transform = boneGO.getTransformComponent();
 
                     transform.worldScale.set(bone.getWorldScaleX(), bone.getWorldScaleY());
                     transform.worldRotation = bone.localToWorldRotation(bone.getRotation());
@@ -276,8 +276,8 @@ public class GameObjectRenderer {
             }
         }
 
-        if (gameObject.hasComponent(TransformComponent.class) && !gameObject.hasComponent(BoneComponent.class)) {
-            TransformComponent transform = gameObject.getComponent(TransformComponent.class);
+        if (gameObject.hasTransformComponent() && !gameObject.hasBoneComponent()) {
+            TransformComponent transform = gameObject.getTransformComponent();
 
             transform.worldPosition.set(transform.position);
             transform.worldScale.set(transform.scale);
@@ -285,10 +285,10 @@ public class GameObjectRenderer {
 
             if (gameObject.parent != null) {
 
-                if (gameObject.parent.hasComponent(TransformComponent.class)) {
+                if (gameObject.parent.hasTransformComponent()) {
                     //Combine our world with the parent
 
-                    TransformComponent parentTransform = gameObject.parent.getComponent(TransformComponent.class);
+                    TransformComponent parentTransform = gameObject.parent.getTransformComponent();
                     transform.worldPosition.scl(parentTransform.worldScale);
                     transform.worldPosition.rotateDeg(parentTransform.worldRotation);
                     transform.worldPosition.add(parentTransform.worldPosition);
@@ -400,16 +400,16 @@ public class GameObjectRenderer {
 
 
     public void renderObject (Batch batch, GameObject gameObject) {
-        if (gameObject.hasComponent(RoutineRendererComponent.class)) {
-            routineRenderer.render(batch, camera, gameObject, gameObject.getComponent(RoutineRendererComponent.class));
+        if (gameObject.hasRoutineRendererComponent()) {
+            routineRenderer.render(batch, camera, gameObject, gameObject.getRoutineRendererComponent());
         }
 
-        if (gameObject.hasComponent(SpriteRendererComponent.class)) {
-            spriteRenderer.render(batch, camera, gameObject, gameObject.getComponent(SpriteRendererComponent.class));
-        } else if (gameObject.hasComponent(ParticleComponent.class)) {
-            particleRenderer.render(batch, camera, gameObject, gameObject.getComponent(ParticleComponent.class));
-        } else if (gameObject.hasComponent(SpineRendererComponent.class)) {
-            spineRenderer.render(batch, camera, gameObject, gameObject.getComponent(SpineRendererComponent.class));
+        if (gameObject.hasSpriteComponent()) {
+            spriteRenderer.render(batch, camera, gameObject, gameObject.getSpriteComponent());
+        } else if (gameObject.hasParticleComponent()) {
+            particleRenderer.render(batch, camera, gameObject, gameObject.getParticleComponent());
+        } else if (gameObject.hasSpineComponent()) {
+            spineRenderer.render(batch, camera, gameObject, gameObject.getSpineComponent());
         } else if (gameObject.hasComponent(MapComponent.class)) {
             mapRenderer.render(batch, camera, gameObject, gameObject.getComponent(MapComponent.class));
         } else if (gameObject.hasComponent(PathRendererComponent.class)) {

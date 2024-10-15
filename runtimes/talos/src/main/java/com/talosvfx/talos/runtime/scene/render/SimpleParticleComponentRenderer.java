@@ -30,8 +30,8 @@ public class SimpleParticleComponentRenderer<T extends BaseVFXProjectData> exten
 		renderer.setCamera(camera);
 		renderer.setBatch((PolygonBatch)batch);
 
-		TransformComponent transformComponent = gameObject.getComponent(TransformComponent.class);
-		ParticleComponent<T> particleComponent = gameObject.getComponent(ParticleComponent.class);
+		TransformComponent transformComponent = gameObject.getTransformComponent();
+		ParticleComponent<T> particleComponent = gameObject.getParticleComponent();
 
 		GameAsset<T> gameAsset = particleComponent.gameAsset;
 

@@ -27,7 +27,7 @@ public class SkeletonComponentRenderer extends ComponentRenderer<SpineRendererCo
 
     @Override
     public void update (GameObject gameObject, SpineRendererComponent spineRendererComponent, float delta) {
-        TransformComponent parentTransform = gameObject.getComponent(TransformComponent.class);
+        TransformComponent parentTransform = gameObject.getTransformComponent();
 
         spineRendererComponent.skeleton.setPosition(parentTransform.worldPosition.x, parentTransform.worldPosition.y);
         spineRendererComponent.skeleton.setScale(parentTransform.worldScale.x * spineRendererComponent.scale, parentTransform.worldScale.y * spineRendererComponent.scale);
@@ -43,8 +43,8 @@ public class SkeletonComponentRenderer extends ComponentRenderer<SpineRendererCo
 
     @Override
     public void render (Batch batch, Camera camera, GameObject gameObject, SpineRendererComponent rendererComponent) {
-        TransformComponent parentTransform = gameObject.getComponent(TransformComponent.class);
-        SpineRendererComponent spineRendererComponent = gameObject.getComponent(SpineRendererComponent.class);
+        TransformComponent parentTransform = gameObject.getTransformComponent();
+        SpineRendererComponent spineRendererComponent = gameObject.getSpineComponent();
 
         GameAsset<SkeletonData> gameResource = rendererComponent.getGameResource();
         if (gameResource.isBroken()) {

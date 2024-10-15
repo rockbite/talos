@@ -37,9 +37,9 @@ public class SpriteComponentRenderer extends ComponentRenderer<SpriteRendererCom
     public void render (Batch batch, Camera camera, GameObject gameObject, SpriteRendererComponent rendererComponent) {
         batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 
-        TransformComponent transformComponent = gameObject.getComponent(TransformComponent.class);
+        TransformComponent transformComponent = gameObject.getTransformComponent();
 
-        SpriteRendererComponent spriteRenderer = gameObject.getComponent(SpriteRendererComponent.class);
+        SpriteRendererComponent spriteRenderer = gameObject.getSpriteComponent();
         GameAsset<AtlasSprite> gameResource = spriteRenderer.getGameResource();
 
         if (gameResource.isBroken()) {

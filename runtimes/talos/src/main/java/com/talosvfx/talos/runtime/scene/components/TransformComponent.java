@@ -27,8 +27,8 @@ public class TransformComponent extends AComponent {
         //gameObject is null so we dont do anything
         if (gameObject == null) return vector;
 
-        if(gameObject.hasComponent(TransformComponent.class)) {
-            TransformComponent transform = gameObject.getComponent(TransformComponent.class);
+        if(gameObject.hasTransformComponent()) {
+            TransformComponent transform = gameObject.getTransformComponent();
 
             vector.scl(transform.scale);
             vector.rotateDeg(transform.rotation);
@@ -52,8 +52,8 @@ public class TransformComponent extends AComponent {
         if(gameObject.parent == null) {
 
             //Check if root has transform component
-            if (gameObject.hasComponent(TransformComponent.class)) {
-                TransformComponent transform = gameObject.getComponent(TransformComponent.class);
+            if (gameObject.hasTransformComponent()) {
+                TransformComponent transform = gameObject.getTransformComponent();
 
                 untransformVectorByTransform(vector, transform);
             }
@@ -66,8 +66,8 @@ public class TransformComponent extends AComponent {
 
         for(int i = tmp.size - 1; i >= 0; i--) {
             GameObject item = tmp.get(i);
-            if(item.hasComponent(TransformComponent.class)) {
-                TransformComponent transform = item.getComponent(TransformComponent.class);
+            if(item.hasTransformComponent()) {
+                TransformComponent transform = item.getTransformComponent();
 
                 untransformVectorByTransform(vector, transform);
             }
