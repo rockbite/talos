@@ -408,10 +408,13 @@ public class GameObject implements GameObjectContainer, RoutineEventListener, Js
 
             getChildrenByComponentFaster(BoneComponent.class, boneChildren);
 
-            //Remove all of those that dont have a visible child that is interesting
-
             for (int i = boneChildren.size - 1; i >= 0; i--) {
                 GameObject boneChildGO = boneChildren.get(i);
+
+                if (!boneChildGO.active) {
+                    boneChildren.removeIndex(i);
+                    continue;
+                }
 
                 int amountOfChildren = boneChildGO.getGameObjects().size;
 
@@ -434,10 +437,13 @@ public class GameObject implements GameObjectContainer, RoutineEventListener, Js
 
                 boolean foundInteresting = false;
                 for (GameObject potentialInterestingGameObject : potentialInterestingGameObjects) {
+
+                    if (!potentialInterestingGameObject.active) {
+                        continue;//not interesting
+                    }
+
                     if (!potentialInterestingGameObject.hasComponent(BoneComponent.class)) {
-                        if (potentialInterestingGameObject.active) {
-                            foundInteresting = true;
-                        }
+                        foundInteresting = true;
                         break;
                     }
                 }
