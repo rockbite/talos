@@ -406,7 +406,47 @@ public class GameObject implements GameObjectContainer, RoutineEventListener, Js
                 boneChildren = new Array<>();
             }
 
-            getChildrenByComponent(BoneComponent.class, boneChildren);
+            getChildrenByComponentFaster(BoneComponent.class, boneChildren);
+
+            //Remove all of those that dont have a visible child that is interesting
+
+            for (int i = boneChildren.size - 1; i >= 0; i--) {
+                GameObject boneChildGO = boneChildren.get(i);
+
+                int amountOfChildren = boneChildGO.getGameObjects().size;
+
+                if (amountOfChildren == 0) {
+                    boneChildren.removeIndex(i);
+                    continue;
+                }
+
+                if (amountOfChildren == 1) {
+                    GameObject child = boneChildGO.getGameObjects().get(0);
+                    //if it has a bone, we remove it, we do not care about single bone childs
+                    if (child.hasComponent(BoneComponent.class)) {
+                        boneChildren.removeIndex(i);
+                        continue;
+                    }
+                }
+
+                //otherwise iterate over all of these little fuckers and see if anyone has a child that isnt a single bone boi
+                Array<GameObject> potentialInterestingGameObjects = boneChildGO.getGameObjects();
+
+                boolean foundInteresting = false;
+                for (GameObject potentialInterestingGameObject : potentialInterestingGameObjects) {
+                    if (!potentialInterestingGameObject.hasComponent(BoneComponent.class)) {
+                        if (potentialInterestingGameObject.active) {
+                            foundInteresting = true;
+                        }
+                        break;
+                    }
+                }
+                if (!foundInteresting) {
+                    boneChildren.removeIndex(i);
+                }
+
+            }
+
 
             calculatedBoneChildren = true;
         }
@@ -414,6 +454,18 @@ public class GameObject implements GameObjectContainer, RoutineEventListener, Js
         return boneChildren;
     }
 
+    public Array<GameObject> getChildrenByComponentFaster (Class<?> clazz, Array<GameObject> list) {
+        for(GameObject gameObject: children) {
+            if(gameObject.hasComponent(clazz)) {
+                list.add(gameObject);
+            }
+            if(gameObject.getGameObjects() != null && gameObject.getGameObjects().size > 0) {
+                gameObject.getChildrenByComponentFaster(clazz, list);
+            }
+        }
+
+        return list;
+    }
 
     public Array<GameObject> getChildrenByComponent (Class<?> clazz, Array<GameObject> list) {
         for(GameObject gameObject: children) {
