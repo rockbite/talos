@@ -2,6 +2,7 @@ package com.talosvfx.talos.runtime.scene.components;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
+import com.esotericsoftware.spine.Bone;
 import com.talosvfx.talos.runtime.scene.GameObject;
 import com.talosvfx.talos.runtime.scene.ValueProperty;
 
@@ -26,6 +27,19 @@ public class TransformComponent extends AComponent {
     public static Vector2 localToWorld(GameObject gameObject, Vector2 vector) {
         //gameObject is null so we dont do anything
         if (gameObject == null) return vector;
+
+        if (gameObject.hasComponent(BoneComponent.class)) {
+            BoneComponent boneComponent = gameObject.getComponent(BoneComponent.class);
+            Bone bone = boneComponent.getBone();
+
+              vector.scl(bone.getScaleX(), bone.getScaleY());
+            vector.rotateDeg(bone.getWorldRotationX());
+
+            vector.add(bone.getWorldX(), bone.getWorldY());
+            vector.add(gameObject.getTransformSettings().offsetX, gameObject.getTransformSettings().offsetY);
+
+            return vector;
+        }
 
         if(gameObject.hasTransformComponent()) {
             TransformComponent transform = gameObject.getTransformComponent();
