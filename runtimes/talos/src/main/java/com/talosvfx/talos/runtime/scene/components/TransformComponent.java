@@ -63,6 +63,20 @@ public class TransformComponent extends AComponent {
         if(gameObject == null) {
             return vector;
         }
+
+        if (gameObject.hasComponent(BoneComponent.class)) {
+            BoneComponent boneComponent = gameObject.getComponent(BoneComponent.class);
+            Bone bone = boneComponent.getBone();
+
+            vector.sub(bone.getWorldX(), bone.getWorldY());
+            vector.sub(gameObject.getTransformSettings().offsetX, gameObject.getTransformSettings().offsetY);
+
+            vector.rotateDeg(-bone.getWorldRotationX());
+            vector.scl(1f/ bone.getScaleX(), 1f/ bone.getScaleY());
+
+            return vector;
+        }
+
         if(gameObject.parent == null) {
 
             //Check if root has transform component
