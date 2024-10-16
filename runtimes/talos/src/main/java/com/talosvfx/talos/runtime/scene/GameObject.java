@@ -500,7 +500,7 @@ public class GameObject implements GameObjectContainer, RoutineEventListener, Js
         gameObjectDirty();
     }
 
-    private void gameObjectDirty () {
+    public void gameObjectDirty () {
         calculatedBoneChildren = false;
         maskDirty = true;
     }
