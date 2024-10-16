@@ -714,7 +714,12 @@ public abstract class ViewportWidget extends Table {
 		ObjectMap<Class<? extends Gizmo>, Gizmo> gameObjectGizmoMap = new ObjectMap<>();
 
 		Iterable<AComponent> components = gameObject.getComponents();
+		ObjectSet<AComponent> copy = new ObjectSet<>();
 		for (AComponent component : components) {
+			copy.add(component);
+		}
+
+		for (AComponent component : copy) {
 			Array<Gizmo> gizmos = GizmoRegister.makeGizmosFor(component);
 
 
