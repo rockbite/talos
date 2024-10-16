@@ -185,8 +185,8 @@ public class Particle implements Pool.Poolable {
                 //Velocity is driven by velocity over time
                 final Vector3 velocityOverTime = particleModule.getVelocityOverTime();
                 velocity.set(velocityOverTime);
-                velocity.rotate(initialWorldRotation, 0, 0, 1);
                 if (!emitterReference.getEmitterModule().isAttached()) {
+                    velocity.rotate(initialWorldRotation, 0, 0, 1); //not attached rotate it
                     velocity.scl(worldScale.x, worldScale.y, 0);
                 }
             } else {

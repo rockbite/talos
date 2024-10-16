@@ -115,6 +115,21 @@ public class SpriteBatchParticleRenderer implements ParticleRenderer {
 			particleEmitter.getScope().setCurrentRequestMode(ScopePayload.SUB_PARTICLE_ALPHA);
 			meshGenerator.render(this, drawableModule.getMaterialModule(), particleEmitter.pointData());
 
+//			batch.end();
+//			ShapeRenderer shapeRenderer = new ShapeRenderer();
+//			shapeRenderer.setProjectionMatrix(camera.combined);
+//			shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+//			Array<ParticlePointGroup> pointData = particleEmitter.pointData();
+//			for (ParticlePointGroup group : pointData) {
+//				shapeRenderer.setColor(1f, 0, 0, 1f);
+//				for (ParticlePointData particlePointData : group.pointDataArray) {
+//					shapeRenderer.circle(particlePointData.x, particlePointData.y, 10.15f, 20);
+//				}
+//			}
+//			shapeRenderer.end();
+//			shapeRenderer.dispose();
+//			batch.begin();
+
 			particleEmitter.getScope().setCurrentRequestMode(cachedMode);
 			particleEmitter.getScope().setCurrentRequesterID(cachedRequesterID);
 

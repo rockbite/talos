@@ -5,10 +5,7 @@ import com.artemis.ComponentMapper;
 import com.artemis.utils.IntBag;
 import com.badlogic.gdx.Files;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Camera;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.VertexAttribute;
-import com.badlogic.gdx.graphics.VertexAttributes;
+import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g3d.utils.RenderContext;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
@@ -182,21 +179,25 @@ public class ParticleRenderPassSystem extends RenderPassSystem implements Partic
             meshGenerator.render(this, drawableModule.getMaterialModule(), particleEmitter.pointData());
 
 
+//            simple3DBatch.end();
 //			ShapeRenderer shapeRenderer = new ShapeRenderer();
 //			shapeRenderer.setProjectionMatrix(cameras.getGameCamera().combined);
 //			shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-//			Array<ParticlePointGroup> pointData = particlePointDataGeneratorModule.pointData;
+//			Array<ParticlePointGroup> pointData = particleEmitter.pointData();
 //			for (ParticlePointGroup group : pointData) {
 //				shapeRenderer.setColor(1f, 0, 0, 1f);
 //				for (ParticlePointData particlePointData : group.pointDataArray) {
-//					shapeRenderer.circle(particlePointData.x, particlePointData.y, 0.25f, 20);
-//				}
+//                    shapeRenderer.setColor(Color.RED);
+//					shapeRenderer.circle(particlePointData.x, particlePointData.y, 0.15f, 20);
+//                }
 //			}
 //			shapeRenderer.end();
-
+//
 
             particleEmitter.getScope().setCurrentRequestMode(cachedMode);
             particleEmitter.getScope().setCurrentRequesterID(cachedRequesterID);
+
+//            simple3DBatch.begin(cameras.getGameCamera(), shaderProgram.getShaderProgram());
         }
 
         simple3DBatch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);

@@ -66,6 +66,7 @@ public class ParticleComponentProvider<T extends BaseVFXProjectData> extends Ren
 		ButtonPropertyWidget<String> playButton = new ButtonPropertyWidget<String>("Play", new ButtonPropertyWidget.ButtonListener<String>() {
 			@Override
 			public void clicked (ButtonPropertyWidget<String> widget) {
+				if (component == null || component.getEffectRef() == null) return;
 				component.getEffectRef().restart();
 			}
 		});
