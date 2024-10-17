@@ -29,6 +29,7 @@ public class GameObject implements GameObjectContainer, RoutineEventListener, Js
     private String prefabLink = null;
 
     public boolean active = true;
+    protected boolean optimizeSkeletonBones = false;
     private boolean editorTransformLocked = false;
     private boolean editorVisible = true;
 
@@ -280,6 +281,7 @@ public class GameObject implements GameObjectContainer, RoutineEventListener, Js
         json.writeValue("uuid", uuid.toString());
         json.writeValue("prefabLink", prefabLink);
         json.writeValue("active", active);
+        json.writeValue("optimizeSkeletonBones", optimizeSkeletonBones);
         json.writeValue("visible", editorVisible);
         json.writeValue("locked", editorTransformLocked);
         Bone attachedSpineBoneOrNull = getAttachedSpineBoneOrNull();
@@ -344,6 +346,7 @@ public class GameObject implements GameObjectContainer, RoutineEventListener, Js
         }
         prefabLink = jsonData.getString("prefabLink", null);
         active = jsonData.getBoolean("active", this.active);
+        optimizeSkeletonBones = jsonData.getBoolean("optimizeSkeletonBones", false);
         editorTransformLocked = jsonData.getBoolean("locked", this.editorTransformLocked);
         editorVisible = jsonData.getBoolean("visible", this.editorVisible);
         readBoneName = jsonData.getString("parentBone", null);
@@ -582,49 +585,51 @@ public class GameObject implements GameObjectContainer, RoutineEventListener, Js
 
             getChildrenByComponentFaster(BoneComponent.class, boneChildren);
 
-            for (int i = boneChildren.size - 1; i >= 0; i--) {
-                GameObject boneChildGO = boneChildren.get(i);
+            if (optimizeSkeletonBones) {
+                for (int i = boneChildren.size - 1; i >= 0; i--) {
+                    GameObject boneChildGO = boneChildren.get(i);
 
-                if (!boneChildGO.active) {
-                    boneChildren.removeIndex(i);
-                    continue;
-                }
-
-                int amountOfChildren = boneChildGO.getGameObjects().size;
-
-                if (amountOfChildren == 0) {
-                    boneChildren.removeIndex(i);
-                    continue;
-                }
-
-                if (amountOfChildren == 1) {
-                    GameObject child = boneChildGO.getGameObjects().get(0);
-                    //if it has a bone, we remove it, we do not care about single bone childs
-                    if (child.hasBoneComponent()) {
+                    if (!boneChildGO.active) {
                         boneChildren.removeIndex(i);
                         continue;
                     }
-                }
 
-                //otherwise iterate over all of these little fuckers and see if anyone has a child that isnt a single bone boi
-                Array<GameObject> potentialInterestingGameObjects = boneChildGO.getGameObjects();
+                    int amountOfChildren = boneChildGO.getGameObjects().size;
 
-                boolean foundInteresting = false;
-                for (GameObject potentialInterestingGameObject : potentialInterestingGameObjects) {
-
-                    if (!potentialInterestingGameObject.active) {
-                        continue;//not interesting
+                    if (amountOfChildren == 0) {
+                        boneChildren.removeIndex(i);
+                        continue;
                     }
 
-                    if (!potentialInterestingGameObject.hasBoneComponent()) {
-                        foundInteresting = true;
-                        break;
+                    if (amountOfChildren == 1) {
+                        GameObject child = boneChildGO.getGameObjects().get(0);
+                        //if it has a bone, we remove it, we do not care about single bone childs
+                        if (child.hasBoneComponent()) {
+                            boneChildren.removeIndex(i);
+                            continue;
+                        }
                     }
-                }
-                if (!foundInteresting) {
-                    boneChildren.removeIndex(i);
-                }
 
+                    //otherwise iterate over all of these little fuckers and see if anyone has a child that isnt a single bone boi
+                    Array<GameObject> potentialInterestingGameObjects = boneChildGO.getGameObjects();
+
+                    boolean foundInteresting = false;
+                    for (GameObject potentialInterestingGameObject : potentialInterestingGameObjects) {
+
+                        if (!potentialInterestingGameObject.active) {
+                            continue;//not interesting
+                        }
+
+                        if (!potentialInterestingGameObject.hasBoneComponent()) {
+                            foundInteresting = true;
+                            break;
+                        }
+                    }
+                    if (!foundInteresting) {
+                        boneChildren.removeIndex(i);
+                    }
+
+                }
             }
 
 

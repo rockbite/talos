@@ -61,6 +61,9 @@ public class GameObjectPropertyProvider implements IPropertyProvider {
 		});
 		properties.add(activeWidget);
 
+		PropertyWidget optimizeWidget = WidgetFactory.generate(gameObject, "optimizeSkeletonBones", "Optimize bones");
+		properties.add(optimizeWidget);
+
 		return properties;
 	}
 
