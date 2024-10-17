@@ -106,6 +106,8 @@ public class GameObject implements GameObjectContainer, RoutineEventListener, Js
     private void recalculateBitMask () {
         if (maskDirty) {
 
+            componentBitMask = 0;
+
             transformComponentCache = null;
             spineComponentCache = null;
             boneComponentCache = null;
