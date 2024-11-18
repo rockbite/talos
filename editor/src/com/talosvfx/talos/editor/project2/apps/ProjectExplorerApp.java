@@ -93,7 +93,7 @@ public class ProjectExplorerApp extends AppManager.BaseApp<Object> implements Co
 
 	@CommandEventHandler(commandType = Commands.CommandType.RENAME)
 	public void onRenameCommand (CommandContextEvent commandContextEvent) {
-		projectExplorerWidget.getDirectoryViewWidget().invokeDelete();
+		projectExplorerWidget.getDirectoryViewWidget().invokeRename();
 	}
 
 
