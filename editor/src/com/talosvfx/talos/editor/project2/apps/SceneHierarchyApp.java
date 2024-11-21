@@ -163,5 +163,8 @@ public class SceneHierarchyApp extends AppManager.BaseApp<SavableContainer> impl
 	public void onPasteCommand (CommandContextEvent commandContextEvent) {
 		hierarchyWidget.pasteFromClipboard();
 	}
+
+	@CommandEventHandler(commandType = Commands.CommandType.RENAME)
+	public void onRenameCommand (CommandContextEvent commandContextEvent) { hierarchyWidget.renameSelected(); }
 }
 
