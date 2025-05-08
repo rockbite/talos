@@ -24,10 +24,10 @@ jobs:
         run: chmod +x gradlew
       - name: Build with Gradle
         run: |
-          ./gradlew runtimes:talos:publishAllPublicationsToSnapshotRepository
-          ./gradlew runtimes:talos-libgdx:publishAllPublicationsToSnapshotRepository
-          ./gradlew runtimes:talos-bongo:publishAllPublicationsToSnapshotRepository
-          ./gradlew tools:publishAllPublicationsToSnapshotRepository
+          ./gradlew runtimes:talos:publishToMavenCentral
+          ./gradlew runtimes:talos-libgdx:publishToMavenCentral
+          ./gradlew runtimes:talos-bongo:publishToMavenCentral
+          ./gradlew tools:publishToMavenCentral
           ./gradlew editor-desktop:dist
           ./gradlew editor-desktop-bootstrap:genConfig
 
