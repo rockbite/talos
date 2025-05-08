@@ -1,7 +1,6 @@
 plugins {
     id 'java-library'
-    id 'maven-publish'
-    id 'signing'
+    id "com.vanniktech.maven.publish" version "0.31.0"
     alias(libs.plugins.lombok)
 }
 
@@ -10,7 +9,7 @@ dependencies {
     api libs.slf4j.api
 
     testImplementation libs.bongo.desktop
-    testImplementation  libs.visui
+    testImplementation libs.visui
 
 }
 
@@ -36,61 +35,48 @@ configurations {
         extendsFrom implementation, runtimeOnly
     }
 }
+import com.vanniktech.maven.publish.JavaLibrary
+import com.vanniktech.maven.publish.JavadocJar
+import com.vanniktech.maven.publish.SonatypeHost
 
+mavenPublishing {
+    publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
 
+    configure(new JavaLibrary(new JavadocJar.Javadoc(), true))
 
-publishing {
-    repositories {
-        maven {
-            name = "snapshot"
-            url = getSnapshotRepositoryUrl()
-            credentials(org.gradle.api.credentials.PasswordCredentials)
-        }
-        maven {
-            name = "release"
-            url = getReleaseRepositoryUrl()
-            credentials(org.gradle.api.credentials.PasswordCredentials)
-        }
-    }
-    publications {
-        mavenJava(MavenPublication) {
-            from components.java
-            artifact packageSources
-            groupId project.group
-            artifactId project.name
-            version project.version
-            pom {
-                name = "Talos Libgdx Runtime"
-                description = "Libgdx runtime for TalosVFX"
-                url = "https://talosvfx.com"
-                licenses {
-                    license {
-                        name = 'The Apache License, Version 2.0'
-                        url = 'https://www.apache.org/licenses/LICENSE-2.0.txt'
-                    }
-                }
-                developers {
-                    developer {
-                        id = 'tomski'
-                        name = 'Tom Wojciechowski'
-                        email = 'tom@asidik.com'
-                    }
-                    developer {
-                        id = 'azakhary'
-                        name = 'Avetis Zakharyan'
-                        email = 'azakhary@rockbitegames.com'
-                    }
-                }
-                scm {
-                    connection = 'scm:git:git://github.com/rockbite/talos.git'
-                    developerConnection = 'scm:git:ssh://github.com/rockbite/talos.git'
-                    url = 'github.com/rockbite/talos/'
-                }
+    coordinates(project.group, project.name, project.version)
+
+    pom {
+        name = "Talos Libgdx Runtime"
+        description = "Libgdx runtime for TalosVFX"
+        inceptionYear = "2020"
+        url = "https://github.com/rockbite/talos/"
+        licenses {
+            license {
+                name = "The Apache License, Version 2.0"
+                url = "http://www.apache.org/licenses/LICENSE-2.0.txt"
+                distribution = "http://www.apache.org/licenses/LICENSE-2.0.txt"
             }
         }
+        developers {
+            developer {
+                id = 'tomski'
+                name = 'Tom Wojciechowski'
+                url = "https://github.com/Tom-Ski/"
+            }
+            developer {
+                id = 'azakhary'
+                name = 'Avetis Zakharyan'
+                url = "https://github.com/azakhary/"
+            }
+        }
+        scm {
+            url = "https://github.com/rockbite/talos/"
+            connection = "scm:git:git://github.com/rockbite/talos.git"
+            developerConnection = "scm:git:ssh://git@github.com/rockbite/talos.git"
+        }
     }
+
+    signAllPublications()
 }
-signing {
-    required { project.isReleaseBuild() }
-    sign publishing.publications.mavenJava
-}
+
