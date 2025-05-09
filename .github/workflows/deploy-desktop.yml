@@ -29,7 +29,7 @@ jobs:
           ./gradlew runtimes:talos-bongo:publishToMavenCentral
           ./gradlew tools:publishToMavenCentral
           ./gradlew editor-desktop:dist
-          ./gradlew editor-desktop-bootstrap:genConfig --stacktrace
+          ./gradlew editor-desktop-bootstrap:genConfig
 
       - name: Install SSH Key
         uses: shimataro/ssh-key-action@v2
