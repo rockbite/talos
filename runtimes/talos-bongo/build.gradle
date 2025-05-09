@@ -38,8 +38,8 @@ mavenPublishing {
     coordinates(project.group, project.name, project.version)
 
     pom {
-        name = "Talos Libgdx Runtime"
-        description = "Libgdx runtime for TalosVFX"
+        name = "Talos Bongo Runtime"
+        description = "Talos Bongo for TalosVFX"
         inceptionYear = "2020"
         url = "https://github.com/rockbite/talos/"
         licenses {
