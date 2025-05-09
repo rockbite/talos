@@ -16,14 +16,9 @@ task packageSources(type: Jar, dependsOn: [classes, jar]) {
     archiveClassifier = 'web'
 }
 
-java {
-    withJavadocJar()
-    withSourcesJar()
-}
 
-artifacts {
-    api(jar, packageSources)
-}
+
+
 
 configurations {
     web {
