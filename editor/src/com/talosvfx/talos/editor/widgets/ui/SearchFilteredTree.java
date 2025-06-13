@@ -98,8 +98,7 @@ public class SearchFilteredTree<T> extends Table {
 
                 tree.smartFilter(typedText, autoSelect);
 
-                boolean justBecameEmpty = !wasEmpty && typedText.isEmpty();
-                if (justBecameEmpty) {
+                if (!wasEmpty && typedText.isEmpty()) {
                     // we just made removed all text and left it empty, try to restore the state
                     if (savedState != null) {
                         filteredTree.restoreFromState(savedState);
