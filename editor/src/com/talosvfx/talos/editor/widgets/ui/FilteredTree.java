@@ -17,16 +17,14 @@
 package com.talosvfx.talos.editor.widgets.ui;
 
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.WidgetGroup;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
@@ -34,9 +32,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.Layout;
 import com.badlogic.gdx.scenes.scene2d.utils.Selection;
 import com.badlogic.gdx.scenes.scene2d.utils.UIUtils;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.GdxRuntimeException;
-import com.badlogic.gdx.utils.Predicate;
+import com.badlogic.gdx.utils.*;
 import info.debatty.java.stringsimilarity.JaroWinkler;
 
 import java.util.Comparator;
@@ -1290,6 +1286,59 @@ public class FilteredTree<T> extends WidgetGroup {
         for (int i = 0; i < children.size; i++) {
             sortChildrenAlphabetical(children.get(i));
         }
+    }
+
+    public TreeState<T> getCurrentState () {
+        TreeState<T> state = new TreeState<>();
+
+        // scrolled amount
+        if (searchFilteredTree != null) {
+            state.scrollAmount = searchFilteredTree.scrollPane.getScrollY();
+        }
+
+        // nodes expanded or collapsed
+        ObjectSet<Node<T>> expandedNodes = state.expandedNodes;
+        for (Node<T> rootNode : rootNodes) {
+            collectExpandedNodes(rootNode, expandedNodes);
+        }
+
+        return state;
+    }
+
+    public void restoreFromState (TreeState<T> state) {
+        for (Node<T> rootNode : rootNodes) {
+            restoreNodesFromState(rootNode, state);
+        }
+
+        if (searchFilteredTree != null) {
+            Gdx.app.postRunnable(() -> {
+                searchFilteredTree.scrollPane.setScrollY(state.scrollAmount);
+            });
+        }
+    }
+
+    private void restoreNodesFromState (Node<T> node, TreeState<T> state) {
+        node.setExpanded(state.expandedNodes.contains(node));
+
+        // ok go through children as well
+        for (Node<T> child : node.getChildren()) {
+            restoreNodesFromState(child, state);
+        }
+    }
+
+    private void collectExpandedNodes (Node<T> node, ObjectSet<Node<T>> nodes) {
+        if (node.isExpanded()) {
+            nodes.add(node);
+        }
+
+        for (Node<T> child : node.getChildren()) {
+            collectExpandedNodes(child, nodes);
+        }
+    }
+
+    static public class TreeState<T> {
+        private final ObjectSet<Node<T>> expandedNodes = new ObjectSet<>();
+        private float scrollAmount;
     }
 
     static public class Node<T> {

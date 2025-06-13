@@ -25,6 +25,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.talosvfx.talos.editor.addons.scene.SceneEditorWorkspace;
+import com.talosvfx.talos.editor.project2.SharedResources;
 
 public class SearchFilteredTree<T> extends Table {
     private static final float AUTO_SCROLL_RANGE = 40;
@@ -49,8 +50,30 @@ public class SearchFilteredTree<T> extends Table {
             textField.setTextFieldFilter(filter);
         }
 
+        ImageButton collapseAllButton = new ImageButton(SharedResources.skin, "collapse-all");
+        ImageButton expandAllButton = new ImageButton(SharedResources.skin, "expand-all");
+
+        collapseAllButton.addListener(new ClickListener() {
+            @Override
+            public void clicked (InputEvent event, float x, float y) {
+                super.clicked(event, x, y);
+                tree.collapseAll();
+            }
+        });
+
+        expandAllButton.addListener(new ClickListener() {
+            @Override
+            public void clicked (InputEvent event, float x, float y) {
+                super.clicked(event, x, y);
+                tree.expandAll();
+            }
+        });
+
+        searchTable.padRight(5);
         searchTable.add(image);
-        searchTable.add(textField).growX().padLeft(5);
+        searchTable.add(textField).growX().spaceLeft(5);
+        searchTable.add(collapseAllButton).spaceLeft(5).height(20);
+        searchTable.add(expandAllButton).spaceLeft(5).height(20);
 
         filteredTree = tree;
         filteredTree.setSearchFilteredTree(this);
@@ -61,12 +84,33 @@ public class SearchFilteredTree<T> extends Table {
         add(scrollPane).grow();
 
         textField.addListener(new ChangeListener() {
+            boolean wasEmpty = true;
+            FilteredTree.TreeState<T> savedState;
+
             @Override
             public void changed (ChangeEvent event, Actor actor) {
-                tree.smartFilter(textField.getText(), autoSelect);
+                String typedText = textField.getText();
+
+                if (wasEmpty && !typedText.isEmpty()) {
+                    // it was empty before, and we just wrote something, save this state
+                    savedState = filteredTree.getCurrentState();
+                }
+
+                tree.smartFilter(typedText, autoSelect);
+
+                boolean justBecameEmpty = !wasEmpty && typedText.isEmpty();
+                if (justBecameEmpty) {
+                    // we just made removed all text and left it empty, try to restore the state
+                    if (savedState != null) {
+                        filteredTree.restoreFromState(savedState);
+                    }
+                }
+
                 tree.invalidateHierarchy();
                 tree.invalidate();
                 tree.layout();
+
+                wasEmpty = typedText.isEmpty();
             }
         });
 

@@ -121,6 +121,7 @@ public class SceneHierarchyApp extends AppManager.BaseApp<SavableContainer> impl
 			}
 		}
 		hierarchyWidget.getTree().restoreExpandedObjects(expandedGameObjects);
+		hierarchyWidget.getTree().collapseAll();
 	}
 
 	@Override
