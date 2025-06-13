@@ -2,7 +2,6 @@ package com.talosvfx.talos.editor.addons.scene.widgets;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasSprite;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -713,6 +712,7 @@ public class HierarchyWidget extends Table implements Observer, EventContextProv
 
     public void loadEntityContainer (GameAsset<SavableContainer> gameAsset) {
         this.gameAsset = gameAsset;
+        FilteredTree.TreeState currentState = tree.getCurrentState();
 
         currentContainer = gameAsset.getResource();
 
@@ -740,7 +740,7 @@ public class HierarchyWidget extends Table implements Observer, EventContextProv
 
         tree.add(parent);
 
-        tree.expandAll();
+        tree.restoreFromState(currentState);
     }
 
     private FilteredTree.Node<GameObject> createNodeForGameObject (GameObject gameObject) {

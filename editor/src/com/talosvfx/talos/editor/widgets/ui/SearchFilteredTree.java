@@ -85,7 +85,7 @@ public class SearchFilteredTree<T> extends Table {
 
         textField.addListener(new ChangeListener() {
             boolean wasEmpty = true;
-            FilteredTree.TreeState<T> savedState;
+            FilteredTree.TreeState savedState;
 
             @Override
             public void changed (ChangeEvent event, Actor actor) {

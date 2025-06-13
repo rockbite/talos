@@ -1288,8 +1288,8 @@ public class FilteredTree<T> extends WidgetGroup {
         }
     }
 
-    public TreeState<T> getCurrentState () {
-        TreeState<T> state = new TreeState<>();
+    public TreeState getCurrentState () {
+        TreeState state = new TreeState();
 
         // scrolled amount
         if (searchFilteredTree != null) {
@@ -1297,7 +1297,7 @@ public class FilteredTree<T> extends WidgetGroup {
         }
 
         // nodes expanded or collapsed
-        ObjectSet<Node<T>> expandedNodes = state.expandedNodes;
+        ObjectSet<String> expandedNodes = state.expandedNodeNames;
         for (Node<T> rootNode : rootNodes) {
             collectExpandedNodes(rootNode, expandedNodes);
         }
@@ -1305,7 +1305,7 @@ public class FilteredTree<T> extends WidgetGroup {
         return state;
     }
 
-    public void restoreFromState (TreeState<T> state) {
+    public void restoreFromState (TreeState state) {
         for (Node<T> rootNode : rootNodes) {
             restoreNodesFromState(rootNode, state);
         }
@@ -1317,8 +1317,8 @@ public class FilteredTree<T> extends WidgetGroup {
         }
     }
 
-    private void restoreNodesFromState (Node<T> node, TreeState<T> state) {
-        node.setExpanded(state.expandedNodes.contains(node));
+    private void restoreNodesFromState (Node<T> node, TreeState state) {
+        node.setExpanded(state.expandedNodeNames.contains(node.getName()));
 
         // ok go through children as well
         for (Node<T> child : node.getChildren()) {
@@ -1326,9 +1326,9 @@ public class FilteredTree<T> extends WidgetGroup {
         }
     }
 
-    private void collectExpandedNodes (Node<T> node, ObjectSet<Node<T>> nodes) {
+    private void collectExpandedNodes (Node<T> node, ObjectSet<String> nodes) {
         if (node.isExpanded()) {
-            nodes.add(node);
+            nodes.add(node.getName());
         }
 
         for (Node<T> child : node.getChildren()) {
@@ -1336,8 +1336,8 @@ public class FilteredTree<T> extends WidgetGroup {
         }
     }
 
-    static public class TreeState<T> {
-        private final ObjectSet<Node<T>> expandedNodes = new ObjectSet<>();
+    static public class TreeState {
+        private final ObjectSet<String> expandedNodeNames = new ObjectSet<>();
         private float scrollAmount;
     }
 
