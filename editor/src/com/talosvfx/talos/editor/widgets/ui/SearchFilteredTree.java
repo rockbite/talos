@@ -52,6 +52,7 @@ public class SearchFilteredTree<T> extends Table {
 
         ImageButton collapseAllButton = new ImageButton(SharedResources.skin, "collapse-all");
         ImageButton expandAllButton = new ImageButton(SharedResources.skin, "expand-all");
+        ImageButton revealLocation = new ImageButton(SharedResources.skin, "reveal-location");
 
         collapseAllButton.addListener(new ClickListener() {
             @Override
@@ -69,11 +70,38 @@ public class SearchFilteredTree<T> extends Table {
             }
         });
 
+        revealLocation.addListener(new ClickListener() {
+            @Override
+            public void clicked (InputEvent event, float x, float y) {
+                super.clicked(event, x, y);
+                FilteredTree.Node<T> first = tree.getSelection().first();
+
+                if (first == null) {
+                    return;
+                }
+                first.expandTo();
+
+                // match the scroll pane
+                Gdx.app.postRunnable(() -> {
+                    //Need to do it frame layer after layut
+                    float topY = scrollPane.getScrollY();
+                    float scrollHeight = scrollPane.getScrollHeight();
+
+                    float positionInParent = tree.getHeight() - first.getActor().getY();
+
+                    if (positionInParent < topY || positionInParent > (topY + scrollHeight)) {
+                        scrollPane.setScrollY(positionInParent - scrollHeight/2f);
+                    }
+                });
+            }
+        });
+
         searchTable.padRight(5);
         searchTable.add(image);
         searchTable.add(textField).growX().spaceLeft(5);
-        searchTable.add(collapseAllButton).spaceLeft(5).height(20);
-        searchTable.add(expandAllButton).spaceLeft(5).height(20);
+        searchTable.add(revealLocation).size(28);
+        searchTable.add(collapseAllButton).size(28);
+        searchTable.add(expandAllButton).size(28);
 
         filteredTree = tree;
         filteredTree.setSearchFilteredTree(this);
