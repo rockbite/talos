@@ -64,6 +64,16 @@ public class RuntimeContext {
         }
     }
 
+    public ObjectMap<String, TalosContext> getTalosContextMap () {
+        return talosContextMap;
+    }
+
+    public void disposeContext () {
+        talosContextMap.clear();
+        sceneData = null;
+        context = null;
+    }
+
     public void registerContext (String talosProjectIdentifier, TalosContext context) {
         talosContextMap.put(talosProjectIdentifier, context);
     }
