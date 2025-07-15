@@ -492,6 +492,7 @@ public class GameObject implements GameObjectContainer, RoutineEventListener, Js
         childrenMap.clear();
         children.clear();
         for (AComponent component : components) {
+            component.setGameObject(null);
             if (component instanceof GameResourceOwner) {
                 ((GameResourceOwner<?>)component).clearResource();
             }
