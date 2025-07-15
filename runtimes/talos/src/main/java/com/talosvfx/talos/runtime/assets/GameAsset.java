@@ -1,6 +1,7 @@
 package com.talosvfx.talos.runtime.assets;
 
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.ObjectIntMap;
 import com.badlogic.gdx.utils.ObjectSet;
 import com.talosvfx.talos.runtime.scene.GameObjectContainer;
@@ -13,7 +14,7 @@ import java.util.Objects;
  * GameAsset is a potentially complex resource. It links 1+ {@link RawAsset} together to reference
  * all assets required for this GameAsset to load
  */
-public class GameAsset<T> {
+public class GameAsset<T> implements Disposable {
 
 
 	public String nameIdentifier;
@@ -46,6 +47,24 @@ public class GameAsset<T> {
 		gameResourcesThatRequireMe.getAndIncrement(containerAsset, 0, counter);
 		for (int i = 0; i < dependentGameAssets.size; i++) {
 			dependentGameAssets.get(i).addDependency(containerAsset, counter);
+		}
+	}
+
+	@Override
+	public void dispose () {
+		try {
+			if (resourcePayload instanceof Disposable) {
+				((Disposable)resourcePayload).dispose();
+			}
+			resourcePayload = null;
+
+			for (GameAsset<?> gameAsset : dependentGameAssets) {
+				gameAsset.dispose();
+			}
+			dependentGameAssets.clear();
+			gameResourcesThatRequireMe.clear();
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 
