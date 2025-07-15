@@ -233,6 +233,14 @@ public class TalosLayer implements GameResourceOwner<TilePaletteData>, Json.Seri
 		}
 	}
 
+	@Override
+	public void clearResource () {
+		if (gameAsset != null) {
+			gameAsset.listeners.removeValue(gameAssetUpdateListener, true);
+			gameAsset = null;
+		}
+	}
+
 
 
 	public void setStaticTile (StaticTile staticTile) {

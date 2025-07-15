@@ -79,6 +79,15 @@ public class SpriteRendererComponent extends RendererComponent implements GameRe
         }
     }
 
+    @Override
+    public void clearResource () {
+        if (gameAsset != null) {
+            gameAsset.listeners.removeValue(gameAssetUpdateListener, true);
+            gameAsset = null;
+        }
+        defaultGameAsset = null;
+    }
+
     public enum RenderMode {
         simple,
         sliced,

@@ -261,4 +261,12 @@ public abstract class SavableContainer implements GameObjectContainer, Json.Seri
 			}
 		}
 	}
+
+	@Override
+	public void dispose () {
+		if (root != null) {
+			root.dispose();
+			root = null;
+		}
+	}
 }

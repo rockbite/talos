@@ -130,6 +130,13 @@ public class SpineRendererComponent extends RendererComponent implements Json.Se
         }
     }
 
+    GameAsset.GameAssetUpdateListener gameAssetUpdateListener = new GameAsset.GameAssetUpdateListener() {
+        @Override
+        public void onUpdate () {
+            createSkeletonFromGameAsset();
+        }
+    };
+
     @Override
     public void setGameAsset (GameAsset<SkeletonData> gameAsset) {
         backupChildrenOfBones();
@@ -140,13 +147,25 @@ public class SpineRendererComponent extends RendererComponent implements Json.Se
             defaultGameAsset = gameAsset;
         }
 
-        this.gameAsset.listeners.add(new GameAsset.GameAssetUpdateListener() {
-            @Override
-            public void onUpdate () {
-                createSkeletonFromGameAsset();
-            }
-        });
+        if (gameAsset != null) {
+            gameAsset.listeners.removeValue(gameAssetUpdateListener, true);
+        }
+
+        this.gameAsset.listeners.add(gameAssetUpdateListener);
         createSkeletonFromGameAsset();
+    }
+
+    @Override
+    public void clearResource () {
+        if (gameAsset != null) {
+            gameAsset.listeners.removeValue(gameAssetUpdateListener, true);
+            gameAsset = null;
+        }
+        defaultGameAsset = null;
+        skeleton = null;
+        animationState = null;
+        boneGOs.clear();
+        directChildrenOfRoot.clear();
     }
 
     /**

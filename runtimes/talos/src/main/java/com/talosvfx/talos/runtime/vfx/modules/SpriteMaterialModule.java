@@ -124,6 +124,16 @@ public class SpriteMaterialModule extends MaterialModule implements GameResource
 		}
 	}
 
+	@Override
+	public void clearResource () {
+		if (asset != null) {
+			asset.listeners.removeValue(this, true);
+			asset = null;
+		}
+		region = null;
+		moduleOutput = null;
+	}
+
 	public TextureAtlas.AtlasSprite getTextureRegion () {
 		return region;
 	}

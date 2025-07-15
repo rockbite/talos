@@ -79,6 +79,15 @@ public class ParticleComponent<T extends BaseVFXProjectData> extends RendererCom
         gameAssetUpdateListener.onUpdate();
     }
 
+    @Override
+    public void clearResource () {
+        if (gameAsset != null) {
+            gameAsset.listeners.removeValue(gameAssetUpdateListener, true);
+            gameAsset = null;
+        }
+        effectRef = null;
+        defaultGameAsset = null;
+    }
     Vector2 vec = new Vector2();
     @Override
     public void minMaxBounds (GameObject ownerEntity, BoundingBox boundingBox) {

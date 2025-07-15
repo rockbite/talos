@@ -109,6 +109,14 @@ public class ShaderMaterialModule extends MaterialModule implements GameResource
 		}
 	}
 
+	@Override
+	public void clearResource () {
+		if (asset != null) {
+			asset = null;
+		}
+		moduleOutput = null;
+	}
+
 	public ShaderInstance getShaderInstance () {
 		return asset.getResource().getShaderInstance();
 	}

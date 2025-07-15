@@ -1,12 +1,13 @@
 package com.talosvfx.talos.runtime.scene;
 
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Disposable;
 import com.talosvfx.talos.runtime.assets.TalosContextProvider;
 import com.talosvfx.talos.runtime.scene.components.AComponent;
 import com.talosvfx.talos.runtime.utils.Supplier;
 
 import java.util.Collection;
-public interface GameObjectContainer extends TalosContextProvider {
+public interface GameObjectContainer extends TalosContextProvider, Disposable {
 
     String getName();
     void setName(String name);
@@ -28,4 +29,7 @@ public interface GameObjectContainer extends TalosContextProvider {
     void setParent(GameObject gameObject);
 
     Supplier<Collection<String>> getAllGONames ();
+
+    @Override
+    void dispose ();
 }

@@ -40,6 +40,13 @@ public class ScriptComponent extends AComponent implements Json.Serializable, Ga
     }
 
     @Override
+    public void clearResource () {
+        if (scriptResource != null) {
+            scriptResource = null;
+        }
+    }
+
+    @Override
     public void write (Json json) {
         GameResourceOwner.writeGameAsset(json, this);
         json.writeValue("properties", scriptProperties);

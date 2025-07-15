@@ -484,6 +484,34 @@ public class GameObject implements GameObjectContainer, RoutineEventListener, Js
         };
     }
 
+    @Override
+    public void dispose () {
+        for (GameObject child : children) {
+            child.dispose();
+        }
+        childrenMap.clear();
+        children.clear();
+        for (AComponent component : components) {
+            if (component instanceof GameResourceOwner) {
+                ((GameResourceOwner<?>)component).clearResource();
+            }
+        }
+        components.clear();
+        componentClasses.clear();
+        parent = null;
+        rootGameObjectContainer = null;
+        routineEventListeners = null;
+        tmp.clear();
+
+
+        transformComponentCache = null;
+        spineComponentCache = null;
+        boneComponentCache = null;
+        spriteComponentCache = null;
+        particleComponentCache = null;
+        routineRendererComponentCache = null;
+    }
+
     private void addNamesToList (ArrayList<String> goNames, GameObject gameObject) {
         goNames.add(gameObject.getName());
         if (gameObject.getGameObjects() != null) {

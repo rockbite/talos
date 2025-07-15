@@ -125,6 +125,15 @@ public class PathRendererComponent extends RendererComponent implements GameReso
     }
 
     @Override
+    public void clearResource () {
+        if (gameAsset != null) {
+            gameAsset.listeners.removeValue(gameAssetUpdateListener, true);
+            gameAsset = null;
+        }
+        defaultGameAsset = null;
+    }
+
+    @Override
     public float getWidth() {
         return 0;
     }

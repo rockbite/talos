@@ -76,6 +76,14 @@ public class PaintSurfaceComponent extends AComponent implements GameResourceOwn
     }
 
     @Override
+    public void clearResource () {
+        if (gameAsset != null) {
+            gameAsset.listeners.removeValue(gameAssetUpdateListener, true);
+            gameAsset = null;
+        }
+    }
+
+    @Override
     public void write(Json json) {
         GameResourceOwner.writeGameAsset(json, this);
         json.writeValue("overlay", overlay);

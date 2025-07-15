@@ -93,4 +93,6 @@ public interface GameResourceOwner<U> {
             return UUID.fromString(uuid);
         }
     }
+
+    void clearResource ();
 }

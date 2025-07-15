@@ -209,7 +209,14 @@ public class RoutineRendererComponent<T extends BaseRoutineData> extends Rendere
         }
     }
 
-
+    @Override
+    public void clearResource () {
+        if (routineResource != null) {
+            routineResource.listeners.removeValue(updateListener, true);
+            routineResource = null;
+        }
+        routineInstance = null;
+    }
 
     @Override
     public boolean allowsMultipleOfTypeOnGameObject () {

@@ -83,4 +83,12 @@ public class PropertyGameAssetWrapper extends PropertyWrapper<GameAsset<?>> impl
 
         gameAssetUpdateListener.onUpdate();
     }
+
+    @Override
+    public void clearResource () {
+        if (value != null) {
+            value.listeners.removeValue(gameAssetUpdateListener, true);
+            value = null;
+        }
+    }
 }
