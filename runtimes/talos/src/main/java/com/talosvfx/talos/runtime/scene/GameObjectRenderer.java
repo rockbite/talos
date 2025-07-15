@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.g2d.PolygonBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.esotericsoftware.spine.Bone;
 import com.talosvfx.talos.runtime.scene.components.*;
@@ -19,7 +20,7 @@ import lombok.Getter;
 
 import java.util.Comparator;
 
-public class GameObjectRenderer {
+public class GameObjectRenderer implements Disposable {
     private ComponentRenderer<SpriteRendererComponent> spriteRenderer;
     private ComponentRenderer<MapComponent> mapRenderer;
     private ComponentRenderer<ParticleComponent<?>> particleRenderer;
@@ -39,9 +40,13 @@ public class GameObjectRenderer {
 
 
     private static TextureRegion brokenRegion;
+    private static Texture brokenTexture;
 
     public GameObjectRenderer () {
-        brokenRegion = new TextureRegion(new Texture(Gdx.files.classpath("missing.png")));
+        if (brokenRegion == null) {
+            brokenTexture = new Texture(Gdx.files.classpath("missing.png"));
+            brokenRegion = new TextureRegion(brokenTexture);
+        }
 
         spriteRenderer = createSpriteRenderer();
         mapRenderer = createMapRenderer();
@@ -446,5 +451,14 @@ public class GameObjectRenderer {
      */
     public void setSkipUpdates (boolean skipUpdates) {
         this.skipUpdates = skipUpdates;
+    }
+
+    @Override
+    public void dispose () {
+		if (brokenRegion != null) {
+            brokenTexture.dispose();
+			brokenRegion = null;
+            brokenTexture = null;
+		}
     }
 }
