@@ -16,6 +16,7 @@ dependencyResolutionManagement {
         libs {
 
             version("libgdx", "1.11.0")
+            version("tools", "1.13.5")
             version("bongo", "0.0.1-SNAPSHOT")
             version("visui", "1.5.0")
             version("string-similarity", "1.2.1")
@@ -36,7 +37,7 @@ dependencyResolutionManagement {
             version("gson", "2.8.5")
 
             library("libgdx", "com.badlogicgames.gdx", "gdx").versionRef("libgdx")
-            library("libgdx-tools", "com.badlogicgames.gdx", "gdx-tools").versionRef("libgdx")
+            library("libgdx-tools", "com.badlogicgames.gdx", "gdx-tools").versionRef("tools")
             library("libgdx-awt", "com.badlogicgames.gdx", "gdx-lwjgl3-glfw-awt-macos").versionRef("libgdx")
             library("libgdx-freetype", "com.badlogicgames.gdx", "gdx-freetype").versionRef("libgdx")
             library("libgdx-freetype-platform", "com.badlogicgames.gdx", "gdx-freetype-platform").versionRef("libgdx")
