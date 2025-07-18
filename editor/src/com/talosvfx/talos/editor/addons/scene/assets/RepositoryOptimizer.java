@@ -123,7 +123,7 @@ public class RepositoryOptimizer {
 
 		Net.HttpRequest httpRequest = new Net.HttpRequest();
 		httpRequest.setMethod(Net.HttpMethods.GET);
-		httpRequest.setUrl("https://oss.sonatype.org/content/repositories/snapshots/com/talosvfx/tools/2.0.2-SNAPSHOT/tools-2.0.2-20241118.062500-32.jar");
+		httpRequest.setUrl("https://central.sonatype.com/repository/maven-snapshots/com/talosvfx/tools/2.0.3-SNAPSHOT/tools-2.0.3-20250718.082913-8.jar");
 		Gdx.net.sendHttpRequest(httpRequest, new Net.HttpResponseListener() {
 			@Override
 			public void handleHttpResponse (Net.HttpResponse httpResponse) {
