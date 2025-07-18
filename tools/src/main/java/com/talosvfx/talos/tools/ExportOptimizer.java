@@ -69,6 +69,7 @@ public class ExportOptimizer {
 		}
 
 		PackPayload packPayload = exportPayload.packPayload;
+		packPayload.settings.fast = true;
 		TexturePacker.process(packPayload.settings, packPayload.input, packPayload.output, packPayload.packFileName);
 	}
 
