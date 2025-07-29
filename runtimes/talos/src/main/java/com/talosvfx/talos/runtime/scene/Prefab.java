@@ -4,7 +4,6 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
-import com.talosvfx.talos.runtime.utils.TempHackUtil;
 
 public class Prefab extends SavableContainer {
     public static String PREFIX = "Prefab_";
