@@ -4,20 +4,29 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
+import com.talosvfx.talos.runtime.utils.TempHackUtil;
 
 public class Prefab extends SavableContainer {
     public static String PREFIX = "Prefab_";
 
     public transient String name;
     private transient String talosIdentifier;
+    public transient String cachedJsonString;
 
     public Prefab () {
     }
 
     public Prefab (String jsonContent, String name) {
         loadFromString(jsonContent);
-
         setName(name);
+    }
+
+    @Override
+    void loadFromString (String jsonString) {
+        String hackedString = TempHackUtil.hackIt(jsonString);
+        this.cachedJsonString = hackedString;
+
+        load(hackedString);
     }
 
     public Prefab(GameObject root) {
