@@ -11,7 +11,7 @@ public class Prefab extends SavableContainer {
 
     public transient String name;
     private transient String talosIdentifier;
-    public transient String cachedJsonString;
+    public transient String cachedRootGoJson;
 
     public Prefab () {
     }
@@ -19,14 +19,6 @@ public class Prefab extends SavableContainer {
     public Prefab (String jsonContent, String name) {
         loadFromString(jsonContent);
         setName(name);
-    }
-
-    @Override
-    void loadFromString (String jsonString) {
-        String hackedString = TempHackUtil.hackIt(jsonString);
-        this.cachedJsonString = hackedString;
-
-        load(hackedString);
     }
 
     public Prefab(GameObject root) {
@@ -48,7 +40,7 @@ public class Prefab extends SavableContainer {
         root = json.readValue(GameObject.class, jsonRoot);
         root.setGameObjectContainer(this);
 
-        //Lets add a fake root
+        cachedRootGoJson = json.toJson(root, GameObject.class);
     }
 
     @Override
