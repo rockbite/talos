@@ -19,10 +19,17 @@ import com.talosvfx.talos.runtime.vfx.serialization.BaseVFXProjectData;
 public class SimpleParticleComponentRenderer<T extends BaseVFXProjectData> extends ComponentRenderer<ParticleComponent<?>> {
 
 	private final SpriteBatchParticleRenderer renderer;
+	private float delta;
 
 	public SimpleParticleComponentRenderer (GameObjectRenderer gameObjectRenderer) {
 		super(gameObjectRenderer);
 		renderer = new SpriteBatchParticleRenderer();
+	}
+
+	@Override
+	public void update (GameObject gameObject, ParticleComponent<?> component, float delta) {
+		super.update(gameObject, component, delta);
+		this.delta = delta;
 	}
 
 	@Override
@@ -57,7 +64,7 @@ public class SimpleParticleComponentRenderer<T extends BaseVFXProjectData> exten
 		instance.setWorldScale(transformComponent.worldScale);
 		instance.setPosition(transformComponent.worldPosition.x, transformComponent.worldPosition.y, 0);
 		if (!gameObjectRenderer.isSkipUpdates()) {
-			instance.update(Gdx.graphics.getDeltaTime());
+			instance.update(delta);
 		}
 
 		renderer.render(instance);

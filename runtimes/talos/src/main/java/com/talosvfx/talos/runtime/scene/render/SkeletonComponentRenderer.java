@@ -34,7 +34,7 @@ public class SkeletonComponentRenderer extends ComponentRenderer<SpineRendererCo
         spineRendererComponent.skeleton.getRootBone().setRotation(parentTransform.rotation);
 
         if (!gameObjectRenderer.isSkipUpdates()) {
-            spineRendererComponent.animationState.update(Gdx.graphics.getDeltaTime());
+            spineRendererComponent.animationState.update(delta);
             spineRendererComponent.animationState.apply(spineRendererComponent.skeleton);
         }
 
