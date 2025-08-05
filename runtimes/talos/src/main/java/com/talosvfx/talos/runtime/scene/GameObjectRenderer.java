@@ -280,6 +280,10 @@ public class GameObjectRenderer implements Disposable {
                 }
             }
         }
+        if (gameObject.hasParticleComponent()) {
+            ParticleComponent<?> particleComponent = gameObject.getParticleComponent();
+            particleRenderer.update(gameObject, particleComponent, delta);
+        }
 
         if (gameObject.hasTransformComponent() && !gameObject.hasBoneComponent()) {
             TransformComponent transform = gameObject.getTransformComponent();
