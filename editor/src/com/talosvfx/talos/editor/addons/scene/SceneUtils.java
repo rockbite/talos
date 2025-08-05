@@ -374,6 +374,7 @@ public class SceneUtils {
 
 		final String clipboard = Gdx.app.getClipboard().getContents();
 		final Json json = new Json();
+		json.setIgnoreUnknownFields(true);
 
 		try {
 			final SceneEditorWorkspace.ClipboardPayload payload = json.fromJson(SceneEditorWorkspace.ClipboardPayload.class, clipboard);
