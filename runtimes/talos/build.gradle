@@ -5,8 +5,8 @@ plugins {
 }
 
 dependencies {
-    implementation libs.libgdx
-    implementation libs.spine.libgdx
+    compileOnly libs.libgdx
+    compileOnly libs.spine.libgdx
     implementation libs.slf4j.api
 }
 
