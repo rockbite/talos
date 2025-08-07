@@ -15,7 +15,7 @@ dependencyResolutionManagement {
     versionCatalogs {
         libs {
 
-            version("libgdx", "1.11.0")
+            version("libgdx", "1.13.5")
             version("tools", "1.13.5")
             version("bongo", "0.0.1-SNAPSHOT")
             version("visui", "1.5.0")
