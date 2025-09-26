@@ -23,7 +23,7 @@ dependencyResolutionManagement {
             version("spine-libgdx", "4.0.18.1")
             version("snakeyaml", "1.21")
             version("lombok", "1.18.2")
-            version("tiny-gizmo", "0.0.1-SNAPSHOT")
+            version("tiny-gizmo", "0.0.2-SNAPSHOT")
             version("logback", "1.2.3")
             version("slf4j", "1.7.25")
             version("spark", "2.9.4")
