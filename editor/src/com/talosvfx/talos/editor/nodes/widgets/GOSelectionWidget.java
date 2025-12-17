@@ -18,7 +18,6 @@ import com.talosvfx.talos.runtime.routine.RoutineInstance;
 import com.talosvfx.talos.runtime.scene.GameObject;
 import com.talosvfx.talos.runtime.scene.Scene;
 
-import java.lang.StringBuilder;
 
 public class GOSelectionWidget extends AbstractWidget<String> {
 
@@ -195,7 +194,7 @@ public class GOSelectionWidget extends AbstractWidget<String> {
                         }
 
                         // construct path
-                        StringBuilder path = new StringBuilder();
+                        CharArray path = new CharArray();
                         while (gameObject != null && rootGO != gameObject) {
                             path.insert(0, gameObject.getName());
                             path.insert(0, ".");

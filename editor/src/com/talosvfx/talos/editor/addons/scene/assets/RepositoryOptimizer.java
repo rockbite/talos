@@ -193,7 +193,7 @@ public class RepositoryOptimizer {
 		return downloadFuture;
 	}
 
-	private static FileHandle getUserHomeTalosDir () {
+	public static FileHandle getUserHomeTalosDir () {
 		String userHome = System.getProperty("user.home");
 		return Gdx.files.absolute(userHome).child("Talos");
 	}
@@ -681,6 +681,7 @@ public class RepositoryOptimizer {
 		settings.filterMag = bucket.magFilter;
 		settings.filterMin = bucket.minFilter;
 		settings.pot = false;
+        settings.premultiplyAlpha = SharedResources.currentProject.isExportPma();
 		return settings;
 	}
 
@@ -697,6 +698,7 @@ public class RepositoryOptimizer {
 		settings.filterMag = bucket.magFilter;
 		settings.filterMin = bucket.minFilter;
 		settings.pot = false;
+        settings.premultiplyAlpha = SharedResources.currentProject.isExportPma();
 		settings.scale = new float[]{Float.parseFloat(SharedResources.currentProject.getExportPackingScale())};
 		return settings;
 	}

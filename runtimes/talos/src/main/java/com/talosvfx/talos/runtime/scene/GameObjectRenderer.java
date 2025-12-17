@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.g2d.PolygonBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.CharArray;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.esotericsoftware.spine.Bone;
@@ -189,7 +190,7 @@ public class GameObjectRenderer implements Disposable {
     public static void debugTransforms (GameObject gameObject, int indent) {
         if (gameObject.hasComponent(TransformComponent.class)) {
             TransformComponent transformComponent = gameObject.getComponent(TransformComponent.class);
-            StringBuilder builder = new StringBuilder();
+            CharArray builder = new CharArray();
 
             //Indent all by indent  * 2 spaces
             //print in format

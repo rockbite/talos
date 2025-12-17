@@ -2,6 +2,7 @@ package com.talosvfx.talos.editor.addons.scene.utils.importers;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.utils.CharArray;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonWriter;
@@ -27,7 +28,6 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.lang.StringBuilder;
 import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -161,7 +161,7 @@ public class AssetImporter {
             }
 
             // bytes to hex
-            StringBuilder result = new StringBuilder();
+            CharArray result = new CharArray();
             for (byte b : md.digest()) {
                 result.append(String.format("%02x", b));
             }

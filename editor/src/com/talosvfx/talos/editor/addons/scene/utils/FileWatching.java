@@ -68,7 +68,11 @@ public class FileWatching {
 
             @Override
             public void dispose () {
-                workingThread.stop();
+                try {
+                    shutdown();
+                } catch (Exception e) {
+                    //dont care
+                }
             }
         });
     }

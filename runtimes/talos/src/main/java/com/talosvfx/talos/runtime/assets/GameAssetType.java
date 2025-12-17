@@ -31,6 +31,7 @@ public enum GameAssetType {
 
 	PREFAB(new String[]{"prefab"}, true),
 	SCENE(new String[]{"scn"}, true),
+    FLIPBOOK(new String[]{"flipbook"}, true),
 	DIRECTORY(new String[]{}, false),
 	TILE_PALETTE(new String[]{"ttp"}, true),
 	LAYOUT_DATA(new String[]{"tlslt"}, true);

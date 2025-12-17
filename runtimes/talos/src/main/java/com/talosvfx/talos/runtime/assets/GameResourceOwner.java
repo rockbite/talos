@@ -72,6 +72,39 @@ public interface GameResourceOwner<U> {
         }
     }
 
+    static <U> GameAsset<U> readAssetForceType (Json json, JsonValue jsonValue, GameAssetType type) {
+        String identifier = readGameResourceFromComponent(jsonValue);
+        UUID uuid = readGameResourceUUIDFromComponent(jsonValue);
+        String talosIdentifier = readTalosIdentifier(jsonValue);
+        RuntimeContext.TalosContext talosContext = RuntimeContext.getInstance().getTalosContext(talosIdentifier);
+        if (talosContext == null) {
+            throw new GdxRuntimeException("No asset repository found for " + talosIdentifier);
+        }
+        BaseAssetRepository baseAssetRepository = talosContext.getBaseAssetRepository();
+
+        if (uuid == null) {
+            GameAsset<U> asset = baseAssetRepository.getAssetForIdentifier(identifier, type);
+            if (asset == null) {
+                System.out.println("Asset not found for identifier " + identifier + " and type " + type);
+            }
+            return asset;
+        } else {
+            GameAsset<U> assetForUniqueIdentifier = baseAssetRepository.getAssetForUniqueIdentifier(uuid, type);
+            if (assetForUniqueIdentifier == null || assetForUniqueIdentifier.isNonFound()) {
+                if (identifier != null) {
+                    GameAsset<U> asset = baseAssetRepository.getAssetForIdentifier(identifier, type);
+                    if (asset == null) {
+                        System.out.println("Asset not found even with identifier type");
+                    } else {
+                        return asset;
+                    }
+                }
+                System.out.println("Asset not found for uuid " + uuid + " and type " + type);
+            }
+            return assetForUniqueIdentifier;
+        }
+    }
+
     static GameAssetType readAssetType(Json json, JsonValue jsonValue) {
         GameAssetType type = json.readValue("type", GameAssetType.class, jsonValue);
         if(type == null) return GameAssetType.SPRITE;

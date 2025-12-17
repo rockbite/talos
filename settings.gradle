@@ -15,10 +15,10 @@ dependencyResolutionManagement {
     versionCatalogs {
         libs {
 
-            version("libgdx", "1.13.5")
-            version("tools", "1.13.5")
+            version("libgdx", "1.14.0")
+            version("tools", "1.14.0")
             version("bongo", "0.0.1-SNAPSHOT")
-            version("visui", "1.5.0")
+            version("visui", "1.5.8-SNAPSHOT")
             version("string-similarity", "1.2.1")
             version("spine-libgdx", "4.0.18.1")
             version("snakeyaml", "1.21")

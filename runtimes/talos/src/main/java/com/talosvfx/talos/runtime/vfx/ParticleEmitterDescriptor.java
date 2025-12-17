@@ -28,6 +28,7 @@ import com.talosvfx.talos.runtime.vfx.modules.DynamicRangeModule;
 import com.talosvfx.talos.runtime.vfx.modules.EmConfigModule;
 import com.talosvfx.talos.runtime.vfx.modules.EmitterModule;
 import com.talosvfx.talos.runtime.vfx.modules.FakeMotionBlurModule;
+import com.talosvfx.talos.runtime.vfx.modules.FlipBookMaterialModule;
 import com.talosvfx.talos.runtime.vfx.modules.ForceApplierModule;
 import com.talosvfx.talos.runtime.vfx.modules.FromToModule;
 import com.talosvfx.talos.runtime.vfx.modules.GlobalScopeModule;
@@ -108,6 +109,7 @@ public class ParticleEmitterDescriptor {
             registeredModules.add(SingleParticlePointDataGeneratorModule.class);
             registeredModules.add(QuadMeshGeneratorModule.class);
             registeredModules.add(SpriteMaterialModule.class);
+            registeredModules.add(FlipBookMaterialModule.class);
             registeredModules.add(DrawableModule.class);
         }
     }

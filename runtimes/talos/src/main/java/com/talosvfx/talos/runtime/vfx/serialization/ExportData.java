@@ -17,9 +17,9 @@
 package com.talosvfx.talos.runtime.vfx.serialization;
 
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.CharArray;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
-import com.badlogic.gdx.utils.StringBuilder;
 import com.talosvfx.talos.runtime.assets.GameResourceOwner;
 import com.talosvfx.talos.runtime.utils.Supplier;
 import com.talosvfx.talos.runtime.vfx.ParticleEffectDescriptor;
@@ -87,7 +87,7 @@ public class ExportData extends BaseVFXProjectData implements Json.Serializable 
 
         @Override
         public String toString () {
-            StringBuilder stringBuilder = new StringBuilder();
+            CharArray stringBuilder = new CharArray();
 
             stringBuilder.append(name);
             stringBuilder.append("\n");

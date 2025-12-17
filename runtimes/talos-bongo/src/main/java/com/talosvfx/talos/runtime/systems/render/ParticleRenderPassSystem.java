@@ -44,6 +44,7 @@ public class ParticleRenderPassSystem extends RenderPassSystem implements Partic
     private ShaderProgram override;
 
     private Vector3 tempVec3 = new Vector3();
+    private boolean pma;
 
     public ParticleRenderPassSystem () {
         this(Particle.class);
@@ -136,6 +137,16 @@ public class ParticleRenderPassSystem extends RenderPassSystem implements Partic
     @Override
     public Camera getCamera () {
         return cameras.getGameCamera();
+    }
+
+    @Override
+    public void setPMA (boolean pma) {
+        this.pma = pma;
+    }
+
+    @Override
+    public boolean isPMA () {
+        return this.pma;
     }
 
     @Override

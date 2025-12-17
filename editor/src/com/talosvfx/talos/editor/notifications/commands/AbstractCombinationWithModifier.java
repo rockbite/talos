@@ -2,6 +2,7 @@ package com.talosvfx.talos.editor.notifications.commands;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.CharArray;
 import com.badlogic.gdx.utils.ObjectSet;
 
 public abstract class AbstractCombinationWithModifier implements Combination {
@@ -111,7 +112,7 @@ public abstract class AbstractCombinationWithModifier implements Combination {
 
     @Override
     public String toString() {
-        StringBuilder modifiersString = new StringBuilder();
+        CharArray modifiersString = new CharArray();
         for (ModifierKey modifierKey : modifierKeys) {
             modifiersString.append(modifierKey).append(" ");
         }

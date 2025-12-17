@@ -40,6 +40,9 @@ public class TalosProjectData implements Json.Serializable {
 	@Getter
 	private String exportPackingScale = "1";
 
+    @Getter
+    private boolean exportPma = false;
+
 	@Getter
 	private String gridColor = "ffffff";
 	private String thicknessFactor = "1";
@@ -130,6 +133,7 @@ public class TalosProjectData implements Json.Serializable {
 		}
 		defaultPixelPerMeter = jsonData.getString("defaultPixelPerMeter", "100");
 		exportPackingScale = jsonData.getString("exportPackingScale", "1");
+        exportPma = jsonData.getBoolean("exportPMA", false);
 		gridColor = jsonData.getString("gridColor", "ffffffff");
 		setThicknessFactor(jsonData.getString("thicknessFactor", "1"));
 		talosProjectIdentifier = jsonData.getString("talosProjectIdentifier", UUID.randomUUID().toString());

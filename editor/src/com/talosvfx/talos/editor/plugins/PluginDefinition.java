@@ -1,5 +1,7 @@
 package com.talosvfx.talos.editor.plugins;
 
+import com.badlogic.gdx.utils.CharArray;
+
 import java.util.ArrayList;
 
 public class PluginDefinition {
@@ -24,7 +26,7 @@ public class PluginDefinition {
     }
 
     private String stringArray (ArrayList<String> stringEntry) {
-        StringBuilder buffer = new StringBuilder();
+        CharArray buffer = new CharArray();
         for (String plugin : stringEntry) {
             buffer.append("\n\t").append(plugin);
         }

@@ -32,7 +32,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.StringBuilder;
+import com.badlogic.gdx.utils.CharArray;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.runtime.assets.GameAssetType;
@@ -72,7 +72,7 @@ public abstract class PreviewWidget extends ViewportWidget {
 
 	private Image previewImage = new Image();
 
-	protected StringBuilder stringBuilder = new StringBuilder();
+	protected CharArray stringBuilder = new CharArray();
 	protected int trisCount = 0;
 	protected FloatCounter renderTime = new FloatCounter(100);
 	protected FloatCounter cpuTime = new FloatCounter(100);

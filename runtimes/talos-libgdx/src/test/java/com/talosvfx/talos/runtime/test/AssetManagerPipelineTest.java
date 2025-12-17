@@ -57,7 +57,7 @@ public class AssetManagerPipelineTest extends ApplicationAdapter {
 
 	private void loaded () {
 		GdxAssetRepo assetRepo = assetManager.get("testProject", GdxAssetRepo.class);
-		scene = assetRepo.getAssetForIdentifier("school-bus", GameAssetType.SCENE);
+		scene = assetRepo.getAssetForIdentifier("home-base", GameAssetType.SCENE);
 	}
 	@Override
 	public void render () {

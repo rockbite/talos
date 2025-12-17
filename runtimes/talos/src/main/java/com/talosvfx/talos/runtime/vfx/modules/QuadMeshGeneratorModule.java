@@ -170,15 +170,31 @@ public class QuadMeshGeneratorModule extends MeshGeneratorModule {
 
 				ParticleModule particleModule = particlePointData.reference.getEmitter().getParticleModule();
 
+                EmitterModule emitterModule = particleModule.graph.getEmitterModule();
+                boolean additive = emitterModule.isAdditive();
+                boolean pma = particleRenderer.isPMA();
+
 				Vector3 rotation = reference.rotation;
 				float transparency = particleModule.getTransparency();
 				Color color = particleModule.getColor();
 				Vector2 pivot = reference.pivot;
 
-				Vector2 worldScale = particlePointData.reference.getEmitter().getWorldScale();
+
+                Vector2 worldScale = particlePointData.reference.getEmitter().getWorldScale();
 
 				this.color.set(color);
-				this.color.a = transparency;
+
+                float multiplier = pma ? transparency : 1f;
+                this.color.a = transparency * multiplier;
+
+                if (pma && additive) {
+                    this.color.a = 0;
+                }
+
+                this.color.r *= multiplier;
+                this.color.g *= multiplier;
+                this.color.b *= multiplier;
+
 
 				float colourBits = this.color.toFloatBits();
 

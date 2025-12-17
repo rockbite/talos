@@ -47,8 +47,9 @@ public class SpriteBatchParticleRenderer implements ParticleRenderer {
 	Color color = new Color(Color.WHITE);
 	private ShaderProgram blendAddShader;
 	private Camera camera;
+    private boolean pma;
 
-	public SpriteBatchParticleRenderer () {
+    public SpriteBatchParticleRenderer () {
 		initShaders();
 	}
 
@@ -77,21 +78,38 @@ public class SpriteBatchParticleRenderer implements ParticleRenderer {
 		return camera;
 	}
 
-	@Override
+    @Override
+    public void setPMA (boolean pma) {
+        this.pma = pma;
+    }
+
+    @Override
+    public boolean isPMA () {
+        return this.pma;
+    }
+
+    @Override
 	public void render (ParticleEffectInstance particleEffectInstance) {
 
 		for (int i = 0; i < particleEffectInstance.getEmitters().size; i++) {
 			final IEmitter particleEmitter = particleEffectInstance.getEmitters().get(i);
 			if(!particleEmitter.isVisible()) continue;
-			if(particleEmitter.isBlendAdd()) {
-				batch.setBlendFunction(GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_ALPHA);
-			} else {
-				if (particleEmitter.isAdditive()) {
-					batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE);
-				} else {
-					batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
-				}
-			}
+
+            if (!isPMA()) {
+                if (particleEmitter.isBlendAdd()) {
+                    batch.setBlendFunction(GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_ALPHA);
+                } else {
+                    if (particleEmitter.isAdditive()) {
+                        batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE);
+                    } else {
+                        batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+                    }
+                }
+            } else {
+                batch.setBlendFunction(GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_ALPHA);
+            }
+
+
 			ShaderProgram prevShader = batch.getShader();
 			if (particleEmitter.isBlendAdd() && prevShader != blendAddShader) {
 				//batch.setShader(blendAddShader); //TODO: let's leave any shader stuff to shader graph, and rest can be baked

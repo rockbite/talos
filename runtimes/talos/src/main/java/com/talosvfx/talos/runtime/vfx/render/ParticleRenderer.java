@@ -24,6 +24,10 @@ public interface ParticleRenderer {
 
     Camera getCamera ();
 
+    void setPMA (boolean pma);
+
+    boolean isPMA ();
+
     void render (ParticleEffectInstance particleEffectInstance);
 
     void render (float[] verts, MaterialModule materialModule);

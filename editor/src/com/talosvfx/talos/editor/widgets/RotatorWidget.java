@@ -26,7 +26,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.utils.StringBuilder;
+import com.badlogic.gdx.utils.CharArray;
 import com.talosvfx.talos.editor.widgets.ui.common.zoomWidgets.LabelWithZoom;
 
 public class RotatorWidget extends Actor {
@@ -49,7 +49,7 @@ public class RotatorWidget extends Actor {
     private final String ROTATORBG = "rotator-bg";
     private final String ROTATORACTIVE = "rotator-active";
 
-    StringBuilder stringBuilder;
+    CharArray stringBuilder;
 
     public RotatorWidget(Skin skin) {
         this.skin = skin;
@@ -57,7 +57,7 @@ public class RotatorWidget extends Actor {
 
         label = new LabelWithZoom("", skin, "small");
 
-        stringBuilder = new StringBuilder();
+        stringBuilder = new CharArray();
 
         addListener(new ClickListener() {
 

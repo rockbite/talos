@@ -22,8 +22,9 @@ public class Particle3DRenderer implements ParticleRenderer {
 	private Simple3DBatch batch;
 
 	private Camera worldCamera;
+    private boolean pma;
 
-	public Particle3DRenderer (Camera worldCamera, Simple3DBatch simple3DBatch) {
+    public Particle3DRenderer (Camera worldCamera, Simple3DBatch simple3DBatch) {
 		this.worldCamera = worldCamera;
 		this.batch = simple3DBatch;
 	}
@@ -37,7 +38,17 @@ public class Particle3DRenderer implements ParticleRenderer {
 		return worldCamera;
 	}
 
-	@Override
+    @Override
+    public void setPMA (boolean pma) {
+        this.pma = pma;
+    }
+
+    @Override
+    public boolean isPMA () {
+        return this.pma;
+    }
+
+    @Override
 	public void render (ParticleEffectInstance particleEffectInstance) {
 
 		batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE);

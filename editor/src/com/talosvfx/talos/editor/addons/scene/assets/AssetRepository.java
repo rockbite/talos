@@ -14,12 +14,10 @@ import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.esotericsoftware.spine.SkeletonBinary;
 import com.esotericsoftware.spine.SkeletonData;
-import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.RoutineEditorApp;
 import com.talosvfx.talos.editor.addons.scene.events.*;
 import com.talosvfx.talos.editor.addons.scene.events.meta.MetaDataReloadedEvent;
 import com.talosvfx.talos.editor.addons.scene.events.explorer.DirectoryMovedEvent;
-import com.talosvfx.talos.editor.addons.shader.nodes.ColorOutput;
 import com.talosvfx.talos.editor.data.ShaderStageData;
 import com.talosvfx.talos.editor.nodes.NodeWidget;
 import com.talosvfx.talos.editor.nodes.widgets.AbstractWidget;
@@ -41,9 +39,11 @@ import com.talosvfx.talos.editor.project2.savestate.GlobalSaveStateSystem;
 import com.talosvfx.talos.editor.serialization.VFXProjectData;
 import com.talosvfx.talos.editor.serialization.VFXProjectSerializer;
 import com.talosvfx.talos.runtime.assets.BaseAssetRepository;
+import com.talosvfx.talos.runtime.assets.FlipBookAsset;
 import com.talosvfx.talos.runtime.assets.GameAssetExportStructure;
 import com.talosvfx.talos.runtime.assets.GameAssetsExportStructure;
 import com.talosvfx.talos.runtime.assets.meta.DirectoryMetadata;
+import com.talosvfx.talos.runtime.assets.meta.FlipBookMetadata;
 import com.talosvfx.talos.runtime.assets.meta.ScriptMetadata;
 import com.talosvfx.talos.runtime.assets.meta.SpineMetadata;
 import com.talosvfx.talos.runtime.assets.meta.SpriteMetadata;
@@ -65,8 +65,9 @@ import com.talosvfx.talos.runtime.scene.components.ScriptComponent;
 import com.talosvfx.talos.runtime.utils.Supplier;
 import com.talosvfx.talos.runtime.utils.TempHackUtil;
 import com.talosvfx.talos.runtime.vfx.ParticleEffectDescriptor;
+import com.talosvfx.talos.runtime.vfx.modules.AbstractModule;
+import com.talosvfx.talos.runtime.vfx.modules.FlipBookMaterialModule;
 import com.talosvfx.talos.runtime.vfx.serialization.ExportData;
-import com.talosvfx.talos.runtime.vfx.shaders.ShaderBuilder;
 import lombok.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -83,6 +84,7 @@ import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.talosvfx.talos.editor.addons.scene.assets.RepositoryOptimizer.getUserHomeTalosDir;
 import static com.talosvfx.talos.editor.layouts.LayoutGrid.LayoutJsonStructure;
 
 public class AssetRepository extends BaseAssetRepository implements Observer {
@@ -586,6 +588,14 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
         }
     }
 
+
+
+    static class FlipBookModuleAsset {
+        FlipBookMaterialModule module;
+        GameAsset<VFXProjectData> vfxAsset;
+        GameAsset<AtlasSprite> flipBookAsset;
+    }
+
     //Export formats
     public void exportToFile (AssetRepositoryCatalogueExportOptions settings, boolean isOptimized) { //todo
         //Go over all entities, go over all components. If component has a game resource, we mark it for export
@@ -653,8 +663,6 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 
                 collectGameResourcesForGameObject(casted, casted.getResource().getSelfObject(), copiedUUIDMap);
             }
-
-
         }
 
         //Force things routines are using
@@ -694,14 +702,80 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
             }
         }
 
+        ObjectMap<GameAsset<AtlasSprite>, FlipBookModuleAsset> flipBookSprites = new ObjectMap<>();
 
         //Force vfx exports
         for (GameAsset<?> copiedAsset : copiedAssets) {
             if (copiedAsset.type == GameAssetType.VFX) {
-                for (GameAsset<?> dependentGameAsset : copiedAsset.dependentGameAssets) {
-                    copiedUUIDMap.get(dependentGameAsset.getRootRawAsset().metaData.uuid.toString()).addDependency(copiedAsset);
+                GameAsset<VFXProjectData> vfxGameAsset = (GameAsset<VFXProjectData>)copiedAsset;
+
+
+                VFXProjectData resource = vfxGameAsset.getResource();
+                for (EmitterData emitter : resource.getEmitters()) {
+                    for (ModuleWrapper<?> module : emitter.modules) {
+                        AbstractModule mod = module.getModule();
+                        if (mod instanceof FlipBookMaterialModule) {
+                            GameAsset<AtlasSprite> asset = ((FlipBookMaterialModule)mod).asset;
+                            FlipBookModuleAsset flipBookModuleAsset = new FlipBookModuleAsset();
+                            flipBookModuleAsset.module = (FlipBookMaterialModule)mod;
+                            flipBookModuleAsset.vfxAsset = vfxGameAsset;
+                            flipBookModuleAsset.flipBookAsset = asset;
+                            flipBookSprites.put(asset, flipBookModuleAsset);
+                        }
+                    }
+                }
+
+                for (GameAsset<?> dependentGameAsset : vfxGameAsset.dependentGameAssets) {
+                    if (flipBookSprites.containsKey((GameAsset)dependentGameAsset)) {
+
+                    } else {
+                        //add vfx as a dependnecy of the sprite asset
+                        copiedUUIDMap.get(dependentGameAsset.getRootRawAsset().metaData.uuid.toString()).addDependency(vfxGameAsset);
+                    }
                 }
             }
+        }
+
+        //For the flip books, we need to remove them, and convert into a flipbook asset type, which is a reference to N sprites
+        for (ObjectMap.Entry<GameAsset<AtlasSprite>, FlipBookModuleAsset> flipBookSprite : flipBookSprites) {
+            GameAsset<AtlasSprite> key = flipBookSprite.key;
+            FlipBookModuleAsset value = flipBookSprite.value;
+
+            GameAsset<VFXProjectData> vfxAsset = value.vfxAsset;
+
+            //Remove the flipbook unpacked from vfx depenedencies
+            vfxAsset.dependentGameAssets.removeValue(key, true);
+
+            FileHandle exportParent = getUserHomeTalosDir().child("Exports");
+            String name = SharedResources.currentProject.getProjectDir().name();
+            FileHandle flipbooks = exportParent.child(name).child("flipbooks");
+            flipbooks.mkdirs();
+
+            Texture texture = key.getResource().getTexture();
+            texture.getTextureData().prepare();
+            Pixmap pixmap = texture.getTextureData().consumePixmap();
+
+            int rowsDefaultValue = value.module.getRowsDefaultValue();
+            int columnsDefaultValue = value.module.getColumnsDefaultValue();
+            int splitCountDefaultValue = value.module.getSplitCountDefaultValue();
+
+
+            FlipBookConversionData conversionData = convertFlipBooksToSprites(key, flipbooks, pixmap, rowsDefaultValue, columnsDefaultValue, splitCountDefaultValue);
+            GameAsset<FlipBookAsset> flipBookAsset = conversionData.flipBookAssetGameAsset;
+
+            copiedUUIDMap.put(flipBookAsset.getRootRawAsset().metaData.uuid.toString(), flipBookAsset);
+            flipBookAsset.addDependency(vfxAsset);
+
+            for (GameAsset<AtlasSprite> generatedSprite : conversionData.generatedSprites) {
+                copiedUUIDMap.put(generatedSprite.getRootRawAsset().metaData.uuid.toString(), generatedSprite);
+            }
+
+
+            vfxAsset.dependentGameAssets.addAll(flipBookAsset);
+
+            copiedAssets.addAll(flipBookAsset);
+
+            copiedAssets.addAll(conversionData.generatedSprites);
         }
 
         //Pass down all references
@@ -710,6 +784,9 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
                 passDependency(copiedAsset, copiedAsset, copiedUUIDMap);
             }
             if (copiedAsset.type == GameAssetType.VFX) {
+                passDependency(copiedAsset, copiedAsset, copiedUUIDMap);
+            }
+            if (copiedAsset.type == GameAssetType.FLIPBOOK) {
                 passDependency(copiedAsset, copiedAsset, copiedUUIDMap);
             }
         }
@@ -774,6 +851,63 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
         }
 
 
+    }
+
+    public static class FlipBookConversionData {
+        GameAsset<FlipBookAsset> flipBookAssetGameAsset;
+        Array<GameAsset<AtlasSprite>> generatedSprites = new Array<>();
+    }
+    private FlipBookConversionData convertFlipBooksToSprites (GameAsset<AtlasSprite> key, FileHandle flipbooks, Pixmap pixmap, int rowsDefaultValue, int columnsDefaultValue, int splitCountDefaultValue) {
+        FlipBookConversionData data = new FlipBookConversionData();
+
+        String flipBookIdentifier = key.nameIdentifier;
+
+        GameAsset<FlipBookAsset> flipBookAssetGameAsset = new GameAsset<>(flipBookIdentifier, GameAssetType.FLIPBOOK);
+
+        data.flipBookAssetGameAsset = flipBookAssetGameAsset;
+
+        FileHandle flipBookRootAsset = flipbooks.child(flipBookIdentifier + ".flipbook");
+        flipBookRootAsset.writeString("marker", false);
+        RawAsset rawAsset = new RawAsset(flipBookRootAsset);
+        FlipBookMetadata flipBookMetadata = new FlipBookMetadata();
+        flipBookMetadata.uuid = UUID.randomUUID();
+        rawAsset.metaData = flipBookMetadata;
+        flipBookAssetGameAsset.dependentRawAssets.add(rawAsset);
+
+        for (int i = 0; i < splitCountDefaultValue; i++) {
+            int row = i / columnsDefaultValue;
+            int column = i % columnsDefaultValue;
+
+            int frameWidth = pixmap.getWidth() / columnsDefaultValue;
+            int frameHeight = pixmap.getHeight() / rowsDefaultValue;
+
+            Pixmap framePixmap = new Pixmap(frameWidth, frameHeight, pixmap.getFormat());
+            framePixmap.drawPixmap(pixmap, 0, 0, column * frameWidth, row * frameHeight, frameWidth, frameHeight);
+
+            String identifierForTheSubSprite = flipBookIdentifier + "_" + i + "_frame";
+
+            FileHandle spriteFileHandle = flipbooks.child(identifierForTheSubSprite + ".png");
+            PixmapIO.writePNG(spriteFileHandle, framePixmap);
+
+            Texture tex = new Texture(framePixmap);
+            framePixmap.dispose();
+
+            GameAsset<AtlasSprite> newSpriteAsset = new GameAsset<>(identifierForTheSubSprite, GameAssetType.SPRITE);
+            newSpriteAsset.setResourcePayload(new AtlasSprite(new TextureAtlas.AtlasRegion(new TextureRegion(tex))));
+
+            RawAsset childSpriteRawAsset = new RawAsset(spriteFileHandle);
+            SpriteMetadata spriteMetadata = new SpriteMetadata();
+            spriteMetadata.uuid = UUID.randomUUID();
+            childSpriteRawAsset.metaData = spriteMetadata;
+            newSpriteAsset.dependentRawAssets.add(childSpriteRawAsset);
+
+            newSpriteAsset.addDependency(flipBookAssetGameAsset);
+
+            flipBookAssetGameAsset.dependentGameAssets.add(newSpriteAsset);
+
+            data.generatedSprites.add(newSpriteAsset);
+        }
+        return data;
     }
 
     private void passDependency (GameAsset<?> copiedAsset, GameAsset<?> parent, ObjectMap<String, GameAsset<?>> copiedUUIDMap) {

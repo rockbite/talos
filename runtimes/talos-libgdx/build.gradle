@@ -9,6 +9,8 @@ dependencies {
     api libs.slf4j.api
     compileOnly libs.libgdx
 
+    testImplementation libs.spine.libgdx
+    testImplementation project(":runtimes:talos")
     testImplementation libs.bongo.desktop
     testImplementation libs.visui
 

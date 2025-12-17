@@ -1,12 +1,12 @@
 package com.talosvfx.talos.editor.utils;
 
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.utils.StringBuilder;
+import com.badlogic.gdx.utils.CharArray;
 
 public class NumberUtils {
     private static final String[] formatMap = {"", "K", "M", "B", "T", "q", "Q", "s", "S", "O", "N", "d", "U", "D"}; // Add more if needed
     private static int startFormatFrom = 1000;
-    private static StringBuilder stringBuilder = new StringBuilder();
+    private static CharArray stringBuilder = new CharArray();
 
     public static CharSequence roundToDecimalPlacesText (float number, int amountOfPlaces) {
         stringBuilder.setLength(0);

@@ -89,6 +89,8 @@ public class RuntimeAssetRepository extends BaseAssetRepository {
 			return this::prefabLoader;
 		case SCENE:
 			return this::sceneLoader;
+        case FLIPBOOK:
+            return this::flipbookLoader;
 		case DIRECTORY:
 			break;
 		case TILE_PALETTE:
@@ -192,6 +194,37 @@ public class RuntimeAssetRepository extends BaseAssetRepository {
 		gameAsset.setResourcePayload("Script");
 		return (GameAsset<T>)gameAsset;
 	}
+
+    private <T> GameAsset<T> flipbookLoader (GameAssetExportStructure exportStructure, FileHandle baseFolder) {
+        if (exportStructure.identifier.equals("missing")) {
+            GameAsset<T> missingAsset = new GameAsset<>("missing", GameAssetType.FLIPBOOK);
+            missingAsset.setBroken(new Exception("Missing asset"));
+            return missingAsset;
+        }
+
+        GameAsset<FlipBookAsset> gameAsset = new GameAsset<>(exportStructure.identifier, exportStructure.type);
+
+        String first = exportStructure.relativePathsOfRawFiles.first();
+        FileHandle child = baseFolder.child(exportStructure.type.name()).child(first);
+
+        //Check our game assets, maybe we are referncing an atlas
+        ObjectSet<String> dependentGameAssets = exportStructure.dependentGameAssets;
+
+        Array<AtlasSprite> frames = new Array<>();
+        for (String dependentGameAsset : dependentGameAssets) {
+
+            GameAsset<AtlasSprite> assetForUniqueIdentifier = getAssetForUniqueIdentifier(UUID.fromString(dependentGameAsset), GameAssetType.ATLAS);
+            if (assetForUniqueIdentifier != null) {
+                AtlasSprite resource = assetForUniqueIdentifier.getResource();
+                frames.add(resource);
+            }
+        }
+        gameAsset.setResourcePayload(new FlipBookAsset(frames));
+
+//        gameAsset.setResourcePayload(new AtlasSprite(new TextureAtlas.AtlasRegion(new TextureRegion(new Texture(child)))));
+        gameAsset.dependentRawAssets.add(fakeMeta(child, FlipBookMetadata.class));
+        return (GameAsset<T>)gameAsset;
+    }
 
 	private <T> GameAsset<T> particleLoader (GameAssetExportStructure exportStructure, FileHandle baseFolder) {
 		GameAsset<BaseVFXProjectData> gameAsset = new GameAsset<>(exportStructure.identifier, exportStructure.type);
