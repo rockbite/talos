@@ -11,7 +11,7 @@ import lombok.Getter;
 
 public final class TALOS_BUILD {
   @Getter
-  private static final String version = "2.0.3-SNAPSHOT";
+  private static final String version = "2.0.4-SNAPSHOT";
 
   @Getter
   private static final String commit = "878ab54";

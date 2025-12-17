@@ -70,6 +70,6 @@ public class Config {
 
 		//Parse the release channel from versioning
 
-		new Config(new Channel("2.0.3-SNAPSHOT"));
+		new Config(new Channel("2.0.4-SNAPSHOT"));
 	}
 }
