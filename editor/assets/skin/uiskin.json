@@ -59,7 +59,9 @@
 		default: {over: button-over, disabled: button, font: default-font, fontColor: white, disabledFontColor: grey, down: button-down, up: button }
 		orange: {over: button-orange-over, disabled: button, font: default-font, fontColor: white, disabledFontColor: grey, down: button-orange-down, up: button-orange }
 		toggle: {font: default-font, fontColor: white, checked: button-down, down: button-down, up: button, over: button-over, disabled: button, disabledFontColor: grey }
-	}
+	},
+
+
 	com.badlogic.gdx.scenes.scene2d.ui.ImageButton$ImageButtonStyle: {
 		default: {down: button-down, up: button }
 		orange: {down: button-orange-down, up: button-orange }
@@ -67,6 +69,9 @@
 		chain: {checked: icon-chain-on, down: icon-chain-on, up: icon-chain-off },
 		mirror: {checked: icon-mirror-on, down: icon-mirror-on, up: icon-mirror-off },
 		settings: {down: settings-normal, up: settings-normal, over: settings-over },
+		expand-all: {imageDown: expand-all-regular, imageUp: expand-all-regular, imageOver: expand-all-over },
+		collapse-all: {imageDown: collapse-all-regular, imageUp: collapse-all-regular, imageOver: collapse-all-over },
+		reveal-location: {imageDown: reveal-location-regular, imageUp: reveal-location-regular, imageOver: reveal-location-over },
 		eye: {checked: eye, down: eye, up: no-eye }
 	}
 	com.badlogic.gdx.scenes.scene2d.ui.ImageTextButton$ImageTextButtonStyle: {
