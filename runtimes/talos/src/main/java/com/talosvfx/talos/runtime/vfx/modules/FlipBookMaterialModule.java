@@ -83,7 +83,9 @@ public class FlipBookMaterialModule extends SpriteMaterialModule implements Game
 
     @Override
     public void processCustomValues () {
+        fetchInputSlotValue(ALPHA);
         float calcAlpha = alphaInputSlot.getFloat();
+        calcAlpha = MathUtils.clamp(calcAlpha, 0, 0.99f);
 
         int calcRows = rowsValue.isEmpty() ? rowsDefaultValue : MathUtils.round(rowsValue.getFloat());
         int calcColumns = columnsValue.isEmpty() ? columnsDefaultValue : MathUtils.round(columnsValue.getFloat());

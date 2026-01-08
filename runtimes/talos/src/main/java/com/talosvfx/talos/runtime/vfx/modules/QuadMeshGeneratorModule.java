@@ -154,6 +154,39 @@ public class QuadMeshGeneratorModule extends MeshGeneratorModule {
 
 				getScope().setCurrentRequesterID(getScope().newParticleRequester());
 
+				if (materialModule instanceof FlipBookMaterialModule) {
+					//update the scope to get the right frame
+					FlipBookMaterialModule flipbook = (FlipBookMaterialModule) materialModule;
+					flipbook.processCustomValues();
+
+					TextureAtlas.AtlasSprite atlasSprite = ((SpriteMaterialModule)materialModule).getTextureRegion();
+					if (atlasSprite == null) return;
+
+					TextureAtlas.AtlasRegion atlasRegion = atlasSprite.getAtlasRegion();
+
+					float offsetX = atlasRegion.getRegionX();
+					float offsetY = atlasRegion.offsetY;
+
+					int regionWidth = atlasRegion.getRegionWidth();
+					int regionHeight = atlasRegion.getRegionHeight();
+
+					int originalWidth = atlasRegion.originalWidth;
+					int originalHeight = atlasRegion.originalHeight;
+
+					atlasOffsetScaleX = originalWidth / (float) regionWidth;
+					atlasOffsetScaleY = originalHeight / (float) regionHeight;
+
+					// Calculate the normalized offset
+					offsetXNormalized = offsetX / (float) originalWidth;
+					offsetYNormalized = offsetY / (float) originalHeight;
+
+
+					U = atlasSprite.getU();
+					U2 = atlasSprite.getU2();
+					V = atlasSprite.getV();
+					V2 = atlasSprite.getV2();
+				}
+
 				fetchInputSlotValue(SIZE);
 
 				float width = size.get(0);
