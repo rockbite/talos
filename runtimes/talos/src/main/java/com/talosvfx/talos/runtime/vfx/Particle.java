@@ -18,6 +18,7 @@ package com.talosvfx.talos.runtime.vfx;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Pool;
@@ -47,6 +48,12 @@ public class Particle implements Pool.Poolable {
     public Vector2 pivot = new Vector2();
 
     public Color color = new Color();
+
+    public Rectangle collisionRect = new Rectangle();
+    public float collisionRestitution = 1.0f;
+    public float collisionFriction = 0.0f;
+    public boolean collisionLocalSpace = false;
+    public float collisionLifetimeReduction = 1.0f;
 
     public float alpha; // alpha position from 0 to 1 in it's lifetime cycle
 
@@ -284,7 +291,97 @@ public class Particle implements Pool.Poolable {
 
         pivot.set(particleModule.getPivot());
 
+        // Update collision rect if defined
+        if (particleModule.hasCollision()) {
+            collisionRect.set(
+                particleModule.getCollisionX(),
+                particleModule.getCollisionY(),
+                particleModule.getCollisionWidth(),
+                particleModule.getCollisionHeight()
+            );
+            collisionRestitution = particleModule.getCollisionRestitution();
+            collisionFriction = particleModule.getCollisionFriction();
+            collisionLocalSpace = particleModule.isCollisionLocalSpace();
+            collisionLifetimeReduction = particleModule.getCollisionLifetimeReduction();
 
+            // Check for collision and bounce
+            handleCollision();
+        } else {
+            collisionRect.set(0, 0, 0, 0);
+        }
+
+    }
+
+    private static final float COLLISION_EPSILON = 0.001f;
+
+    private void handleCollision() {
+        if (collisionRect.width <= 0 || collisionRect.height <= 0) return;
+
+        // Get particle position based on local/world space setting
+        float particleX, particleY;
+        if (collisionLocalSpace) {
+            particleX = localPosition.x;
+            particleY = localPosition.y;
+        } else {
+            particleX = getX();
+            particleY = getY();
+        }
+
+        // Check if particle is inside the collision rectangle
+        if (collisionRect.contains(particleX, particleY)) {
+            // Calculate distances to each edge
+            float distToLeft = particleX - collisionRect.x;
+            float distToRight = (collisionRect.x + collisionRect.width) - particleX;
+            float distToBottom = particleY - collisionRect.y;
+            float distToTop = (collisionRect.y + collisionRect.height) - particleY;
+
+            // Find the minimum distance to determine which edge to bounce from
+            float minDistX = Math.min(distToLeft, distToRight);
+            float minDistY = Math.min(distToBottom, distToTop);
+
+            if (minDistX < minDistY) {
+                // Bounce horizontally - apply restitution to normal velocity
+                velocity.x = -velocity.x * collisionRestitution;
+                // Apply friction to tangent velocity (Y in this case)
+                velocity.y *= (1.0f - collisionFriction);
+
+                // Push particle outside the rectangle with small buffer to prevent re-collision
+                if (distToLeft < distToRight) {
+                    localPosition.x -= (distToLeft + COLLISION_EPSILON);
+                } else {
+                    localPosition.x += (distToRight + COLLISION_EPSILON);
+                }
+            } else {
+                // Bounce vertically - apply restitution to normal velocity
+                velocity.y = -velocity.y * collisionRestitution;
+                // Apply friction to tangent velocity (X in this case)
+                velocity.x *= (1.0f - collisionFriction);
+
+                // Push particle outside the rectangle with small buffer to prevent re-collision
+                if (distToBottom < distToTop) {
+                    localPosition.y -= (distToBottom + COLLISION_EPSILON);
+                } else {
+                    localPosition.y += (distToTop + COLLISION_EPSILON);
+                }
+            }
+
+            // Update world position after adjustment
+            worldPosition.set(localPosition);
+
+            // Apply lifetime reduction
+            // lifetimeReduction: 0 = die immediately, 1 = no change, 0.5 = halve remaining life
+            if (collisionLifetimeReduction <= 0) {
+                // Kill particle immediately
+                alpha = 1.0f;
+            } else if (collisionLifetimeReduction < 1.0f) {
+                // Reduce remaining lifetime
+                // Remaining life fraction is (1 - alpha), multiply by reduction factor
+                float remainingLifeFraction = 1.0f - alpha;
+                float reducedRemaining = remainingLifeFraction * collisionLifetimeReduction;
+                alpha = 1.0f - reducedRemaining;
+            }
+            // If lifetimeReduction == 1, no change to alpha
+        }
     }
 
 
@@ -353,5 +450,9 @@ public class Particle implements Pool.Poolable {
         int x = requesterID;
         int y = emitterReference.getEffectUniqueID();
         return ((x + y) * (x + y + 1)) / 2 + y;
+    }
+
+    public boolean hasCollision() {
+        return collisionRect.width > 0 && collisionRect.height > 0;
     }
 }

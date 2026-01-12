@@ -17,12 +17,14 @@
 package com.talosvfx.talos.runtime.vfx.modules;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.talosvfx.talos.runtime.vfx.Particle;
 import com.talosvfx.talos.runtime.vfx.ScopePayload;
+import com.talosvfx.talos.runtime.vfx.values.ModuleValue;
 import com.talosvfx.talos.runtime.vfx.values.NumericalValue;
 
 public class ParticleModule extends AbstractModule {
@@ -51,6 +53,8 @@ public class ParticleModule extends AbstractModule {
 
     public static final int PIVOT = 15;
 
+    public static final int COLLISION = 30;
+
     NumericalValue life;
     NumericalValue color;
     NumericalValue transparency;
@@ -70,7 +74,10 @@ public class ParticleModule extends AbstractModule {
 
     NumericalValue pivot;
 
+    ModuleValue<RectCollisionModule> collision;
+
     Color tmpColor = new Color();
+    Rectangle tmpRect = new Rectangle();
     Vector2 tmpVec = new Vector2();
     Vector3 tmp3Vec = new Vector3();
 
@@ -104,6 +111,8 @@ public class ParticleModule extends AbstractModule {
         transparency = createInputSlot(TRANSPARENCY);
 
         pivot = createInputSlot(PIVOT);
+
+        collision = createInputSlot(COLLISION, new ModuleValue<RectCollisionModule>());
     }
 
     @Override
@@ -273,6 +282,74 @@ public class ParticleModule extends AbstractModule {
         if(color.isEmpty()) return Color.WHITE; // defaults
         tmpColor.set(color.get(0), color.get(1), color.get(2), 1f);
         return tmpColor;
+    }
+
+    public boolean hasCollision() {
+        fetchInputSlotValue(COLLISION);
+        return collision.getModule() != null;
+    }
+
+    public RectCollisionModule getCollisionModule() {
+        fetchInputSlotValue(COLLISION);
+        return collision.getModule();
+    }
+
+    public float getCollisionX() {
+        RectCollisionModule module = getCollisionModule();
+        if (module == null) return 0;
+        return module.getX();
+    }
+
+    public float getCollisionY() {
+        RectCollisionModule module = getCollisionModule();
+        if (module == null) return 0;
+        return module.getY();
+    }
+
+    public float getCollisionWidth() {
+        RectCollisionModule module = getCollisionModule();
+        if (module == null) return 0;
+        return module.getWidth();
+    }
+
+    public float getCollisionHeight() {
+        RectCollisionModule module = getCollisionModule();
+        if (module == null) return 0;
+        return module.getHeight();
+    }
+
+    public Rectangle getCollisionRect() {
+        RectCollisionModule module = getCollisionModule();
+        if (module == null) {
+            tmpRect.set(0, 0, 0, 0);
+        } else {
+            tmpRect.set(module.getX(), module.getY(), module.getWidth(), module.getHeight());
+        }
+        return tmpRect;
+    }
+
+    public float getCollisionRestitution() {
+        RectCollisionModule module = getCollisionModule();
+        if (module == null) return 1.0f;
+        return module.getRestitution();
+    }
+
+    public float getCollisionFriction() {
+        RectCollisionModule module = getCollisionModule();
+        if (module == null) return 0.0f;
+        return module.getFriction();
+    }
+
+    public boolean isCollisionLocalSpace() {
+        RectCollisionModule module = getCollisionModule();
+        if (module == null) return false;
+        return module.isLocalSpace();
+    }
+
+    public float getCollisionLifetimeReduction() {
+        RectCollisionModule module = getCollisionModule();
+        if (module == null) return 1.0f;
+        return module.getLifetimeReduction();
     }
 
 

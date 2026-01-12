@@ -9,12 +9,17 @@ import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.graphics.glutils.HdpiUtils;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.rockbite.bongo.engine.systems.RenderPassSystem;
 import com.talosvfx.talos.editor.wrappers.IDragPointProvider;
+import com.talosvfx.talos.runtime.vfx.IEmitter;
+import com.talosvfx.talos.runtime.vfx.ParticleEmitterInstance;
+import com.talosvfx.talos.runtime.vfx.Particle;
 import lombok.Getter;
 
 import com.talosvfx.talos.runtime.utils.Supplier;
@@ -35,6 +40,9 @@ public class Preview3D extends PreviewWidget {
 
     private IDragPointProvider dragPointProvider;
     private Array<DragPoint> dragPoints = new Array<>();
+
+    private boolean drawCollisionDebug = true;
+    private Color collisionDebugColor = new Color(0f, 1f, 0f, 0.8f);
 
     public Preview3D() {
         super();
@@ -214,6 +222,11 @@ public class Preview3D extends PreviewWidget {
 
         bongoPreview.render();
 
+        // Draw collision debug rectangles
+        if (drawCollisionDebug && effectInstance != null) {
+            drawCollisionRects();
+        }
+
         Gdx.gl.glEnable(GL20.GL_SCISSOR_TEST);
 
         Supplier<Camera> currentCameraSupplier = viewportViewSettings.getCurrentCameraSupplier();
@@ -272,6 +285,42 @@ public class Preview3D extends PreviewWidget {
     @Override
     public void fileDrop(float x, float y, String[] paths) {
 
+    }
+
+    private void drawCollisionRects() {
+        Camera camera = viewportViewSettings.getCurrentCamera();
+        shapeRenderer.setProjectionMatrix(camera.combined);
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+        shapeRenderer.setColor(collisionDebugColor);
+
+        for (IEmitter emitter : effectInstance.getEmitters()) {
+            for (Particle particle : emitter.getActiveParticles()) {
+                if (particle.hasCollision()) {
+                    boolean localSpace = emitter.getParticleModule().getCollisionModule().isLocalSpace();
+                    Vector3 position = effectInstance.getPosition();
+
+                    if (localSpace) {
+                         shapeRenderer.rect(particle.collisionRect.x + position.x,
+                                 particle.collisionRect.y + position.y,
+                                 particle.collisionRect.width,
+                                 particle.collisionRect.height);
+                    } else {
+                        Rectangle rect = particle.collisionRect;
+                        shapeRenderer.rect(rect.x, rect.y, rect.width, rect.height);
+                    }
+                }
+            }
+        }
+
+        shapeRenderer.end();
+    }
+
+    public void setDrawCollisionDebug(boolean draw) {
+        this.drawCollisionDebug = draw;
+    }
+
+    public boolean isDrawCollisionDebug() {
+        return drawCollisionDebug;
     }
 
     public void registerForDragPoints(IDragPointProvider dragPointProvider) {

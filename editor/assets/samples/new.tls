@@ -78,7 +78,7 @@
 					"data": {
 						"class": "com.talosvfx.talos.runtime.modules.QuadMeshGeneratorModule",
 						"index": 3,
-						"billboard": true
+						"billboard": false
 					}
 				}
 			},

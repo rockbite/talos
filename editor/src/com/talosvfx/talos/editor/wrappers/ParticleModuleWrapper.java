@@ -69,6 +69,10 @@ public class ParticleModuleWrapper extends ModuleWrapper<ParticleModule> {
         addInputSlot("position override",  ParticleModule.POSITION_OVERRIDE);
         addInputSlot("rotation override",  ParticleModule.ROTATION_OVERRIDE);
 
+        addSeparator(true);
+
+        addInputSlot("collision",  ParticleModule.COLLISION);
+
     }
 
     @Override
@@ -78,6 +82,7 @@ public class ParticleModuleWrapper extends ModuleWrapper<ParticleModule> {
         if(slot.getIndex() == ParticleModule.PIVOT) return Vector3Module.class;
         if(slot.getIndex() == ParticleModule.COLOR) return GradientColorModule.class;
         if(slot.getIndex() == ParticleModule.TRANSPARENCY) return CurveModule.class;
+        if(slot.getIndex() == ParticleModule.COLLISION) return RectCollisionModule.class;
 
         /*
         //Mode

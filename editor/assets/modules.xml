@@ -49,6 +49,9 @@
         <module name = "Attractor" wrapper = "AttractorModuleWrapper">AttractorModule</module>
         <module name = "ForceApplier" wrapper = "ForceApplierModuleWrapper">ForceApplierModule</module>
     </category>
+    <category name = "Collision">
+        <module name = "Rect Collision" wrapper = "RectCollisionModuleWrapper">RectCollisionModule</module>
+    </category>
     <category name = "Curves and Math">
         <module name = "Curve" wrapper = "CurveModuleWrapper">CurveModule</module>
         <module name = "Interpolation" wrapper = "InterpolationWrapper">InterpolationModule</module>
