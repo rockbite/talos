@@ -327,37 +327,46 @@ public class Particle implements Pool.Poolable {
             particleY = getY();
         }
 
-        // Check if particle is inside the collision rectangle
-        if (collisionRect.contains(particleX, particleY)) {
+        // Get world scale to apply to collision rectangle
+        Vector2 worldScale = emitterReference.getWorldScale();
+        float scaleX = worldScale.x;
+        float scaleY = worldScale.y;
+
+        // Scale the collision rectangle position and size
+        float scaledX = collisionRect.x * scaleX;
+        float scaledY = collisionRect.y * scaleY;
+        float scaledWidth = collisionRect.width * scaleX;
+        float scaledHeight = collisionRect.height * scaleY;
+
+        // Check if particle point is inside the scaled collision rectangle
+        if (particleX >= scaledX && particleX <= scaledX + scaledWidth &&
+                particleY >= scaledY && particleY <= scaledY + scaledHeight) {
+
             // Calculate distances to each edge
-            float distToLeft = particleX - collisionRect.x;
-            float distToRight = (collisionRect.x + collisionRect.width) - particleX;
-            float distToBottom = particleY - collisionRect.y;
-            float distToTop = (collisionRect.y + collisionRect.height) - particleY;
+            float distToLeft = particleX - scaledX;
+            float distToRight = (scaledX + scaledWidth) - particleX;
+            float distToBottom = particleY - scaledY;
+            float distToTop = (scaledY + scaledHeight) - particleY;
 
             // Find the minimum distance to determine which edge to bounce from
             float minDistX = Math.min(distToLeft, distToRight);
             float minDistY = Math.min(distToBottom, distToTop);
 
             if (minDistX < minDistY) {
-                // Bounce horizontally - apply restitution to normal velocity
+                // Bounce horizontally
                 velocity.x = -velocity.x * collisionRestitution;
-                // Apply friction to tangent velocity (Y in this case)
                 velocity.y *= (1.0f - collisionFriction);
 
-                // Push particle outside the rectangle with small buffer to prevent re-collision
                 if (distToLeft < distToRight) {
                     localPosition.x -= (distToLeft + COLLISION_EPSILON);
                 } else {
                     localPosition.x += (distToRight + COLLISION_EPSILON);
                 }
             } else {
-                // Bounce vertically - apply restitution to normal velocity
+                // Bounce vertically
                 velocity.y = -velocity.y * collisionRestitution;
-                // Apply friction to tangent velocity (X in this case)
                 velocity.x *= (1.0f - collisionFriction);
 
-                // Push particle outside the rectangle with small buffer to prevent re-collision
                 if (distToBottom < distToTop) {
                     localPosition.y -= (distToBottom + COLLISION_EPSILON);
                 } else {
@@ -369,21 +378,15 @@ public class Particle implements Pool.Poolable {
             worldPosition.set(localPosition);
 
             // Apply lifetime reduction
-            // lifetimeReduction: 0 = die immediately, 1 = no change, 0.5 = halve remaining life
             if (collisionLifetimeReduction <= 0) {
-                // Kill particle immediately
                 alpha = 1.0f;
             } else if (collisionLifetimeReduction < 1.0f) {
-                // Reduce remaining lifetime
-                // Remaining life fraction is (1 - alpha), multiply by reduction factor
                 float remainingLifeFraction = 1.0f - alpha;
                 float reducedRemaining = remainingLifeFraction * collisionLifetimeReduction;
                 alpha = 1.0f - reducedRemaining;
             }
-            // If lifetimeReduction == 1, no change to alpha
         }
     }
-
 
     public float getAttachedPositionX () {
         return emitterReference.getEffectPosition().x + worldPosition.x;
