@@ -208,8 +208,8 @@ public class Particle implements Pool.Poolable {
                 float forcesY = forces.y;
                 float forcesZ = forces.z;
                 final Vector3 gravity = particleModule.getGravity();
-                float gravityX = gravity.x;
-                float gravityY = gravity.y;
+                float gravityX = gravity.x * worldScale.x;
+                float gravityY = gravity.y * worldScale.y;
                 float gravityZ = gravity.z;
 
                 ax += forcesX * delta;
