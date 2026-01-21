@@ -1,5 +1,6 @@
 package com.talosvfx.talos.editor.utils;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
@@ -36,6 +37,10 @@ public class Toasts {
 			setTransform(true);
 		}
 
+		@Override
+		public float getPrefWidth () {
+		return Gdx.graphics.getWidth() * 0.25f;
+		}
 	}
 
 	public static Toasts getInstance () {

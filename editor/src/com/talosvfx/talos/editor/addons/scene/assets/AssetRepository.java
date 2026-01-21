@@ -67,6 +67,7 @@ import com.talosvfx.talos.runtime.utils.TempHackUtil;
 import com.talosvfx.talos.runtime.vfx.ParticleEffectDescriptor;
 import com.talosvfx.talos.runtime.vfx.modules.AbstractModule;
 import com.talosvfx.talos.runtime.vfx.modules.FlipBookMaterialModule;
+import com.talosvfx.talos.runtime.vfx.modules.MaterialModule;
 import com.talosvfx.talos.runtime.vfx.serialization.ExportData;
 import lombok.NonNull;
 import org.slf4j.Logger;
@@ -717,6 +718,22 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
                         if (mod instanceof FlipBookMaterialModule) {
                             GameAsset<AtlasSprite> asset = ((FlipBookMaterialModule)mod).asset;
                             FlipBookModuleAsset flipBookModuleAsset = new FlipBookModuleAsset();
+                            for (GameAsset.GameAssetUpdateListener listener : asset.listeners) {
+                                //do we have any listeners that arent FlipbookMaterialModel
+                                if (!(listener instanceof FlipBookMaterialModule)) {
+                                    String message = "Flipbook Is used in mixed MaterialModules.\n" +
+                                            " This is not supported, if its a flipbook, do not use in SpriteMaterialModule.\n" +
+                                            " If its a Sprite, do not use in Flipbook\n";
+
+                                    //Lets find the vfx it might be used in
+
+                                    String nameIdentifier = vfxGameAsset.nameIdentifier;
+                                    message += " Used in VFX: " + nameIdentifier;
+
+                                    Toasts.getInstance().showErrorToast("Invalid flipbook usage, " + message);
+                                    return;
+                                }
+                            }
                             flipBookModuleAsset.module = (FlipBookMaterialModule)mod;
                             flipBookModuleAsset.vfxAsset = vfxGameAsset;
                             flipBookModuleAsset.flipBookAsset = asset;
@@ -736,6 +753,7 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
             }
         }
 
+        ObjectSet<GameAsset<?>> toRemoveBecauseFlipBookConversion = new ObjectSet<>();
         //For the flip books, we need to remove them, and convert into a flipbook asset type, which is a reference to N sprites
         for (ObjectMap.Entry<GameAsset<AtlasSprite>, FlipBookModuleAsset> flipBookSprite : flipBookSprites) {
             GameAsset<AtlasSprite> key = flipBookSprite.key;
@@ -744,7 +762,9 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
             GameAsset<VFXProjectData> vfxAsset = value.vfxAsset;
 
             //Remove the flipbook unpacked from vfx depenedencies
-            vfxAsset.dependentGameAssets.removeValue(key, true);
+            boolean removed = vfxAsset.dependentGameAssets.removeValue(key, true);
+            copiedAssets.remove(key);
+//            \toRemoveBecauseFlipBookConversion.add(key);
 
             FileHandle exportParent = getUserHomeTalosDir().child("Exports");
             String name = SharedResources.currentProject.getProjectDir().name();
@@ -763,6 +783,7 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
             FlipBookConversionData conversionData = convertFlipBooksToSprites(key, flipbooks, pixmap, rowsDefaultValue, columnsDefaultValue, splitCountDefaultValue);
             GameAsset<FlipBookAsset> flipBookAsset = conversionData.flipBookAssetGameAsset;
 
+            //this overrides the previous atlas with same id, so probs fine bro
             copiedUUIDMap.put(flipBookAsset.getRootRawAsset().metaData.uuid.toString(), flipBookAsset);
             flipBookAsset.addDependency(vfxAsset);
 
@@ -771,12 +792,17 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
             }
 
 
-            vfxAsset.dependentGameAssets.addAll(flipBookAsset);
+            vfxAsset.dependentGameAssets.add(flipBookAsset);
 
-            copiedAssets.addAll(flipBookAsset);
+            copiedAssets.add(flipBookAsset);
 
             copiedAssets.addAll(conversionData.generatedSprites);
         }
+
+//        for (GameAsset<?> gameAsset : toRemoveBecauseFlipBookConversion) {
+//            copiedAssets.remove(gameAsset);
+//        }
+
 
         //Pass down all references
         for (GameAsset<?> copiedAsset : copiedAssets) {
@@ -870,7 +896,7 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
         flipBookRootAsset.writeString("marker", false);
         RawAsset rawAsset = new RawAsset(flipBookRootAsset);
         FlipBookMetadata flipBookMetadata = new FlipBookMetadata();
-        flipBookMetadata.uuid = UUID.randomUUID();
+        flipBookMetadata.uuid = key.getRootRawAsset().metaData.uuid;
         rawAsset.metaData = flipBookMetadata;
         flipBookAssetGameAsset.dependentRawAssets.add(rawAsset);
 

@@ -25,9 +25,11 @@ import com.talosvfx.talos.runtime.vfx.ScopePayload;
 import com.talosvfx.talos.runtime.vfx.Slot;
 import com.talosvfx.talos.runtime.vfx.values.NumericalValue;
 import com.talosvfx.talos.runtime.vfx.values.Value;
+import lombok.Getter;
 
 public abstract class AbstractModule implements Json.Serializable {
 
+    @Getter
     protected ParticleEmitterDescriptor graph;
 
     protected IntMap<Slot> inputSlots = new IntMap<>();
