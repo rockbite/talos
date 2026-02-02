@@ -168,7 +168,7 @@ public class OffsetModuleWrapper extends ModuleWrapper<OffsetModule> implements 
         lowShape.setShape(module.getLowShape());
         highShape.setShape(module.getHighShape());
         lowShape.setEdge(module.getLowEdge());
-        highShape.setEdge(module.getLowEdge());
+        highShape.setEdge(module.getHighEdge());
         highShape.setSide(module.getLowSide());
         highShape.setSide(module.getHighSide());
         lockUpdate = false;
