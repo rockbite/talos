@@ -159,6 +159,7 @@ public class StripMeshGeneratorModule extends MeshGeneratorModule {
 				ParticlePointData particlePointData = pointData.get(j);
 
 				Particle fromReference = particlePointData.reference;
+                Vector2 worldScale = fromReference.getEmitter().getWorldScale();
 
 				float particleTransparency = fromReference.getEmitter().getParticleModule().getTransparency();
 
@@ -170,10 +171,16 @@ public class StripMeshGeneratorModule extends MeshGeneratorModule {
 
 				fetchAllInputSlotValues();
 
-				float width = thickness.getFloat();
+                float width = thickness.getFloat() * worldScale.x;
 
-				float scaleU = uvs.get(0);
-				float scaleV = uvs.get(1);
+                float scaleU = uvs.get(0);
+                float scaleV = uvs.get(1);
+
+                fromOffset.set(offset.get(0), offset.get(1), offset.get(2));
+
+                // Scale the offset by the world scale so relative positioning is maintained
+                fromOffset.x *= worldScale.x;
+                fromOffset.y *= worldScale.y;
 
 				fromOffset.set(offset.get(0), offset.get(1), offset.get(2));
 				fromColour.set(colour.get(0), colour.get(1), colour.get(2), 1f);
