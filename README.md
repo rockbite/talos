@@ -8,6 +8,7 @@ Prebuilt binaries:
 [Snapshot download 1.4.2-SNAPSHOT](https://editor.talosvfx.com/editor-binaries/editor-desktop-1.4.2-SNAPSHOT.jar)
 
 
+
 ![alt text](https://i.imgur.com/Fxw1Unn.jpg)
 
 Node based, open source VFX Editor with powerful interface and a ready to use libGDX runtime.
