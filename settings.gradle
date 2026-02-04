@@ -49,7 +49,7 @@ dependencyResolutionManagement {
 
             library("lombok", "org.projectlombok", "lombok").versionRef("lombok")
 
-            library("visui", "com.kotcrab.vis", "vis-ui").versionRef("visui")
+            library("visui", "com.asidik.vis", "vis-ui").versionRef("visui")
 
             library("string-similarity", "info.debatty", "java-string-similarity").versionRef("string-similarity")
 
