@@ -14,6 +14,7 @@ import com.talosvfx.talos.editor.utils.Toasts;
 import com.talosvfx.talos.runtime.assets.*;
 import com.talosvfx.talos.runtime.assets.meta.AtlasMetadata;
 import com.talosvfx.talos.runtime.assets.meta.SpriteMetadata;
+import com.talosvfx.talos.runtime.scene.Scene;
 import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -224,6 +225,9 @@ public class RepositoryOptimizer {
 		GameAsset<?> parentAsset = null;
 		boolean single;
 
+        public String debug = "";
+        public int totalAssets;
+
 		public boolean hasAllGameResourcesToRequireAsset (GameAsset asset) {
 			if (parentAsset.nameIdentifier.equals(asset.nameIdentifier)) return true;
 			return false;
@@ -257,7 +261,9 @@ public class RepositoryOptimizer {
 
 				handle.writeString("\t" + atlasSpriteGameAsset.nameIdentifier + " " + atlasSpriteGameAsset.type + "\n", true);
 			}}
-	}
+
+
+    }
 
 	public static void process (ObjectSet<GameAsset<?>> gameAssetsToExport, GameAssetsExportStructure gameAssetExportStructure, BaseAssetRepository.AssetRepositoryCatalogueExportOptions settings, Runnable runnable) {
 		OrderedSet<TextureBucket> buckets = new OrderedSet<>();
@@ -316,6 +322,32 @@ public class RepositoryOptimizer {
 			TextureBucket bucket = findOrCreateBucket(sprite, resource.getTexture(), buckets, (SpriteMetadata)sprite.getRootRawAsset().metaData);
 			bucket.texturesToPack.add(sprite);
 		}
+
+//        if (true) {
+//            logger.info("  ");
+//
+//            for (TextureBucket bucket : buckets) {
+//                if (bucket.single) {
+//                    logger.info("=== single bucket for asset {} ===", bucket.parentAsset.nameIdentifier);
+//                    logger.info(bucket.debug + "\n");
+//                    logger.info("Total assets: {}", bucket.totalAssets);
+//                    logger.info("=== end single bucket for asset {} ===", bucket.parentAsset.nameIdentifier);
+//                    continue;
+//                };
+//
+//                if (bucket.totalAssets < 10) {
+//                    logger.info("=== start bucket {} ===", bucket.identifier);
+//                    logger.info(bucket.debug + "\n");
+//                    logger.info("Total assets: {}", bucket.totalAssets);
+//                    logger.info("=== end bucket {} ===", bucket.identifier);
+//
+//                    logger.info("\n");
+//                }
+//            }
+//
+//            logger.info("  ");
+//            return;
+//        }
 
 		CompletableFuture<TextureBucket>[] futures = new CompletableFuture[buckets.size];
 
@@ -601,16 +633,30 @@ public class RepositoryOptimizer {
 
 		ObjectIntMap<GameAsset<?>> gameResourcesThatRequireMe1 = gameAsset.getGameResourcesThatRequireMe();
 
+        String dependenciesDebug = "";
+
 		GameAsset<?> highest = null;
 		int highestValue =  0;
 		for (ObjectIntMap.Entry<GameAsset<?>> gameAssetEntry : gameResourcesThatRequireMe1) {
 			int value = gameAssetEntry.value;
 			GameAsset<?> key = gameAssetEntry.key;
+
+            if (gameAssetEntry.key.type == GameAssetType.SCENE) {
+                boolean optimized = ((Scene)gameAssetEntry.key.getResource()).isOptimized();
+                if (optimized) {
+                    value += 1000000; // if its optimized, it means it has more dependencies, so we prioritize it higher
+                }
+            }
+            dependenciesDebug += "\t" + gameAssetEntry.key.nameIdentifier + ":" + gameAssetEntry.key.type + " count: " + value + "\n";
+
 			if (value > highestValue) {
 				highest = key;
 				highestValue = value;
 			}
 		}
+        if (gameResourcesThatRequireMe1.size == 0) {
+            dependenciesDebug = "\tWARNING No dependencies\n";
+        }
 
 
 		if (highest == null) {
@@ -625,13 +671,17 @@ public class RepositoryOptimizer {
 		for (TextureBucket bucket : buckets) {
 			if (bucket.single) continue;
 
-			if (bucketMatchesTextureSettings(resource, bucket)) {
+//			if (bucketMatchesTextureSettings(resource, bucket)) {
 				filteredBuckets.add(bucket);
-			}
+//			}
 		}
 
 		for (TextureBucket filteredBucket : filteredBuckets) {
 			if (filteredBucket.hasAllGameResourcesToRequireAsset(highest)) {
+
+                filteredBucket.debug += "Asset: " + gameAsset.nameIdentifier + ":" + gameAsset.type + "\n" + dependenciesDebug + "\n";
+                filteredBucket.totalAssets++;
+
 				return filteredBucket;
 			}
 		}
@@ -640,6 +690,10 @@ public class RepositoryOptimizer {
 
 		//Must create a new bucket
 		TextureBucket newBucketFromTextureSettings = createNewBucketFromTextureSettings(buckets, resource, highest);
+
+        newBucketFromTextureSettings.debug += "Asset: " + gameAsset.nameIdentifier + ":" + gameAsset.type + "\n" + dependenciesDebug + "\n";
+        newBucketFromTextureSettings.totalAssets++;
+
 		return newBucketFromTextureSettings;
 	}
 
@@ -656,10 +710,10 @@ public class RepositoryOptimizer {
 		return false;
 	}
 
-	private static RepositoryOptimizer.TextureBucket createNewBucketFromTextureSettings (ObjectSet<TextureBucket> buckets, Texture texture, GameAsset<?> highest) {
+	private static TextureBucket createNewBucketFromTextureSettings (ObjectSet<TextureBucket> buckets, Texture texture, GameAsset<?> highest) {
 		TextureBucket textureBucket = new TextureBucket();
-		textureBucket.minFilter = texture.getMinFilter();
-		textureBucket.magFilter = texture.getMagFilter();
+		textureBucket.minFilter = Texture.TextureFilter.Linear;
+		textureBucket.magFilter = Texture.TextureFilter.Linear;
 		textureBucket.identifier = "talos-pack-" + buckets.size;
 		textureBucket.packSettings = getDefaultPackSettings(textureBucket);
 		textureBucket.parentAsset = highest;
@@ -695,6 +749,7 @@ public class RepositoryOptimizer {
 		settings.stripWhitespaceY = true;
 		settings.maxWidth = 2048;
 		settings.maxHeight = 2048;
+        settings.combineSubdirectories = true;
 		settings.filterMag = bucket.magFilter;
 		settings.filterMin = bucket.minFilter;
 		settings.pot = false;
