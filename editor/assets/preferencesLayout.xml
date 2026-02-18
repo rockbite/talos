@@ -19,7 +19,7 @@
             <block name="assets" title="Assets">
                 <number name="defaultPixelPerMeter" default="100" shared-project="true">Default Pixel Per Unit</number>
                 <number name="exportPackingScale" default="1" shared-project="true">Export Packing Scale</number>
-                <boolean name = "exportPMA" default="false"  project="true">Export Premultiplied alpha</boolean>
+                <boolean name = "exportPMA" default="true"  project="true">Export Premultiplied alpha</boolean>
             </block>
         </tab>
         <tab name="guides" title="Guides, Grid &amp; Slices">

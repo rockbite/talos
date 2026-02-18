@@ -349,6 +349,59 @@ public class RepositoryOptimizer {
 //            return;
 //        }
 
+
+        //I wanna make a report!
+        class Meowy {
+            int totalPixelResolution;
+            String identifier;
+            ObjectIntMap<GameAsset<?>> parentIdentifier;
+        }
+
+        Array<Meowy> report = new Array<>();
+        for (TextureBucket bucket : buckets) {
+            ObjectSet<GameAsset<AtlasSprite>> texturesToPack = bucket.texturesToPack;
+            ObjectSet<GameAsset<TextureAtlas>> atlasesToUnpack = bucket.atlasesToUnpack;
+            for (GameAsset<AtlasSprite> atlasSpriteGameAsset : texturesToPack) {
+                Meowy meowy = new Meowy();
+                meowy.parentIdentifier = atlasSpriteGameAsset.getGameResourcesThatRequireMe();
+                meowy.identifier = atlasSpriteGameAsset.nameIdentifier;
+                Texture texture = atlasSpriteGameAsset.getResource().getTexture();
+                int height = texture.getHeight();
+                int width = texture.getWidth();
+                meowy.totalPixelResolution = width * height;
+                report.add(meowy);
+            }
+            for (GameAsset<TextureAtlas> textureAtlasGameAsset : atlasesToUnpack) {
+                Meowy meowy = new Meowy();
+                meowy.parentIdentifier = textureAtlasGameAsset.getGameResourcesThatRequireMe();
+                meowy.identifier = textureAtlasGameAsset.nameIdentifier;
+                Texture texture = textureAtlasGameAsset.getResource().getTextures().first();
+                int height = texture.getHeight();
+                int width = texture.getWidth();
+                meowy.totalPixelResolution = width * height;
+                report.add(meowy);
+            }
+        }
+
+        if (true) {
+            report.sort(new Comparator<Meowy>() {
+                @Override
+                public int compare (Meowy meowy, Meowy t1) {
+                   return -Integer.compare(meowy.totalPixelResolution, t1.totalPixelResolution);
+                }
+            });
+
+            for (Meowy meowy : report) {
+                String depDebug = "";
+                for (ObjectIntMap.Entry<GameAsset<?>> gameAssetEntry : meowy.parentIdentifier) {
+                    depDebug += "\t" + gameAssetEntry.key.nameIdentifier + " " + gameAssetEntry.key.type + "\n";
+                }
+                System.out.println("ID:" + meowy.identifier + " " +Math.sqrt(meowy.totalPixelResolution));
+                System.out.println(depDebug);
+            }
+//            return;
+        }
+
 		CompletableFuture<TextureBucket>[] futures = new CompletableFuture[buckets.size];
 
 		// mark the age of most recent file, to optimize on the next export
