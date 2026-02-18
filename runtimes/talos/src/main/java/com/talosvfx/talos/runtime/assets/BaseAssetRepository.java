@@ -20,6 +20,7 @@ public abstract class BaseAssetRepository {
 	private RuntimeContext.TalosContext talosContext;
 
 	@Getter
+	@Setter
 	public static class AssetRepositoryCatalogueExportOptions {
 		boolean forceExportAll = true;
 		private FileHandle exportScriptHandle;

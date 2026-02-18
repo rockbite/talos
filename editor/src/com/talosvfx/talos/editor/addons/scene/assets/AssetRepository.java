@@ -16,6 +16,7 @@ import com.esotericsoftware.spine.SkeletonBinary;
 import com.esotericsoftware.spine.SkeletonData;
 import com.talosvfx.talos.editor.addons.scene.apps.routines.RoutineEditorApp;
 import com.talosvfx.talos.editor.addons.scene.events.*;
+import com.talosvfx.talos.editor.addons.scene.events.save.ExportCompleteEvent;
 import com.talosvfx.talos.editor.addons.scene.events.meta.MetaDataReloadedEvent;
 import com.talosvfx.talos.editor.addons.scene.events.explorer.DirectoryMovedEvent;
 import com.talosvfx.talos.editor.data.ShaderStageData;
@@ -866,6 +867,7 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 
                     Toasts.getInstance().showInfoToast("Optimized export completed");
 
+                    Notifications.quickFire(ExportCompleteEvent.class);
                 }
             });
 
@@ -874,6 +876,8 @@ public class AssetRepository extends BaseAssetRepository implements Observer {
 
             FileHandle assetRepoExportFile = settings.getExportPathHandle().child("assetExport.json");
             assetRepoExportFile.writeString(json.toJson(gameAssetExportStructure), false);
+
+            Notifications.quickFire(ExportCompleteEvent.class);
         }
 
 

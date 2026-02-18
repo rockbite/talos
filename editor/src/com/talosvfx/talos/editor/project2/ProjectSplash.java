@@ -29,6 +29,8 @@ import com.talosvfx.talos.editor.filesystem.FileSystemInteraction;
 import com.talosvfx.talos.editor.nodes.widgets.ButtonWidget;
 import com.talosvfx.talos.editor.nodes.widgets.LabelWidget;
 import com.talosvfx.talos.editor.nodes.widgets.TextValueWidget;
+import com.talosvfx.talos.editor.project2.batch.BatchExportRunner;
+import com.talosvfx.talos.editor.project2.batch.BatchExportScript;
 import com.talosvfx.talos.editor.project2.localprefs.PrefKeys;
 import com.talosvfx.talos.editor.project2.localprefs.TalosLocalPrefs;
 import com.talosvfx.talos.editor.widgets.propertyWidgets.EditableLabelWidget;
@@ -36,6 +38,8 @@ import com.talosvfx.talos.editor.widgets.ui.common.ButtonLabel;
 import com.talosvfx.talos.editor.widgets.ui.common.ColorLibrary;
 import com.talosvfx.talos.editor.widgets.ui.common.FileOpenField;
 import com.talosvfx.talos.editor.widgets.ui.common.RoundedFlatButton;
+
+import com.badlogic.gdx.utils.Json;
 
 import java.io.File;
 
@@ -80,9 +84,33 @@ public class ProjectSplash extends Table {
 			}
 		});
 
+		ButtonLabel runScriptBtn = new ButtonLabel(SharedResources.skin.getDrawable("ic-file-blank"), "Run Script...");
+		runScriptBtn.addListener(new ClickListener() {
+			@Override
+			public void clicked (InputEvent event, float x, float y) {
+				FileSystemInteraction.instance().showFileChooser("json", new FileChooserListener() {
+					@Override
+					public void selected (Array<FileHandle> files) {
+						if (files.size == 1) {
+							FileHandle scriptFile = files.first();
+							Json json = new Json();
+							BatchExportScript script = json.fromJson(BatchExportScript.class, scriptFile);
+							if (script != null && script.projects != null && script.projects.size > 0) {
+								ProjectSplash.this.hide();
+								BatchExportRunner runner = new BatchExportRunner(script);
+								runner.start();
+							}
+						}
+					}
+				});
+			}
+		});
+
 		left.add(createTable).grow();
 		left.row();
 		left.add(openBtn).padTop(30).left().expand();
+		left.row();
+		left.add(runScriptBtn).padTop(10).left().expand();
 
 		right.add(openTable).grow().top().expand();
 
