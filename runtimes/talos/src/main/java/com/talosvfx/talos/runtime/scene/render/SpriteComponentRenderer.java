@@ -101,6 +101,7 @@ public class SpriteComponentRenderer extends ComponentRenderer<SpriteRendererCom
                     float pivotX = transformComponent.pivot.x;
                     float pivotY = transformComponent.pivot.y;
 
+
                     batch.setColor(tempColor);
                     patch.draw(batch,
                             transformComponent.worldPosition.x - pivotX * width * xSign, transformComponent.worldPosition.y - pivotY * height * ySign,
