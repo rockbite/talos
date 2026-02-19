@@ -28,9 +28,16 @@ public class SpriteComponentRenderer extends ComponentRenderer<SpriteRendererCom
 
     private Vector2 vector2 = new Vector2();
 
+    private boolean pma = false;
+
+    private Color tempColor = new Color();
 
     public SpriteComponentRenderer (GameObjectRenderer gameObjectRenderer) {
         super(gameObjectRenderer);
+    }
+
+    public void setPMA (boolean pma) {
+        this.pma = pma;
     }
 
     @Override
@@ -53,6 +60,7 @@ public class SpriteComponentRenderer extends ComponentRenderer<SpriteRendererCom
 
         AtlasSprite textureRegion = gameResource.getResource();
 
+
         if (metaData instanceof SpriteMetadata) {
             //It should be
             SpriteMetadata metadata = (SpriteMetadata) metaData;
@@ -66,7 +74,13 @@ public class SpriteComponentRenderer extends ComponentRenderer<SpriteRendererCom
 
             if (textureRegion != null) {
                 textureRegion.flip(textureRegion.isFlipX() != rendererComponent.flipX, textureRegion.isFlipY() != rendererComponent.flipY);
-                textureRegion.setColor(spriteRenderer.finalColor);
+                tempColor.set(spriteRenderer.finalColor);
+                if (pma) {
+                    tempColor.r *= tempColor.a;
+                    tempColor.g *= tempColor.a;
+                    tempColor.b *= tempColor.a;
+                }
+                textureRegion.setColor(tempColor);
 
                 final float width = spriteRenderer.size.x;
                 final float height = spriteRenderer.size.y;
@@ -87,7 +101,7 @@ public class SpriteComponentRenderer extends ComponentRenderer<SpriteRendererCom
                     float pivotX = transformComponent.pivot.x;
                     float pivotY = transformComponent.pivot.y;
 
-                    batch.setColor(rendererComponent.finalColor);
+                    batch.setColor(tempColor);
                     patch.draw(batch,
                             transformComponent.worldPosition.x - pivotX * width * xSign, transformComponent.worldPosition.y - pivotY * height * ySign,
                             pivotX * width * xSign, pivotY * height * ySign,
