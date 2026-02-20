@@ -180,7 +180,9 @@ public class Particle implements Pool.Poolable {
 
             worldPosition.set(localPosition);
             if (emitterReference.getEmitterModule().isAttached()) {
-                worldPosition.rotate(Vector3.Z, worldRotation).scl(worldScale.x);
+                worldPosition.rotate(Vector3.Z, worldRotation).scl(worldScale.x, worldScale.y, 1f);
+            } else {
+                worldPosition.scl(worldScale.x, worldScale.y, 1f);
             }
         } else {
             final Vector3 drag = particleModule.getDrag();
