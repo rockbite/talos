@@ -58,6 +58,8 @@ public class ParticleEmitterDescriptor {
 
     Array<AbstractModule> modules = new Array<>();
 
+    String name;
+
     ParticleModule particleModule;
     EmitterModule emitterModule;
     DrawableModule drawableModule;
@@ -208,6 +210,10 @@ public class ParticleEmitterDescriptor {
 
     public int getSortPosition() {
         return sortPosition;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public void setSortPosition(int sortPosition) {
