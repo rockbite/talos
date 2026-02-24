@@ -83,8 +83,9 @@ public class ParticleEffectDescriptor {
 
 		for (ExportData.EmitterExportData emitter : exportData.emitters) {
 			ParticleEmitterDescriptor emitterDescriptor = new ParticleEmitterDescriptor(this);
+            emitterDescriptor.name = emitter.name;
 
-			IntMap<AbstractModule> idMap = new IntMap<>();
+            IntMap<AbstractModule> idMap = new IntMap<>();
 
 			for (int i = 0; i < emitter.modules.size; i++) {
 				AbstractModule module = emitter.modules.get(i);
@@ -101,7 +102,6 @@ public class ParticleEffectDescriptor {
 				}
 				idMap.put(module.getIndex(), module);
 				emitterDescriptor.modules.add(module); // I cannot understand how this was working before. This is needed so that it can later reset requesters.
-                emitterDescriptor.name = emitter.name;
 			}
 
 			for (int i = 0; i < emitter.connections.size; i++) {
