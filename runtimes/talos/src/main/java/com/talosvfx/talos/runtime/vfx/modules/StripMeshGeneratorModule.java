@@ -161,7 +161,9 @@ public class StripMeshGeneratorModule extends MeshGeneratorModule {
 				Particle fromReference = particlePointData.reference;
                 Vector2 worldScale = fromReference.getEmitter().getWorldScale();
 
+				boolean pma = particleRenderer.isPMA();
 				float particleTransparency = fromReference.getEmitter().getParticleModule().getTransparency();
+				boolean additive = fromReference.getEmitter().isAdditive();
 
 				getScope().set(ScopePayload.SUB_PARTICLE_ALPHA, particlePointData.alpha);
 				getScope().set(ScopePayload.PARTICLE_SEED, fromReference.seed);
@@ -186,7 +188,18 @@ public class StripMeshGeneratorModule extends MeshGeneratorModule {
 				fromColour.set(colour.get(0), colour.get(1), colour.get(2), 1f);
 				fromTransparency = this.transparency.isEmpty() ? 1 : this.transparency.getFloat(); //default
 
-				fromColour.a = fromTransparency * particleTransparency;
+				float calcTransparency = fromTransparency * particleTransparency;
+				fromColour.a = calcTransparency;
+
+				float multiplier = pma ? calcTransparency : 1f;
+
+				if (pma && additive) {
+					this.fromColour.a = 0;
+				}
+
+				this.fromColour.r *= multiplier;
+				this.fromColour.g *= multiplier;
+				this.fromColour.b *= multiplier;
 
 				float fromColourBits = fromColour.toFloatBits();
 
