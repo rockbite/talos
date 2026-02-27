@@ -218,7 +218,7 @@ public class QuadMeshGeneratorModule extends MeshGeneratorModule {
 				this.color.set(color);
 
                 float multiplier = pma ? transparency : 1f;
-                this.color.a = transparency * multiplier;
+                this.color.a = transparency;
 
                 if (pma && additive) {
                     this.color.a = 0;
