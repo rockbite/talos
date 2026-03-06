@@ -56,6 +56,7 @@ public class GameObject implements GameObjectContainer, RoutineEventListener, Js
     private Array<RoutineEventInterface> routineEventListeners;
 
     int componentBitMask = 0;
+    private boolean hasRenderableFlag;
     boolean maskDirty = true;
 
 //BoneComponent (com.talosvfx.talos.runtime.scene.components)
@@ -162,6 +163,27 @@ public class GameObject implements GameObjectContainer, RoutineEventListener, Js
             }
             maskDirty = false;
         }
+    }
+
+    public boolean hasRenderableComponent () {
+        //check bitmask
+        recalculateBitMask();
+        return (componentBitMask & RENDERER_COMPONENT_BIT) != 0;
+    }
+
+    public RendererComponent getCachedRendererComponent () {
+        recalculateBitMask();
+        if ((componentBitMask & SPINE_RENDERER_COMPONENT_BIT) != 0) {
+            return spineComponentCache;
+        } else if ((componentBitMask & SPRITE_RENDERER_COMPONENT_BIT) != 0) {
+            return spriteComponentCache;
+        } else if ((componentBitMask & PARTICLE_COMPONENT_BIT) != 0) {
+            return particleComponentCache;
+        } else if ((componentBitMask & ROUTINE_RENDERER_COMPONENT_BIT) != 0) {
+            return routineRendererComponentCache;
+        }
+
+        return getComponentAssignableFrom(RendererComponent.class);
     }
 
     public boolean hasTransformComponent () {

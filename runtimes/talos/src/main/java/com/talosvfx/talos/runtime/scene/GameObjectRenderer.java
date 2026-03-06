@@ -108,8 +108,8 @@ public class GameObjectRenderer implements Disposable {
     }
 
     private static float getBottomY (GameObject gameObject) {
-        if (gameObject.hasComponentType(RendererComponent.class)) {
-            RendererComponent componentAssignableFrom = gameObject.getComponentAssignableFrom(RendererComponent.class);
+        if (gameObject.hasRenderableComponent()) {
+            RendererComponent componentAssignableFrom = gameObject.getCachedRendererComponent();
             TransformComponent transformComponent = gameObject.getComponent(TransformComponent.class);
 
             float y = transformComponent.worldPosition.y;
@@ -141,8 +141,8 @@ public class GameObjectRenderer implements Disposable {
     }
 
     private static SceneLayer getLayerSafe (GameObject gameObject) {
-        if (gameObject.hasComponentType(RendererComponent.class)) {
-            RendererComponent rendererComponent = gameObject.getComponentAssignableFrom(RendererComponent.class);
+        if (gameObject.hasRenderableComponent()) {
+            RendererComponent rendererComponent = gameObject.getCachedRendererComponent();
             return rendererComponent.sortingLayer;
         }
 
@@ -150,8 +150,8 @@ public class GameObjectRenderer implements Disposable {
     }
 
     public static float getDrawOrderSafe (GameObject gameObject) {
-        if (gameObject.hasComponentType(RendererComponent.class)) {
-            RendererComponent rendererComponent = gameObject.getComponentAssignableFrom(RendererComponent.class);
+        if (gameObject.hasRenderableComponent()) {
+            RendererComponent rendererComponent = gameObject.getCachedRendererComponent();
             return rendererComponent.orderingInLayer;
         }
 
@@ -188,7 +188,7 @@ public class GameObjectRenderer implements Disposable {
     }
 
     public static void debugTransforms (GameObject gameObject, int indent) {
-        if (gameObject.hasComponent(TransformComponent.class)) {
+        if (gameObject.hasTransformComponent()) {
             TransformComponent transformComponent = gameObject.getComponent(TransformComponent.class);
             CharArray builder = new CharArray();
 
@@ -225,7 +225,7 @@ public class GameObjectRenderer implements Disposable {
             builder.append(transformComponent.worldRotation);
             builder.append("\n");
 
-            if (gameObject.hasComponent(ParticleComponent.class)) {
+            if (gameObject.hasParticleComponent()) {
                 ParticleComponent particleComponent = gameObject.getComponent(ParticleComponent.class);
                 if (particleComponent.getEffectRef() != null) {
                     float worldRotation = particleComponent.getEffectRef().getWorldRotation();
@@ -310,8 +310,8 @@ public class GameObjectRenderer implements Disposable {
         }
 
         // if root has render component try mixing colors if they exist
-        if (gameObject.hasComponentType(RendererComponent.class)) {
-            final RendererComponent rendererComponent = gameObject.getComponentAssignableFrom(RendererComponent.class);
+        if (gameObject.hasRenderableComponent()) {
+            final RendererComponent rendererComponent = gameObject.getCachedRendererComponent();
 
             // check if render component has color value
             if (rendererComponent instanceof IColorHolder) {
@@ -325,8 +325,8 @@ public class GameObjectRenderer implements Disposable {
                 if (colorHolder.shouldInheritParentColor()) {
                     if (gameObject.parent != null) {
                         // check if parent contains render component
-                        if (gameObject.parent.hasComponentType(RendererComponent.class)) {
-                            final RendererComponent parentRendererComponent = gameObject.parent.getComponentAssignableFrom(RendererComponent.class);
+                        if (gameObject.parent.hasRenderableComponent()) {
+                            final RendererComponent parentRendererComponent = gameObject.parent.getCachedRendererComponent();
 
                             // check if parent render component has color value
                             if (parentRendererComponent instanceof IColorHolder) {
@@ -352,8 +352,8 @@ public class GameObjectRenderer implements Disposable {
             if (!root.active || !root.isEditorVisible()) continue;
 
             boolean childrenVisibleFlag = true;
-            if (root.hasComponentType(RendererComponent.class)) {
-                RendererComponent rendererComponent = root.getComponentAssignableFrom(RendererComponent.class);
+            if (root.hasRenderableComponent()) {
+                RendererComponent rendererComponent = root.getCachedRendererComponent();
                 childrenVisibleFlag = rendererComponent.childrenVisible;
                 if (rendererComponent.visible) {
                     list.add(root);
@@ -373,7 +373,7 @@ public class GameObjectRenderer implements Disposable {
 
         float width = 1f;
         float height = 1f;
-        if (gameObject.hasComponent(SpriteRendererComponent.class)) {
+        if (gameObject.hasSpriteComponent()) {
             SpriteRendererComponent component = gameObject.getComponent(SpriteRendererComponent.class);
             width = component.size.x;
             height = component.size.y;

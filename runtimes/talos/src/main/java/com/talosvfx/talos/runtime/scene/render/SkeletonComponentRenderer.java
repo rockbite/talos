@@ -29,6 +29,11 @@ public class SkeletonComponentRenderer extends ComponentRenderer<SpineRendererCo
     public void update (GameObject gameObject, SpineRendererComponent spineRendererComponent, float delta) {
         TransformComponent parentTransform = gameObject.getTransformComponent();
 
+        GameAsset<SkeletonData> gameResource = spineRendererComponent.getGameResource();
+        if (gameResource.isBroken()) {
+            return;
+        }
+
         spineRendererComponent.skeleton.setPosition(parentTransform.worldPosition.x, parentTransform.worldPosition.y);
         spineRendererComponent.skeleton.setScale(parentTransform.worldScale.x * spineRendererComponent.scale, parentTransform.worldScale.y * spineRendererComponent.scale);
         spineRendererComponent.skeleton.getRootBone().setRotation(parentTransform.rotation);
@@ -47,7 +52,7 @@ public class SkeletonComponentRenderer extends ComponentRenderer<SpineRendererCo
         SpineRendererComponent spineRendererComponent = gameObject.getSpineComponent();
 
         GameAsset<SkeletonData> gameResource = rendererComponent.getGameResource();
-        if (gameResource.isBroken()) {
+        if (gameResource.isBroken() || spineRendererComponent == null) {
             GameObjectRenderer.renderBrokenComponent(batch, gameObject, parentTransform);
             return;
         }

@@ -28,7 +28,7 @@ public class TransformComponent extends AComponent {
         //gameObject is null so we dont do anything
         if (gameObject == null) return vector;
 
-        if (gameObject.hasComponent(BoneComponent.class)) {
+        if (gameObject.hasBoneComponent()) {
             BoneComponent boneComponent = gameObject.getComponent(BoneComponent.class);
             Bone bone = boneComponent.getBone();
 
@@ -64,7 +64,7 @@ public class TransformComponent extends AComponent {
             return vector;
         }
 
-        if (gameObject.hasComponent(BoneComponent.class)) {
+        if (gameObject.hasBoneComponent()) {
             BoneComponent boneComponent = gameObject.getComponent(BoneComponent.class);
             Bone bone = boneComponent.getBone();
 
