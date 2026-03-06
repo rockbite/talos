@@ -56,7 +56,6 @@ public class GameObject implements GameObjectContainer, RoutineEventListener, Js
     private Array<RoutineEventInterface> routineEventListeners;
 
     int componentBitMask = 0;
-    private boolean hasRenderableFlag;
     boolean maskDirty = true;
 
 //BoneComponent (com.talosvfx.talos.runtime.scene.components)
@@ -156,7 +155,7 @@ public class GameObject implements GameObjectContainer, RoutineEventListener, Js
                     transformComponentCache = (TransformComponent) component;
                 }
 
-                if (aClass.isAssignableFrom(RendererComponent.class)) {
+                if (RendererComponent.class.isAssignableFrom(aClass)) {
                     componentBitMask |= RENDERER_COMPONENT_BIT;
                 }
 
