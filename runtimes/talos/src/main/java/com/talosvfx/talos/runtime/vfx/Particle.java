@@ -260,7 +260,7 @@ public class Particle implements Pool.Poolable {
             localPosition.set(posX, posY, posZ);
             worldPosition.set(localPosition);
             if (emitterReference.getEmitterModule().isAttached()) {
-                worldPosition.rotate(Vector3.Z, worldRotation).scl(worldScale.x);
+                worldPosition.rotate(Vector3.Z, worldRotation).scl(worldScale.x, worldScale.y, 1f);
             }
         }
 
@@ -289,6 +289,11 @@ public class Particle implements Pool.Poolable {
 
         if (emitterReference.getEmitterModule().isAligned()) {
             rotation.set(velocity);
+        }
+
+        //Hack, rotations should probably be handled better.
+        if ((worldScale.x * worldScale.y) < 0) {
+            rotation.scl(-1f);
         }
 
         pivot.set(particleModule.getPivot());
