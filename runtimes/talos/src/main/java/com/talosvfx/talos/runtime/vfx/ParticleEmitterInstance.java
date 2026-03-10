@@ -220,7 +220,7 @@ public class ParticleEmitterInstance implements IEmitter {
 
 		if(activeParticles.size == 0) {
 			if (pointData.size > 0) {
-				freePoints(this, particlePointDataPool, groupPool);
+				//	freePoints(this, particlePointDataPool, groupPool);
 			}
 			isComplete = true;
 		} else {
