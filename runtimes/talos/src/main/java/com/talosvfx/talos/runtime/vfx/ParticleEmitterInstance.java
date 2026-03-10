@@ -276,7 +276,6 @@ public class ParticleEmitterInstance implements IEmitter {
 		freePoints(this, particlePointDataPool, groupPool);
 
 		for (int i = activeParticles.size - 1; i >= 0; i--) {
-			System.out.println("updating particle " + i);
 
 			Particle particle = activeParticles.get(i);
 
@@ -290,7 +289,6 @@ public class ParticleEmitterInstance implements IEmitter {
 			}
 
 			if (particle.alpha >= 1f) {
-				System.out.println("REmoving particle " + i);
 				particle.notifyKill();
 				particlePool.free(particle);
 				activeParticles.removeIndex(i);
