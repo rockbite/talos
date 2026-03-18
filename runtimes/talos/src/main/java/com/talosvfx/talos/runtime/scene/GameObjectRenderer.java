@@ -115,16 +115,20 @@ public class GameObjectRenderer implements Disposable {
             float y = transformComponent.worldPosition.y;
 
 
+            float scaleForFakeOffset = 1f;
             if (componentAssignableFrom instanceof SpriteRendererComponent) {
                 Vector2 size = ((SpriteRendererComponent) componentAssignableFrom).size;
                 Vector2 worldScale = transformComponent.worldScale;
+
+
+                scaleForFakeOffset = worldScale.y;
 
                 float totalHeight = size.y * worldScale.y;
                 y -= totalHeight / 2f;
             }
 
             if (componentAssignableFrom instanceof RendererComponent) {
-                float fakeOffsetY = componentAssignableFrom.fakeOffsetY;
+                float fakeOffsetY = componentAssignableFrom.fakeOffsetY * scaleForFakeOffset;
                 y += fakeOffsetY;
             }
 
