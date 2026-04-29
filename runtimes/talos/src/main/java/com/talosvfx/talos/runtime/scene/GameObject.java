@@ -633,6 +633,8 @@ public class GameObject implements GameObjectContainer, RoutineEventListener, Js
         if (!calculatedBoneChildren) {
             if (boneChildren == null) {
                 boneChildren = new Array<>();
+            } else {
+                boneChildren.clear();
             }
 
             getChildrenByComponentFaster(BoneComponent.class, boneChildren);
