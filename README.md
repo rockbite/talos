@@ -1,7 +1,6 @@
 
 # Talos VFX
 
-
 Website: [https://talosvfx.com/](https://talosvfx.com/)
 Discord Server: [https://discord.gg/EQqYGcyMfr](https://discord.gg/EQqYGcyMfr)
 
