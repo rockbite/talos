@@ -1,12 +1,11 @@
 package com.talosvfx.talos.editor.utils.grid;
 
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.scenes.scene2d.Group;
+import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Align;
-import com.talosvfx.talos.TalosMain;
 import com.talosvfx.talos.editor.project2.SharedResources;
 import com.talosvfx.talos.editor.widgets.ui.ViewportWidget;
 
@@ -37,10 +36,12 @@ public class RulerRenderer extends Group {
         Skin skin = SharedResources.skin;
         xRulerTable = new Table(skin);
         xRulerTable.background("panel_input_bg");
+        xRulerTable.setTouchable(Touchable.disabled);
         addActor(xRulerTable);
 
         yRulerTable = new Table(skin);
         yRulerTable.background("panel_input_bg");
+        yRulerTable.setTouchable(Touchable.disabled);
         addActor(yRulerTable);
     }
 
